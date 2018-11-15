@@ -1,0 +1,49 @@
+######## Neuralynx Data File Header
+## File Name E:\Tamir\bat_0034\TT_Turning\2018-03-04_16-11-08\TT3.ntt
+## Time Opened (m/d/y): 3/4/2018  (h:m:s.ms) 16:11:17.904
+## Time Closed (m/d/y): 3/4/2018  (h:m:s.ms) 16:55:57.850
+
+-FileType Spike
+-FileVersion 3.3.0
+-RecordSize 304
+
+-CheetahRev 5.6.0 
+
+-HardwareSubSystemName AcqSystem1
+-HardwareSubSystemType DigitalLynxSX
+-SamplingFrequency 32000
+-ADMaxValue 32767
+-ADBitVolts 0.000000004577776380187970 0.000000004577776380187970 0.000000004577776380187970 0.000000004577776380187970
+
+-AcqEntName TT3
+-NumADChannels 4
+-ADChannel 40 41 42 43
+-InputRange 150 150 150 150
+-InputInverted True
+
+-DSPLowCutFilterEnabled True
+-DspLowCutFrequency 600
+-DspLowCutNumTaps 64
+-DspLowCutFilterType FIR
+-DSPHighCutFilterEnabled True
+-DspHighCutFrequency 6000
+-DspHighCutNumTaps 32
+-DspHighCutFilterType FIR
+-DspDelayCompensation Disabled
+-DspFilterDelay_µs 1468
+
+-WaveformLength 32
+-AlignmentPt 8
+-ThreshVal 30 30 30 30
+-MinRetriggerSamples 24
+-SpikeRetriggerTime 750
+-DualThresholding False
+
+-Feature Peak 0 0 
+-Feature Peak 1 1 
+-Feature Peak 2 2 
+-Feature Peak 3 3 
+-Feature Valley 4 0 
+-Feature Valley 5 1 
+-Feature Valley 6 2 
+-Feature Valley 7 3 

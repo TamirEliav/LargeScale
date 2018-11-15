@@ -1,0 +1,4 @@
+-FileType: CSC 
+-SamplingFrequency
+-ADMaxValue 32767 
+-ADBitVolts 0.000001
