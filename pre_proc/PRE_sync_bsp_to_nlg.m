@@ -33,21 +33,21 @@ nlg_TTL_intervals_inc = diff(nlg_TTL_intervals);
 %% plot TTL timings
 ax_h = [];
 figure
-ax_h(1) = subaxis(2,2,1);
+ax_h(1) = subplot(2,2,1);
 plot(bsp_TTL_ts_msec(2:end)*1e-3/60,bsp_TTL_intervals*1e-3,'.')
 % xlabel('Time (minutes)')
 ylabel('inter-TTL-interval (sec)')
 title('bsp TTL timings')
-ax_h(3) = subaxis(2,2,3);
+ax_h(3) = subplot(2,2,3);
 plot(bsp_TTL_ts_msec(3:end)*1e-3/60,bsp_TTL_intervals_inc,'.')
 xlabel('Time (minutes)')
 ylabel('inter-TTL-interval increament (msec)')
-ax_h(2) = subaxis(2,2,2);
+ax_h(2) = subplot(2,2,2);
 plot(nlg_TTL_ts_msec(2:end)*1e-3/60,nlg_TTL_intervals*1e-3,'.')
 title('nlg TTL timings')
 % xlabel('Time (minutes)')
 ylabel('inter-TTL-interval (sec)')
-ax_h(4) = subaxis(2,2,4);
+ax_h(4) = subplot(2,2,4);
 plot(nlg_TTL_ts_msec(3:end)*1e-3/60,nlg_TTL_intervals_inc,'.')
 xlabel('Time (minutes)')
 ylabel('inter-TTL-interval increament (msec)')

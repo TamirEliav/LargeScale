@@ -1,4 +1,4 @@
-function [exp_path exp_info] = DS_get_path(exp_ID)
+function [exp_path exp_info] = DS_get_exp_path(exp_ID)
 %% 
 % TODO: change top only one output exp with exp_path inside as a field
 

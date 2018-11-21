@@ -15,11 +15,13 @@ p.arena.balls_detect_vel_thr = 0.1;
 % p.pos.vel_max
 % p.pos.resample_fs = 100;
 
-p.flight.vel_min = 1;
-p.rest.vel_thr = 0.1;
-p.rest.duration_min = 2;
-p.rest.merge_thr = 0.5;
-p.rest.balls_margins = 0.2; % max distance to balls
+p.flight.min_duration = 1;
+p.flight.vel_thr1 = 4;
+p.flight.vel_thr2 = 1;
+% p.rest.vel_thr = 0.1;
+% p.rest.duration_min = 2;
+% p.rest.merge_thr = 0.5;
+% p.rest.balls_margins = 0.2; % max distance from balls
 
 % p.spikes.thr_std
 % p.spikes.thr_uV

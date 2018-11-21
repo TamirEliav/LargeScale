@@ -43,7 +43,7 @@ sidelobe_ratio = PKS_sorted(1) / PKS_sorted(2);
 sidelobe_dB = 20*log10(sidelobe_ratio);
 sidelobe_delay = abs(LOCS_sorted(1) - LOCS_sorted(2));
 
-subaxis(1,3,1)
+subplot(1,3,1)
 hold on
 plot(lags,c)
 plot(lags(LOCS),c(LOCS),'or')
@@ -78,7 +78,7 @@ Y = TTL_ts_2(IX_matching_TTL_2);
 p = polyfit(X,Y,1);
 p_inverse = polyfit(Y,X,1);
 
-subaxis(1,3,2)
+subplot(1,3,2)
 hold on
 plot(X,Y,'o')
 plot(X,polyval(p,X),'r')
@@ -98,7 +98,7 @@ Y = TTL_ts_2(IX_matching_TTL_2);
 p = polyfit(X,Y,1);
 p_inverse = polyfit(Y,X,1);
 
-subaxis(1,3,3)
+subplot(1,3,3)
 hold on
 plot(X,Y,'o')
 plot(X,polyval(p,X),'r')
