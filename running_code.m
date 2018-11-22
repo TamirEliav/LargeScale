@@ -11,7 +11,7 @@ clc
 % git fetch -v --dry-run
 % git remote update
 
-%%
+%% merge session ts in recording_summary to one single column
 clear
 clc
 exp_t = DS_get_exp_summary();
@@ -72,10 +72,10 @@ for ii_folder = 1:length(folders)
     dir_files = fullfile(folders(ii_folder).folder, folders(ii_folder).name,'spikes_NTT');
     files = dir(dir_files);
     files = files(~[files.isdir]);
-    file_temp = ['spikes_b' bat '_d' folders(ii_folder).name(3:end) '_'];
+    file_tmpl = ['spikes_b' bat '_d' folders(ii_folder).name(3:end) '_'];
     for ii_file = 1:length(files)
         filename_orig = fullfile(files(ii_file).folder, files(ii_file).name);
-        filename_new = strrep(filename_orig, 'spikes__', file_temp);
+        filename_new = strrep(filename_orig, 'spikes__', file_tmpl);
         [status,msg,msgID] = movefile(filename_orig,filename_new)
     end
 end
@@ -185,11 +185,24 @@ for ii_cell = 1:length(IX)
 
 end
 
-
-
-
-
-
+%% 21/11/2018 rename sorted NTT files from Shir (remove '_')
+clear
+clc
+bat = '0148';
+dir_main = ['L:\Analysis\pre_proc\SpikeSorting\' bat '\2*'];
+folders = dir(dir_main);
+for ii_folder = 1:length(folders)
+    dir_files = fullfile(folders(ii_folder).folder, folders(ii_folder).name,'spikes_NTT');
+    files = dir(dir_files);
+    files = files(~[files.isdir]);
+    file_tmpl = ['spikes_b' bat '_d' folders(ii_folder).name(3:end) '_'];
+    for ii_file = 1:length(files)
+        filename_orig = fullfile(files(ii_file).folder, files(ii_file).name);
+%         filename_new = strrep(filename_orig, '_.', '.');
+        filename_new = regexprep(filename_orig, ['spikes_\d+_bat' bat '_'], file_tmpl);
+        [status,msg,msgID] = movefile(filename_orig,filename_new)
+    end
+end
 
 %%
 
