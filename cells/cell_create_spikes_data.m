@@ -30,7 +30,7 @@ spikes.NTT_file = NTT_file;
     cell_calc_cluster_quality(Samples, IX);
 
 %% save spikes data in mat file
-filename_cell_spikes = ['L:\Analysis\Results\Cells\spikes\' cell_ID '_cell_spikes'];
+filename_cell_spikes = ['L:\Analysis\Results\cells\spikes\' cell_ID '_cell_spikes'];
 save(filename_cell_spikes, 'spikes');
 
 

@@ -11,13 +11,13 @@ cell_data=struct();
 
 %% details
 if any(contains(varargin, 'details')) | load_all
-    details = load(fullfile('L:\Analysis\Results\Cells\details',[cell_ID '_cell_details']));
+    details = load(fullfile('L:\Analysis\Results\cells\details',[cell_ID '_cell_details']));
     cell_data.details = details.details;
 end
 
 %% spikes
 if any(contains(varargin, 'spikes')) | load_all
-    spikes = load(fullfile('L:\Analysis\Results\Cells\spikes',[cell_ID '_cell_spikes']));
+    spikes = load(fullfile('L:\Analysis\Results\cells\spikes',[cell_ID '_cell_spikes']));
     cell_data.spikes = spikes.spikes;
 end
 
