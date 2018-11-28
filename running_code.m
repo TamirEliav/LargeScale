@@ -204,10 +204,101 @@ for ii_folder = 1:length(folders)
     end
 end
 
+%% 22/11/2018 calc y data inposition projection (linearization)
+IX = 10000:20000;
+IX = 20000:40000;
+plot(pos.raw.pos(IX,1),pos.raw.pos(IX,2),'.-')
+hold on
+plot(calib_tunnel.spline_fitresult)
+
 %%
+figure
+hold on
+IX = pos.proj.dir==1;
+plot(pos.proj.pos(IX,1), pos.proj.pos(IX,2),'b.');
+IX = pos.proj.dir==-1;
+plot(pos.proj.pos(IX,1), pos.proj.pos(IX,2),'r.');
+xlim([0 200])
+ylim([-1 1])
 
+%%
+figure
+hold on
+plot(pos.raw.pos(:,1),pos.raw.pos(:,2),'.b')
+plot(pos.calib_tunnel.spline_fitresult)
 
+%% 26/11/2018 structure array stuff
+clear
+clc
+subs = [1 nan 1 1 1 2 2 3  3  3]';
+val  = [8 50  8 7 8 4 3 10 9 11]';
+IX = ~isnan(subs);
+A = accumarray(subs(IX),val(IX),[],@mean)
+A = accumarray(subs(IX),val(IX),[],@median)
+A = accumarray(subs(IX),val(IX),[],@range)
 
+%% 27/11/2018 compare csaps using the indices vs. the time as X input (and how this relates to the smoothing factor)
+% csaps_p1 = 1e-6;
+csaps_p1 = 1e-8;
+% csaps_p2 = 1-1e-1000;
+interval = 1;
+fs = pos.proc_1D.fs / interval;
+t = pos.proc_1D.ts(1:interval:end);
+x = pos.proc_1D.pos(1:interval:end);
+pp1 = csaps(1:length(t), x, csaps_p1);
+% pp2 = csaps(t, x, csaps_p2);
+xpp1 = fnval(pp1, 1:length(t) );
+% xpp2 = fnval(pp2, t );
+vel = diff(x) .* fs;
+vel_pp1 = fnval(fnder(pp1), 1:length(t)).* fs;
+% vel_pp2 = fnval(fnder(pp2), t) .* 1e6;
+
+figure
+hold on
+plot(t(2:end),vel,'.k')
+plot(t,vel_pp1,'.b')
+% plot(t,vel_pp2,'.r')
+% legend({'raw';'pp1';'pp2'})
+rescale_plot_data('x',[1e-6/60 t(1)])
+xlim([42 45])
+ylim([-15 15])
+title(sprintf('fs=%d, p=%d',fs,csaps_p1))
+
+%% 27/11/2018 compare usage of my new util function get_data_in_ti
+clc
+ti = 0:100:100000;
+ti = [ti' ti'+30];
+t = rand(1,10000);
+t = normalize(t,'range', [min(ti(:)) max(ti(:))]);
+tic
+IX1 = get_data_in_ti(t,ti,1);
+toc
+tic
+IX2 = get_data_in_ti(t,ti,2);
+toc
+whos ti t IX1 IX2
+length(IX1) / length(t)
+length(IX2) / length(t)
+
+sum(sort(IX1)~=sort(IX2))
+
+%% 28/11/2018 test shir's fill holes function
+clear
+clc
+Fs = 150;
+Ts = 1/Fs;
+Ttotal = 5;
+ts = 0:Ts:Ttotal;
+
+ts(200:300) = [];
+pos = sin(2.*pi.*ts);
+ts = ts.*1e6;
+[pos_new, ts_new] = POS_fill_holes(pos, ts);
+
+figure 
+hold on
+plot(ts, pos,'k.')
+% plot(ts_new, pos_new,'.r')
 
 %% 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 

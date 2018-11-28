@@ -13,13 +13,15 @@ p.arena.balls_detect_vel_thr = 0.1;
 % p.pos.pos_max_interp
 % p.pos.vel_min
 % p.pos.vel_max
-% p.pos.resample_fs = 100;
+p.pos.resample_fs = 100; % note that the csaps smoothing parameter is dependent 
+% on the sample rate, so if you change this, you should also change the 
+% smoothing param (there is no clear linear correspondense between the fs
+% and p).
+p.pos.csaps_p = 1e-7;
 
-p.flight.min_duration = 1;
-p.flight.vel_thr1 = 4;
-p.flight.vel_thr2 = 1;
-% p.rest.vel_thr = 0.1;
-% p.rest.duration_min = 2;
+p.flight.speed_high_thr = 4;
+p.flight.speed_low_thr = 1;
+p.flight.min_duration_high_speed = 1;
 % p.rest.merge_thr = 0.5;
 % p.rest.balls_margins = 0.2; % max distance from balls
 

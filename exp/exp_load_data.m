@@ -1,4 +1,4 @@
-function exp_data = exp_load_data(varargin)
+function exp = exp_load_data(varargin)
 
 %% parse input
 if nargin == 0
@@ -7,19 +7,24 @@ if nargin == 0
 end
 load_all = nargin==1;
 exp_ID = varargin{1};
-exp_data=struct();
+exp = struct();
+
+%% path
+if any(contains(varargin, 'path')) | load_all
+    exp.path = DS_get_exp_path(exp_ID);
+end
 
 %% details
 if any(contains(varargin, 'details')) | load_all
     details = load(fullfile('L:\Analysis\Results\exp\details',[exp_ID '_exp_details']));
-    exp_data.details = details.details;
+    exp.details = details.details;
 end
 
 %% position
-% if any(contains(varargin, 'pos')) | load_all
-%     position = load(fullfile('L:\Analysis\Results\exp\position',[exp_ID '_exp_position']));
-%     exp_data.pos = position.position;
-% end
+if any(contains(varargin, 'pos')) | load_all
+    position = load(fullfile('L:\Analysis\Results\exp\position',[exp_ID '_exp_position']));
+    exp.pos = position.pos;
+end
 
 
 end
