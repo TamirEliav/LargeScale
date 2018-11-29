@@ -7,6 +7,7 @@ prm = PARAMS_GetAll();
 %% extract/load bespoon position data
 load(exp.path.bsp_tag_file);
 pos.raw = bsp_pos;
+pos.raw.fs = 1e6/median(diff(pos.raw.ts_nlg_usec));
 
 %% Linearize (project to the tunnel midline curve)
 load(exp.path.calib_tunnel_file);
@@ -21,14 +22,7 @@ pos.proj.ts = pos.raw.ts_nlg_usec;
 %% Fill holes (interp/exterp)
 pos.proc_1D.pos = pos.proj.pos(:,1)';
 pos.proc_1D.ts = pos.proj.ts';
-tic
 [pos.proc_1D.pos, pos.proc_1D.ts] = POS_fill_holes(pos.proc_1D.pos, pos.proc_1D.ts);
-toc
-
-%% TODO: more...
-% 			§ Interpolation/extrapolation
-% 			§ UPsample
-% 			§ calc Velocity (using smoothing)
 
 %% UP-sample
 Ts = 1/prm.pos.resample_fs;

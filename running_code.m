@@ -285,20 +285,30 @@ sum(sort(IX1)~=sort(IX2))
 %% 28/11/2018 test shir's fill holes function
 clear
 clc
-Fs = 150;
-Ts = 1/Fs;
-Ttotal = 5;
-ts = 0:Ts:Ttotal;
+% cell_ID = 'b0034_d180312_TT4_SS01';
+% cell = cell_load_data(cell_ID);
+% exp_ID = cell.details.exp_ID;
+exp_ID = 'b0148_d170608';
+% exp_create_position(exp_ID);
+exp = exp_load_data(exp_ID);
 
-ts(200:300) = [];
-pos = sin(2.*pi.*ts);
-ts = ts.*1e6;
-[pos_new, ts_new] = POS_fill_holes(pos, ts);
-
-figure 
+figure
 hold on
-plot(ts, pos,'k.')
-% plot(ts_new, pos_new,'.r')
+plot(exp.pos.proc_1D.ts,exp.pos.proc_1D.pos,'.k')
+fs_old = 1e6/median(diff(exp.pos.raw.ts_nlg_usec));
+fs_new = exp.pos.proc_1D.fs;
+ib = find_nearest_point(exp.pos.proc_1D.ts, exp.pos.raw.ts_nlg_usec);
+dist_from_orig_ts = abs(exp.pos.proc_1D.ts - exp.pos.raw.ts_nlg_usec(ib)');
+IX = dist_from_orig_ts >(1e6/fs_old);
+plot(exp.pos.proc_1D.ts(IX),exp.pos.proc_1D.pos(IX),'.r')
+
+%%
+figure
+hold on
+plot(1:10,'k')
+plot(10:-1:1,'r')
+h=legend({'black';'red'})
+
 
 %% 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
