@@ -8,4 +8,5 @@ for ii_exp = 1:height(exp_t)
     exp_ID = exp_t.exp_ID{ii_exp};
     fprintf('%d/%d %s\n', ii_exp, height(exp_t), exp_ID);
     exp_create_position(exp_ID);
+    exp_plot_position(exp_ID);
 end

@@ -303,12 +303,8 @@ IX = dist_from_orig_ts >(1e6/fs_old);
 plot(exp.pos.proc_1D.ts(IX),exp.pos.proc_1D.pos(IX),'.r')
 
 %%
-figure
-hold on
-plot(1:10,'k')
-plot(10:-1:1,'r')
-h=legend({'black';'red'})
-
+sdf = repelem(struct,10)
+[sdf(:).a] = disperse(1:10)
 
 %% 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
