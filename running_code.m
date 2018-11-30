@@ -271,16 +271,20 @@ ti = [ti' ti'+30];
 t = rand(1,10000);
 t = normalize(t,'range', [min(ti(:)) max(ti(:))]);
 tic
+% [IX1, IX_per_ti] = get_data_in_ti(t,ti,1);
 IX1 = get_data_in_ti(t,ti,1);
 toc
 tic
-IX2 = get_data_in_ti(t,ti,2);
+[IX2, IX_per_ti] = get_data_in_ti(t,ti,2);
 toc
 whos ti t IX1 IX2
 length(IX1) / length(t)
 length(IX2) / length(t)
 
 sum(sort(IX1)~=sort(IX2))
+
+IX_per_ti;
+cellfun(@(x)(t(x)), IX_per_ti, 'UniformOutput',false);
 
 %% 28/11/2018 test shir's fill holes function
 clear
@@ -303,8 +307,15 @@ IX = dist_from_orig_ts >(1e6/fs_old);
 plot(exp.pos.proc_1D.ts(IX),exp.pos.proc_1D.pos(IX),'.r')
 
 %%
-sdf = repelem(struct,10)
-[sdf(:).a] = disperse(1:10)
+sdf = repelem(struct,10);
+[sdf(:).a] = disperse([1:10:100;(1:10:100)+3])
+
+%%
+clc
+sdf = {[1 2 3], [11 12]};
+sdf2 = cellfun(@(x)(ones(size(x))), sdf, 'UniformOutput', false)
+% [sdf{:}]
+
 
 %% 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 

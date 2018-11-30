@@ -21,5 +21,24 @@ if any(contains(varargin, 'spikes')) | load_all
     cell_data.spikes = spikes.spikes;
 end
 
+%% RecStability
+if any(contains(varargin, 'RecStability')) | load_all
+    RecStability = load(fullfile('L:\Analysis\Results\cells\RecStability',[cell_ID '_cell_RecStability']));
+    cell_data.RecStability = RecStability.RecStability;
+end
+
+%% FE (flight epochs)
+if any(contains(varargin, 'FE')) | load_all
+    FE = load(fullfile('L:\Analysis\Results\cells\FE',[cell_ID '_cell_FE']));
+    cell_data.FE = FE.FE;
+end
+
+%% Firing rate map 
+if any(contains(varargin, 'FR_map')) | load_all
+    FR_map = load(fullfile('L:\Analysis\Results\cells\FR_map',[cell_ID '_cell_FR_map']));
+    cell_data.FR_map = FR_map.FR_map;
+end
+
+
 
 end

@@ -21,9 +21,15 @@ if any(contains(varargin, 'details')) | load_all
 end
 
 %% position
-if any(contains(varargin, 'pos')) | load_all
+if any(contains(varargin, 'position')) | load_all
     position = load(fullfile('L:\Analysis\Results\exp\position',[exp_ID '_exp_position']));
     exp.pos = position.pos;
+end
+
+%% flight
+if any(contains(varargin, 'flight')) | load_all
+    flight = load(fullfile('L:\Analysis\Results\exp\flight',[exp_ID '_exp_flight']));
+    exp.flight = flight.flight;
 end
 
 

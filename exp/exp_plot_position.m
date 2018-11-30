@@ -1,7 +1,6 @@
 function exp_plot_position(exp_ID)
 
 %% load exp data
-exp_ID = 'b0148_d170608'
 exp = exp_load_data(exp_ID,'details','position');
 prm = PARAMS_GetAll();
 
@@ -83,6 +82,7 @@ h.Units = 'normalized'; h.Position = [0.05 1]; h.HorizontalAlignment = 'Left'; h
 %% save figure
 fig_filename = fullfile('L:\Analysis\Results\exp\position', [exp_ID '_exp_position'])
 saveas(gcf,fig_filename,'tif')
+saveas(gcf,fig_filename,'fig')
 
 
 
