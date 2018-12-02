@@ -39,6 +39,18 @@ if any(contains(varargin, 'FR_map')) | load_all
     cell_data.FR_map = FR_map.FR_map;
 end
 
+%% Ipos
+if any(contains(varargin, 'Ipos')) | load_all
+    Ipos = load(fullfile('L:\Analysis\Results\cells\Ipos',[cell_ID '_cell_Ipos']));
+    cell_data.Ipos = Ipos.Ipos;
+end
 
 
 end
+
+
+
+
+
+
+
