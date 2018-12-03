@@ -1,7 +1,7 @@
 function cell_calc_Ipos(cell_ID)
 
 %% load cell/exp data
-cell = cell_load_data(cell_ID,'details','spikes','FE');
+cell = cell_load_data(cell_ID,'details','FE');
 exp = exp_load_data(cell.details.exp_ID,'details');
 
 %% params

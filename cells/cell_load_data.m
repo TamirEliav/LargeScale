@@ -45,6 +45,11 @@ if any(contains(varargin, 'Ipos')) | load_all
     cell_data.Ipos = Ipos.Ipos;
 end
 
+%% fields
+if any(contains(varargin, 'fields')) | load_all
+    fields = load(fullfile('L:\Analysis\Results\cells\fields',[cell_ID '_cell_fields']));
+    cell_data.fields = fields.fields;
+end
 
 end
 

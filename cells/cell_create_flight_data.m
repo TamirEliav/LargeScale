@@ -26,8 +26,8 @@ for ii_dir = 1:length(directions)
     spikes_vel = interp1([FE_dir.ts], [FE_dir.vel], spikes_ts, 'linear');
     spikes_ts_by_epoch    = cellfun(@(x)(cell.spikes.ts(x)),            spikes_IX_per_ti, 'UniformOutput',false);
     spikes_wvfrm_by_epoch = cellfun(@(x)(cell.spikes.waveforms(:,:,x)), spikes_IX_per_ti, 'UniformOutput',false);
-    spikes_pos_by_epoch   = cellfun(@(x)(cell.spikes.pos(x)),       spikes_IX_per_ti, 'UniformOutput',false);
-    spikes_vel_by_epoch   = cellfun(@(x)(cell.spikes.vel(x)),       spikes_IX_per_ti, 'UniformOutput',false);
+    spikes_pos_by_epoch   = cellfun(@(x)(cell.spikes.pos(x)),           spikes_IX_per_ti, 'UniformOutput',false);
+    spikes_vel_by_epoch   = cellfun(@(x)(cell.spikes.vel(x)),           spikes_IX_per_ti, 'UniformOutput',false);
     num_spikes_by_epoch = cellfun(@length, spikes_ts_by_epoch);
     
     [FE_dir(:).spikes_ts] = disperse(spikes_ts_by_epoch);
