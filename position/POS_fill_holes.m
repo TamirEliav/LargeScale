@@ -1,5 +1,4 @@
 function [bsp_full_data_pos,bsp_full_data_ts] = POS_fill_holes(raw_data_pos,raw_data_ts_usec)
-
 % raw_data - raw bsp data from one flight: with holes that we need to fill:
 %           raw_data_pos (1xN) - linearized bsp position
 %           raw_data_ts_usec (1xN) - timestamps in usec
@@ -17,6 +16,7 @@ diff_ts = diff(raw_data_ts_usec);
 min_ts_diff = median(diff_ts) + 1; %the regular dt between consecutive samples
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+warning('off', 'curvefit:fit:equationBadlyConditioned')
 %% remove repetitions in data: (consecutive samples with the exact same position)
 
 vel_TH = 2; %m/s , so we will only remove repeting smaples in the middle of
@@ -50,6 +50,7 @@ holes_size_t = raw_data_ts_usec(holes_ind_end) - raw_data_ts_usec(holes_ind_star
 if isempty(holes_ind_start)
     bsp_full_data_pos = raw_data_pos;
     bsp_full_data_ts = raw_data_ts_usec;
+    warning('off', 'curvefit:fit:equationBadlyConditioned')
     return;
 end
 
@@ -234,6 +235,7 @@ end
 
 bsp_full_data_pos = [bsp_full_data_pos raw_data_pos((holes_ind_end(end)):end)];
 bsp_full_data_ts = [bsp_full_data_ts raw_data_ts_usec((holes_ind_end(end)):end)];
+warning('off', 'curvefit:fit:equationBadlyConditioned')
 
 end
 

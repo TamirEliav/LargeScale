@@ -19,7 +19,7 @@ prm.pos.resample_fs = 100; % note that the csaps smoothing parameter is dependen
 % on the sample rate, so if you change this, you should also change the 
 % smoothing param (there is no clear linear correspondense between the fs
 % and p).
-prm.pos.csaps_p = 1e-7;
+prm.pos.csaps_p = 1e-5;
 
 prm.flight.speed_high_thr = 4;
 prm.flight.speed_low_thr = 1;

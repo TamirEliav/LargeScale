@@ -98,7 +98,7 @@ h.Units = 'normalized';
 axis off
 
 %% save figure
-fig_filename = fullfile('L:\Analysis\Results\exp\flight', [exp_ID '_exp_flight'])
+fig_filename = fullfile('L:\Analysis\Results\exp\flight', [exp_ID '_exp_flight']);
 saveas(gcf,fig_filename,'tif')
 saveas(gcf,fig_filename,'fig')
 
