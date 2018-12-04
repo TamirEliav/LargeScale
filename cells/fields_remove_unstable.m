@@ -4,13 +4,17 @@ if isempty(fields)==0
     return
 end
 
-prm.fields.min_flights_with_spikes = 5;
-prm.fields.min_flights_with_spikes_prc = 0.2;
-total_num_flights = length([fields(1).num_spikes_per_flight]);
-num_flights_thr = max(prm.fields.min_flights_with_spikes, ...
-                       prm.fields.min_flights_with_spikes_prc * total_num_flights);
+for ii_field = 1:length(fields)
+    num_flights_thr = max([prm.fields.min_flights_with_spikes, ...
+                           prm.fields.min_flights_with_spikes_prc * fields(ii_field).FE_field_pass_num]);
 
-unstable_fields = [fields.num_flights_with_spikes] < num_flights_thr;
+
+    if [fields.num_flights_with_spikes] < num_flights_thr;
+        unstable_fields_IX = [unstable_fields_IX ii_field];
+    end
+
+end
+
 fields(unstable_fields) = [];
 
 end

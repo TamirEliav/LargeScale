@@ -29,11 +29,11 @@ for ii_field = ind
     valley_loc = FR_map.bin_centers(valley_IX);
     
     if valley_loc < fields(ii_field).edges_href(2)
-        fields(ii_field).edges_href(2) = valey_loc;
+        fields(ii_field).edges_href(2) = valley_loc ;
         fields(ii_field).width_href = range(fields(ii_field).edges_href);
     end
-    if valey_loc > fields(ii_field+1).edges_href(1)
-        fields(ii_field+1).edges_href(1) = valey_loc;
+    if valley_loc > fields(ii_field+1).edges_href(1)
+        fields(ii_field+1).edges_href(1) = valley_loc;
         fields(ii_field+1).width_href = range(fields(ii_field+1).edges_href);
     end
 end

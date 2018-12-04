@@ -16,12 +16,19 @@ for ii_field = 1:length(fields)
     fields(ii_field).width_prc = range(fields(ii_field).edges_prc);
     fields(ii_field).width_std = std(fields(ii_field).spikes_pos);
     % get number of spikes in field per flight
-    IX = cellfun(@(x)(get_data_in_ti(x,field_edges)),{FE.spikes_pos},'UniformOutput',false);
-    fields(ii_field).num_spikes_per_flight = cellfun(@length, IX);
-    fields(ii_field).num_spikes_per_flight_cv = std(fields(ii_field).num_spikes_per_flight)/mean(fields(ii_field).num_spikes_per_flight);
+    % first, check if the bat passed the field in that flight! (if not set nan)
+    FE_no_field_pass_IX = cellfun(@(x)(isempty(get_data_in_ti(x,field_edges))),{FE.pos});
+    FE_field_pass_IX = ~FE_no_field_pass_IX;
+    fields(ii_field).FE_field_pass_IX = FE_field_pass_IX;
+    fields(ii_field).FE_field_pass_num = sum(FE_field_pass_IX);
+    spikes_IX = cellfun(@(x)(get_data_in_ti(x,field_edges)),{FE.spikes_pos},'UniformOutput',false);
+    fields(ii_field).num_spikes_per_flight = cellfun(@length, spikes_IX);
+    fields(ii_field).num_spikes_per_flight(FE_no_field_pass_IX) = nan;
+    fields(ii_field).num_spikes_per_flight_cv = nanstd(fields(ii_field).num_spikes_per_flight) / ...
+                                                nanmean(fields(ii_field).num_spikes_per_flight);
     fields(ii_field).num_flights_with_spikes     = sum(fields(ii_field).num_spikes_per_flight>0);
     fields(ii_field).num_flights_with_spikes_prc = sum(fields(ii_field).num_spikes_per_flight>0) / ...
-                                                   length([fields(ii_field).num_spikes_per_flight]);
+                                                   fields(ii_field).FE_field_pass_num;
 end
 
 

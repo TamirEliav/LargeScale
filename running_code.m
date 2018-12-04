@@ -316,6 +316,11 @@ sdf = {[1 2 3], [11 12]};
 sdf2 = cellfun(@(x)(ones(size(x))), sdf, 'UniformOutput', false)
 % [sdf{:}]
 
+%% 04/12/2018 - compare pos vs. csaps
+exp_ID = 'b9861_d180711'
+exp=exp_load_data(exp_ID);
+err = exp.pos.proc_1D.pos - exp.pos.proc_1D.pos_csaps;
+plot(exp.pos.proc_1D.vel_csaps,err,'.')
 
 %% 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 

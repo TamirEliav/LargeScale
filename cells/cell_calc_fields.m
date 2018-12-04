@@ -22,7 +22,7 @@ for ii_dir = 1:2
     [widths, edges] = fields_calc_width_edges(FR_map, fields, prm.fields.width_href);
     [fields(:).width_href]   = disperse(widths);
     [fields(:).edges_href]   = disperse(edges');
-    
+        
     %% remove overlapping, lower fields
     fields = fields_remove_overlaps(FR_map, fields, prm);
     

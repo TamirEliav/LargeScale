@@ -33,16 +33,19 @@ while ii_argin<nargin
     
     switch axes_str
         case 'X'
+            h.XLim = (h.XLim-offset).*gain;
             for ii_child = 1:length(h.Children)
                 hchild = h.Children(ii_child);
                 hchild.XData = (hchild.XData-offset).*gain;
             end
         case 'Y'
+            h.YLim = (h.YLim-offset).*gain;
             for ii_child = 1:length(h.Children)
                 hchild = h.Children(ii_child);
                 hchild.YData = (hchild.YData-offset).*gain;
             end
         case 'Z'
+            h.ZLim = (h.ZLim-offset).*gain;
             for ii_child = 1:length(h.Children)
                 hchild = h.Children(ii_child);
                 hchild.ZData = (hchild.ZData-offset).*gain;

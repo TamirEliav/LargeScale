@@ -1,5 +1,6 @@
 function [widths, edges] = fields_calc_width_edges(FR_map, fields, ref_height_for_width)
-    
+widths = [];
+edges = [];
 for ii_field = 1:length(fields)
     
     %% arrange data
