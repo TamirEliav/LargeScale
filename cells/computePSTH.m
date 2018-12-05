@@ -40,6 +40,7 @@ PSTH = spike_density ./ time_spent;
 %%
 sigma_PF_smoothing = 0.5;
 hsize = 1 + (5*sigma_PF_smoothing/bin_size);% %ceil(5*(param.general.sigma_PF_smoothing*3));
+hsize = round(hsize);
 alpha = hsize*bin_size/(2*sigma_PF_smoothing); %the equation is:
 % alpha = hsize/2*sigma  where sigma is in number of samples - so the sigma_PF_smoothing
 % (m) is devided by bin size (m) in order to get the sigma in number of bins unit.

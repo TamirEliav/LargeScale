@@ -19,9 +19,9 @@ for ii_dir = 1:length(directions)
     FE_dir_IX = find([exp.flight.FE.direction]==directions(ii_dir));
     FE = exp.flight.FE(FE_dir_IX);
     
-    %% add spikes data to Fe struct
+    %% add spikes data to FE struct
     ti = [FE.start_ts; FE.end_ts]';
-    [spikes_ts, spikes_IX_per_ti] = get_data_in_ti(cell.spikes.ts, ti);
+    [~, spikes_IX_per_ti] = get_data_in_ti(cell.spikes.ts, ti);
     spikes_ts_by_epoch    = cellfun(@(x)(cell.spikes.ts(x)),            spikes_IX_per_ti, 'UniformOutput',false);
     spikes_wvfrm_by_epoch = cellfun(@(x)(cell.spikes.waveforms(:,:,x)), spikes_IX_per_ti, 'UniformOutput',false);
     spikes_pos_by_epoch   = cellfun(@(x)(cell.spikes.pos(x)),           spikes_IX_per_ti, 'UniformOutput',false);

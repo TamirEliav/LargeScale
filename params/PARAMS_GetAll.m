@@ -55,6 +55,8 @@ prm.FR_map.bin_size = 0.1;
 prm.FR_map.ker_SD = 0.2;
 prm.FR_map.min_time_spent_per_meter = 0.75;
 prm.FR_map.ker_type = 'gaussian';
+prm.FR_map.shuffles_num = 1000;
+prm.FR_map.shuffles_max_shift = 30;
 
 prm.fields.FR_thr = 1;
 prm.fields.overlap_href = 0.5; % href=horizontal reference
