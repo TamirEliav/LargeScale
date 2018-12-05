@@ -16,13 +16,13 @@ for ii_dir = 1:2
     %% detect peaks
     fields = fields_detect_peaks(FR_map,prm);
     
-    %% TODO: remove fields with not enough spikes
-    
     %% Field width/edges
     [widths, edges] = fields_calc_width_edges(FR_map, fields, prm.fields.width_href);
     [fields(:).width_href]   = disperse(widths);
     [fields(:).edges_href]   = disperse(edges');
-        
+
+    %% TODO: remove fields with not enough spikes
+
     %% remove overlapping, lower fields
     fields = fields_remove_overlaps(FR_map, fields, prm);
     
