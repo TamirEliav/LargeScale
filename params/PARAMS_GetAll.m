@@ -15,6 +15,8 @@ function prm = PARAMS_GetAll()
 % prm.pos.pos_max_interp
 % prm.pos.vel_min
 % prm.pos.vel_max
+prm.pos.outliers_pos_dist_from_midline = 2;
+prm.pos.outliers_speed = 20;
 prm.pos.resample_fs = 100; % note that the csaps smoothing parameter is dependent 
 % on the sample rate, so if you change this, you should also change the 
 % smoothing param (there is no clear linear correspondense between the fs
