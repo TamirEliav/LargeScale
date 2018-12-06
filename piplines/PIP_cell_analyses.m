@@ -4,7 +4,7 @@ clc
 
 %% load cells summary and choose cells
 cells = DS_get_cells_summary();
-cells(cells.bat~=9861,:)=[];
+cells(cells.bat~=34,:)=[];
 % cells(~strcmp(cells.brain_area, 'dCA1'),:)=[];
 
 %%
@@ -18,10 +18,10 @@ for ii_cell = 1:height(cells)
         
 %     cell_create_details(cell_ID);
 %     cell_create_spikes_data(cell_ID);
-%     cell_calc_time_stability(cell_ID);
-%     cell_create_flight_data(cell_ID);
-%     cell_calc_FR_map(cell_ID);
-%     cell_calc_Ipos(cell_ID);
+    cell_calc_time_stability(cell_ID);
+    cell_create_flight_data(cell_ID);
+    cell_calc_FR_map(cell_ID);
+    cell_calc_Ipos(cell_ID);
     cell_calc_fields(cell_ID);
     cell_plot_map_fields(cell_ID);
     
