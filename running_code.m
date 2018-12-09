@@ -322,6 +322,11 @@ exp=exp_load_data(exp_ID);
 err = exp.pos.proc_1D.pos - exp.pos.proc_1D.pos_csaps;
 plot(exp.pos.proc_1D.vel_csaps,err,'.')
 
+%%
+cells_list = {'b0034_d180312_TT4_SS01';'b0034_d180312_TT4_SS03'};
+cells = cellfun(@(x)(cell_load_data(x,'details','FE','fields')), cells_list, 'UniformOutput', false);
+cells = [cells{:}];
+
 %% 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 % % % % Internal functions section  % % % % % % % % % % % % % % % % % % % % 

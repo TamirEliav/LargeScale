@@ -4,13 +4,11 @@ function POS_detect_flight(exp_ID)
 exp = exp_load_data(exp_ID,'position');
 prm = PARAMS_GetAll();
 
-%% TODO: need to re-check everything after I have the position processing of interpolation and upsampling (+adding NANs!!)
-
 %% arrange relevant data
 session_ti = exp_get_sessions_ti(exp_ID,'Behave');
 IX = get_data_in_ti(exp.pos.proc_1D.ts, session_ti);
 pos.ts = exp.pos.proc_1D.ts(IX);
-pos.pos = exp.pos.proc_1D.pos_csaps(IX);
+pos.pos = exp.pos.proc_1D.pos(IX);
 pos.vel = exp.pos.proc_1D.vel_csaps(IX);
 pos.fs = exp.pos.proc_1D.fs;
 

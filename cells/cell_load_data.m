@@ -1,4 +1,17 @@
-function cell_data = cell_load_data(varargin)
+function cell_data = cell_load_data(cell_ID, varargin)
+
+%% options to load
+field_options = {
+    'details',
+    'spikes',
+    'RecStability',
+    'FE',
+    'FR_map',
+    'Ipos',
+    'fields',
+    'shuffle',
+    'signif',
+    };
 
 %% parse input
 if nargin == 0
@@ -6,49 +19,32 @@ if nargin == 0
     return;
 end
 load_all = nargin==1;
-cell_ID = varargin{1};
+
+if load_all
+    fields2load = field_options;
+else
+	fields2load = varargin;
+end
+
+%%
 cell_data=struct();
-
-%% details
-if any(contains(varargin, 'details')) | load_all
-    details = load(fullfile('L:\Analysis\Results\cells\details',[cell_ID '_cell_details']));
-    cell_data.details = details.details;
-end
-
-%% spikes
-if any(contains(varargin, 'spikes')) | load_all
-    spikes = load(fullfile('L:\Analysis\Results\cells\spikes',[cell_ID '_cell_spikes']));
-    cell_data.spikes = spikes.spikes;
-end
-
-%% RecStability
-if any(contains(varargin, 'RecStability')) | load_all
-    RecStability = load(fullfile('L:\Analysis\Results\cells\RecStability',[cell_ID '_cell_RecStability']));
-    cell_data.RecStability = RecStability.RecStability;
-end
-
-%% FE (flight epochs)
-if any(contains(varargin, 'FE')) | load_all
-    FE = load(fullfile('L:\Analysis\Results\cells\FE',[cell_ID '_cell_FE']));
-    cell_data.FE = FE.FE;
-end
-
-%% Firing rate map 
-if any(contains(varargin, 'FR_map')) | load_all
-    FR_map = load(fullfile('L:\Analysis\Results\cells\FR_map',[cell_ID '_cell_FR_map']));
-    cell_data.FR_map = FR_map.FR_map;
-end
-
-%% Ipos
-if any(contains(varargin, 'Ipos')) | load_all
-    Ipos = load(fullfile('L:\Analysis\Results\cells\Ipos',[cell_ID '_cell_Ipos']));
-    cell_data.Ipos = Ipos.Ipos;
-end
-
-%% fields
-if any(contains(varargin, 'fields')) | load_all
-    fields = load(fullfile('L:\Analysis\Results\cells\fields',[cell_ID '_cell_fields']));
-    cell_data.fields = fields.fields;
+for ii_field = 1:length(fields2load)
+    field_name = fields2load{ii_field};
+    switch field_name
+        case field_options
+            file2load = fullfile('L:\Analysis\Results\cells', field_name, [cell_ID '_cell_' field_name '.mat']);
+            if exist(file2load,'file')
+                field_data = load(file2load);
+                cell_data.(field_name) = field_data.(field_name);
+            elseif ~load_all
+                % raise error only if the user asked for this field
+                % specifically, otherwise just load all the available
+                % fields
+                error(sprintf('field %s data does not exist for cell %s',field_name, cell_ID))
+            end
+        otherwise
+            error(sprintf('field name %s not recognized',field_name));
+    end
 end
 
 end

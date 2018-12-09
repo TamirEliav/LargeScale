@@ -14,19 +14,28 @@ load(exp.path.calib_tunnel_file);
 pos.calib_tunnel = calib_tunnel;
 pos.proj.pos = POS_calc_linearized(pos.raw.pos,calib_tunnel);
 pos.proj.ts = pos.raw.ts_nlg_usec;
+pos.proj.speed = 1e6.*[0 ;sqrt(sum(diff(pos.proj.pos,1,1).^2,2)) ./ diff(pos.proj.ts)];
 
-%% TODO: remove outliers
+%% identify outliers
 % by distance from the tunnel
-% by mismatch with adjucent points (in time), i.e. high momentray velocity/acc...
+pos.proj.outliers_pos_IX = find( abs(pos.proj.pos(:,2)) > prm.pos.outliers_pos_dist_from_midline );
+% by high momentray velocity
+pos.proj.outliers_speed_IX = find( pos.proj.speed > prm.pos.outliers_speed);
+pos.proj.outliers_IX = union(pos.proj.outliers_pos_IX, pos.proj.outliers_speed_IX);
+pos.proj.outliers_pos_dist_from_midline = prm.pos.outliers_pos_dist_from_midline;
+pos.proj.outliers_speed = prm.pos.outliers_speed;
 
-%% Fill holes (interp/exterp)
+%% create proccessed 1D data from linearized X position
 pos.proc_1D.pos = pos.proj.pos(:,1)';
 pos.proc_1D.ts = pos.proj.ts';
+pos.proc_1D.pos(pos.proj.outliers_IX) = [];
+pos.proc_1D.ts(pos.proj.outliers_IX) = [];
+
+%% Fill holes (interp/exterp)
 [pos.proc_1D.pos, pos.proc_1D.ts] = POS_fill_holes(pos.proc_1D.pos, pos.proc_1D.ts);
 
 %% UP-sample
 Ts = 1/prm.pos.resample_fs;
-% pos.proc_1D.ts = pos.raw.ts_nlg_usec(1) : Ts*1e6 : pos.raw.ts_nlg_usec(end);
 ts_upsampled = pos.proc_1D.ts(1) : Ts*1e6 : pos.proc_1D.ts(end);
 pos.proc_1D.pos = interp1(pos.proc_1D.ts, pos.proc_1D.pos, ts_upsampled);
 pos.proc_1D.ts = ts_upsampled;
