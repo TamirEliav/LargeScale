@@ -26,7 +26,7 @@ for ii_field = 1:length(fields)
     FE_PSTH_shuffle = FE_compute_PSTH_shuffle(FE_field,...
                                               prm.fields.local_shuffle.n_shuffles,...
                                               prm.fields.local_shuffle.max_shift);
-    SI_shuffle = [FE_PSTH_shuffle.FE_PSTH.SI_bits_sec];
+    SI_shuffle = [FE_PSTH_shuffle.FE_PSTH.SI_bits_spike];
     fields(ii_field).signif = FE_PSTH.SI_bits_spike > prctile(SI_shuffle,prm.fields.local_shuffle.signif_SI_prc);
    
 end
