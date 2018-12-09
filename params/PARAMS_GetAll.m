@@ -7,6 +7,7 @@ function prm = PARAMS_GetAll()
 % - Hz for sample rate
 % - Hz for firing rate
 % - radians for phase
+% - percentage in 0-100
 
 % prm.arena.balls_detect_area = [6 7; 191 192];
 % prm.arena.balls_detect_vel_thr = 0.1;
@@ -65,10 +66,19 @@ prm.fields.width_prc = [5 95];
 prm.fields.min_spikes = 10;
 prm.fields.min_flights_with_spikes = 5;
 prm.fields.min_flights_with_spikes_prc = 0.2;
+prm.fields.local_shuffle.margin = 0.5; % relative to field width
+prm.fields.local_shuffle.n_shuffles = 1000;
+prm.fields.local_shuffle.max_shift = 30;
+prm.fields.local_shuffle.signif_SI_prc = 95;
 
 prm.Ipos.time_bin_size = 0.050;
 prm.Ipos.pos_bin_size = 1;
 prm.Ipos.pos_bin_limits = [0 200];
+
+prm.signif.SI_thr = 0.5;
+prm.signif.SI_thr_shuffle = 99;
+prm.signif.odd_even_FR_map_corr_thr = 0.5;
+
 
 prm.graphics.colors.flight_directions = {...
     [0         0.4470    0.7410];...

@@ -10,6 +10,7 @@ field_options = {
     'Ipos',
     'fields',
     'shuffle',
+    'signif',
     };
 
 %% parse input

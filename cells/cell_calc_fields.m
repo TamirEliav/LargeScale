@@ -35,10 +35,10 @@ for ii_dir = 1:2
     %% remove unstable fields
     fields = fields_remove_unstable(fields, prm);
     
-    %% Remove non significant fields based on shuffling analysis.
-    
+    %% Remove non significant fields based on local shuffling analysis
+    fields = fields_find_signif(FE, fields, prm);
 
-    %%
+    %% sort fields by position
     [~,IX] = sort([fields.loc],'ascend');
     fields = fields(IX);
     fields_per_dir{ii_dir} = fields;
