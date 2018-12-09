@@ -11,7 +11,7 @@ function [p, p_inverse internals] = sync_TTL_polyfit(TTL_ts_1, TTL_ts_2, N_smoot
 if isempty(N_smoothing)
     N_smoothing = 5;
 end
-figure
+figure('units','normalized', 'position', [0 0 1 1])
 
 %% create time-series vectors
 TTL_vec_1 = zeros(1, TTL_ts_1(end)-TTL_ts_1(1)+1);

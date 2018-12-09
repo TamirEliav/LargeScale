@@ -2,9 +2,6 @@ function PRE_sync_bsp_to_nlg(bsp_dir, nlg_dir, out_dir)
 % TODO: make sure to plot figures showing good sync!
 
 %%
-% eval(expname); 
-
-%%
 % bsp_dir =  fullfile(main_dir, 'bsp');
 % nlg_dir =  fullfile(main_dir, 'nlx');
 % out_dir = fullfile(main_dir, 'sync');
