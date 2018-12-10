@@ -47,8 +47,8 @@ pos.proc_1D.pos_csaps_pp = csaps(1:length(pos.proc_1D.ts), pos.proc_1D.pos', prm
 pos.proc_1D.pos_csaps_p = prm.pos.csaps_p;
 pos.proc_1D.pos_csaps = fnval(pos.proc_1D.pos_csaps_pp, 1:length(pos.proc_1D.ts) );
 pos.proc_1D.vel_csaps = fnval( fnder(pos.proc_1D.pos_csaps_pp), 1:length(pos.proc_1D.ts)) .* prm.pos.resample_fs;
-pos.proc_1D.pos_csaps(isnan(exp.pos.proc_1D.pos)) = nan;
-pos.proc_1D.vel_csaps(isnan(exp.pos.proc_1D.pos)) = nan;
+pos.proc_1D.pos_csaps(isnan(pos.proc_1D.pos)) = nan;
+pos.proc_1D.vel_csaps(isnan(pos.proc_1D.pos)) = nan;
 
 
 %% save data to file
