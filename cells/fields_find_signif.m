@@ -1,11 +1,17 @@
 function fields = fields_find_signif(FE, fields, prm)
 
+if length(fields)==0
+    return;
+end
+    
+
 %%
-for ii_field = 1:length(fields)
+[fields(:).signif] = disperse( repelem(false,length(fields)) ); % pre-define field 'signif' to allow parfor
+parfor ii_field = 1:length(fields)
     
     %% create FE struct specifically for the flights passed through the field
     FE_field = repelem(struct(),length(FE)); % create struct
-    xi = fields(ii_field).edges_href';
+    xi = fields(ii_field).edges_href;
     xi = xi + [-1 1] .* prm.fields.local_shuffle.margin .* range(xi); % take margins around the field
     [pos_IX_per_flight,~,pos_per_flight,~] = cellfun(@get_data_in_ti, {FE.pos}, repelem({xi},length(FE)) , 'UniformOutput', false);
     ts_per_flight = cellfun(@(x,IX)(x(IX)), {FE.ts}, pos_IX_per_flight, 'UniformOutput', false);

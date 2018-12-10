@@ -52,8 +52,8 @@ prm.RecStability.BinSize = 2; % in seconds
 % prm.LFP.flight_rhythm.band = [3 10];
 % prm.LFP.flight_rhythm.resample_fs = 1000;
 
-prm.FR_map.bin_size = 0.1;
-prm.FR_map.ker_SD = 0.2;
+prm.FR_map.bin_size = 0.2;
+prm.FR_map.ker_SD = 0.5;
 prm.FR_map.min_time_spent_per_meter = 0.75;
 prm.FR_map.ker_type = 'gaussian';
 prm.FR_map.shuffles_num = 1000;

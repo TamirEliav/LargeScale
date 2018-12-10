@@ -73,17 +73,17 @@ for ii_dir = 1:2
     
     %% compare mean waveforms of the strongest channel
     pnl(2,ii_dir,1).select(); hold on;
-    all_fields_spikes_wvfrms = cat(3,fields.spikes_wvfrm);
-    [~,ch_max] = max(max(mean(all_fields_spikes_wvfrms,3)),[],2);
-    plot( mean(all_fields_spikes_wvfrms(:,ch_max,:),3) , 'k', 'LineWidth',1.5);
-    for ii_field = 1:length(fields)
-        field = fields(ii_field);
-        field_spikes_wvfrms = [field.spikes_wvfrm];
-        plot( mean(field_spikes_wvfrms(:,ch_max,:),3));
-    end
-    legend_str = cellfun(@(x)(sprintf('#%d',x)),num2cell(1:length(fields)),'UniformOutput',false);
-    legend_str = {'all fields' legend_str{:}};
-    legend(legend_str )
+%     all_fields_spikes_wvfrms = cat(3,fields.spikes_wvfrm);
+%     [~,ch_max] = max(max(mean(all_fields_spikes_wvfrms,3)),[],2);
+%     plot( mean(all_fields_spikes_wvfrms(:,ch_max,:),3) , 'k', 'LineWidth',1.5);
+%     for ii_field = 1:length(fields)
+%         field = fields(ii_field);
+%         field_spikes_wvfrms = [field.spikes_wvfrm];
+%         plot( mean(field_spikes_wvfrms(:,ch_max,:),3));
+%     end
+%     legend_str = cellfun(@(x)(sprintf('#%d',x)),num2cell(1:length(fields)),'UniformOutput',false);
+%     legend_str = {'all fields' legend_str{:}};
+%     legend(legend_str )
     
     %% plot each field spikes seperaetly
     for ii_field = 1:length(fields)

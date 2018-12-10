@@ -1,9 +1,5 @@
 function cell_create_spikes_data(cell_ID)
 
-%% TODO: TEMP - load data in mat files from Shir
-% filename_data_shir = ['L:\Analysis\from_Shir_20181011\Wild_cells_rearranged\', 'cell_data_' cell_ID '.mat'];
-% load(filename_data_shir, 'spikes');
-
 %% load cell details
 cell_data = cell_load_data(cell_ID,'details');
 
@@ -25,9 +21,10 @@ spikes.ts = Timestamps(IX);
 spikes.waveforms = Samples(:,:,IX);
 spikes.NTT_file = NTT_file;
  
-% add some further information about the spikes
-[spikes.L_Ratio,spikes.Isolation_dis,spikes.features_space] = ...
+% add cluster quality info
+[spikes.L_Ratio, spikes.Isolation_dis, features_space] = ...
     cell_calc_cluster_quality(Samples, IX);
+% spikes.features_space = features_space(IX);
 
 %% save spikes data in mat file
 filename_cell_spikes = ['L:\Analysis\Results\cells\spikes\' cell_ID '_cell_spikes'];

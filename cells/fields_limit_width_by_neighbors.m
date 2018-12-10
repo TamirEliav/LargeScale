@@ -12,15 +12,16 @@ end
 fields = fields(IX);
 
 %%
-fields_edges = cat(2,fields.edges_href);
-checkEdges = (fields_edges(1,2:end) - fields_edges(2,1:end-1))<0;
+fields_edges = cat(1,fields.edges_href);
+checkEdges = (fields_edges(2:end,1) - fields_edges(1:end-1,1))<0;
 ind = find(checkEdges);
 %field i left border minus field i-1 right border. if it's  smalller
 %than 0 then, the field i overlap with field i-1.
 % TODO: there is an option for bug/undefined condition here! because:
 % (1) we only compare neighboring fields
 % (2) we don't consider the option of field inside another field (like we did in the overlap function...)
-for ii_field = ind
+for ii_ind = 1:length(ind)
+    ii_field = ind(ii_ind);
     win_edges = [fields(ii_field).loc fields(ii_field+1).loc];
     PSTH_win_IX = get_data_in_ti(FR_map.bin_centers, win_edges);
     PSTH_win = nan(size(FR_map.PSTH));

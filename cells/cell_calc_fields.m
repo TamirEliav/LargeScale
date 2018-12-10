@@ -19,7 +19,7 @@ for ii_dir = 1:2
     %% Field width/edges
     [widths, edges] = fields_calc_width_edges(FR_map, fields, prm.fields.width_href);
     [fields(:).width_href]   = disperse(widths);
-    [fields(:).edges_href]   = disperse(edges');
+    [fields(:).edges_href]   = disperse(edges);
 
     %% TODO: remove fields with not enough spikes
 

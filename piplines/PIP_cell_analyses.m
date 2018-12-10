@@ -3,22 +3,22 @@ clear
 clc
 
 %% load cells summary and choose cells
-cells = DS_get_cells_summary();
-cells(cells.bat~=34,:)=[];
-% cells(~strcmp(cells.brain_area, 'dCA1'),:)=[];
+cells_t = DS_get_cells_summary();
+cells_t(~ismember(cells_t.bat, [79,148,34,9861,2289] ),:) = [];
+cells_t(~strcmp(cells_t.brain_area, 'dCA1'),:)=[];
 
 %%
-for ii_cell = 1:height(cells)
+for ii_cell = 1:height(cells_t)
     %%
-    cell_ID = cells.cell_ID{ii_cell};
-    fprintf('cell %d/%d %s\n', ii_cell, height(cells), cell_ID);
+    cell_ID = cells_t.cell_ID{ii_cell};
+    fprintf('cell %d/%d %s\n', ii_cell, height(cells_t), cell_ID);
     
     %%
     try
         
-%     cell_create_details(cell_ID);
-%     cell_create_spikes_data(cell_ID);
-%     cell_calc_time_stability(cell_ID);
+    cell_create_details(cell_ID);
+    cell_create_spikes_data(cell_ID);
+    cell_calc_time_stability(cell_ID);
     cell_create_flight_data(cell_ID);
     cell_calc_FR_map(cell_ID);
     cell_calc_FR_map_shuffles(cell_ID);
@@ -31,6 +31,6 @@ for ii_cell = 1:height(cells)
         disp(err)
     end
     
-%     close all
+    close all
     
 end

@@ -327,6 +327,19 @@ cells_list = {'b0034_d180312_TT4_SS01';'b0034_d180312_TT4_SS03'};
 cells = cellfun(@(x)(cell_load_data(x,'details','FE','fields')), cells_list, 'UniformOutput', false);
 cells = [cells{:}];
 
+%%
+% edges = [1 2; 3 4; 5 6]'
+edges = {[1 2],[3 4],[5 6]}
+sdf = repelem(struct(),3);
+[sdf(:).width] = disperse([1 2 3]);
+[sdf(:).edges] = disperse(edges);
+% sdf.width
+sdf.edges
+
+%%
+edges = [1 2; 3 4; 5 6]
+edges = num2cell(edges,2)
+
 %% 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 % % % % Internal functions section  % % % % % % % % % % % % % % % % % % % % 

@@ -1,16 +1,16 @@
 function fields = fields_add_spikes_data(FE,FR_map,fields,prm)
 
 for ii_field = 1:length(fields)
-    field_edges = [fields(ii_field).edges_href]';
+    field_edges = fields(ii_field).edges_href;
     IX = get_data_in_ti([FE.spikes_pos], field_edges);
     spikes_ts  = [FE.spikes_ts];
     spikes_pos = [FE.spikes_pos];
     spikes_vel = [FE.spikes_vel];
-    spikes_wvfrm = cat(3,FE.spikes_wvfrm);
+%     spikes_wvfrm = cat(3,FE.spikes_wvfrm);
     fields(ii_field).spikes_ts = spikes_ts(IX);
     fields(ii_field).spikes_pos = spikes_pos(IX);
     fields(ii_field).spikes_vel = spikes_vel(IX);
-    fields(ii_field).spikes_wvfrm = spikes_wvfrm(:,:,IX);
+%     fields(ii_field).spikes_wvfrm = spikes_wvfrm(:,:,IX);
     % calc field size based on spikes
     fields(ii_field).edges_prc = prctile(fields(ii_field).spikes_pos, prm.fields.width_prc);
     fields(ii_field).width_prc = range(fields(ii_field).edges_prc);

@@ -56,6 +56,8 @@ for ii_field = 1:length(fields)
     edges(ii_field,:) = interp1(1:length(FR_map.bin_centers), FR_map.bin_centers, field_edges_bin);
 end
 
+edges = num2cell(edges,2);
+
 end
 
 

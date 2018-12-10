@@ -2,7 +2,7 @@ function FE_PSTH_shuffle = FE_compute_PSTH_shuffle(FE_data,n_shuffles, shuffles_
 
 rng(0);
 FE_PSTH_all_shuffles = {};
-for ii_shuffle = 1:n_shuffles
+parfor ii_shuffle = 1:n_shuffles
     %% create FE from real data with shuffled spikes ts (circular shuffle per flight!)
     FE = FE_data;
     ti = cellfun(@(x,y)([x;y]),{FE.start_ts},{FE.end_ts},'UniformOutput',false);
