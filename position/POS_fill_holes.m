@@ -50,7 +50,7 @@ holes_size_t = raw_data_ts_usec(holes_ind_end) - raw_data_ts_usec(holes_ind_star
 if isempty(holes_ind_start)
     bsp_full_data_pos = raw_data_pos;
     bsp_full_data_ts = raw_data_ts_usec;
-    warning('off', 'curvefit:fit:equationBadlyConditioned')
+    warning('on', 'curvefit:fit:equationBadlyConditioned')
     return;
 end
 
@@ -235,7 +235,7 @@ end
 
 bsp_full_data_pos = [bsp_full_data_pos raw_data_pos((holes_ind_end(end)):end)];
 bsp_full_data_ts = [bsp_full_data_ts raw_data_ts_usec((holes_ind_end(end)):end)];
-warning('off', 'curvefit:fit:equationBadlyConditioned')
+warning('on', 'curvefit:fit:equationBadlyConditioned')
 
 end
 

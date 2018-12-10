@@ -54,7 +54,12 @@ function FE_PSTH = FE_PSTH_compute_AC(FE_PSTH)
     lags = lags .* FE_PSTH.bin_size;
     
     [~,~,w,~] = findpeaks(c,'SortStr', 'descend');
-    AC_width = w(1) .* FE_PSTH.bin_size;
+    if ~isempty(w)
+        AC_width = w(1) .* FE_PSTH.bin_size;
+    else
+        AC_width = nan;
+    end
+    
     
     FE_PSTH.AC.c = c;
     FE_PSTH.AC.lags = lags;

@@ -340,6 +340,38 @@ sdf.edges
 edges = [1 2; 3 4; 5 6]
 edges = num2cell(edges,2)
 
+%%
+cells=cellfun(@(x)(cell_load_data(x,'details','fields','FR_map','Ipos','RecStability','signif')), cells_t.cell_ID,'UniformOutput', false);
+cells = [cells{:}];
+num_fields = cellfun(@(x)([length(x{1}) length(x{2})]),{cells.fields}, 'UniformOutput', false);
+num_fields = cat(1,num_fields{:});
+figure
+plot(num_fields(:,1), num_fields(:,2), '.')
+
+%%
+signif = cellfun(@(x)([x(:).TF]),{cells.signif}, 'UniformOutput', false);
+signif = cat(1,signif{:});
+
+%%
+FR_maps = cellfun(@(x)([x(:).all]),{cells.FR_map}, 'UniformOutput', false);
+FR_maps = cat(1,FR_maps{:});
+SI_bits_spike  = arrayfun(@(x)(x.SI_bits_spike), FR_maps)
+plot(SI_bits_spike(:,1),SI_bits_spike(:,2),'.')
+axis equal
+refline(1,0)
+xlim([0 8])
+ylim([0 8])
+xlabel('SI direction 1 (bits/spike)')
+ylabel('SI direction 2 (bits/spike)')
+title('comparing spatial info between flight directions')
+saveas(gcf,'L:/Analysis/Results/comparing spatial info between flight directions','tif');
+
+%%
+fields1 = cellfun(@(x)(x{1}),{cells.fields}, 'UniformOutput', false)
+cellfun(@(x)( sum([x.width_prc]) ), cells(:).fields{1}, 'UniformOutput', false);
+% sum([sdf.width_prc])
+% fields_total_area = sum(arrayfun(@(x)(x.width_prc), sdf))
+
 %% 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 % % % % Internal functions section  % % % % % % % % % % % % % % % % % % % % 
