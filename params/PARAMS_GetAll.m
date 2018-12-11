@@ -36,7 +36,7 @@ prm.flight.high_speed_min_duration = 1;
 % prm.spikes.lockout_time_usec;
 % prm.spikes.noise_coincidence_win_msec
 
-prm.RecStability.BinSize = 2; % in seconds
+prm.RecStability.BinSize = 4; % in minutes
 
 % prm.oscillations.time_AC.bin_size = 0.010;
 % prm.oscillations.time_AC.win_size = 2;

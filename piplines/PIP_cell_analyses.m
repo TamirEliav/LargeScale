@@ -25,6 +25,7 @@ try
 %     cell_calc_Ipos(cell_ID);
 %     cell_calc_fields(cell_ID);
 %     cell_calc_significant(cell_ID);
+%     cell_calc_mean_FR(cell_ID)
     cell_plot_map_fields(cell_ID);
     toc
     
@@ -32,6 +33,6 @@ catch err
     disp(err)
 end
     
-    close all
+%     close all
     
 end
