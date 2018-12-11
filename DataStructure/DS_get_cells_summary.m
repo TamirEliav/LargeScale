@@ -1,9 +1,9 @@
 function cells_t = DS_get_cells_summary()
 
     %%
-    cells_data_file = 'L:\Analysis\Code\inclusion_lists\SfN_2018_Shir_sorting';
-%     opt = 'ReadFromExcel';
-    opt = 'ReadFromMat';
+    cells_data_file = 'L:\Analysis\Code\inclusion_lists\cells_summary';
+    opt = 'ReadFromExcel';
+%     opt = 'ReadFromMat';
     
     %%
     switch opt
