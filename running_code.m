@@ -345,8 +345,20 @@ cells=cellfun(@(x)(cell_load_data(x,'details','fields','FR_map','Ipos','RecStabi
 cells = [cells{:}];
 num_fields = cellfun(@(x)([length(x{1}) length(x{2})]),{cells.fields}, 'UniformOutput', false);
 num_fields = cat(1,num_fields{:});
+
+%%
 figure
-plot(num_fields(:,1), num_fields(:,2), '.')
+plot_std = 0.1;
+plot(   num_fields(:,1)+plot_std.*randn(size(num_fields,1),1),...
+        num_fields(:,2)+plot_std.*randn(size(num_fields,1),1),    '.')
+axis equal
+refline(1,0)
+xlim([0 20])
+ylim([0 20])
+xlabel('#fields direction 1')
+ylabel('#fields direction 2')
+title('comparing number of fields between flight directions')
+saveas(gcf,'L:/Analysis/Results/comparing number of fields between flight directions','tif');
 
 %%
 signif = cellfun(@(x)([x(:).TF]),{cells.signif}, 'UniformOutput', false);
@@ -371,6 +383,23 @@ fields1 = cellfun(@(x)(x{1}),{cells.fields}, 'UniformOutput', false)
 cellfun(@(x)( sum([x.width_prc]) ), cells(:).fields{1}, 'UniformOutput', false);
 % sum([sdf.width_prc])
 % fields_total_area = sum(arrayfun(@(x)(x.width_prc), sdf))
+
+%%
+clc
+pnl = panel();
+pnl.pack(2,3)
+sdf1=pnl.ch
+sdf2=pnl.de
+pnl.select('all')
+pnl.identify()
+cellfun(@(x)(x.axis),sdf2,'UniformOutput',false)
+sdf2(cellfun(@(x)(isempty(x.axis)),sdf2)) = []
+% arrayfun(@(ax)({ax.Position(3:4) = [0.2 0.2]}), pnl.de.axis)
+% for ii_ax = 1:length(pnl.de.axis)
+%     ax = pnl.de.axis(ii_ax)
+%     ax.Position(3:4) = [0.2 0.2]
+% end
+
 
 %% 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 

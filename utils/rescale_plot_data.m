@@ -36,19 +36,34 @@ while ii_argin<nargin
             h.XLim = (h.XLim-offset).*gain;
             for ii_child = 1:length(h.Children)
                 hchild = h.Children(ii_child);
-                hchild.XData = (hchild.XData-offset).*gain;
+                switch class(hchild)
+                    case {'matlab.graphics.chart.primitive.Line','matlab.graphics.chart.primitive.Bar'}
+                        hchild.XData = (hchild.XData-offset).*gain;
+                    case 'matlab.graphics.primitive.Text'
+                        hchild.Position(1) = (hchild.Position(1)-offset).*gain;
+                end
             end
         case 'Y'
             h.YLim = (h.YLim-offset).*gain;
             for ii_child = 1:length(h.Children)
                 hchild = h.Children(ii_child);
-                hchild.YData = (hchild.YData-offset).*gain;
+                switch class(hchild)
+                    case {'matlab.graphics.chart.primitive.Line','matlab.graphics.chart.primitive.Bar'}
+                        hchild.YData = (hchild.YData-offset).*gain;
+                    case 'matlab.graphics.primitive.Text'
+                        hchild.Position(2) = (hchild.Position(2)-offset).*gain;
+                end
             end
         case 'Z'
             h.ZLim = (h.ZLim-offset).*gain;
             for ii_child = 1:length(h.Children)
                 hchild = h.Children(ii_child);
-                hchild.ZData = (hchild.ZData-offset).*gain;
+                switch class(hchild)
+                    case {'matlab.graphics.chart.primitive.Line','matlab.graphics.chart.primitive.Bar'}
+                        hchild.ZData = (hchild.ZData-offset).*gain;
+                    case 'matlab.graphics.primitive.Text'
+                        hchild.Position(3) = (hchild.Position(3)-offset).*gain;
+                end
             end
     end
     ii_argin = ii_argin+2;
