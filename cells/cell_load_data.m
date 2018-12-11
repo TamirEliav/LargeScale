@@ -12,6 +12,7 @@ field_options = {
     'shuffle',
     'signif',
     'meanFR',
+    'stats',
     };
 
 %% parse input

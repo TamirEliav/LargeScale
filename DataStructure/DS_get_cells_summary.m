@@ -9,7 +9,7 @@ function cells_t = DS_get_cells_summary()
     switch opt
         case 'ReadFromExcel'
             cells_t = readtable([cells_data_file '.xlsx'], 'ReadRowNames',1);
-            save(cells_data_file, 'cells_t');
+%             save(cells_data_file, 'cells_t');
         case 'ReadFromMat'
             load(cells_data_file, 'cells_t');
     end
