@@ -400,18 +400,46 @@ sdf2(cellfun(@(x)(isempty(x.axis)),sdf2)) = []
 %     ax.Position(3:4) = [0.2 0.2]
 % end
 
-
-%% 
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
-% % % % Internal functions section  % % % % % % % % % % % % % % % % % % % % 
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
-
-
-
-
-
-
-
+%%
+exp_ID ='b0034_d180312';
+% exp=exp_load_data(exp_ID);
+prm = PARAMS_GetAll();
+pos = exp.pos.proj.pos;
+ts = exp.pos.proj.ts;
+pos(exp.pos.proj.outliers_IX,:)=[];
+ts(exp.pos.proj.outliers_IX)=[];
+ti = [[exp.flight.FE.start_ts];[exp.flight.FE.end_ts]]';
+IX = get_data_in_ti(ts',ti);
+ts = ts(IX);
+pos = pos(IX,:);
+directions = interp1(exp.pos.proc_1D.ts, sign(exp.pos.proc_1D.vel_csaps), ts);
+dir_colors = prm.graphics.colors.flight_directions;
+dir_sign = [1 -1];
+figure
+hold on
+bin_edges = 0:0.5:200;
+bin_centers = edges2centers(bin_edges);
+for ii_dir = 1:2
+    IX = directions == dir_sign(ii_dir);
+    plot(pos(IX,1),pos(IX,2),'.', 'color', dir_colors{ii_dir},'MarkerSize',1);
+    [~,~,BIN] = histcounts(pos(IX,1),bin_edges);
+    ymean = accumarray(BIN,pos(IX,2),[],@mean);
+    ystd = accumarray(BIN,pos(IX,2),[],@std);
+    
+    x = bin_centers;
+    y = nan(size(bin_centers));
+    err = nan(size(bin_centers));
+    y(unique(BIN)) = ymean(unique(BIN));
+    err(unique(BIN)) = ystd(unique(BIN));
+    
+    yyaxis left
+    hold on
+    h=shadedErrorBar(x, y, err,'lineprops',{'color', dir_colors{ii_dir}});
+    
+    yyaxis right
+    hold on
+    plot(x, err, '.-', 'color', dir_colors{ii_dir});
+end
 
 
 
