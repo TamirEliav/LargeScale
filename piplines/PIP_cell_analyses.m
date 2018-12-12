@@ -37,7 +37,7 @@ try
 %     cell_calc_fields(cell_ID);
 %     cell_calc_significant(cell_ID);
 %     cell_calc_mean_FR(cell_ID)
-%     cell_calc_stats(cell_ID)
+    cell_calc_stats(cell_ID)
     cell_plot_map_fields(cell_ID);
     toc
     

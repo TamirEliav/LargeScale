@@ -67,7 +67,7 @@ end
 %% link position axes
 linkaxes(pnl(1).de.axis, 'x');
 
-%% spikes waveforms (per field)
+% spikes waveforms (per field)
 cell = fields_add_spikes_waveforms(cell);
 for ii_dir = 1:2
     %%
@@ -78,12 +78,19 @@ for ii_dir = 1:2
     
     %% create axes for fields spikes waveforms
     pnl(2,ii_dir).pack('h',[25 75]);
-    ncol = min(length(fields),5);
-    nrow = ceil( length(fields) / ncol );
+    max_col = 5;
+    max_row = 4;
+    max_fields_to_plot = max_col * max_row;
+    ncol = min(length(fields),max_col);
+    nrow = min(ceil( length(fields) / ncol ), max_row);
     pnl(2,ii_dir,2).pack(nrow,ncol);
     pnl(2,ii_dir,2).select('all');
+    pnl(2,ii_dir,2).de.margin = 5;
     fields_axes = pnl(2,ii_dir,2).de;
     fields_axes(cellfun(@(x)(isempty(x.axis)),fields_axes)) = [];
+    if length(fields) > max_fields_to_plot
+        warning(sprintf('Too many fields!!! plotting only %d out of %d fields',max_fields_to_plot,length(fields)));
+    end
     
     %% compare mean waveforms of the strongest channel
     pnl(2,ii_dir,1).select(); hold on;
@@ -97,14 +104,19 @@ for ii_dir = 1:2
     end
     xlim([1 32])
     legend_str = cellfun(@(x)(sprintf('#%d',x)),num2cell(1:length(fields)),'UniformOutput',false);
-    legend_str = {'all fields' legend_str{:}};
-    legend(legend_str )
+    legend_str = {'all' legend_str{:}};
+    leg_max_row = 8;
+    leg_ncol = ceil(length(legend_str)/leg_max_row);
+    hleg = columnlegend(leg_ncol, legend_str, 'location', 'NorthEast','boxoff');
+    hax = gca;
+    hleg.Position([1:2]) = hax.Position([1:2])+[0.06 0.14];
+    hleg.Position([3:4]) = [0.03 0.2];
     title('max ch. all fields')
     xlabel('Samples')
     ylabel('\muV')
     
     %% plot each field spikes seperaetly
-    for ii_field = 1:length(fields)
+    for ii_field = 1:min(length(fields),max_fields_to_plot)
         field = fields(ii_field);
 %         ax = pnl(2,ii_dir,2).de(ii_field);
         ax = fields_axes{ii_field};
@@ -113,9 +125,19 @@ for ii_dir = 1:2
         plot(mean(field_spikes_wvfrms,3))
         xlim([1 32])
         title(sprintf('#%d',ii_field))
+        axis off
     end
+    % remove extra axes
+    for ii_ax = (length(fields)+1) : length(fields_axes)
+        ax = fields_axes{ii_ax};
+        ax.select(); hold on;
+        axis off
+    end
+    
 end
-linkaxes(pnl(2).de.axis, 'xy');
+if length(cell.fields{2})>0 & length(cell.fields{2})>0
+    linkaxes(pnl(2).de.axis, 'xy');
+end
 
 %% results table
 pnl(3,1).select();hold on
