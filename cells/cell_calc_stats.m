@@ -21,14 +21,13 @@ for ii_dir = 1:2
         fields_to_add = rmfield(fields_to_add,'overlap_edges');
     end
     fields_all = [fields_all fields_to_add];
-    
 end
 
 %%
 stats_per_dir = repelem(struct(),2);
 for ii_dir = 1:2
 
-    stats_per_dir(ii_dir).num_spikes_air = sum([FE{ii_dir}.num_spikes]);
+    stats_per_dir(ii_dir).spikes_num_air = sum([FE{ii_dir}.num_spikes]);
     stats_per_dir(ii_dir).total_distance = sum([FE{ii_dir}.distance]) .* 1e-3; % in km
     stats_per_dir(ii_dir).time_in_air    = sum([FE{ii_dir}.duration]) ./ 60; % in minutes
 
@@ -49,12 +48,15 @@ for ii_dir = 1:2
         stats_per_dir(ii_dir).field_smallest = min([fields{ii_dir}.width_prc]);
         stats_per_dir(ii_dir).field_ratio_LS = max([fields{ii_dir}.width_prc]) / min([fields{ii_dir}.width_prc]);
         stats_per_dir(ii_dir).field_CV       = nanstd([fields{ii_dir}.width_prc]) / nanmean([fields{ii_dir}.width_prc]);
+        stats_per_dir(ii_dir).spikes_num_field = length([fields{ii_dir}.spikes_ts]);
     else
         stats_per_dir(ii_dir).field_largest  = nan;
         stats_per_dir(ii_dir).field_smallest = nan;
         stats_per_dir(ii_dir).field_ratio_LS = nan;
         stats_per_dir(ii_dir).field_CV       = nan;
+        stats_per_dir(ii_dir).spikes_num_field = 0;
     end
+    stats_per_dir(ii_dir).spikes_prc_field = stats_per_dir(ii_dir).spikes_num_field / stats_per_dir(ii_dir).spikes_num_air;
 end
 
 %%
@@ -65,10 +67,11 @@ stats_all.L_Ratio = cell.spikes.L_Ratio;
 stats_all.meanFR_all = cell.meanFR.all_sessions;
 stats_all.meanFR_flight = cell.meanFR.in_flight;
 
-stats_all.num_spikes_air = sum([stats_per_dir.num_spikes_air]);
+stats_all.spikes_num_air = sum([stats_per_dir.spikes_num_air]);
 stats_all.total_distance = sum([stats_per_dir.total_distance]);
-stats_all.num_spikes_air = sum([stats_per_dir.num_spikes_air]);
 stats_all.time_in_air    = sum([stats_per_dir.time_in_air]);
+stats_all.spikes_num_field = sum([stats_per_dir.spikes_num_field]);
+stats_all.spikes_prc_field = stats_all.spikes_num_field / stats_all.spikes_num_air;
 
 stats_all.field_num      = length(fields_all);
 if length(fields_all) > 0 % only if there are fields
