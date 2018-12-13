@@ -1,7 +1,7 @@
 function exp_calc_pos_std_y(exp_ID)
 
 %% load exp data
-exp = exp_load_data(exp_ID);
+exp = exp_load_data(exp_ID,'position','flight');
 prm = PARAMS_GetAll();
 
 %% arrange relevant data for analysis (take only data from detected flights)
@@ -28,6 +28,7 @@ for ii_dir = 1:2
     
     ymean = accumarray(BIN,pos(IX,2),[],@(x)(trimmean(x,trim_prc*2)));
     ystd = accumarray(BIN,pos(IX,2),[],@(x)(trimstd(x,trim_prc*2)));
+    yrange=[];
     yrange(1,:) = accumarray(BIN,pos(IX,2),[],@(x)(prctile(x,range_prc(1))));
     yrange(2,:) = accumarray(BIN,pos(IX,2),[],@(x)(prctile(x,range_prc(2))));
     
