@@ -32,5 +32,10 @@ if any(contains(varargin, 'flight')) | load_all
     exp.flight = flight.flight;
 end
 
+%% pos_y_std
+if any(contains(varargin, 'pos_y_std')) | load_all
+    pos_y_std = load(fullfile('L:\Analysis\Results\exp\pos_y_std',[exp_ID '_exp_pos_y_std']));
+    exp.pos_y_std = pos_y_std.pos_y_std;
+end
 
 end
