@@ -13,7 +13,7 @@ fields = fields(IX);
 
 %%
 fields_edges = cat(1,fields.edges_href);
-checkEdges = (fields_edges(2:end,1) - fields_edges(1:end-1,1))<0;
+checkEdges = fields_edges(2:end,1) < fields_edges(1:end-1,2);
 ind = find(checkEdges);
 %field i left border minus field i-1 right border. if it's  smalller
 %than 0 then, the field i overlap with field i-1.

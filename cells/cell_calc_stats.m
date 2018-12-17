@@ -56,7 +56,7 @@ for ii_dir = 1:2
         stats_per_dir(ii_dir).field_CV       = nan;
         stats_per_dir(ii_dir).spikes_num_field = 0;
     end
-    stats_per_dir(ii_dir).spikes_prc_field = stats_per_dir(ii_dir).spikes_num_field / stats_per_dir(ii_dir).spikes_num_air;
+    stats_per_dir(ii_dir).spikes_prc_field = 100.* stats_per_dir(ii_dir).spikes_num_field / stats_per_dir(ii_dir).spikes_num_air;
 end
 
 %%
@@ -71,7 +71,7 @@ stats_all.spikes_num_air = sum([stats_per_dir.spikes_num_air]);
 stats_all.total_distance = sum([stats_per_dir.total_distance]);
 stats_all.time_in_air    = sum([stats_per_dir.time_in_air]);
 stats_all.spikes_num_field = sum([stats_per_dir.spikes_num_field]);
-stats_all.spikes_prc_field = stats_all.spikes_num_field / stats_all.spikes_num_air;
+stats_all.spikes_prc_field = 100.* stats_all.spikes_num_field / stats_all.spikes_num_air;
 
 stats_all.field_num      = length(fields_all);
 if length(fields_all) > 0 % only if there are fields
