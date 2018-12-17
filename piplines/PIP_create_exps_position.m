@@ -29,7 +29,7 @@ try
 %     POS_plot_flight(exp_ID);
 
     exp_calc_pos_std_y(exp_ID);
-    exp_plot_pos_std_y(exp_ID);
+%     exp_plot_pos_std_y(exp_ID);
     
 catch err
     disp(err);

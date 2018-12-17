@@ -44,6 +44,8 @@ for ii_dir = 1:2
     pos_y_std(ii_dir).ymean = ymean_;
     pos_y_std(ii_dir).ystd = ystd_;
     pos_y_std(ii_dir).yrange = yrange_;
+    pos_y_std(ii_dir).ystd_median = nanmedian(ystd_);
+    pos_y_std(ii_dir).yrange_median = nanmedian(yrange_);
     pos_y_std(ii_dir).range_prc = range_prc;
     pos_y_std(ii_dir).trim_prc = trim_prc ;
 end
