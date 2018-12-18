@@ -18,7 +18,7 @@ function fields = fields_remove_overlaps(FR_map, fields, prm)
         
         %%
         edges = [fields(ii_field).overlap_edges];
-        edges_higher = cat(1,fields(1:ii_field-1).edges_href);
+        edges_higher = cat(1,fields(1:ii_field-1).overlap_edges);
         % case 1: the field intersect with other fields
         overlapping_fields_ind1 = ...
             or( and( edges(1)>edges_higher(:,1), edges(1)<edges_higher(:,2) ),...
