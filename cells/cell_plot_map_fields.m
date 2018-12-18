@@ -67,7 +67,20 @@ end
 %% link position axes
 linkaxes(pnl(1).de.axis, 'x');
 
-% spikes waveforms (per field)
+%% add arrows for directions
+arrow_pos_X = [.01 .05;
+               .05 .01]+0.04;
+arrow_pos_Y = [repelem(0.825, 2);
+               repelem(0.815, 2)]+0.15;
+for ii_dir = 1:2
+    c = dir_colors{ii_dir};
+    ah=annotation('arrow',arrow_pos_X(ii_dir,:),arrow_pos_Y(ii_dir,:),'Color',c);
+    ah.LineWidth = 1.5;
+    set(ah,'HeadStyle','cback1','HeadWidth',5);
+end
+
+
+%% spikes waveforms (per field)
 cell = fields_add_spikes_waveforms(cell);
 for ii_dir = 1:2
     %%
@@ -170,6 +183,7 @@ stats_table_data =  {...
     'L-Ratio',          [], [], stats_all.L_Ratio,       '';...
     'meanFR all',       [], [], stats_all.meanFR_all,    'Hz';...
     'meanFR air',       [], [], stats_all.meanFR_flight, 'Hz';...
+    'num flights',      stats_dir.num_full_flights, stats_all.num_full_flights, '';...
 };
 columnname =   {'Parameter', 'dir1', 'dir2', 'all', 'units'};
 columnformat = {'char', 'numeric', 'numeric', 'numeric', 'char'}; 

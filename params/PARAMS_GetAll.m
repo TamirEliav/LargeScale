@@ -27,6 +27,7 @@ prm.pos.csaps_p = 1e-5;
 prm.flight.speed_high_thr = 4;
 prm.flight.speed_low_thr = 1;
 prm.flight.high_speed_min_duration = 1;
+prm.flight.full_min_distance = 100;
 
 % prm.rest.merge_thr = 0.5;
 % prm.rest.balls_margins = 0.2; % max distance from balls

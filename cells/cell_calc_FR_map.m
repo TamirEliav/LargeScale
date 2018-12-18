@@ -10,7 +10,7 @@ for ii_dir = 1:2
     
     %%
     FE = cell.FE{ii_dir};
-    FE_full = FE([FE.distance]>100); % TODO: decide what we consider to be a full flight! and use param for 100...
+    FE_full = FE([FE.distance]>prm.flight.full_min_distance ); % TODO: decide what we consider to be a full flight!
     FE_odd  = FE(1:2:end);
     FE_even = FE(2:2:end);
     FE_begin = FE(1 : round(length(FE)/2)        );

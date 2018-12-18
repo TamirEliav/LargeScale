@@ -8,6 +8,7 @@ prm = PARAMS_GetAll();
 %% create struct
 FR_map = cell.FR_map;
 FE = cell.FE;
+FE_all = [FE{:}];
 fields = cell.fields;
 fields_all = [];
 for ii_dir = 1:2
@@ -30,6 +31,8 @@ for ii_dir = 1:2
     stats_per_dir(ii_dir).spikes_num_air = sum([FE{ii_dir}.num_spikes]);
     stats_per_dir(ii_dir).total_distance = sum([FE{ii_dir}.distance]) .* 1e-3; % in km
     stats_per_dir(ii_dir).time_in_air    = sum([FE{ii_dir}.duration]) ./ 60; % in minutes
+    stats_per_dir(ii_dir).num_flights      = length([FE{ii_dir}]);
+    stats_per_dir(ii_dir).num_full_flights = sum([FE{ii_dir}.distance] > prm.flight.full_min_distance );
 
     stats_per_dir(ii_dir).SI_bits_spike  = FR_map(ii_dir).all.SI_bits_spike;
     stats_per_dir(ii_dir).SI_bits_sec    = FR_map(ii_dir).all.SI_bits_sec;
@@ -64,8 +67,10 @@ stats_all = struct();
 
 stats_all.IsoDist = cell.spikes.Isolation_dis;
 stats_all.L_Ratio = cell.spikes.L_Ratio;
-stats_all.meanFR_all = cell.meanFR.all_sessions;
-stats_all.meanFR_flight = cell.meanFR.in_flight;
+stats_all.meanFR_all     = cell.meanFR.all_sessions;
+stats_all.meanFR_flight  = cell.meanFR.in_flight;
+stats_all.num_flights      = length(FE_all);
+stats_all.num_full_flights = sum([FE_all.distance] > prm.flight.full_min_distance );
 
 stats_all.spikes_num_air = sum([stats_per_dir.spikes_num_air]);
 stats_all.total_distance = sum([stats_per_dir.total_distance]);
