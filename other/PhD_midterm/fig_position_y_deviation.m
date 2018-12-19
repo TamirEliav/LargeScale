@@ -59,7 +59,8 @@ xlabel({'Y position';...
         'deviation (m)'})
 ylabel('Prob.');
 
-% save figure
+
+%% save figure
 dir_out = 'L:\Analysis\Results\midterm';
 mkdir(dir_out);
 filename = fullfile(dir_out, 'fig_pos_y_deviation')
