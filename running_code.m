@@ -340,17 +340,49 @@ sdf.edges
 edges = [1 2; 3 4; 5 6]
 edges = num2cell(edges,2)
 
+
 %%
-cells=cellfun(@(x)(cell_load_data(x,'details','fields','FR_map','Ipos','RecStability','signif')), cells_t.cell_ID,'UniformOutput', false);
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+%%
+cells=cellfun(@(x)(cell_load_data(x,'details','fields','FR_map','Ipos','RecStability','signif','stats')), cells_t.cell_ID,'UniformOutput', false);
 cells = [cells{:}];
+
+%% remove IN
+mean_FR_flight = arrayfun(@(x)(x.all.meanFR_flight),[cells.stats]);
+mean_FR_all = arrayfun(@(x)(x.all.meanFR_all),[cells.stats]);
+
+figure
+subplot(1,2,1)
+hold on
+bins = [0:0.2:10];
+histogram(mean_FR_flight,bins)
+histogram(mean_FR_all,bins)
+legend({'flight';'all'})
+subplot(1,2,2)
+plot(repelem([1;2],1,length(mean_FR_flight)), [mean_FR_flight;mean_FR_all],'.-')
+h=gca;
+h.TickDir='both';
+h.XTick=[1 2];
+h.XTickLabel={'flight';'all'};
+
+%% take only signif cells (in both directions)
+signif = cellfun(@(x)([x.TF]),{cells.signif},'UniformOutput',0);
+signif = cat(1,signif{:});
+signif = all(signif,2);
+cells = cells(signif);
+
+%% get num fields
 num_fields = cellfun(@(x)([length(x{1}) length(x{2})]),{cells.fields}, 'UniformOutput', false);
 num_fields = cat(1,num_fields{:});
 
-%%
+%% plot num fields DIR1 vs. DIR2
 figure
 plot_std = 0.1;
-plot(   num_fields(:,1)+plot_std.*randn(size(num_fields,1),1),...
-        num_fields(:,2)+plot_std.*randn(size(num_fields,1),1),    '.')
+scatter(num_fields(:,1)+plot_std.*randn(size(num_fields,1),1),...
+        num_fields(:,2)+plot_std.*randn(size(num_fields,1),1),...
+        10, arrayfun(@(x)(find(unique(bats) == x)), bats),'filled')
 axis equal
 refline(1,0)
 xlim([0 20])
@@ -360,19 +392,16 @@ ylabel('#fields direction 2')
 title('comparing number of fields between flight directions')
 saveas(gcf,'L:/Analysis/Results/comparing number of fields between flight directions','tif');
 
-%%
-signif = cellfun(@(x)([x(:).TF]),{cells.signif}, 'UniformOutput', false);
-signif = cat(1,signif{:});
-
-%%
+%% plot SI DIR1 vs. DIR2
 FR_maps = cellfun(@(x)([x(:).all]),{cells.FR_map}, 'UniformOutput', false);
 FR_maps = cat(1,FR_maps{:});
-SI_bits_spike  = arrayfun(@(x)(x.SI_bits_spike), FR_maps)
-plot(SI_bits_spike(:,1),SI_bits_spike(:,2),'.')
+SI_bits_spike  = arrayfun(@(x)(x.SI_bits_spike), FR_maps);
+scatter(SI_bits_spike(:,1),SI_bits_spike(:,2),...
+        10, arrayfun(@(x)(find(unique(bats) == x)), bats),'filled')
 axis equal
+xlim([0 5])
+ylim([0 5])
 refline(1,0)
-xlim([0 8])
-ylim([0 8])
 xlabel('SI direction 1 (bits/spike)')
 ylabel('SI direction 2 (bits/spike)')
 title('comparing spatial info between flight directions')
@@ -440,10 +469,6 @@ for ii_dir = 1:2
     hold on
     plot(x, err, '.-', 'color', dir_colors{ii_dir});
 end
-
-
-
-
 
 
 

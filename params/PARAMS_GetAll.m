@@ -39,8 +39,8 @@ prm.flight.full_min_distance = 100;
 
 prm.RecStability.BinSize = 4; % in minutes
 
-% prm.oscillations.time_AC.bin_size = 0.010;
-% prm.oscillations.time_AC.win_size = 2;
+prm.oscillations.time_AC.bin_size = 0.010;
+prm.oscillations.time_AC.win_size = 2;
 % prm.oscillations.phase_AC.bin_size = 2*pi/15;
 % prm.oscillations.phase_AC.win_size = 4 * 2*pi;
 % prm.oscillations.phase_hist.bin_size = 2*pi/20;

@@ -13,6 +13,7 @@ field_options = {
     'signif',
     'meanFR',
     'stats',
+    'time_AC',
     };
 
 %% parse input
