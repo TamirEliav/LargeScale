@@ -15,7 +15,7 @@ pnl(1,1).pack('v',2)
 pnl(1,2).pack('v',2)
 pnl(2).pack('v',2)
 pnl(3).pack('v',[80 20])
-pnl.margin = [15 25 10 15];
+pnl.margin = [15 25 15 15];
 pnl(1).margin = 10;
 pnl(1).de.margin = 10;
 % pnl(1,1).margin = 10;
@@ -213,8 +213,9 @@ end
         
 %% recording stability
 pnl(3,2).select();hold on
-behave_ti = exp_get_sessions_ti(exp.details.exp_ID,'Behave');
-bar(cell.RecStability.bin_centers, cell.RecStability.FR)
+
+% plot avg FR in large chuncks
+bar(cell.RecStability.bin_centers, cell.RecStability.FR);
 ylimits = get(gca,'ylim');
 for ii_session = 1:length(exp.details.session_names)
     sname = exp.details.session_names{ii_session};
@@ -223,9 +224,30 @@ for ii_session = 1:length(exp.details.session_names)
     plot(repelem(ti(2),2), ylimits,'--m')
     text(mean(ti), ylimits(2)+0.05*diff(ylimits), sname,'HorizontalAlignment','center','FontWeight','bold');
 end
+xlimits = exp.details.session_ts([1 end]);
+xlimits = xlimits + [-1 1].*range(xlimits)*0.025;
+xlim(xlimits);
+% align time to behave session
+ 
+behave_ti = exp_get_sessions_ti(exp.details.exp_ID,'Behave');
 rescale_plot_data('x',[1e-6/60 behave_ti(1)])
+xlimits = get(gca,'xlim'); % workaround
 xlabel('Time (min)')
-ylabel('Firing rate')
+ylabel('Firing rate (Hz)')
+
+% plot spikes peak vs. time
+wvfms=[cell.spikes.waveforms];
+[~,max_ch_IX] = max(max(squeeze(mean(wvfms,3))));
+spikes_peaks = squeeze(max(wvfms(:,max_ch_IX,:),[],1));
+yyaxis right
+hold on
+plot(cell.spikes.ts, spikes_peaks,'.','MarkerSize',4);
+ylim([0 max(spikes_peaks)*1.1])
+rescale_plot_data('x',[1e-6/60 behave_ti(1)])
+ylabel('Spikes peak (\muV)')
+
+% set xlim again (workaround)
+xlim(xlimits);
 
 %% save figure
 h=pnl.title(cell_ID); h.FontSize=16; h.Interpreter='none';h.Position=[0.5 1.03];

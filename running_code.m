@@ -470,9 +470,17 @@ for ii_dir = 1:2
     plot(x, err, '.-', 'color', dir_colors{ii_dir});
 end
 
+%%
+figure
+t = 1:100;
+yyaxis left
+plot(t, sin(t))
+rescale_plot_data('x',[1e-1 50])
 
+yyaxis right
+plot(t, cos(t))
 
-
+rescale_plot_data('x',[1e-1 50])
 
 %%
 

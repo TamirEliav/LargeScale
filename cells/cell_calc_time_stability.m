@@ -6,11 +6,11 @@ exp = exp_load_data(cell.details.exp_ID,'details');
 prm = PARAMS_GetAll();
 
 %%
-ts_limits = exp.details.session_ts([1 end]);
-edges = ts_limits(1) : (prm.RecStability.BinSize*1e6*60) : ts_limits(end);
-N = histcounts(cell.spikes.ts,edges);
+[N,edges] = histcounts(cell.spikes.ts,...
+                       'BinWidth',prm.RecStability.BinSize*1e6*60,...
+                       'Normalization','count');
 FR = N ./ (prm.RecStability.BinSize*60);
-bin_centers = (edges(1:end-1)+edges(1:end-1)) ./ 2;
+bin_centers = edges2centers(edges);
 
 %% create struct
 RecStability.BinSize = prm.RecStability.BinSize;
