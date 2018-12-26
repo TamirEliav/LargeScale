@@ -18,18 +18,18 @@ for ii_exp = 1:height(exp_t)
     
     %%
 try
-    
-%     exp=exp_load_data(exp_ID,'details','path');
+%     exp=exp_load_data(exp_ID);
 %     bsp_extract_data(exp.path.bsp);
-%     PRE_sync_bsp_to_nlg(exp.path.bsp, exp.path.nlx, exp.path.sync);    
+    exp_create_details(exp_ID);    
+    exp_sync_bsp2nlg(exp_ID);
 
-%     exp_create_position(exp_ID);
-%     POS_detect_flight(exp_ID);
-%     exp_plot_position(exp_ID);
-%     POS_plot_flight(exp_ID);
+    exp_create_position(exp_ID);
+    POS_detect_flight(exp_ID);
+    exp_plot_position(exp_ID);
+    POS_plot_flight(exp_ID);
 
     exp_calc_pos_std_y(exp_ID);
-%     exp_plot_pos_std_y(exp_ID);
+    exp_plot_pos_std_y(exp_ID);
     
 catch err
     disp(err);

@@ -482,6 +482,109 @@ plot(t, cos(t))
 
 rescale_plot_data('x',[1e-1 50])
 
+
+%%
+cells = cellfun(@(x)(cell_load_data(x,'details','spikes')), cells_t.cell_ID, 'UniformOutput', false);
+cells = [cells{:}];
+%%
+CQ = arrayfun(@(x)(x.ClusterQuality),[cells.details]);
+CQ = CQ==1;
+IsoDist = arrayfun(@(x)(x.Isolation_dis),[cells.spikes]);
+figure
+hold on
+data = {IsoDist(~CQ),IsoDist(CQ)};
+plotSpread(data)
+violin(data)
+h=gca;
+h.XTick = [1 2];
+h.XTickLabel = {'bad','good'};
+title('bat 34 IsoDist comparing bad/good manualy quality')
+ylabel('IsoDist')
+
+
+%% 24/12/2018 - debug sync problems (bsp<->nlg)
+clear 
+clc
+exp_ID = 'b0034_d180313';
+exp=exp_load_data(exp_ID);
+
+% BSP TTL
+load( fullfile(exp.path.bsp, 'bsp_TTL.mat') );
+bsp_TTL_ts_msec = round(1e-6.*bsp_TTL_ts_ns');
+bsp_TTL_intervals = diff(bsp_TTL_ts_msec);
+bsp_TTL_intervals_inc = diff(bsp_TTL_intervals);
+% NLG TTL
+nlg_TTL_file_name = fullfile(exp.path.nlx, 'EVENTS__Digital in.nev');
+FieldSelection = [1 0 0 0 0];
+ExtractHeader = 0;
+ExtractMode = 1;
+ModeArray = [];
+nlg_TTL_ts_usec = Nlx2MatEV( nlg_TTL_file_name ,FieldSelection,ExtractHeader,ExtractMode,ModeArray);
+nlg_TTL_ts_msec = nlg_TTL_ts_usec*1e-3;
+nlg_TTL_intervals = diff(nlg_TTL_ts_msec);
+nlg_TTL_intervals_inc = diff(nlg_TTL_intervals);
+
+whos bsp_TTL_ts_msec nlg_TTL_ts_msec
+
+time_conv_p_msec = sync_TTL_polyfit(round(bsp_TTL_ts_msec), round(nlg_TTL_ts_msec), 2, 100);
+
+
+%%
+thr = 5;
+x = diff(bsp_TTL_ts_msec);
+y = diff(nlg_TTL_ts_msec);
+[dist,ix,iy] = dtw(x,y);
+pairs = [x(ix);y(iy)];
+rsdl = diff(pairs);
+IX = find( abs(rsdl) < thr );
+pairs_good = pairs(:,IX);
+
+if length(unique(pairs(1,IX))) ~= length(IX) || ...
+   length(unique(pairs(2,IX))) ~= length(IX)
+   error()
+end
+
+mathing_TTL_bsp = bsp_TTL_ts_msec(union(ix(IX), ix(IX)+1));
+mathing_TTL_nlg = nlg_TTL_ts_msec(union(iy(IX), iy(IX)+1));
+
+%%
+a=unique(ix(IX))
+b=unique(iy(IX))
+if length(a)~=length(b)
+    error
+%     TODO: choose the closest ones to the bsp!! (because bsp is the
+%     master)
+end
+pairs_x_IX = union(a,a+1);
+pairs_y_IX = union(b,b+1);
+whos x y ix iy a b pairs_x_IX pairs_y_IX IX
+
+%%
+figure
+subplot(2,1,1); hold on
+plot(rsdl,   '.-b')
+plot(IX,rsdl(IX),'or')
+plot(get(gca,'xlim'),  [thr thr],'m--')
+plot(get(gca,'xlim'), -[thr thr],'m--')
+xlabel('interval pair index')
+ylabel('interval pair diff (msec)')
+% zoom-in 
+subplot(2,1,2); hold on
+plot(rsdl,   '.-b')
+plot(IX,rsdl(IX),'or')
+plot(get(gca,'xlim'),  [thr thr],'m--')
+plot(get(gca,'xlim'), -[thr thr],'m--')
+ylim([-100 100])
+xlabel('interval pair index')
+ylabel('interval pair diff (msec)')
+title('zoom-in')
+suptitle('finding matching pairs of intervals');
+
+
+%%
+
+
+
 %%
 
 
