@@ -1,16 +1,11 @@
-%% create all cells spikes data
+%% cell analysis pipline
 clear
 clc
-
 %% open log file
 log_name_str = ['cell_analysis ' datestr(clock, 'yyyy-mm-dd HH-MM-SS') '.txt'];
 log_name_out = fullfile('L:\Analysis\Results\pipelines', log_name_str );
-diary off
-diary(log_name_out)
-diary on
-
-%% save script code to log
-disp(mfilename)
+diary off; diary(log_name_out); diary on
+% TODO: save script code to log
 
 %% load cells summary and choose cells
 cells_t = DS_get_cells_summary();
@@ -25,7 +20,6 @@ for ii_cell = 1:height(cells_t)
     %%
     cell_ID = cells_t.cell_ID{ii_cell};
     fprintf('cell %d/%d %s\n', ii_cell, height(cells_t), cell_ID);
-    
     %%
 try
     tic
