@@ -107,25 +107,25 @@ title('TTL interval increament timings (relative to 1st TTL)')
 % validate resonable gain
 pnl(2,1).select(); hold on;
 plot(pairs_good_bsp_ts, pairs_good(1,:)./pairs_good(2,:), '.-')
-plot(repmat(sync_jump_ts,2,1), repelem(get(gca,'ylim'),length(sync_jump_ts)), 'm-')
+plot(repmat(sync_jump_ts,2,1), repmat(get(gca,'ylim'),length(sync_jump_ts),1)', 'm-')
 rescale_plot_data('x', [1e-9/60 0]);
-xlabel('intervals index')
+xlabel('bsp time (minutes)')
 ylabel('clock gain')
 title('only matching intervals')
 
 pnl(2,2).select(); hold on;
 plot(edges2centers(mathing_TTL_bsp_ts), 1e-3.*diff(mathing_TTL_bsp_ts) ./ diff(mathing_TTL_nlg_ts),'.-')
-plot(repmat(sync_jump_ts,2,1), repelem(get(gca,'ylim'),length(sync_jump_ts)), 'm-')
+plot(repmat(sync_jump_ts,2,1), repmat(get(gca,'ylim'),length(sync_jump_ts),1)', 'm-')
 rescale_plot_data('x', [1e-9/60 0]);
-xlabel('intervals index')
+xlabel('bsp time (minutes)')
 ylabel('clock gain')
 title('all TTLs from matching intervals')
 
 pnl(2,3).select(); hold on;
 plot(edges2centers(sync_ts.bsp), 1e-3.*diff(sync_ts.bsp) ./ diff(sync_ts.nlg),'.-')
-plot(repmat(sync_jump_ts,2,1), repelem(get(gca,'ylim'),length(sync_jump_ts)), 'm-')
+plot(repmat(sync_jump_ts,2,1), repmat(get(gca,'ylim'),length(sync_jump_ts),1)', 'm-')
 rescale_plot_data('x', [1e-9/60 0]);
-xlabel('intervals index')
+xlabel('bsp time (minutes)')
 ylabel('clock gain')
 title('after adding dummy TTLs in sync jumps')
 
