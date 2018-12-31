@@ -151,8 +151,48 @@ end
 if length(cell.fields{2})>0 & length(cell.fields{2})>0
     linkaxes(pnl(2).de.axis, 'xy');
 end
+        
+%% recording stability
+pnl(3,2).select();hold on
+
+% plot avg FR in large chuncks
+bar(cell.RecStability.bin_centers, cell.RecStability.FR);
+ylimits = get(gca,'ylim');
+for ii_session = 1:length(exp.details.session_names)
+    sname = exp.details.session_names{ii_session};
+    ti = exp.details.session_ts(ii_session,:);
+    plot(repelem(ti(1),2), ylimits,'--m');
+    plot(repelem(ti(2),2), ylimits,'--m')
+    text(mean(ti), ylimits(2)+0.05*diff(ylimits), sname,'HorizontalAlignment','center','FontWeight','bold');
+end
+xlimits = exp.details.session_ts([1 end]);
+xlimits = xlimits + [-1 1].*range(xlimits)*0.025;
+xlim(xlimits);
+% align time to behave session
+ 
+behave_ti = exp_get_sessions_ti(exp.details.exp_ID,'Behave');
+rescale_plot_data('x',[1e-6/60 behave_ti(1)])
+xlimits = get(gca,'xlim'); % workaround
+xlabel('Time (min)')
+ylabel('Firing rate (Hz)')
+
+% plot spikes peak vs. time
+wvfms=[cell.spikes.waveforms];
+[~,max_ch_IX] = max(max(squeeze(mean(wvfms,3))));
+spikes_peaks = squeeze(max(wvfms(:,max_ch_IX,:),[],1));
+yyaxis right
+hold on
+plot(cell.spikes.ts, spikes_peaks,'.','MarkerSize',4);
+ylim([0 max(spikes_peaks)*1.1])
+rescale_plot_data('x',[1e-6/60 behave_ti(1)])
+ylabel('Spikes peak (\muV)')
+
+% set xlim again (workaround)
+xlim(xlimits);
+
 
 %% results table
+if isfield(cell,'stats')
 pnl(3,1).select();hold on
 axis off
 % FR_map = cell.FR_map;
@@ -210,45 +250,7 @@ for ii_col = 1:length(t.ColumnFormat)
         end
     end
 end
-        
-%% recording stability
-pnl(3,2).select();hold on
-
-% plot avg FR in large chuncks
-bar(cell.RecStability.bin_centers, cell.RecStability.FR);
-ylimits = get(gca,'ylim');
-for ii_session = 1:length(exp.details.session_names)
-    sname = exp.details.session_names{ii_session};
-    ti = exp.details.session_ts(ii_session,:);
-    plot(repelem(ti(1),2), ylimits,'--m');
-    plot(repelem(ti(2),2), ylimits,'--m')
-    text(mean(ti), ylimits(2)+0.05*diff(ylimits), sname,'HorizontalAlignment','center','FontWeight','bold');
 end
-xlimits = exp.details.session_ts([1 end]);
-xlimits = xlimits + [-1 1].*range(xlimits)*0.025;
-xlim(xlimits);
-% align time to behave session
- 
-behave_ti = exp_get_sessions_ti(exp.details.exp_ID,'Behave');
-rescale_plot_data('x',[1e-6/60 behave_ti(1)])
-xlimits = get(gca,'xlim'); % workaround
-xlabel('Time (min)')
-ylabel('Firing rate (Hz)')
-
-% plot spikes peak vs. time
-wvfms=[cell.spikes.waveforms];
-[~,max_ch_IX] = max(max(squeeze(mean(wvfms,3))));
-spikes_peaks = squeeze(max(wvfms(:,max_ch_IX,:),[],1));
-yyaxis right
-hold on
-plot(cell.spikes.ts, spikes_peaks,'.','MarkerSize',4);
-ylim([0 max(spikes_peaks)*1.1])
-rescale_plot_data('x',[1e-6/60 behave_ti(1)])
-ylabel('Spikes peak (\muV)')
-
-% set xlim again (workaround)
-xlim(xlimits);
-
 %% save figure
 h=pnl.title(cell_ID); h.FontSize=16; h.Interpreter='none';h.Position=[0.5 1.03];
 fig_filename = fullfile('L:\Analysis\Results\cells\figures', [cell_ID '_map_fields']);

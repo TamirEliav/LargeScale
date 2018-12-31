@@ -581,13 +581,119 @@ title('zoom-in')
 suptitle('finding matching pairs of intervals');
 
 
+%% 27/12/2018 plexon header stuff...
+clear
+% clc
+% file_IN = 'L:\Analysis\pre_proc\SpikeSorting\0034\20180310\spikes_NTT\spikes_b0034_d180310_TT3.NTT';
+% file_OUT = 'L:\Analysis\pre_proc\SpikeSorting\0034\20180310\spikes_NTT\spikes_b0034_d180310_TT3_plexon.NTT';
+% file_IN = 'D:\Tamir\PROJECTS\Plexon\Data\spikes_b0148_d170608_TT4_.NTT';
+% file_OUT = 'D:\Tamir\PROJECTS\Plexon\Data\spikes_b0148_d170608_TT4__new_header_++.NTT';
+% file_IN = 'D:\Tamir\PROJECTS\Plexon\Data\spikes_b0034_d180310_TT1_shir.NTT';
+% file_OUT = 'D:\Tamir\PROJECTS\Plexon\Data\spikes_b0034_d180310_TT1__plexon.NTT';
+
+header_file = 'plexon_header_NTT.txt';
+header_new = textread(header_file, '%s', 'delimiter', '\n', 'whitespace', '');
+
+% [Timestamps, ScNumbers, CellNumbers, Features, Samples, Header] =...
+%     Nlx2MatSpike(file_IN , [1 1 1 1 1], 1, 1, [] );
+% whos
+
+% ScNumbers(:) = 1;
+% CellNumbers(:) = 0;
+% Mat2NlxSpike(file_OUT, 0, 1, [], [1 1 1 1 1 1], ...
+%     Timestamps, ScNumbers, CellNumbers, Features, Samples, header_new);
+% Mat2NlxSpike(file_OUT, 0, 1, [], [1 0 0 1 1 1], ...
+%     Timestamps, Features, Samples, header_new);
+
+%% cont - create demo data
+clear
+clc
+file_OUT = 'D:\Tamir\PROJECTS\Plexon\Data\test_20181227.NTT';
+header_file = 'plexon_header_NTT.txt';
+Header = textread(header_file, '%s', 'delimiter', '\n', 'whitespace', '');
+
+n = 1e4;
+Timestamps = linspace(0,1e6*60*60,n);
+ScNumbers = zeros(1,n);
+CellNumbers = zeros(1,n);
+% Features = 
+spike_shape = normpdf(1:32,8,2)';
+spike_shape = spike_shape ./ max(spike_shape);
+spike_shape = spike_shape .* 250;
+% spike_shape = spike_shape + randn(size(spike_shape));
+Samples = repmat(spike_shape,1,4,n);
+Samples = Samples + randn(size(Samples)).*10;
+
+AppendToFileFlag = 0;
+ExportMode = 1;
+ExportModeVector = [];
+FieldSelectionFlags = [1 1 1 0 1 1];
+Mat2NlxSpike( file_OUT, AppendToFileFlag, ExportMode, ExportModeVector,...
+              FieldSelectionFlags, Timestamps, ScNumbers, CellNumbers, Samples, Header);
+
+%% 30/12/2018 - nlx header stuff...
+clear
+clc
+file_IN = 'D:\Tamir\PROJECTS\Plexon\Data\bat6255_Day120326_1_PreSleep_TT1.Ntt';
+file_OUT = 'D:\Tamir\PROJECTS\Plexon\Data\bat6255_Day120326_1_PreSleep_TT1_copy.Ntt';
+[Timestamps, ScNumbers, CellNumbers, Features, Samples, Header] =...
+    Nlx2MatSpike(file_IN, [1 1 1 1 1], 1, 1, [] );
+
+ADMaxValue = 32767;
+ADC=0.000000009155552760375940;
+figure
+plot(mean(Samples,[2 3]).*ADC*1e6)
+
+% ADC=0.000000009155552760375940;
+% ADC=0.000000009160000000000000;
+
+% ADC_new = ADC;
+InputRange_new = max(Samples(:)) *ADC*1e6;
+% ADC_new = 1e-6;
+ADC_new = InputRange_new / ADMaxValue / 1e6;
+
+Samples = Samples .* ADC ./ ADC_new;
+Samples = round(Samples);
+
+% InputRange = ADMaxValue * ADC_new * 1e6;
+% InputRange = round(InputRange);
+
+ADC_str = sprintf('%.24f',ADC_new);
+InputRange_str = sprintf('%g',InputRange_new);
+Header{16} = sprintf('-ADBitVolts %s %s %s %s', ADC_str, ADC_str, ADC_str, ADC_str);
+Header{21} = sprintf('-InputRange %s %s %s %s', InputRange_str, InputRange_str, InputRange_str, InputRange_str);
+
+figure
+plot(mean(Samples,[2 3]).*ADC_new*1e6)
+
+Mat2NlxSpike(file_OUT, 0, 1, [], [1 1 1 1 1 1], ...
+    Timestamps, ScNumbers, CellNumbers, Features, Samples, Header);
+whos
+
+% close all
+
 %%
+file_IN = 'L:\Analysis\pre_proc\SpikeSorting\0034\20180311\spikes_NTT\spikes_b0034_d180311_TT4.NTT';
+nlx_change_header(file_IN, []);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 %%
-
-
-
-
-
