@@ -23,22 +23,23 @@ legend({'in-flight';'dir1';'dir2'})
 
 %% plot (flight by directions)
 pnl(2).select(); hold on
-plot_AC(cell.time_AC.in_field, {'color','k', 'LineWidth',1.5});
-fields_color = get(groot,'defaultAxesColorOrder');
-for ii_field = 1:length(cell.time_AC.by_fields)
-    c_IX = mod( ii_field-1, size(fields_color,1)-1 )+1;
-    c = fields_color(c_IX,:);
-    plot_AC(cell.time_AC.by_fields(ii_field) , {'color',c, 'LineWidth',0.1});
+if ~(isempty(cell.time_AC.in_field) | isempty(cell.time_AC.by_fields) )
+    plot_AC(cell.time_AC.in_field, {'color','k', 'LineWidth',1.5});
+    fields_color = get(groot,'defaultAxesColorOrder');
+    for ii_field = 1:length(cell.time_AC.by_fields)
+        c_IX = mod( ii_field-1, size(fields_color,1)-1 )+1;
+        c = fields_color(c_IX,:);
+        plot_AC(cell.time_AC.by_fields(ii_field) , {'color',c, 'LineWidth',0.1});
+    end
+    legend_str = cellfun(@(x)(sprintf('#%d',x)),num2cell(1:length(cell.time_AC.by_fields)),'UniformOutput',false);
+    legend_str = {'all' legend_str{:}};
+    leg_max_row = 8;
+    leg_ncol = ceil(length(legend_str)/leg_max_row);
+    hleg = columnlegend(leg_ncol, legend_str, 'location', 'NorthEast','boxoff');
+    hax = gca;
+    hleg.Position([1:2]) = hax.Position([1:2])+[0.8 0.2];
+    hleg.Position([3:4]) = [0.03 0.2];
 end
-legend_str = cellfun(@(x)(sprintf('#%d',x)),num2cell(1:length(cell.time_AC.by_fields)),'UniformOutput',false);
-legend_str = {'all' legend_str{:}};
-leg_max_row = 8;
-leg_ncol = ceil(length(legend_str)/leg_max_row);
-hleg = columnlegend(leg_ncol, legend_str, 'location', 'NorthEast','boxoff');
-hax = gca;
-hleg.Position([1:2]) = hax.Position([1:2])+[0.8 0.2];
-hleg.Position([3:4]) = [0.03 0.2];
-
 
 end
 

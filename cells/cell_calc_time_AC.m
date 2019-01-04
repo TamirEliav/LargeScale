@@ -23,23 +23,29 @@ for ii_dir = 1:2
     time_AC.by_dir(ii_dir) = AC;
 end
 
-%% TODO: fix cases with fields
-%% in-field
+%% TODO: fix cases with no fields
 fields = [cell.fields{:}];
-spikes_ts = [fields.spikes_ts];
-AC = cumpute_time_AC(spikes_ts*1e-6, ...
-                     prm.oscillations.time_AC.bin_size,...
-                     prm.oscillations.time_AC.win_size);
-time_AC.in_field = AC;
-
-%% by fields
-fields = [cell.fields{:}];
-for ii_field = 1:length(fields)
-    spikes_ts = [fields(ii_field).spikes_ts];
+if length(fields)==0
+    time_AC.in_field = [];
+    time_AC.by_fields = [];
+else
+    %% in-field
+    spikes_ts = [fields.spikes_ts];
     AC = cumpute_time_AC(spikes_ts*1e-6, ...
                          prm.oscillations.time_AC.bin_size,...
                          prm.oscillations.time_AC.win_size);
-    time_AC.by_fields(ii_field) = AC;
+    time_AC.in_field = AC;
+
+    %% by fields
+    for ii_field = 1:length(fields)
+        spikes_ts = [fields(ii_field).spikes_ts];
+        AC = cumpute_time_AC(spikes_ts*1e-6, ...
+                             prm.oscillations.time_AC.bin_size,...
+                             prm.oscillations.time_AC.win_size);
+        time_AC.by_fields(ii_field) = AC;
+    end
+
+    time_AC.by_fields = [];
 end
 
 %% sleep
@@ -57,6 +63,14 @@ end
 
 
 function AC = cumpute_time_AC(ts,bin_size,win_size)
+
+if isempty(ts)
+    AC.lags = [];
+    AC.c = [];
+    AC.bin_size = bin_size;
+    AC.win_size = win_size;
+    return;
+end
 
 edges = ts(1) : bin_size : ts(end);
 [N,edges] = histcounts(ts,edges);
