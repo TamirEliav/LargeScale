@@ -15,6 +15,12 @@ NTT_file = fullfile(...
 [Timestamps, CellNumbers, Samples, Header] = ...
      Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 1, [] );
 
+%% parse header
+ADBitVolts = sscanf(Header{contains(Header,'ADBitVolts')},'-ADBitVolts %f %f %f %f');
+
+%% convert bits to uVolts
+Samples = Samples .* ADBitVolts' .* 1e6;
+
 %% create spikes structure
 IX = find(CellNumbers==cell_data.details.SS);
 spikes.ts = Timestamps(IX);

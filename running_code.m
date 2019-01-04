@@ -673,18 +673,74 @@ whos
 % close all
 
 %%
-file_IN = 'L:\Analysis\pre_proc\SpikeSorting\0034\20180311\spikes_NTT\spikes_b0034_d180311_TT4.NTT';
+file_IN = 'L:\Analysis\pre_proc\SpikeSorting\0034\20180312\spikes_NTT\spikes_b0034_d180312_TT4.NTT';
 nlx_change_header(file_IN, []);
 
+%% 01/01/2019 - change header for NTTs I got from Shir
+clear 
+clc
+dir_IN = 'L:\Analysis\pre_proc\SpikeSorting_Shir';
+dir_OUT = 'L:\Analysis\pre_proc\SpikeSorting';
+files = dir( fullfile(dir_IN,'**','*.NTT') )
+for ii_file = 1:length(files)
+    file = files(ii_file);
+    file_IN = fullfile(file.folder,file.name)
+    file_OUT = strrep(file_IN, dir_IN, dir_OUT);
+    nlx_change_header(file_IN, file_OUT);
+end
+
+
+%% 03/01/2019 - plexon CSC spikes detection test
+% I did the following steps:
+% 1. loaded raw ncs data to plexon
+% 2. saved it as PLX file
+% 3. convert 4 channels to 1 tetrode 
+% 4. filter
+% 5. thr detection (only positive)
+% 6. saved only the spikes plx channel
+% 7. exported the waveforms to matlab (only sorted waveforms), with the
+% following data columns:
+%      col. 1: unit
+%      col. 2: ts
+%      col. 3-end: wvfrm
+% now I want to load it and save it as ntt file
+clear 
+clc
+% load data
+load('D:\__TEMP\plexon_CSC_test\CSC13-02.mat');
+file_OUT = 'D:\__TEMP\plexon_CSC_test\matlab_exported_sorting.NTT';
+% arrange data
+% remove invalidated waveforms
+TT4( TT4(:,1)==-1 , :) = [];
+CellNumbers = TT4(:,1)';
+Timestamps = TT4(:,2)' .* 1e6;
+Samples = TT4(:,4:end)';
+Samples = reshape(Samples,32,4,length(CellNumbers));
+% plot( mean(Samples,[2 3]) )
+% histogram(categorical(CellNumbers))
+% convert to ntt
+header_file = 'Nlx_header_NTT.txt';
+header_new = textread(header_file, '%s', 'delimiter', '\n', 'whitespace', '');
+ADMaxValue = 32767;
+InputRange = max(Samples(:));
+ADC = InputRange / ADMaxValue / 1e6;
+Samples = Samples ./ ADC ./ 1e6;
+ADC_str = sprintf('%.24f',ADC);
+InputRange_str = sprintf('%g',InputRange);
+ADC_str_IX = contains(header_new, 'ADBitVolts');
+InputRange_str_IX = contains(header_new, 'InputRange');
+header_new{ADC_str_IX} = sprintf('-ADBitVolts %s %s %s %s', ADC_str, ADC_str, ADC_str, ADC_str);
+header_new{InputRange_str_IX} = sprintf('-InputRange %s %s %s %s', InputRange_str, InputRange_str, InputRange_str, InputRange_str);
+% save ntt file
+Mat2NlxSpike(file_OUT, 0, 1, [], [1 0 1 0 1 1], ...
+    Timestamps, CellNumbers, Samples, header_new);
 
 
 
 
 
 
-
-
-
+%%
 
 
 

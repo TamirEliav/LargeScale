@@ -16,24 +16,28 @@ function nlx_csc_write(file_name, signal, ts_usec, fs)
 %% arrange data
 signal = signal(:)';
 ts_usec = ts_usec(:)';
-padding_n = 512 - mod(length(signal),512);
+block_size = 512;
+padding_n = block_size - mod(length(signal),block_size);
 padding = zeros(1,padding_n);
-signal_blocks = reshape( [signal padding], 512, []);
+signal_blocks = reshape( [signal padding], block_size, []);
 num_blocks = size(signal_blocks,2);
-blocks_ts = round(ts_usec(1:512:end));
+blocks_ts = round(ts_usec(1:block_size:end));
 SampleFrequencies = repmat(fs,1,num_blocks);
-% Header = {...
-%     '-FileType: CSC ';...
-%     '-RecordSize 1044 ';...
-% ...%     '-ADCounts 1';...
-%     '-ADBitVolts 1.0';...
-%     ['-SamplingFrequency ' sprintf('%.30f',fs)];...
-%     };
 
-header_file = which('Nlg2Nlx_header.txt');
+%% arrange params
+ADMaxValue = 32767;
+InputRange = max(signal(:));
+ADBitVolts = InputRange / ADMaxValue / 1e6;
+
+%% set header params
+% header_filename = 'Nlg2Nlx_header.txt';
+header_filename = 'Nlx_header_NCS.txt';
+header_file = which(header_filename);
 Header = textread(header_file, '%s', 'delimiter', '\n', 'whitespace', '');
-Header = strrep(Header,'-SamplingFrequency', ['-SamplingFrequency ' char(vpa(fs))]);
-% Header = strrep(Header,'-RecordSize', ['-RecordSize ' num2str(512*num_blocks)]);
+Header = strrep(Header,'-SamplingFrequency', sprintf('-SamplingFrequency %d', fs));
+Header = strrep(Header,'-InputRange', sprintf('-InputRange %g', InputRange));
+Header = strrep(Header,'-ADBitVolts', sprintf('-ADBitVolts %.24f', ADBitVolts));
+% Header = strrep(Header,'-RecordSize', sprintf('-RecordSize %d', block_size*2+20));
 
 
 %% write file

@@ -1,4 +1,13 @@
--FileType: CSC 
--SamplingFrequency
--ADMaxValue 32767 
--ADBitVolts 0.000001
+-FileType CSC
+-FileVersion 3.3.0
+-RecordSize 1044
+
+-SamplingFrequency 
+-ADMaxValue 32767
+-ADBitVolts 
+
+-AcqEntName 
+-NumADChannels 1
+-ADChannel 
+-InputRange 
+-InputInverted True

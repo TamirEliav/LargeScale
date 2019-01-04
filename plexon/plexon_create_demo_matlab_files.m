@@ -13,7 +13,7 @@ num_cells = length(cells_FRs);
 waveforms_peaks_val = [ 100 100 100 100;...
                         200 200 200 200];
 waveforms_peaks_std = 10; 
-Ttotal = 5*60;
+Ttotal = 15*60;
 Fs = 32000;
 Ts = 1/Fs;
 
@@ -107,12 +107,12 @@ save('D:\Tamir\PROJECTS\Plexon\Data\MATLAB\contdata.mat', 'ch_signals')
 save('D:\Tamir\PROJECTS\Plexon\Data\MATLAB\spikes.mat', 'waveforms', 'timestamps')
 
 %% export to NLX files (NCS)
-if 0
+if 1
 for ii_ch = 1:4
-    file_name = ['D:\Tamir\PROJECTS\Plexon\Data\MATLAB\' sprintf('TT1_ch%d.ncs', ii_ch)];
+    file_name = ['D:\Tamir\PROJECTS\Plexon\Data\MATLAB\CSC\' sprintf('TT1_ch%d.ncs', ii_ch)];
     signal = ch_signals(ii_ch, :);
     time_offset = 60*60*10;
-    time_offset = 0;
+%     time_offset = 0;
     ts_usec = (t+time_offset)*1e6;
     fs = Fs;
     
