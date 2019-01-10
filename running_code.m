@@ -707,8 +707,10 @@ end
 clear 
 clc
 % load data
-load('D:\__TEMP\plexon_CSC_test\CSC13-02.mat');
-file_OUT = 'D:\__TEMP\plexon_CSC_test\matlab_exported_sorting.NTT';
+file_IN = 'D:\__TEMP\plexon_CSC_test\TT4.mat';
+file_OUT = strrep(file_IN,'.mat','.NTT');
+load(file_IN);
+TT4 = CSC13;
 % arrange data
 % remove invalidated waveforms
 TT4( TT4(:,1)==-1 , :) = [];
@@ -740,14 +742,84 @@ Mat2NlxSpike(file_OUT, 0, 1, [], [1 0 1 0 1 1], ...
 
 
 
+%% try to load spikes from PLX file!
+clear 
+clc
+filename = 'D:\__TEMP\plexon_CSC_test\TT4-01.plx';
+channel = 'CSC13';
+unit = 2;
+% [n, npw, ts, wave] = plx_waves_v(filename, channel, unit);
+% wave = wave.*1e3;
+% plot(mean(wave))
+
+% [OpenedFileName, Version, Freq, Comment, Trodalness, NPW, PreTresh, SpikePeakV, SpikeADResBits, SlowPeakV, SlowADResBits, Duration, DateTime] = plx_information(filename)
+
+% [adfreq, n, ts, fn, ad] = plx_ad_v(filename, channel);
+[n,names] = plx_chan_names(filename)
+% [tscounts, wfcounts, evcounts, slowcounts] = plx_info(filename,1)
+
+whos
+
+
+%% develop fast coincident detector (vectorized)
+clear 
+clc
+x = zeros(4,25);
+x(:,5)=1;
+x([1 2 3],10)=1;
+x([4],11)=1;
+x(1,20)=1;
+x(2,21)=1;
+x(3,22)=1;
+x(4,23)=1;
+x
+
+n = 3;
+win = rectwin(n);
+CD_filtfilt = filtfilt(win, 1, sum(x)) ./ size(x,1) ./ n
+% CD_conv1 = conv(sum(x),win,'full')
+CD_conv2 = conv(sum(x),win,'same')
+% CD_conv3 = conv(sum(x),win,'valid')
+% T = table(x',CD_filtfilt',CD_conv1',CD_conv2',CD_conv3')
+T = table(x',CD_filtfilt',CD_conv2')
+
 %%
+clear 
+clc
+dir_IN = 'D:\__TEMP\spike_detection\spikes_raw';
+dir_OUT = 'D:\__TEMP\spike_detection\spikes_detection';
+params.thr_uV = [repelem(50,4);...
+                 repelem(25,4);...
+                 repelem(50,4);...
+                 repelem(50,4);];
+params.thr_uV = 50;
+params.ref_ch = [2 1];
+% params.t_start_end = [61004856668 61526309828];
+% params.t_start_end = [62630516212 62772030572];
+params.t_start_end = [];
+params.use_neg_thr = 0;
+params.TT_to_use = [1 2 3 4];
+params.merge_thr_crs_width = 4;
+params.lib_spike_shapes = 'library_of_acceptable_spike_shapes.mat';
+params.lib_corr_thr = 0.8;
+params.active_TT_channels = ones(4,4);
+params.CD_detect_win_len = 32;
+params.CD_invalid_win_len = 32*5;
+params.CD_n_TT_thr = 3;
+% run!
+Nlx_detect_spikes_CSC(dir_IN,dir_OUT,params)
 
 
-
-
-
-
-
+%%
+sdf = zeros(length(Timestamps_accepted_spikes_TT), n_samples);
+for ii_TT = 1:length(Timestamps_accepted_spikes_TT)
+    spikes_ts_IX = ismember(timestamps,Timestamps_accepted_spikes_TT{ii_TT});
+	sdf(ii_TT,spikes_ts_IX) = 1;
+end
+CD_win_len = 32;
+win = rectwin(CD_win_len);
+CD_conv2 = conv(sum(sdf),win,'same');
+plot(CD_conv2)
 
 
 
