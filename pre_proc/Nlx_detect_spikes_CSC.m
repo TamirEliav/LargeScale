@@ -60,14 +60,15 @@ if ~isempty(params.ref_ch)
     filename = TT_files_raw{params.ref_ch(1),params.ref_ch(2)};
     [ref_ch_csc,~] = Nlx_csc_read(fullfile(dir_IN,filename),params.t_start_end);
     % remove this TT from the tetrodes list to use
-    params.TT_to_use( params.TT_to_use == params.ref_ch(1) ) = [];
+%     params.TT_to_use( params.TT_to_use == params.ref_ch(1) ) = [];
 end
 
 
 %% detect spikes
 for TT = params.TT_to_use
 
-    disp(['running detection on TT' TT])
+    disp('')
+    disp(['running detection on TT' num2str(TT)])
     
     %% sanity checks
     if sum(TT_ch_exist(TT,:)) == 0
@@ -89,7 +90,7 @@ for TT = params.TT_to_use
     for ii_ch = act_ch
         filename = TT_files_raw{TT,ii_ch};
         [csc{ii_ch}, timestamps{ii_ch}] = Nlx_csc_read(fullfile(dir_IN,filename),params.t_start_end);
-        if ~isempty(params.ref_ch)
+        if ~isempty(params.ref_ch) && params.ref_ch(1) ~= TT
             csc{ii_ch} = csc{ii_ch} - ref_ch_csc;
         end
     end
@@ -135,6 +136,10 @@ for TT = params.TT_to_use
         diff_thres_cross_vec{ii_ch} = diff(thr_cross_vec{ii_ch});
         SPK_start{ii_ch} = find(diff_thres_cross_vec{ii_ch} ==1)+1;
         SPK_End{ii_ch} = find(diff_thres_cross_vec{ii_ch} ==(-1))+1;
+        
+        if isempty(SPK_End{1})
+            continue
+        end
         
         %Check for the case that csc start/end point already crossed the thr
         if SPK_End{ii_ch}(1) < SPK_start{ii_ch}(1)
@@ -191,31 +196,6 @@ for TT = params.TT_to_use
     toc
 % % % % % % % % % % % % % % % % % % % % % % % %     
 
-
-% % %     % take as a start point all the spikes from ch1
-% % %     SPK_All_Ch_combined = SPK_IX{1};
-% % % 
-% % %     % merge into this list spikes from all other channels
-% % %     for curr_chan_idx=2:4
-% % %         % First loop over the spikes detected on the first channel and compare their seperation from those detected on the second channel
-% % %         % Save only those which are seperated by a minimal number of bins to avoid counting the same spike twice
-% % %         tic
-% % %         for ii_spike = 1:length(SPK_All_Ch_combined)
-% % %             current_spike_IX = SPK_All_Ch_combined(ii_spike);
-% % %             shared_IXs = find(abs(SPK_IX{curr_chan_idx} - current_spike_IX)<= param.spikes.x_sep_spike_thres);
-% % %             if ~isempty(shared_IXs) % i.e., the same spike is detected twice
-% % %                 SPK_IX{curr_chan_idx}(shared_IXs) = [];
-% % %             end
-% % %         end
-% % %         toc
-% % %         % Now that we do not have the same spikes on two channels we can merge the spike IXs of both channels,
-% % %         % as those represent different spikes
-% % %         SPK_All_Ch_combined = [SPK_All_Ch_combined,SPK_IX{curr_chan_idx}];
-% % %     end
-% % %     
-% % %     % sort them to preserve their temporal order:
-% % %     SPK_IXs_All_Ch_combined_sorted = sort(SPK_All_Ch_combined);
-    
     toc
     
     %% Extract spike waveforms
@@ -279,51 +259,6 @@ for TT = params.TT_to_use
     rrr = max(rrr,[],1);
     
     vector_of_accepted_spikes = ( rrr >=  params.lib_corr_thr ); % TODO: plot hist of 'r' values + thr
-    
-% % % %     for ii_spike = 1:size(SPK_waveforms,2)
-% % % %         %(ii_spike/size(SPK_waveforms,2))*100
-% % % %         spike_shape_4channels = zeros(32,4);
-% % % %         for jj_channel = 1:size(SPK_waveforms,1)
-% % % %             spike_shape_4channels(:,jj_channel) = SPK_waveforms{jj_channel,ii_spike}';
-% % % %         end
-% % % %         % Choose the channel # for which the spike has the largest height:
-% % % %         [ stam  idx_channel_max_height ] = max( max( spike_shape_4channels ) );
-% % % %         spike_shape = spike_shape_4channels( :, idx_channel_max_height )' ;
-% % % %         
-% % % %         if ( std( spike_shape(2:end-1) ) == 0 ), % If this is a completely FLAT "spike", I cannot compute CORRCOEF, so I will set r = 0
-% % % %             vector_of_max_r_values( ii_spike ) = 0 ;  % Set r = 0 in this case
-% % % %         else % If this spike DOES have some shape (this is the case basically for ALL the recorded waveforms)
-% % % %             % Compute the correlation coefficients with all the acceptable spike shapes -- lag 0 :
-% % % %             xxx_lags = 2 : 31 ; % Use CENTRAL 30 points
-% % % %             ccc = corrcoef([ spike_shape(2:end-1) ; library_of_acceptable_spike_shapes(:,xxx_lags)]' ); % Correlation coefficients
-% % % %             rrr_vec_lag_0 = ccc( 1, 2:end ); % All the correlation coefficients with the acceptable spike shapes
-% % % %             % Compute the correlation coefficients with all the acceptable spike shapes -- lag (+1) :
-% % % %             xxx_lags = 1 : 30 ; % Use FIRST 30 points (RIGHT shift of the "Acceptable Spike Shapes matrix")
-% % % %             ccc = corrcoef([ spike_shape(2:end-1) ; library_of_acceptable_spike_shapes(:,xxx_lags)]' ); % Correlation coefficients
-% % % %             rrr_vec_lag_plus1 = ccc( 1, 2:end ); % All the correlation coefficients with the acceptable spike shapes
-% % % %             % Compute the correlation coefficients with all the acceptable spike shapes -- lag (-1) :
-% % % %             xxx_lags = 3 : 32 ; % Use LAST 30 points (LEFT shift of the "Acceptable Spike Shapes matrix")
-% % % %             ccc = corrcoef([ spike_shape(2:end-1) ; library_of_acceptable_spike_shapes(:,xxx_lags)]' ); % Correlation coefficients
-% % % %             rrr_vec_lag_minus1 = ccc( 1, 2:end ); % All the correlation coefficients with the acceptable spike shapes
-% % % %             % Save the MAXIMAL r value -- use the maximal correlation among the 3 lags (-1,0,+1):
-% % % %             vector_of_max_r_values( ii_spike ) = max( [ rrr_vec_lag_0  rrr_vec_lag_plus1  rrr_vec_lag_minus1 ] );
-% % % %         end
-% % % %         
-% % % %         % Determine if this spike should be Accepted (set value to '1') or Rejected (set value to '0'):
-% % % %         vector_of_accepted_spikes( ii_spike ) = ...
-% % % %             vector_of_max_r_values( ii_spike )  >=  r_threshold ;
-% % % %         % Accept the spike shape ('1') if its correlation with ANY of the acceptable shapes
-% % % %         % is >= r_threshold ; else, reject the spike ('0').
-% % % %         % FOR DBG: plot waveform in 'r' if rejected and 'b' if accepted
-% % % %         %     if (vector_of_sccepted_spikes( ii_spike )== 1)
-% % % %         %     plot(spike_shape)
-% % % %         %     else
-% % % %         %     plot(spike_shape,'r')
-% % % %         %     end
-% % % %         %     title(['spike num = ',num2str(ii_spike), ' ,r val = ' num2str(vector_of_max_r_values( ii_spike ))])
-% % % %         %     waitforbuttonpress
-% % % %     end % End "Loop over spikes extracted from the Ntt file"
-    
 
     % Find the IXs of the accepted spike waveforms and store the accepted and
     % not-accepted waveforms speratly.
@@ -371,7 +306,7 @@ for TT = params.TT_to_use
     clear VT VT_Parameters ccc spikes_sleep
     clear vector_of_accepted_spikes vector_of_accepted_spikes_sleep
     clear csc
-    clear timestamps 
+%     clear timestamps 
 
     [numCh, numRec ~] = size(Spike_waveforms_accepted);
     spikes = zeros(32,4,numRec);
@@ -401,115 +336,30 @@ if do_coincidence_detection && (length(params.TT_to_use) > 1)
     disp('Coincidence-Detection (eliminate artifacts)')
     tic
     
-    % first, build the indeces of overlapping timestamps between all TT pairs
-    CD1_IX = {};
-    for ii_TT1 = 1:length(params.TT_to_use)
-        for ii_TT2 = 1:length(params.TT_to_use)
-            if ii_TT1 == ii_TT2 
-                continue;
-            end
-            ts_TT1 = Timestamps_accepted_spikes_TT{ params.TT_to_use(ii_TT1) };
-            ts_TT2 = Timestamps_accepted_spikes_TT{ params.TT_to_use(ii_TT2) };
-            IX = find_vec_in_vec( ts_TT1, ts_TT2);
-            IX_TT1 = find( abs(ts_TT1 - ts_TT2(IX)) <= param.coincidence_window );
-            IX_TT2 = IX(IX_TT1);
-            CD1_IX{ii_TT1,ii_TT2,1} = IX_TT1;
-            CD1_IX{ii_TT1,ii_TT2,2} = IX_TT2;
-        end
+    %% find the invalid ts (with CD)
+    TTs_events = zeros(length(Timestamps_accepted_spikes_TT), length(timestamps));
+    for ii_TT = 1:length(Timestamps_accepted_spikes_TT)
+        spikes_ts_IX = ismember(timestamps,Timestamps_accepted_spikes_TT{ii_TT});
+        TTs_events(ii_TT,spikes_ts_IX) = 1;
     end
-    
-    % second, check for 1st order coincidence
-    CD2_IX = {};
-    for ii_TT1 = 1:size(CD1_IX,1)
-        
-        other_TTs_IX = 1:size(CD1_IX,1);
-        other_TTs_IX(other_TTs_IX==ii_TT1) = []; % ix of other tts
-        sdf = CD1_IX(ii_TT1,other_TTs_IX,1);
-        IX_TT1 = mintersect( sdf{:} ); % indeces of current tt that coincide with ALL other tts event
-        for ii_TT2 = other_TTs_IX
-            temp_IX = ismember( CD1_IX{ii_TT1,ii_TT2,1}, IX_TT1 );
-            CD2_IX{ii_TT1, ii_TT2, 1} = CD1_IX{ii_TT1,ii_TT2,1}(temp_IX);
-            CD2_IX{ii_TT1, ii_TT2, 2} = CD1_IX{ii_TT1,ii_TT2,2}(temp_IX);
-        end
-    end
-    
-    % third, check for 2nd order coincidence 
-    CD3_IX = {};
-    for ii_TT1 = 1:size(CD1_IX,1)
-        
-        other_TTs_IX = 1:size(CD1_IX,1);
-        other_TTs_IX(other_TTs_IX==ii_TT1) = []; % ix of other tts
-        sdf = CD1_IX(other_TTs_IX,ii_TT1,2); % note the swapping
-        CD3_IX{ii_TT1} = mintersect( sdf{:} );
-    end
+    mask = conv(sum(TTs_events), ones(1,params.CD_detect_win_len), 'same');
+    mask = mask >= params.CD_n_TT_thr;
+    mask = conv(mask, ones(1,params.CD_invalid_win_len), 'same');
+    TTs_events(:,mask>0) = 0;
     
     % Last, update accepted spikes (ts+shape)
     for ii_TT = 1:length(params.TT_to_use)
         TT = params.TT_to_use(ii_TT);
-        Timestamps_accepted_spikes_TT{TT}(CD3_IX{ii_TT}) = [];
-        spikes_TT{TT}(:,:,CD3_IX{ii_TT}) = [];
+        % find the invalid spikes in each TT
+        old_spikes_ts = Timestamps_accepted_spikes_TT{TT};
+        new_spikes_ts = timestamps( TTs_events(TT,:)==1 );
+        invalid_spikes = ~ismember(old_spikes_ts, new_spikes_ts);
+        Timestamps_accepted_spikes_TT{TT}(invalid_spikes) = [];
+        spikes_TT{TT}(:,:,invalid_spikes) = [];
     end
     
     toc
 end
-% %         time_diff = abs(bsxfun(@minus, ts_A, ts_B'));
-
-
-%%  Read Timestamp data and use Coincidence-Detection across Tetrodes to eliminate artifacts (just as we do in the wired case): --------
-% -------------------------------------------- OLD version ----------------
-do_coincidence_detection = 0;
-if do_coincidence_detection
-    
-    disp('-------------------------------------------')
-    disp('Coincidence-Detection (eliminate artifacts)')
-    tic
-    
-    idx_coincidence_vec{length(param.tetrodes.use_tetrodes)} = [];  % Initialize this variable (for later)
-    
-    % Find coincidence-detection events = coincidence-detection on a millisecond-scale:
-    for ii_spikes = 1:length(Timestamps_accepted_spikes_TT{1}), % Loop over the spikes of the FIRST tetrode
-        t_spike = Timestamps_accepted_spikes_TT{1}(ii_spikes);
-        idx{1} = ii_spikes; % Index of this spike
-        
-        for ii_file = 2:length(param.tetrodes.use_tetrodes) % Loop over the other tetrodes, finding the coincidnce-detection
-            idx{ii_file} = find( abs( Timestamps_accepted_spikes_TT{ii_file} - t_spike ) <= param.spikes.coincidence_window ); % THE COINCIDENCE DETECTION
-        end
-        
-        % Check that the coincidence-detection occurred on ALL tetrodes:
-        test_variable = 1;
-        for ii_file =1: length(param.tetrodes.use_tetrodes) % Loop over all tetrode files
-            if ( isempty( idx{ii_file} ) ), % If there is NO coincidence-detection
-                test_variable = 0 ;
-            end
-        end
-        
-        if length(param.tetrodes.use_tetrodes)>=3 %If there are at least 3 tetrodes
-            % Check that the temporal separation between the OTHER two tetrodes also meets the coincidence-detection criterion
-            % (this is needed since the spikes on the OTHER two tetrodes may be up to twice-the-time apart, in principle!!! ):
-            if ( test_variable == 1 ), % If we passed the first test
-                if ( abs( Timestamps_accepted_spikes_TT{2}(idx{2}(1)) - Timestamps_accepted_spikes_TT{3}(idx{3}(1)) ) > param.spikes.coincidence_window  ),
-                    test_variable = 0 ; % Reset test_variable if the time between spikes on the OTHER two tetrodes is too large
-                end
-            end
-        end;
-        
-        % Save the indexes of the coincidence-detection "spikes" to be REMOVED:
-        if ( test_variable == 1 ), % If all indexes exist = there IS a coincidence detection on ALL tetrodes
-            for ii_file =1:length( param.tetrodes.use_tetrodes) % Loop over all tetrode files
-                idx_coincidence_vec{ii_file} = [ idx_coincidence_vec{ii_file}  idx{ii_file} ];
-            end
-        end
-%         if mod(ii_spikes,1000) == 0
-%             disp(['Processing coindicedence detection across TT- ' num2str((ii_spikes/length(Timestamps_accepted_spikes_TT{tetrodes(1)}))*100)])
-%         end
-    end %end looping over spikes for coincidence detection
-    
-    toc
-    
-else
-    idx_coincidence_vec{1}=[];idx_coincidence_vec{2}=[];idx_coincidence_vec{3}=[];idx_coincidence_vec{4}=[];
-end
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %% Save the data in Neuralynx NTT files for three cases:
