@@ -38,6 +38,11 @@ L_Ratio = sum(ones([num_spikes_noise,1]) - CDF_noiseSpikes)/num_spikes_cluster;
 
 %% Isolation Distance
 D_2_noise_sorted = sort(D_2_noise,'ascend');
-Isolation_dis = D_2_noise_sorted(num_spikes_cluster);
+if num_spikes_cluster > length(D_2_noise_sorted)
+    Isolation_dis = D_2_noise_sorted(end);
+else
+    Isolation_dis = D_2_noise_sorted(num_spikes_cluster);
+end
+
 
 
