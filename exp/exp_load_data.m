@@ -2,7 +2,7 @@ function exp = exp_load_data(varargin)
 
 %% parse input
 if nargin == 0
-    error('cell ID not specified')
+    error('exp_ID not specified')
     return;
 end
 load_all = nargin==1;
@@ -38,4 +38,25 @@ if any(contains(varargin, 'pos_y_std')) | load_all
     exp.pos_y_std = pos_y_std.pos_y_std;
 end
 
+%% LM (landmarks)
+if any(contains(varargin, 'LM')) | load_all
+    %% TODO: temp, make it pretty....
+    exp_path = exp_load_data(exp_ID,'path');
+    load(exp_path.path.calib_tunnel_file);
+    clear LM
+    LM_file = 'L:\Analysis\Code\calib\Landmarks.xlsx';
+    T = readtable(LM_file);
+    pos_proj = POS_calc_linearized([T.pos_X T.pos_Y], calib_tunnel);
+    T.pos_proj = pos_proj(:,1);
+    T.pos_proj_y = pos_proj(:,2);
+    LM = table2struct(T);
+    exp.LM = LM;
 end
+
+
+end
+
+
+
+
+

@@ -2,7 +2,7 @@ function cell_plot_map_fields(cell_ID)
 
 %% load cell/exp data
 cell = cell_load_data(cell_ID);
-exp = exp_load_data(cell.details.exp_ID,'details');
+exp = exp_load_data(cell.details.exp_ID,'details','LM');
 prm = PARAMS_GetAll();
 dir_colors = prm.graphics.colors.flight_directions;
 
@@ -42,7 +42,8 @@ for ii_dir = 1:2
             'FontSize',7,'HorizontalAlignment','center','VerticalAlignment','bottom');
     end
     
-    % Landmarks (TODO: add!)
+    % plot Landmarks
+    plot_LM(exp.LM);
     
     % labels
     xlabel('Position (m)')
@@ -58,6 +59,9 @@ for ii_dir = 1:2
     plot([FE.spikes_pos],[FE.spikes_ts], '.', 'Color', dir_colors{ii_dir})
     ylim(ti)
     rescale_plot_data('y',[1e-6/60 ti(1)])
+    
+    % plot Landmarks
+    plot_LM(exp.LM);
     
     % labels
     xlabel('Position (m)')
@@ -263,7 +267,17 @@ end
 
 
 
+%% local function to plot lines for landmarks
+function plot_LM(LM)
 
+ylimits = get(gca,'ylim');
+for ii_LM=1:length(LM)
+    x = LM(ii_LM).pos_proj;
+    plot(repelem(x,2) , ylimits, '-', 'color', 0.9.*[1 1 1], 'LineWidth',0.5)
+%     text(x, ylimits(2)+0.02*diff(ylimits), LM(ii_LM).name, 'Rotation', 45, 'FontSize',4)
+end
+
+end
 
 
 
