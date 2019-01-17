@@ -6,7 +6,8 @@ function pos_proj = POS_calc_linearized(pos,calib)
     [pos(:,1) pos(:,2)],...
     'linear'); 
 
-%% calc side of the tunnel (curve)
+%% calc side of the tunnel (curve) 
+% We do that by comparing to the tangent of the tunnel curve (taken as the line between the 2-nearset points on the curve)
 IX = knnsearch(calib.curvexy,xy,'K',2,'IncludeTies',false,'Distance','euclidean');
 IX = sort(IX,2,'ascend'); % ascend will create the points north to the tunnel positive!
 side = zeros(size(xy,1),1);

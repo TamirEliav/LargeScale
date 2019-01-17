@@ -77,7 +77,7 @@ for ii_ch = 1:4
     ylabel('peak')
 end
 suptitle('peak changed over time');
-saveas(gcf, 'D:\Tamir\PROJECTS\Plexon\Data\MATLAB\peak changed over time','tif');
+% saveas(gcf, 'D:\Tamir\PROJECTS\Plexon\Data\MATLAB\peak changed over time','tif');
 
 %% export demo data
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
@@ -112,7 +112,7 @@ for ii_ch = 1:4
     file_name = ['D:\Tamir\PROJECTS\Plexon\Data\MATLAB\CSC\' sprintf('TT1_ch%d.ncs', ii_ch)];
     signal = ch_signals(ii_ch, :);
     time_offset = 60*60*10;
-%     time_offset = 0;
+    time_offset = 0;
     ts_usec = (t+time_offset)*1e6;
     fs = Fs;
     

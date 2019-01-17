@@ -783,34 +783,46 @@ CD_conv2 = conv(sum(x),win,'same')
 % T = table(x',CD_filtfilt',CD_conv1',CD_conv2',CD_conv3')
 T = table(x',CD_filtfilt',CD_conv2')
 
-%%
+%% test new spike detection
 clear 
 clc
-dir_IN = 'D:\__TEMP\spike_detection\spikes_raw';
-dir_OUT = 'D:\__TEMP\spike_detection\spikes_detection';
-params.thr_uV = [repelem(50,4);...
+dir_IN = 'L:\Analysis\pre_proc\0034\20180315\spikes_raw';
+dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_Sleep1';
+params.thr_uV = [repelem(30,4);...
                  repelem(25,4);...
-                 repelem(50,4);...
-                 repelem(50,4);];
-params.thr_uV = 50;
+                 repelem(30,4);...
+                 repelem(35,4)];
+% params.thr_uV = 50;
 params.ref_ch = [2 1];
 % params.t_start_end = [61004856668 61526309828];
-% params.t_start_end = [62630516212 62772030572];
-params.t_start_end = [];
+params.t_start_end = [61639062973 62365439740];
+% params.t_start_end = [];
 params.use_neg_thr = 0;
 params.TT_to_use = [1 2 3 4];
 params.merge_thr_crs_width = 4;
-params.lib_spike_shapes = 'library_of_acceptable_spike_shapes.mat';
-params.lib_corr_thr = 0.8;
+params.lib_spike_shapes = 'library_of_acceptable_spike_shapes_new.mat';
+params.lib_corr_thr = 0.9;
 params.active_TT_channels = ones(4,4);
 params.CD_detect_win_len = 32;
-params.CD_invalid_win_len = 32*5;
+params.CD_invalid_win_len = 32*2;
 params.CD_n_TT_thr = 3;
 % run!
 Nlx_detect_spikes_CSC(dir_IN,dir_OUT,params)
 
 
-%%
+%% convert plx to ntt
+clear
+clc
+file_IN = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection\spikes_b0034_d180315_TT4-02.plx';
+% file_OUT = 'D:\__TEMP\spike_detection\spikes_detection\spikes_b0034_d180314_TT1-11.NTT';
+plexon_plx2ntt(file_IN, [])
+% plexon_plx2ntt(file_IN, file_OUT)
+
+
+
+
+
+%% test convolution idea to make coincidence detection faster
 sdf = zeros(length(Timestamps_accepted_spikes_TT), n_samples);
 for ii_TT = 1:length(Timestamps_accepted_spikes_TT)
     spikes_ts_IX = ismember(timestamps,Timestamps_accepted_spikes_TT{ii_TT});
@@ -820,6 +832,55 @@ CD_win_len = 32;
 win = rectwin(CD_win_len);
 CD_conv2 = conv(sum(sdf),win,'same');
 plot(CD_conv2)
+
+%% play with spaese matrix
+clear
+clc
+nSamples = 32*1e3*60*60*2.5;
+nSpikes = 1e5;
+nTT = 16;
+for ii = 1:nTT
+    spikes_IX(ii,:) = randsample(nSamples,nSpikes);
+end
+
+%%
+tic
+for ii = 1:nTT
+    A = sparse(ii, spikes_IX(ii,:), 1,nTT,nSamples);
+end
+toc
+
+tic
+B = zeros(nTT,nSamples);
+for ii = 1:nTT
+    B(ii, spikes_IX(ii,:)) = 1;
+end
+toc
+
+%% play with findpeaks
+clear 
+clc
+nSamples = 32*1e3*60*60*2.5;
+nSpikes = 1e5;
+% nSamples = 100;
+% nSpikes = 20;
+x = zeros(nSamples,1);
+x( randsample(nSamples,nSpikes) ) = rand(nSpikes,1)+1;
+
+%%
+tic
+sdf=findpeaks(x,'MinPeakDistance',5);
+toc
+tic
+sdf=findpeaks(x,'MinPeakDistance',5, 'MinPeakHeight', 1);
+toc
+
+
+
+%%
+
+
+
 
 
 
