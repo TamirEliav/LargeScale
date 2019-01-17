@@ -10,7 +10,13 @@ function Nlx_detect_spikes_CSC(dir_IN,dir_OUT,params)
 % 1. detected spikes
 % 2. spikes that were detected but thrown away after library comparison
 
-% % % %%
+%% open log file
+log_name_str = ['spikes_detection_' datestr(clock, 'yyyy-mm-dd HH-MM-SS') '.txt'];
+log_name_out = fullfile(dir_OUT, log_name_str );
+if ~exist(dir_OUT,'dir'), mkdir(dir_OUT); end 
+diary off; diary(log_name_out); diary on
+
+%%
 % % % forcerecalc = 0;
 % % % 
 % % % %%
@@ -27,11 +33,10 @@ function Nlx_detect_spikes_CSC(dir_IN,dir_OUT,params)
 % % % % params.ref_ch = 1; % []
 % % % % params.TT_to_use = [4];
 % params.t_start_end = [];
-params.merge_thr_crs_width = 4;
-params.use_neg_thr = 0;
-params.lib_spike_shapes = 'library_of_acceptable_spike_shapes.mat';
-params.lib_corr_thr = 0.8;
-param.coincidence_window = 1e3;
+% params.merge_thr_crs_width = 4;
+% params.use_neg_thr = 0;
+% params.lib_spike_shapes = 'library_of_acceptable_spike_shapes.mat';
+% params.lib_corr_thr = 0.8;
 
 %% Get files
 files_raw = dir( fullfile(dir_IN,['*_TT*_ch*']) );
@@ -253,7 +258,7 @@ for TT = params.TT_to_use
     rrr = [];
     for ii_shift = 1:size(xxx_lags_shifts,1)
         xxx_lags = xxx_lags_shifts(ii_shift, :);
-        ccc = corr(spikes_waveforms(:,xxx_lags)', library_of_acceptable_spike_shapes(:,xxx_lags)');
+        ccc = corr(spikes_waveforms(:,xxx_lags)', library_of_acceptable_spike_shapes(:,2:end-1)');
         rrr(ii_shift,:) = max(ccc,[],2);
     end
     rrr = max(rrr,[],1);
@@ -365,7 +370,6 @@ end
 %% Save the data in Neuralynx NTT files for three cases:
 % (1) All the data.
 
-if ~exist(dir_OUT,'dir'), mkdir(dir_OUT); end 
 for TT = params.TT_to_use
 
     % make sure there are data from this TT
@@ -380,18 +384,35 @@ for TT = params.TT_to_use
     
     filename_out = fullfile(dir_OUT,NTT_filename);
    
-    % load generic header to add to NTT files
-    load('ntt_generic_header.mat');
-    
-    Timestamps_accepted_spikes=Timestamps_accepted_spikes_TT{TT};
-%     Timestamps_accepted_spikes(idx_coincidence_vec{TT})=[];
-    spikes=spikes_TT{TT};
-%     spikes(:,:,idx_coincidence_vec{TT})=[];
+    header_file = 'Nlx_header_NTT.txt';
+    header = textread(header_file, '%s', 'delimiter', '\n', 'whitespace', '');
 
-    %only export timestamps and data points
-    FieldSelection = [1 0 0 0 1 0];
-    Mat2NlxSpike(filename_out, 0, 1, [], FieldSelection, Timestamps_accepted_spikes, spikes);
+    Timestamps = Timestamps_accepted_spikes_TT{TT};
+    CellNumbers = zeros(size(Timestamps));
+    Samples = spikes_TT{TT};
+    fs = 1e6/median(diff(timestamps));
+    ADMaxValue = 32767;
+    InputRange = max(Samples(:));
+    ADC = InputRange / ADMaxValue / 1e6;
+    Samples = Samples ./ ADC ./ 1e6;
+    ADC_str = sprintf('%.24f',ADC);
+    InputRange_str = sprintf('%g',InputRange);
+    ADC_str_IX = contains(header, 'ADBitVolts');
+    InputRange_str_IX = contains(header, 'InputRange');
+    header{ADC_str_IX} = sprintf('-ADBitVolts %s %s %s %s', ADC_str, ADC_str, ADC_str, ADC_str);
+    header{InputRange_str_IX} = sprintf('-InputRange %s %s %s %s', InputRange_str, InputRange_str, InputRange_str, InputRange_str);
+    header{contains(header, '-SamplingFrequency')} = sprintf('-SamplingFrequency %g',fs);
     
+    Mat2NlxSpike(filename_out, 0, 1, [], [1 0 1 0 1 1], ...
+        Timestamps, CellNumbers, Samples, header);
     
 end % end looping over tetrodes
+
+
+%% close log file
+diary off
+
+
+
+
 
