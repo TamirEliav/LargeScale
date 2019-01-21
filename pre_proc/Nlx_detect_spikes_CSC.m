@@ -31,12 +31,14 @@ diary off; diary(log_name_out); diary on
 % % % % params.thr_uV = 40;
 % % % % params.ref_TT = 1; % []
 % % % % params.ref_ch = 1; % []
-% % % % params.TT_to_use = [4];
+% % % % params.TT_to_use = [1 2 3 4];
 % params.t_start_end = [];
 % params.merge_thr_crs_width = 4;
 % params.use_neg_thr = 0;
 % params.lib_spike_shapes = 'library_of_acceptable_spike_shapes.mat';
 % params.lib_corr_thr = 0.8;
+params.nSamples = 32;
+params.AlignSample = 8;
 
 %% Get files
 files_raw = dir( fullfile(dir_IN,['*_TT*_ch*']) );
@@ -55,19 +57,27 @@ end
 TT_ch_exist = cellfun(@(x)(~isempty(x)), TT_files_raw);
 num_TTs = size(TT_files_raw,1);
 
-%% arrange data/params
+%% arrange params
 if length(params.thr_uV) == 1
     params.thr_uV = repmat(params.thr_uV, size(TT_ch_exist))
 end
 
+if length(params.use_neg_thr) == 1
+    params.use_neg_thr = repmat(params.use_neg_thr, size(TT_ch_exist))
+end
+
+%% init time measure
+time_measure = struct();
+
 %% load ref channel (if exist)
+tic 
 if ~isempty(params.ref_ch)
     filename = TT_files_raw{params.ref_ch(1),params.ref_ch(2)};
     [ref_ch_csc,~] = Nlx_csc_read(fullfile(dir_IN,filename),params.t_start_end);
     % remove this TT from the tetrodes list to use
 %     params.TT_to_use( params.TT_to_use == params.ref_ch(1) ) = [];
 end
-
+time_measure.load_ref_ch = toc;
 
 %% detect spikes
 for TT = params.TT_to_use
@@ -87,9 +97,9 @@ for TT = params.TT_to_use
 %     end
     
     %% load raw data (CSCs)
+    tic
     csc = {};
     timestamps  = {};
-    % TODO: for disconnected channels place zeros as the signal
     act_ch = find(params.active_TT_channels(TT, :));
     non_act_ch = find(~params.active_TT_channels(TT, :));
     for ii_ch = act_ch
@@ -110,11 +120,10 @@ for TT = params.TT_to_use
     for ii_ch = non_act_ch
         csc{ii_ch} = zeros(size(timestamps));
     end
-    
+    time_measure.load_TT(TT) = toc;
         
     %% detect threshold crossing 
-    disp('------------------------------------')
-    disp('Detect spike (thr crossing)         ')
+    fprintf('\t Detect spike (thr crossing) \n')
     tic
     thr_cross_vec = {};
     thr_cross_IX = {};
@@ -124,17 +133,20 @@ for TT = params.TT_to_use
     Last_Spike_IX = 0; % Initialize
     SPK_timestamp = [];% Initialize
 
-    % TODO: run only over valid channels
+    % TODO: enable negative thr per channel
     for ii_ch = act_ch
         thr = params.thr_uV(TT,ii_ch);
-        thr_cross_vec{ii_ch} = zeros(1,length(csc{ii_ch})); % TODO: initiate first!
-        if params.use_neg_thr
+        use_neg_thr = params.use_neg_thr(TT,ii_ch);
+        % TODO: report used thr and what was the 5*median(signal) auto thr?
+        
+        if use_neg_thr
             thr_cross_IX{ii_ch} = find(csc{ii_ch}>thr | csc{ii_ch}<-thr);
         else
             thr_cross_IX{ii_ch} = find(csc{ii_ch}>thr);
-        end;
+        end
         
         % place '1' at threshold crossing:
+        thr_cross_vec{ii_ch} = zeros(1,length(csc{ii_ch}));
         thr_cross_vec{ii_ch}(thr_cross_IX{ii_ch})=1; % place '1' at threshold crossing
 
         % Find the start and end segment of each spiking event on each channel of the tetrode:
@@ -161,16 +173,19 @@ for TT = params.TT_to_use
         for jj = 1:length(SPK_End{ii_ch})
             temp_IX_vec = SPK_start{ii_ch}(jj):SPK_End{ii_ch}(jj);
             temp_SPK_events = csc{ii_ch}(temp_IX_vec);
-            [temp_SPK_max,IX] = max(temp_SPK_events);
-            max_IX = temp_IX_vec(IX);
-            SPK_IX{ii_ch}(1,jj) = max_IX; % Correct for the real timestamp relative to the entire recording session
+            % using abs for the negative thr option (if no negative thr 
+            % used it will not affect the positive, unless there is a sharp 
+            % transition from positive to negative or vice versa without 
+            % passing below abs thr)
+            [temp_SPK_max,IX] = max(abs(temp_SPK_events)); 
+            max_IX = temp_IX_vec(IX); % Correct for the real timestamp relative to the entire recording session
+            SPK_IX{ii_ch}(1,jj) = max_IX;
         end
-        
     end
     clear diff_thres_cross_vec
     clear thres_cross_vec
     clear thres_cross_IX
-    toc
+    time_measure.thr_crs(TT) = toc;
   
     
     %% Merge spikes from different channels
@@ -178,78 +193,69 @@ for TT = params.TT_to_use
     % If two spikes are detected on differnt channel but they are close
     % enough in time (<params.merge_thr_crs_width), we merge them to a single
     % spike
-    disp('------------------------------------')
-    disp('Merge spikes from different channels')
+    fprintf('\t Merge spikes from different channels \n')
     tic
     
-% % % % % % % % % % % % % % % % % % % % % % % %     
+    % set '1' at events per ch and sum them up
     events_all_ch = zeros(4,length(csc{1}));
     for ii_ch = 1:4
         events_all_ch( ii_ch, SPK_IX{ii_ch} ) = 1;
     end
     events_ch_combined = sum(events_all_ch);
     clear events_all_ch;
-    toc
-% % % % % % % % % % % % % % % % % % % % % % % %     
+    % convolve with a rectangular kernal with width of the merging event 
     rect_kernel = ones(1,params.merge_thr_crs_width);
     events_ch_combined_filtered = filtfilt(rect_kernel, 1, events_ch_combined);
-    toc
-% % % % % % % % % % % % % % % % % % % % % % % %     
+    % find the peaks in the convolved signal, representing the different
+    % merged events (across channels)
     [~,SPK_IXs_All_Ch_combined_sorted] = findpeaks(events_ch_combined_filtered);
-%     [~,SPK_IXs_All_Ch_combined_sorted] = findpeaks(events_ch_combined, 'MinPeakDistance', param.spikes.x_sep_spike_thres);
+    
     clear events_ch_combined
-    toc
-% % % % % % % % % % % % % % % % % % % % % % % %     
-
-    toc
+    time_measure.merge_ch(TT) = toc;
     
     %% Extract spike waveforms
     % Extract the waveform and timestamps of each spike (as in Neuralynx, the peak
     % will be the 8th sample out of over all 32 samples of
     %the spike shape vec.
     
-    disp('------------------------------------')
-    disp('Extract waveforms')
+    fprintf('\t Extract waveforms \n')
     tic
     
-    SPK_waveforms = zeros(4,length(SPK_IXs_All_Ch_combined_sorted),32);% Initialize
-    current_file_spike_counter = 0;
-    for ii_spike = 1:length(SPK_IXs_All_Ch_combined_sorted)
-        current_spike_max_IX = SPK_IXs_All_Ch_combined_sorted(ii_spike);
-        if ((current_spike_max_IX+24<=length(timestamps))&& (current_spike_max_IX-7>0)) % i.e., we are NOT cutting the spike in the middle, TODO: no need to check this every loop, we can check only for the first and last spikes....
-            current_file_spike_counter = current_file_spike_counter + 1;
-            SPK_timestamp(1,Last_Spike_IX+current_file_spike_counter) = timestamps(current_spike_max_IX);
-            for curr_chan_idx=1:4
-                SPK_waveforms(curr_chan_idx,Last_Spike_IX+current_file_spike_counter,:) = csc{curr_chan_idx}(current_spike_max_IX-7:1:current_spike_max_IX+24);
-            end
-        end
+    if (SPK_IXs_All_Ch_combined_sorted(1) < params.AlignSample)
+        SPK_IXs_All_Ch_combined_sorted(1) = [];
     end
-    Last_Spike_IX = Last_Spike_IX + current_file_spike_counter;
+    if (SPK_IXs_All_Ch_combined_sorted(end) + params.nSamples-params.AlignSample > length(timestamps))
+        SPK_IXs_All_Ch_combined_sorted(end) = [];
+    end
     
-    toc
+    SPK_waveforms = zeros(params.nSamples,4,length(SPK_IXs_All_Ch_combined_sorted));% Initialize
+    % IX relative to spikes peak
+    trigger_IX = repmat( [(1-params.AlignSample):(params.nSamples-params.AlignSample)]',1,length(SPK_IXs_All_Ch_combined_sorted));
+    % IX relative to csc signal
+    trigger_IX = trigger_IX + repmat(SPK_IXs_All_Ch_combined_sorted,[params.nSamples 1]);
+    for ch = 1:4
+        SPK_waveforms(:,ch,:) = csc{ch}(trigger_IX);
+    end
+    % get spikes ts
+    SPK_timestamp = timestamps(SPK_IXs_All_Ch_combined_sorted);
+    
+    time_measure.extract_wvfrm(TT) = toc;
     
     %% library of acceptable spike shapes
     % Clean artifacts using the library of acceptable spike shapes.
     % Now we will throw away noisy theshold crossing using the library of
     % acceptable spike shapes as reference
 
-    disp('------------------------------------')
-    disp('library of acceptable spike shapes')
+    fprintf('\t library of acceptable spike shapes \n')
     tic
-    
-    % First we will need to normalize peak amplitude of each spike to a value
-    % of '1' such that we can comapre it to the library of acceptable spike
-    % shapes:
-    
     load(params.lib_spike_shapes);
-    vector_of_accepted_spikes = zeros( 1, length(SPK_waveforms) ) + NaN ; % Initialize
-    vector_of_max_r_values = zeros( 1, 1 ) + NaN ;
     
     % For each event take the channel with the largest peak (8th point)
-    spikes_waveforms = zeros(size(SPK_waveforms,2),32);
-    for ii_spike = 1:size(SPK_waveforms,2)
-        [~,ii_ch_max] = max(SPK_waveforms(:,ii_spike,8));
-        spikes_waveforms(ii_spike,:) = SPK_waveforms(ii_ch_max,ii_spike,:);
+    [~,max_ch_IX] = max(squeeze(abs(SPK_waveforms(params.AlignSample,:,:))),[],1);
+    spikes_waveforms = zeros(size(SPK_waveforms,1),size(SPK_waveforms,3));
+    for ch=1:4
+        IX = find(max_ch_IX == ch);
+        spikes_waveforms(:,IX) = squeeze(SPK_waveforms(:,ch,IX));
     end
     
     % calc corr
@@ -258,52 +264,28 @@ for TT = params.TT_to_use
     rrr = [];
     for ii_shift = 1:size(xxx_lags_shifts,1)
         xxx_lags = xxx_lags_shifts(ii_shift, :);
-        ccc = corr(spikes_waveforms(:,xxx_lags)', library_of_acceptable_spike_shapes(:,2:end-1)');
+        ccc = corr(spikes_waveforms(xxx_lags,:), library_of_acceptable_spike_shapes(:,2:end-1)');
         rrr(ii_shift,:) = max(ccc,[],2);
     end
     rrr = max(rrr,[],1);
-    
     vector_of_accepted_spikes = ( rrr >=  params.lib_corr_thr ); % TODO: plot hist of 'r' values + thr
-
+    
+    time_measure.lib_corr(TT) = toc;
+    
+    %% get spikes data for accepted spikes
+    % TODO: enable saving the non-accepted waveforms (or at least report
+    % how many)
     % Find the IXs of the accepted spike waveforms and store the accepted and
     % not-accepted waveforms speratly.
-    IX_accepted = find(vector_of_accepted_spikes ==1);
-    IX_NO_accepted = find(vector_of_accepted_spikes ==0);
+    tic
+%     Spike_waveforms_accepted = SPK_waveforms(:,vector_of_accepted_spikes,:);
+%     Spike_waveforms_NO_accepted = SPK_waveforms(:,~vector_of_accepted_spikes,:);
     
-    
-    toc
-    
-    
-    
-    %%
-    % Extract the accepted (and not accepted) spikes and define new varialbes:
-    Spike_waveforms_accepted = zeros(4,length(IX_accepted),32);
-    Spike_waveforms_NO_accepted = zeros(4,length(IX_NO_accepted),32);
-    
-    counter_accepted = 0;
-    counter_NO_accepted = 0;
-    for ii = 1:length(vector_of_accepted_spikes)
-        if vector_of_accepted_spikes(ii) == 1;
-            counter_accepted = counter_accepted + 1;
-            
-            for curr_chan_idx=1:4
-                Spike_waveforms_accepted(curr_chan_idx,counter_accepted,:) = SPK_waveforms(curr_chan_idx,ii,:);
-            end
-        else
-            counter_NO_accepted = counter_NO_accepted + 1;
-            for curr_chan_idx=1:4
-                Spike_waveforms_NO_accepted(curr_chan_idx,counter_NO_accepted,:) = SPK_waveforms(curr_chan_idx,ii,:);
-            end
-        end
-    end
-    
-    
-    %%
-    Timestamps_accepted_spikes = SPK_timestamp(IX_accepted);
-    %rotate the timestamps to be 1 x num_records
-    %timestamps = rot90(Timestamps_accepted_spikes);
-    
-    % Clear un-needed variables
+    Timestamps_accepted_spikes_TT{TT} = SPK_timestamp(vector_of_accepted_spikes);
+    spikes_TT{TT} = SPK_waveforms(:,:,vector_of_accepted_spikes);
+    time_measure.divide_lib_corr_results(TT) = toc;
+
+    %% Clear un-needed variables
     clear IX_NO_accepted IX_NO_accepted_sleep IX_accepted_sleep
     clear SPK_All_Ch_combined
     clear Spike_waveforms_NO_accepted
@@ -313,33 +295,16 @@ for TT = params.TT_to_use
     clear csc
 %     clear timestamps 
 
-    [numCh, numRec ~] = size(Spike_waveforms_accepted);
-    spikes = zeros(32,4,numRec);
-    for rec=1:numRec
-        %rec/numRec
-        for channel = 1:numCh
-            current_channel_waveform = squeeze(Spike_waveforms_accepted(channel,rec,:));
-            %for point=1:32
-            %             spikes(point, channel, rec) = current_channel_waveform(point)*amplitude_factor;
-            %end
-%             spikes(:, channel, rec) = current_channel_waveform*param.spikes.amplitude_factor;
-            spikes(:, channel, rec) = current_channel_waveform;
-        end
-    end
-    
-    Timestamps_accepted_spikes_TT{TT} = Timestamps_accepted_spikes;
-    spikes_TT{TT} = spikes;
-
 end %end looping over Tetrodes
 
 
 %% Coincidence detection - Tamir's version
 do_coincidence_detection = 1;
+tic
 if do_coincidence_detection && (length(params.TT_to_use) > 1)
 
     disp('-------------------------------------------')
     disp('Coincidence-Detection (eliminate artifacts)')
-    tic
     
     %% find the invalid ts (with CD)
     TTs_events = zeros(length(Timestamps_accepted_spikes_TT), length(timestamps));
@@ -362,14 +327,15 @@ if do_coincidence_detection && (length(params.TT_to_use) > 1)
         Timestamps_accepted_spikes_TT{TT}(invalid_spikes) = [];
         spikes_TT{TT}(:,:,invalid_spikes) = [];
     end
-    
-    toc
 end
+time_measure.CD = toc;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %% Save the data in Neuralynx NTT files for three cases:
 % (1) All the data.
-
+tic
+disp('-------------------------')
+disp('Write results (NTT files)')
 for TT = params.TT_to_use
 
     % make sure there are data from this TT
@@ -407,7 +373,24 @@ for TT = params.TT_to_use
         Timestamps, CellNumbers, Samples, header);
     
 end % end looping over tetrodes
+time_measure.write_NTTs = toc;
 
+%% report timing
+time_measure_fields = fieldnames(time_measure);
+total_runtime = 0;
+for ii_field = 1:length(time_measure_fields)
+    total_runtime = total_runtime + sum(time_measure.(time_measure_fields{ii_field}));
+end
+time_measure.total_runtime = total_runtime;
+time_measure
+
+%% TODO: report used parmas
+
+%% TODO: report results stats (num spikes detected / CD / lib / ...)
+
+%% TODO: save some meta-data to .mat file (params,)
+params_fileout = fullfile(dir_OUT,'params');
+save(params_fileout, 'params');
 
 %% close log file
 diary off
