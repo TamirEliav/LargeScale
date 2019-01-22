@@ -57,7 +57,7 @@ prm.FR_map.bin_size = 0.2;
 prm.FR_map.ker_SD = 0.5;
 prm.FR_map.min_time_spent_per_meter = 0.75;
 prm.FR_map.ker_type = 'gaussian';
-prm.FR_map.shuffles_num = 10;
+prm.FR_map.shuffles_num = 1000;
 prm.FR_map.shuffles_max_shift = 30;
 
 prm.fields.FR_thr = 1;
@@ -68,7 +68,7 @@ prm.fields.min_spikes = 10;
 prm.fields.min_flights_with_spikes = 5;
 prm.fields.min_flights_with_spikes_prc = 0.2;
 prm.fields.local_shuffle.margin = 0.5; % relative to field width
-prm.fields.local_shuffle.n_shuffles = 10;
+prm.fields.local_shuffle.n_shuffles = 1000;
 prm.fields.local_shuffle.max_shift = 30;
 prm.fields.local_shuffle.signif_SI_prc = 95;
 
