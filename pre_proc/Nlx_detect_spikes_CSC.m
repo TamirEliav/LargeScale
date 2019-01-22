@@ -66,8 +66,9 @@ if length(params.use_neg_thr) == 1
     params.use_neg_thr = repmat(params.use_neg_thr, size(TT_ch_exist))
 end
 
-%% init time measure
+%% init time measure and stats
 time_measure = struct();
+stats = struct();
 
 %% load ref channel (if exist)
 tic 
@@ -133,7 +134,6 @@ for TT = params.TT_to_use
     Last_Spike_IX = 0; % Initialize
     SPK_timestamp = [];% Initialize
 
-    % TODO: enable negative thr per channel
     for ii_ch = act_ch
         thr = params.thr_uV(TT,ii_ch);
         use_neg_thr = params.use_neg_thr(TT,ii_ch);
@@ -186,7 +186,7 @@ for TT = params.TT_to_use
     clear thres_cross_vec
     clear thres_cross_IX
     time_measure.thr_crs(TT) = toc;
-  
+	stats.detect_nEvents(:,TT) = cellfun(@length,SPK_IX);
     
     %% Merge spikes from different channels
     % Merge spikes from all channels of the same TT
@@ -212,6 +212,7 @@ for TT = params.TT_to_use
     
     clear events_ch_combined
     time_measure.merge_ch(TT) = toc;
+    stats.merge_nEvents(TT) = length(SPK_IXs_All_Ch_combined_sorted);
     
     %% Extract spike waveforms
     % Extract the waveform and timestamps of each spike (as in Neuralynx, the peak
@@ -240,6 +241,8 @@ for TT = params.TT_to_use
     SPK_timestamp = timestamps(SPK_IXs_All_Ch_combined_sorted);
     
     time_measure.extract_wvfrm(TT) = toc;
+    stats.extract_nWvfrm(:,TT) = size(SPK_waveforms);
+    stats.extract_nTimestamps(TT) = length(SPK_timestamp);
     
     %% library of acceptable spike shapes
     % Clean artifacts using the library of acceptable spike shapes.
@@ -268,9 +271,23 @@ for TT = params.TT_to_use
         rrr(ii_shift,:) = max(ccc,[],2);
     end
     rrr = max(rrr,[],1);
-    vector_of_accepted_spikes = ( rrr >=  params.lib_corr_thr ); % TODO: plot hist of 'r' values + thr
+    vector_of_accepted_spikes = ( rrr >=  params.lib_corr_thr );
+    
+    figure('Units','normalized','Position',[0 0 1 1]);
+    hold on
+    h= histogram(rrr);
+    h.NumBins = h.NumBins * 5;
+    plot(repelem(params.lib_corr_thr,2), get(gca,'ylim'), 'r', 'LineWidth',2);
+    xlabel('max lib corr')
+    ylabel('Counts')
+    title(sprintf('TT %d',TT));
+    lib_corr_figname = fullfile(dir_OUT, sprintf('lib_corr_TT_%d',TT));
+    saveas(gcf,lib_corr_figname,'tif')
+    close gcf
     
     time_measure.lib_corr(TT) = toc;
+    stats.lib_nAccepted(TT) = sum(vector_of_accepted_spikes);
+    stats.lib_nNotAccepted(TT) = sum(~vector_of_accepted_spikes);
     
     %% get spikes data for accepted spikes
     % TODO: enable saving the non-accepted waveforms (or at least report
@@ -284,6 +301,8 @@ for TT = params.TT_to_use
     Timestamps_accepted_spikes_TT{TT} = SPK_timestamp(vector_of_accepted_spikes);
     spikes_TT{TT} = SPK_waveforms(:,:,vector_of_accepted_spikes);
     time_measure.divide_lib_corr_results(TT) = toc;
+    stats.extract_lib_accepted_nWvfrm(:,TT) = size(spikes_TT{TT});
+    stats.extract_lib_accepted_nTimestamps(TT) = length(Timestamps_accepted_spikes_TT{TT});
 
     %% Clear un-needed variables
     clear IX_NO_accepted IX_NO_accepted_sleep IX_accepted_sleep
@@ -307,15 +326,16 @@ if do_coincidence_detection && (length(params.TT_to_use) > 1)
     disp('Coincidence-Detection (eliminate artifacts)')
     
     %% find the invalid ts (with CD)
+    % first, mark 1 for event for each TT
     TTs_events = zeros(length(Timestamps_accepted_spikes_TT), length(timestamps));
     for ii_TT = 1:length(Timestamps_accepted_spikes_TT)
         spikes_ts_IX = ismember(timestamps,Timestamps_accepted_spikes_TT{ii_TT});
         TTs_events(ii_TT,spikes_ts_IX) = 1;
     end
-    mask = conv(sum(TTs_events), ones(1,params.CD_detect_win_len), 'same');
-    mask = mask >= params.CD_n_TT_thr;
-    mask = conv(mask, ones(1,params.CD_invalid_win_len), 'same');
-    TTs_events(:,mask>0) = 0;
+    mask = conv(sum(TTs_events), ones(1,params.CD_detect_win_len), 'same'); % sum across TT and convolve with CD detection window
+    mask = mask >= params.CD_n_TT_thr; % apply min number of TT for detection
+    mask = conv(mask, ones(1,params.CD_invalid_win_len), 'same'); % convolve dections with the invalidation window (we are after detection!)
+    TTs_events(:,mask>0) = 0; % invalidate events
     
     % Last, update accepted spikes (ts+shape)
     for ii_TT = 1:length(params.TT_to_use)
@@ -326,9 +346,15 @@ if do_coincidence_detection && (length(params.TT_to_use) > 1)
         invalid_spikes = ~ismember(old_spikes_ts, new_spikes_ts);
         Timestamps_accepted_spikes_TT{TT}(invalid_spikes) = [];
         spikes_TT{TT}(:,:,invalid_spikes) = [];
+        stats.CD_nEventRemove(TT) = length(invalid_spikes);
     end
+    
 end
 time_measure.CD = toc;
+
+%%
+stats.rec_len.nSamples = length(timestamps);
+stats.rec_len.totalTimeHours = range(timestamps)*1e-6/60/60;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %% Save the data in Neuralynx NTT files for three cases:
@@ -382,15 +408,21 @@ for ii_field = 1:length(time_measure_fields)
     total_runtime = total_runtime + sum(time_measure.(time_measure_fields{ii_field}));
 end
 time_measure.total_runtime = total_runtime;
-time_measure
+fn_structdisp(time_measure)
 
-%% TODO: report used parmas
+%% report used parmas
+fn_structdisp(stats)
 
-%% TODO: report results stats (num spikes detected / CD / lib / ...)
+%% report results stats (num spikes detected / CD / lib / ...)
+fn_structdisp(stats)
 
-%% TODO: save some meta-data to .mat file (params,)
+%% save some meta-data to .mat file (params,stats)
 params_fileout = fullfile(dir_OUT,'params');
 save(params_fileout, 'params');
+stats_fileout = fullfile(dir_OUT,'stats');
+save(stats_fileout, 'stats');
+time_measure_fileout = fullfile(dir_OUT,'time_measure');
+save(time_measure_fileout, 'time_measure');
 
 %% close log file
 diary off

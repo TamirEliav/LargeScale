@@ -787,7 +787,13 @@ T = table(x',CD_filtfilt',CD_conv2')
 clear 
 clc
 dir_IN = 'L:\Analysis\pre_proc\0034\20180315\spikes_raw';
-dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_Sleep1';
+% dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime4_sleep_original';
+% dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime5_sleep_new_bug';
+% dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime6_sleep_new_with_abs_in_lib';
+% dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime7_all_new_no_abs_lib_yes_abs_align';
+% dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime8_all_new_yes_abs_lib_yes_abs_align';
+dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime9_updated_code_sleep_only';
+
 params.thr_uV = [repelem(30,4);...
                  repelem(25,4);...
                  repelem(30,4);...
@@ -797,7 +803,7 @@ params.ref_ch = [2 1];
 % params.t_start_end = [61004856668 61526309828];
 params.t_start_end = [61639062973 62365439740];
 % params.t_start_end = [];
-params.use_neg_thr = 0;
+params.use_neg_thr = 1;
 params.TT_to_use = [1 2 3 4];
 params.merge_thr_crs_width = 4;
 params.lib_spike_shapes = 'library_of_acceptable_spike_shapes_new.mat';
