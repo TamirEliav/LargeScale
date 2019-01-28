@@ -137,7 +137,9 @@ for TT = params.TT_to_use
     for ii_ch = act_ch
         thr = params.thr_uV(TT,ii_ch);
         use_neg_thr = params.use_neg_thr(TT,ii_ch);
-        % TODO: report used thr and what was the 5*median(signal) auto thr?
+        % report stats (choosen thr vs. median/std)
+        stats.thr_div_abs_median(ii_ch,TT) = thr / median(abs(csc{ii_ch}));
+        stats.thr_div_std(ii_ch,TT) = thr / std(csc{ii_ch});
         
         if use_neg_thr
             thr_cross_IX{ii_ch} = find(csc{ii_ch}>thr | csc{ii_ch}<-thr);
@@ -178,6 +180,7 @@ for TT = params.TT_to_use
             % transition from positive to negative or vice versa without 
             % passing below abs thr)
             [temp_SPK_max,IX] = max(abs(temp_SPK_events)); 
+%             [temp_SPK_max,IX] = max(temp_SPK_events);
             max_IX = temp_IX_vec(IX); % Correct for the real timestamp relative to the entire recording session
             SPK_IX{ii_ch}(1,jj) = max_IX;
         end
@@ -200,6 +203,7 @@ for TT = params.TT_to_use
     events_all_ch = zeros(4,length(csc{1}));
     for ii_ch = 1:4
         events_all_ch( ii_ch, SPK_IX{ii_ch} ) = 1;
+%         events_all_ch( ii_ch, SPK_IX{ii_ch} ) = abs(csc{ii_ch}(SPK_IX{ii_ch}));
     end
     events_ch_combined = sum(events_all_ch);
     clear events_all_ch;
@@ -423,6 +427,9 @@ stats_fileout = fullfile(dir_OUT,'stats');
 save(stats_fileout, 'stats');
 time_measure_fileout = fullfile(dir_OUT,'time_measure');
 save(time_measure_fileout, 'time_measure');
+
+%% FIN
+disp('spikes detection FINISH!!!')
 
 %% close log file
 diary off

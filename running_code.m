@@ -786,23 +786,32 @@ T = table(x',CD_filtfilt',CD_conv2')
 %% test new spike detection
 clear 
 clc
-dir_IN = 'L:\Analysis\pre_proc\0034\20180315\spikes_raw';
+exp_ID = 'b0034_d180306';
+exp = exp_load_data(exp_ID,'details','path');
+dir_IN = exp.path.spikes_raw;
+dir_OUT = exp.path.spikes_detection;
+dir_OUT = [dir_OUT '_test_artifacts3'];
+% dir_IN = 'L:\Analysis\pre_proc\0034\20180306\spikes_raw';
+% dir_OUT = 'L:\Analysis\pre_proc\0034\20180306\spikes_detection_test2';
 % dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime4_sleep_original';
 % dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime5_sleep_new_bug';
 % dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime6_sleep_new_with_abs_in_lib';
 % dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime7_all_new_no_abs_lib_yes_abs_align';
 % dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime8_all_new_yes_abs_lib_yes_abs_align';
-dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime9_updated_code_sleep_only';
+% dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime9_updated_code_sleep_only';
+% dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime10_Sleep1_report_thr_std_median';
 
 params.thr_uV = [repelem(30,4);...
                  repelem(25,4);...
                  repelem(30,4);...
                  repelem(35,4)];
 % params.thr_uV = 50;
-params.ref_ch = [2 1];
+params.ref_ch = [2 3];
 % params.t_start_end = [61004856668 61526309828];
 params.t_start_end = [61639062973 62365439740];
-% params.t_start_end = [];
+params.t_start_end = [];
+params.t_start_end = exp_get_sessions_ti(exp_ID,'Sleep1');
+% params.t_start_end = mean(params.t_start_end) + 1e6*60*2.*[-1 1];
 params.use_neg_thr = 1;
 params.TT_to_use = [1 2 3 4];
 params.merge_thr_crs_width = 4;
@@ -811,22 +820,22 @@ params.lib_corr_thr = 0.9;
 params.active_TT_channels = ones(4,4);
 params.CD_detect_win_len = 32;
 params.CD_invalid_win_len = 32*2;
-params.CD_n_TT_thr = 3;
+% params.CD_n_TT_thr = 3;
+params.CD_n_ch_thr = 0.5 * sum(params.active_TT_channels(:)); % at least on half of the channels
+params.is_save_artifacts = 1;
 % run!
-Nlx_detect_spikes_CSC(dir_IN,dir_OUT,params)
+Nlx_detect_spikes_CSC3(dir_IN,dir_OUT,params)
 
 
 %% convert plx to ntt
 clear
 clc
-file_IN = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection\spikes_b0034_d180315_TT4-02.plx';
+% file_IN = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection\spikes_b0034_d180315_TT4-02.plx';
+file_IN = 'L:\Analysis\pre_proc\0034\20180306\spikes_detection_new_code\spikes_b0034_d180306_TT4_.plx';
+
 % file_OUT = 'D:\__TEMP\spike_detection\spikes_detection\spikes_b0034_d180314_TT1-11.NTT';
 plexon_plx2ntt(file_IN, [])
 % plexon_plx2ntt(file_IN, file_OUT)
-
-
-
-
 
 %% test convolution idea to make coincidence detection faster
 sdf = zeros(length(Timestamps_accepted_spikes_TT), n_samples);
@@ -881,11 +890,42 @@ tic
 sdf=findpeaks(x,'MinPeakDistance',5, 'MinPeakHeight', 1);
 toc
 
+%% 22/01/2019 - test if accum array is faster than for loop
+clear
+clc
+n = 1e5;
+k = 32;
+x = zeros(1,k*n);
+x(5:k:length(x)) = 150;
+subs = ceil((1:length(x))./k);
+tic
+accumarray(subs',x',[],@max);
+toc
+tic
+accumarray(subs',x',[],@my_func);
+toc
+plot(subs)
+
+%%
+clc
+iter = 10000;
+tic
+for ii=1:iter
+    a = max(x);
+end
+toc
+
+tic
+for ii=1:iter
+    [a,b] = max(x);
+end
+toc
 
 
 %%
-
-
+function max_IX = my_func(x)
+[~,max_IX] = max(x);
+end
 
 
 
