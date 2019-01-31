@@ -4,10 +4,8 @@
 -FileType: CSC 
 -RecordSize 1044 
 
--SamplingFrequency
-
+-SamplingFrequency 320000
 -ADMaxValue 32767 
--ADBitVolts 
-
--InputRange 
+-InputRange 7000
+-ADBitVolts 0.000001
 -InputInverted True 

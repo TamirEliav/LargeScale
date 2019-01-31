@@ -1,5 +1,4 @@
-
-function Nlg2Nlx(main_dir)
+function Nlg2Nlx(main_dir,forcecalc)
 
 % function Nlg2Nlx(main_dir)
 %
@@ -11,26 +10,34 @@ function Nlg2Nlx(main_dir)
 % revised - Didi Omer, June 2015
 %
 
+%% defaults
+if nargin==1
+    forcecalc = 0;
+end
 
 %% arrange files/folders
-
 disp('1. constract/verify file structure...');
-header_file = 'Nlg2Nlx_header.txt';
-
-% case 1: no nlg and nlx directories
-
-
 Nlg_InDir = fullfile(main_dir, 'nlg');
 Nlx_OutDir = fullfile(main_dir, 'nlx');
 if ~exist(Nlg_InDir,'dir')
     error('NLG input folder does not exist');
 end
-if ~exist(Nlx_OutDir,'dir')
-    mkdir(main_dir,'nlx')
+if exist(Nlx_OutDir,'dir')
+    if forcecalc
+%         % rename existing output dir
+%         Nlx_OutDir_OLD_rename = sprintf([Nlx_OutDir '_OLD_%s'],datetime(datetime,'Format','yyyymmdd_HHmmss'));
+%         movefile(Nlx_OutDir, Nlx_OutDir_OLD_rename);
+        % delete existing output dir
+        warning('NLX output dir already existing and you chose to override it, deleting old NLX dir!')
+        rmdir(Nlx_OutDir,'s')
+    else
+        error('NLX output folder already exist, use forcecalc to override it!');
+    end
 end
+% at this point we should not have the nlx output dir, so let's create it!
+mkdir(Nlx_OutDir)
 
 %% parameters setting
-motion_channel=1;
 num_channels = 16;
 data_cnl_ind = [0:15]; % note that this numbering system is of the neurologger which means channels 0-15
 DATA_file_prefix = 'NEUR0';
@@ -42,6 +49,8 @@ is_remove_flash_write_artifact = false;
 use_clock_diff_correction = true;
 use_post_rec_ref_channel = false; % use this if you recorded with GND as ref channel
 post_rec_ref_channel = 1; % (1-16) If the above is true - choose the channel you want to substract from all the other channels
+motion_channel = 1;
+header_file = 'Nlg2Nlx_header.txt';
 
 %% read EVENT file
 event_file_name_xlsx = fullfile(Nlg_InDir, 'EVENTLOG.csv');
@@ -66,7 +75,7 @@ uVolt_per_bit = str2num(cell2mat(ADC_resolution_uVolt));
 block_period_time_usec = (512/fs) * 1e6;
 digital_data_block_period_time_usec = (512/fs) * 1e6;
 block_period_time_usec_2 = 512 * (ADC_SAMPLE_PERIOD * num_channels) * 1e6;
-file_len_time_usec = block_period_time_usec*1024; % TODO: calc
+file_len_time_usec = block_period_time_usec*1024;
 fs_acc = 1e6/(file_len_time_usec / 2048);
 ts_offset_acc_neur_usec = file_len_time_usec / 2048;
 
@@ -154,23 +163,31 @@ if use_clock_diff_correction
     end
     CD_values = CD_values.*1e6; % change from sec to usec
     
-    % TODO: we need to check what is the meaning of CD (clock difference). Logger-Tx
-    % or Tx-Logger?
-    % Is this old comment relevant? Didi
-    % TODO: best to do is to check this again after Jacob bring us the new
-    % version that fix the problem from version 1.69
-    
-    CD_event_ts__logger_time = CD_timestamps-CD_timestamps(1);        % removed 1st timestamp to balance the fit data closer to zero (otheriwse it gives a warning message)
+    CD_event_ts__logger_time = CD_timestamps;
     CD_event_ts__Tx_time = CD_event_ts__logger_time - CD_values;
-    transceiver_2_logger_time_fit = polyfit(CD_event_ts__Tx_time, CD_event_ts__logger_time , 1);
-    ts_source_transceiver_events_IX = find(strcmp('Transceiver', events_TS_source)); % TODO: add Transceiver (fine) - validate string !!
-    events_TS(ts_source_transceiver_events_IX) = polyval(transceiver_2_logger_time_fit , events_TS(ts_source_transceiver_events_IX) - CD_timestamps(1)) + CD_timestamps(1);
-    for ii_event = 1:length(ts_source_transceiver_events_IX)
-        events_TS_source{ts_source_transceiver_events_IX(ii_event)} = 'Logger';
+    tx2logger_time_lm = fitlm(CD_event_ts__Tx_time, CD_event_ts__logger_time , 'linear');
+    ts_src_tx_events_IX = find(contains(events_TS_source, 'Transceiver'));
+    events_TS(ts_src_tx_events_IX) = predict(tx2logger_time_lm, events_TS(ts_src_tx_events_IX));
+    for ii_event = 1:length(ts_src_tx_events_IX)
+        events_TS_source{ts_src_tx_events_IX(ii_event)} = 'Logger';
     end
     
-    % TODO: plot some figure, and make a check that the clock dcorrection
-    % was OK
+    % plot figure to make a check that the clock correction was OK
+    figure
+    subplot(1,2,1)
+    plot(CD_event_ts__logger_time, CD_values.*1e-3, 'o-');
+    xlabel('Logger time (usec)')
+    ylabel('Clock Diff (ms)')
+    title('logger vs. tx clock drift')
+    subplot(1,2,2)
+    plot(tx2logger_time_lm)
+    text(0.1,0.8, sprintf('clock gain (logger vs. tx):\n%.24f',tx2logger_time_lm.Coefficients.Estimate(2)), 'Units','normalized','FontSize',12)
+    axis equal
+    xlabel('Logger time (usec)')
+    ylabel('Transciever time (usec)')
+    suptitle(main_dir)
+    fig_file = fullfile(Nlx_OutDir, 'Clock_diff_correction');
+    saveas(gcf, fig_file , 'tif')
 end
 
 %% write event file in Nlx format
@@ -225,10 +242,11 @@ if is_recording
 end
 
 legend({'battey voltage','record mode change event'})
+suptitle(main_dir)
 
 fig_file = fullfile(Nlx_OutDir, 'Battery_discharge');
-saveas(gcf, fig_file , 'jpg')
-saveas(gcf, fig_file , 'fig')
+saveas(gcf, fig_file , 'tif')
+% saveas(gcf, fig_file , 'fig')
 
 
 %% create Nlx data files - continuous sampling files called (.ncs)
@@ -240,11 +258,27 @@ FileStarted_details = events_details(FileStarted_IX);
 
 % read header template
 header = textread(header_file, '%s', 'delimiter', '\n', 'whitespace', '');
+header_neural = header;
+header_motion = header;
 % change fields that are recording specific
-header_neural = strrep(header,'-SamplingFrequency', ['-SamplingFrequency ' char(vpa(fs))]);
-header_motion = strrep(header,'-SamplingFrequency', ['-SamplingFrequency ' char(vpa(fs_acc))]);
-disp('6. Nlg -> Nlx...');
+ADMaxValue = 32767;
+InputRange = 7000;
+ADBitVolts = InputRange / ADMaxValue / 1e6;
+if is_invert_data
+    InputInvertedStr = 'True';
+else
+    InputInvertedStr = 'False';
+end
+header_neural{contains(header_neural,'SamplingFrequency')}  = sprintf('-SamplingFrequency %g', fs);
+header_neural{contains(header_neural,'ADMaxValue')}         = sprintf('-ADMaxValue %d', ADMaxValue);
+header_neural{contains(header_neural,'InputRange')}         = sprintf('-InputRange %g', InputRange);
+header_neural{contains(header_neural,'ADBitVolts')}         = sprintf('-ADBitVolts %.24f', ADBitVolts);
+header_neural{contains(header_neural,'InputInverted')}      = sprintf('-InputInverted %s', InputInvertedStr);
+header_neural{contains(header_neural,'SamplingFrequency')}  = sprintf('-SamplingFrequency %g', fs);
+header_neural{contains(header_neural,'SamplingFrequency')}  = sprintf('-SamplingFrequency %g', fs);
+header_motion{contains(header_motion,'SamplingFrequency')}  = sprintf('-SamplingFrequency %g', fs_acc);
 
+disp('6. Nlg -> Nlx...');
 for ii_file_start_entry = 1:length(FileStarted_TS)
     
     %%
@@ -292,9 +326,7 @@ for ii_file_start_entry = 1:length(FileStarted_TS)
             gyro_len = rec_data(8);
             magnet_len = rec_data(9);
             
-            
             % Didi - for each of the 2048 sequences take the mean for each sensor.
-            
             acc_data_seg = rec_data( (acc_offset+1) : (acc_offset+acc_len));
             gyro_data_seg = rec_data( (gyro_offset+1) : (gyro_offset+gyro_len));
             magnet_data_seg = rec_data( (magnet_offset+1) : (magnet_offset+magnet_len));
@@ -320,18 +352,9 @@ for ii_file_start_entry = 1:length(FileStarted_TS)
                 
             end
             
-            
-            
-            
         end
         %     digital_data_ts = digital_data_ts';
         %     digital_data_ts_usec = digital_data_ts .* 1e3;
-        
-        
-        
-        
-        
-        
         acc_data_X = acc_data(1,:);
         acc_data_Y = acc_data(2,:);
         acc_data_Z = acc_data(3,:);
@@ -429,44 +452,6 @@ for ii_file_start_entry = 1:length(FileStarted_TS)
         end
     end
     
-    %% Remove repetative flash write artifact
-    % % % %     if is_remove_flash_write_artifact
-    % % % %         weak_artifacts_block_IX = [1:256 513:768 1025:1280 1537:1793];
-    % % % %         strong_artifacts_block_IX = setdiff(1:2048, weak_artifacts_block_IX);
-    % % % %         trim_prc = 1;
-    % % % %         for ii_channel = 1:size(data,1)
-    % % % %             data_channel_blocks = reshape( data(ii_channel,:), 256, [] );
-    % % % %             flash_write_artifact_shape_weak = trimmean(data_channel_blocks(:,weak_artifacts_block_IX), trim_prc , 'round', 2);
-    % % % %             flash_write_artifact_shape_strong = trimmean(data_channel_blocks(:,strong_artifacts_block_IX), trim_prc , 'round', 2);
-    % % % %
-    % % % %             %% TEMP
-    % % % %             sdf = data_channel_blocks(:,strong_artifacts_block_IX);
-    % % % %             sdf = sdf - mean(mean(sdf));
-    % % % %             sdf = abs(sdf);
-    % % % %             sdf = sdf.*uVolt_per_bit;
-    % % % %             figure
-    % % % %             hold all
-    % % % %             plot(mean(sdf,2));
-    % % % %             plot(prctile(sdf,50,2));
-    % % % %             plot(prctile(sdf,60,2));
-    % % % %             plot(prctile(sdf,70,2));
-    % % % %             plot(prctile(sdf,80,2));
-    % % % %             plot(prctile(sdf,90,2));
-    % % % %             legend({'averaged','50%','60%','70%','80%','90%'});
-    % % % %             ylim([0 50])
-    % % % %
-    % % % %             %%
-    % % % %             data_channel_blocks_corrected = zeros(size(data_channel_blocks));
-    % % % %             for ii_block = weak_artifacts_block_IX
-    % % % %                 data_channel_blocks_corrected(:,ii_block) = data_channel_blocks(:,ii_block) - flash_write_artifact_shape_weak;
-    % % % %             end
-    % % % %             for ii_block = strong_artifacts_block_IX
-    % % % %                 data_channel_blocks_corrected(:,ii_block) = data_channel_blocks(:,ii_block) - flash_write_artifact_shape_strong;
-    % % % %             end
-    % % % %             data(ii_channel,:) = reshape(data_channel_blocks_corrected,1,[]);
-    % % % %        end
-    % % % %     end
-    
     %% if we recorded with GND as ref. channel we want to have a
     % "post-recording ref. channel"
     if use_post_rec_ref_channel
@@ -509,15 +494,7 @@ for ii_file_start_entry = 1:length(FileStarted_TS)
         
         Mat2NlxCSC(out_file, append_flag, 1, 0, [1 0 0 0 1 1], blocks_timestamps_usec, cnl_data_blocks, header_neural );
     end
-    %pause;
 end
-
-% %
-% % %% try to add header
-% % file = 'D:\arseny\NlgRec\neurologger_recording_20140107_arseny\test\test.ncs';
-% % % Mat2NlxCSC(file, 0, 1, 0, [1 0 0 0 1 1], zeros(1,0), zeros(512,0), header );
-% % % Mat2NlxCSC(file, 0, 1, 0, [1 0 0 0 1 1], blocks_timestamps_usec, cnl_data_blocks, header );
-% % Mat2NlxCSC(file, 1, 1, 0, [1 0 0 0 1 1], blocks_timestamps_usec+20*1e6, cnl_data_blocks, header );
 
 %%
 disp('Finished converting all files from Nlg format to Nlx format!')
