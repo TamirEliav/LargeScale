@@ -262,13 +262,32 @@ if do_coincidence_detection && (length(params.TT_to_use) > 1)
     
     %% find the invalid ts (with CD)
     % first, mark 1 for event for each TT
-    high_amp_art_IX = cat(2,all_TT.TT_high_amp_art_IX{:});
+    
+    % option 1 - using all detected event pooled for each TT from all channels -
+    % uVolt thr different from spikes
     mask = zeros(size(timestamps));
-    for ii = 1:length(high_amp_art_IX)
+    for ii_TT = 1:length(all_TT.TT_high_amp_art_IX)
+        TT_high_amp_art_IX = all_TT.TT_high_amp_art_IX{ii_TT};
+        high_amp_art_IX = cat(2, TT_high_amp_art_IX{:});
         mask_temp = zeros(size(timestamps));
-        mask_temp(high_amp_art_IX{ii}) = 1;
+        mask_temp(high_amp_art_IX) = 1;
         mask = mask+mask_temp;
     end
+    nSourceEvent_thr = params.CD_n_TT_thr;
+    
+% %     % option 2 - using all detected event from all channels - uVolt thr
+% %     % seperate from spikes
+% %     high_amp_art_IX = cat(2,all_TT.TT_high_amp_art_IX{:});
+% %     mask = zeros(size(timestamps));
+% %     for ii = 1:length(high_amp_art_IX)
+% %         mask_temp = zeros(size(timestamps));
+% %         mask_temp(high_amp_art_IX{ii}) = 1;
+% %         mask = mask+mask_temp;
+% %     end
+% %     nSourceEvent_thr = params.CD_n_ch_thr;
+    
+% %     % option 3 - using detected events per TT (all events/only lib
+% %     % detected) - uVolt thr as for spikes  (original code)
 % %     mask = zeros(length(params.TT_to_use), length(timestamps));
 % %     % TODO: replace with summing up the ones in the for loop (to avoid
 % %     % large memoryu allocation for 16 TT case)
@@ -278,9 +297,10 @@ if do_coincidence_detection && (length(params.TT_to_use) > 1)
 % %         mask(ii_TT, all_TT.TT_events_IX{TT}) = 1; % NOTE: we are using all the detected events!! (not only the expected spikes)
 % %     end
 % %     mask = sum(mask);
+% %     nSourceEvent_thr = params.CD_n_TT_thr;
+
     mask = conv(mask, ones(1,params.CD_detect_win_len), 'same'); % sum across TT and convolve with CD detection window
-%     mask = mask >= params.CD_n_TT_thr; % apply min number of TT for detection
-    mask = mask >= params.CD_n_ch_thr; % apply min number of ch for detection
+    mask = mask >= nSourceEvent_thr ; % apply min number of sources for detection (sources = TT or ch)
     mask = conv(mask, ones(1,params.CD_invalid_win_len), 'same'); % convolve dections with the invalidation window (we are after detection!)
     mask = mask>0; % now in mask we have 1 for CD invalidation
     
