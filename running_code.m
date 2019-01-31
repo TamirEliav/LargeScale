@@ -790,7 +790,7 @@ exp_ID = 'b0034_d180306';
 exp = exp_load_data(exp_ID,'details','path');
 dir_IN = exp.path.spikes_raw;
 dir_OUT = exp.path.spikes_detection;
-dir_OUT = [dir_OUT '_test_artifacts3'];
+dir_OUT = [dir_OUT '_old_code'];
 % dir_IN = 'L:\Analysis\pre_proc\0034\20180306\spikes_raw';
 % dir_OUT = 'L:\Analysis\pre_proc\0034\20180306\spikes_detection_test2';
 % dir_OUT = 'L:\Analysis\pre_proc\0034\20180315\spikes_detection_test_runtime4_sleep_original';
@@ -810,9 +810,9 @@ params.ref_ch = [2 3];
 % params.t_start_end = [61004856668 61526309828];
 params.t_start_end = [61639062973 62365439740];
 params.t_start_end = [];
-params.t_start_end = exp_get_sessions_ti(exp_ID,'Sleep1');
+% params.t_start_end = exp_get_sessions_ti(exp_ID,'Sleep1');
 % params.t_start_end = mean(params.t_start_end) + 1e6*60*2.*[-1 1];
-params.use_neg_thr = 1;
+params.use_neg_thr = 0;
 params.TT_to_use = [1 2 3 4];
 params.merge_thr_crs_width = 4;
 params.lib_spike_shapes = 'library_of_acceptable_spike_shapes_new.mat';
@@ -820,11 +820,14 @@ params.lib_corr_thr = 0.9;
 params.active_TT_channels = ones(4,4);
 params.CD_detect_win_len = 32;
 params.CD_invalid_win_len = 32*2;
-% params.CD_n_TT_thr = 3;
-params.CD_n_ch_thr = 0.5 * sum(params.active_TT_channels(:)); % at least on half of the channels
+params.CD_n_TT_thr = 3;
+params.CD_n_ch_thr = 9;
+% params.CD_n_TT_thr  = length(params.TT_to_use);
+% params.CD_n_ch_thr = 0.5 * sum(params.active_TT_channels(:)); % at least on half of the channels
 params.is_save_artifacts = 1;
 % run!
-Nlx_detect_spikes_CSC3(dir_IN,dir_OUT,params)
+Nlx_detect_spikes_CSC(dir_IN,dir_OUT,params)
+% Nlx_detect_spikes_CSC3(dir_IN,dir_OUT,params)
 
 
 %% convert plx to ntt
@@ -921,14 +924,73 @@ for ii=1:iter
 end
 toc
 
+%% test std and median runtime for large arrays
+fs = 32000;
+x = randn(1,fs*60*60*2);
+tic; std(x); toc
+tic; median(abs(x)); toc
+tic; mean(abs(x)); toc
 
-%%
-function max_IX = my_func(x)
-[~,max_IX] = max(x);
+%% plot median/std of neural raw channels for bats across days
+clear;clc
+% load exp summary and choose exps
+exp_t = DS_get_exp_summary();
+bat_num = 2289;
+exp_t(~contains(exp_t.recordingArena, '200m'),:) = [];
+exp_t(exp_t.position_data_exist==0,:) = [];
+exp_t(exp_t.neural_data_exist==0,:) = [];
+exp_t(~ismember(exp_t.batNum, [bat_num] ),:) = [];
+exp_t
+
+exps = cellfun(@(x)(exp_load_data(x,'details','csc_raw_stats')), exp_t.exp_ID, 'UniformOutput', false);
+exps = exps(cellfun(@(x)(isfield(x,'csc_raw_stats')),exps));
+exps = [exps{:}];
+dates = cellfun(@(x)(x.date), {exps.details});
+stats = [exps.csc_raw_stats];
+abs_median = cat(3,stats.csc_abs_median);
+reref_abs_median = cat(3,stats.csc_reref_abs_median);
+
+% plot to figure
+figure('Units','normalized','Position',[0 0 1 1])
+pnl = panel();
+pnl.pack('v',2,'h',4);
+pnl.margin=25;
+h=pnl.title(sprintf('Raw neural data noise levels, bat %04d',bat_num));
+h.FontSize = 20;
+h.Position = [0.5 1.05];
+h=pnl(1).title('No re-ref');
+h.FontSize = 16;
+for TT=1:4
+    pnl(1,TT).select();
+    title(sprintf('TT %d',TT))
+    plot(dates, squeeze(abs_median(TT,:,:)),'.-')
+    xlabel('Date')
+    ylabel('median(abs(raw data)) [uVolt]')
+    ylim([0 10])
+    legend({'ch1','ch2','ch3','ch4'})
 end
+h=pnl(2).title('with re-ref');
+h.FontSize = 16;
+for TT=1:4
+    pnl(2,TT).select();
+    title(sprintf('TT %d',TT))
+    plot(dates, squeeze(reref_abs_median (TT,:,:)),'.-')
+    xlabel('Date')
+    ylabel('median(abs(raw data)) [uVolt]')
+    ylim([0 10])
+    legend({'ch1','ch2','ch3','ch4'})
+end
+% save figure
+fig_filename = fullfile('L:\Analysis\Results', sprintf('csc_raw_stats_bat_%04d',bat_num));
+saveas(gcf,fig_filename, 'tif')
+
+
 
 
 
 
 
 %%
+
+
+
