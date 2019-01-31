@@ -52,7 +52,7 @@ pos.proc_1D.vel_csaps(isnan(pos.proc_1D.pos)) = nan;
 
 
 %% save data to file
-filename = fullfile('L:\Analysis\Results\exp\position',[exp_ID '_exp_position']);
+filename = fullfile('L:\Analysis\Results\exp\pos',[exp_ID '_exp_pos']);
 save(filename, 'pos');
 
 

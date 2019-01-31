@@ -1,7 +1,7 @@
 function exp_calc_pos_std_y(exp_ID)
 
 %% load exp data
-exp = exp_load_data(exp_ID,'position','flight');
+exp = exp_load_data(exp_ID,'pos','flight');
 prm = PARAMS_GetAll();
 
 %% arrange relevant data for analysis (take only data from detected flights)

@@ -17,12 +17,7 @@ field_options = {
     };
 
 %% parse input
-if nargin == 0
-    error('cell ID not specified')
-    return;
-end
 load_all = nargin==1;
-
 if load_all
     fields2load = field_options;
 else

@@ -2,7 +2,7 @@ function cell_create_flight_data(cell_ID)
 
 %% load cell/exp data
 cell = cell_load_data(cell_ID,'details','spikes');
-exp = exp_load_data(cell.details.exp_ID,'details','flight','position');
+exp = exp_load_data(cell.details.exp_ID,'details','flight','pos');
 prm = PARAMS_GetAll();
 
 %% calc pos/vel for each spikes (TODO: maybe that should be done in a seperate function)

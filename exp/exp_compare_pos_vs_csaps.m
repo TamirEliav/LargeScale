@@ -1,7 +1,7 @@
 function exp_compare_pos_vs_csaps(exp_ID)
 
 %% load exp data
-exp=exp_load_data(exp_ID,'details','position');
+exp=exp_load_data(exp_ID,'details','pos');
 
 %% plot
 figure

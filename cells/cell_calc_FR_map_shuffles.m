@@ -2,7 +2,7 @@ function cell_calc_FR_map_shuffles(cell_ID)
 
 %% load cell data
 cell = cell_load_data(cell_ID,'details','FE');
-exp = exp_load_data(cell.details.exp_ID,'details','position');
+exp = exp_load_data(cell.details.exp_ID,'details','pos');
 prm = PARAMS_GetAll();
 
 %%

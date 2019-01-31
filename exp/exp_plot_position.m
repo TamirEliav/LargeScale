@@ -1,7 +1,7 @@
 function exp_plot_position(exp_ID)
 
 %% load exp data
-exp = exp_load_data(exp_ID,'details','position');
+exp = exp_load_data(exp_ID,'details','pos');
 prm = PARAMS_GetAll();
 
 %%
