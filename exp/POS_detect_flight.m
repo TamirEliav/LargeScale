@@ -1,7 +1,7 @@
 function POS_detect_flight(exp_ID)
 
 %% load exp data
-exp = exp_load_data(exp_ID,'position');
+exp = exp_load_data(exp_ID,'pos');
 prm = PARAMS_GetAll();
 
 %% arrange relevant data

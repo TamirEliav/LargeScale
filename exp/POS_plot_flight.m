@@ -1,7 +1,7 @@
 function POS_plot_flight(exp_ID)
 
 %% load data
-exp = exp_load_data(exp_ID, 'details', 'position', 'flight');
+exp = exp_load_data(exp_ID, 'details', 'pos', 'flight');
 prm = PARAMS_GetAll();
 
 %% arrange data
