@@ -140,7 +140,7 @@ end
 disp('3. correcting for clock diff...');
 
 if use_clock_diff_correction
-    
+    %%
     PC_gen_events_IX = find(strcmp('PC-generated comment', events_type));
     CD_str = 'CD=';
     CD_values = [];
@@ -158,33 +158,53 @@ if use_clock_diff_correction
     end
     CD_values = CD_values.*1e6; % change from sec to usec
     
+    % detect false CD value measurements!
+    CD_outliers_thr = 20e3;
+    CD_outliers = abs(CD_values-median(CD_values)) > CD_outliers_thr;
+    
     CD_event_ts__logger_time = CD_timestamps;
     CD_event_ts__Tx_time = CD_event_ts__logger_time - CD_values;
-    tx2logger_time_lm = fitlm(CD_event_ts__Tx_time, CD_event_ts__logger_time , 'linear');
+    tx2logger_time_lm        = fitlm(CD_event_ts__Tx_time, CD_event_ts__logger_time , 'linear');
+    tx2logger_time_lm_robust = fitlm(CD_event_ts__Tx_time, CD_event_ts__logger_time , 'linear', 'Exclude', CD_outliers);
     ts_src_tx_events_IX = find(contains(events_TS_source, 'Transceiver'));
-    events_TS(ts_src_tx_events_IX) = predict(tx2logger_time_lm, events_TS(ts_src_tx_events_IX));
+    events_TS(ts_src_tx_events_IX) = predict(tx2logger_time_lm_robust, events_TS(ts_src_tx_events_IX));
     for ii_event = 1:length(ts_src_tx_events_IX)
         events_TS_source{ts_src_tx_events_IX(ii_event)} = 'Logger';
     end
     
-    % plot figure to make a check that the clock correction was OK
+    %% plot figure to make a check that the clock correction was OK
     figure('Units','normalized','Position',[0 0 1 1])
-    subplot(1,2,1)
+    % CD values (median+thr/outliers)
+    subplot(1,2,1); hold on
     plot(CD_event_ts__logger_time, CD_values.*1e-3, 'o-');
+    plot(CD_event_ts__logger_time(CD_outliers),  CD_values(CD_outliers) .*1e-3, 'xk','MarkerSize',15);
+    plot(CD_event_ts__logger_time(~CD_outliers), CD_values(~CD_outliers).*1e-3, '.r','MarkerSize',15);
+    h=refline([0 median(CD_values.*1e-3)]); h.Color = 'm'; h.LineStyle = '-';
+    h=refline([0 (median(CD_values)+CD_outliers_thr).*1e-3]); h.Color = 'm'; h.LineStyle = '--';
+    h=refline([0 (median(CD_values)-CD_outliers_thr).*1e-3]); h.Color = 'm'; h.LineStyle = '--';
     xlabel('Logger time (usec)')
     ylabel('Clock Diff (ms)')
     title('logger vs. tx clock drift')
-    subplot(1,2,2)
-    plot(tx2logger_time_lm)
-    text(0.1,0.8, sprintf('clock gain (logger vs. tx):\n%.24f',tx2logger_time_lm.Coefficients.Estimate(2)), 'Units','normalized','FontSize',12)
-    axis equal
+    % linear fit residulals
+    subplot(1,2,2); hold on
+    plot(CD_event_ts__logger_time, tx2logger_time_lm.Residuals.Raw.*1e-3, 'o-b');
+    plot(CD_event_ts__logger_time, tx2logger_time_lm_robust.Residuals.Raw.*1e-3, 'o-r');
+    gain = tx2logger_time_lm.Coefficients.Estimate(2);
+    gain_robust = tx2logger_time_lm_robust.Coefficients.Estimate(2);
+    text(0.1,0.95, sprintf('clock gain (logger vs. tx):\n%.10f\n-log_{10}=%.2f',gain,       -log10(abs(1-gain))),         'Units','normalized','FontSize',12,'Color','b')
+    text(0.1,0.85, sprintf('clock gain (logger vs. tx):\n%.10f\n-log_{10}=%.2f',gain_robust,-log10(abs(1-gain_robust))),  'Units','normalized','FontSize',12,'Color','r')
     xlabel('Logger time (usec)')
-    ylabel('Transciever time (usec)')
+    ylabel('Residuals (msec)')
+    title('linear fit residuals')
+    legend({'all points';'excluding outliers'})
+    
     suptitle(main_dir)
     fig_file = fullfile(Nlx_OutDir, 'Clock_diff_correction');
     saveas(gcf, fig_file , 'tif')
     
     % save the linear model
+    save( fullfile(Nlx_OutDir,'clock_diff_correction'), 'tx2logger_time_lm', 'tx2logger_time_lm_robust' );
+    
 end
 
 %% write event file in Nlx format
