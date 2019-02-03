@@ -984,6 +984,17 @@ end
 fig_filename = fullfile('L:\Analysis\Results', sprintf('csc_raw_stats_bat_%04d',bat_num));
 saveas(gcf,fig_filename, 'tif')
 
+%%
+clear;clc
+limits_ts = [60389322391 60496267561];
+file_in = 'L:\DATA\0034_Ace\20180228\nlx\CSC0.ncs';
+file_out = 'L:\DATA\0034_Ace\20180228\nlx\CSC0__.ncs';
+[signal, ts, fs, params] = Nlx_csc_read(file_in, limits_ts);
+signal = signal(1:2:end);
+ts = ts(1:2:end);
+fs = fs/2;
+plot(ts,signal)
+nlx_csc_write(file_out , signal, ts, fs)
 
 
 

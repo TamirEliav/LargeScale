@@ -1,11 +1,11 @@
--CheetahRev 5.3.0 
+-CheetahRev 5.3.0
 
--AcqEntName CSC1 
--FileType: CSC 
--RecordSize 1044 
+-AcqEntName CSC1
+-FileType: CSC
+-RecordSize 1044
 
--SamplingFrequency 320000
--ADMaxValue 32767 
+-SamplingFrequency 32000
+-ADMaxValue 32767
 -InputRange 7000
 -ADBitVolts 0.000001
--InputInverted True 
+-InputInverted True

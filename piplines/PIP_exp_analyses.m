@@ -31,22 +31,28 @@ exp_list = {
 exp_t = DS_get_exp_summary();
 exp_t(~contains(exp_t.recordingArena, '200m'),:) = [];
 exp_t(exp_t.position_data_exist==0,:) = [];
+exp_t(exp_t.neural_data_exist==0,:) = [];
 % exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = [];
-exp_t(~ismember(exp_t.batNum, [79 2289] ),:) = [];
+exp_t(~ismember(exp_t.batNum, [34] ),:) = [];
 % exp_t(~contains(exp_t.exp_ID, exp_list),:) = [];
 exp_t
 
 %%
+forcecalc = 1;
+err_list = {};
 for ii_exp = 1:height(exp_t)
     %%
     exp_ID = exp_t.exp_ID{ii_exp};
-%     datetime
+    disp(datetime)
     fprintf('%d/%d %s\n', ii_exp, height(exp_t), exp_ID);
     
     %%
 try
-    exp_calc_CSC_RAW_stats(exp_ID)
-%     exp=exp_load_data(exp_ID);
+    exp=exp_load_data(exp_ID,'details','path');
+    Nlg2Nlx(exp.path.raw,forcecalc);
+%     PRE_filter_CSCs(exp_ID, forcecalc);
+%     exp_calc_CSC_RAW_stats(exp_ID)
+    
 %     bsp_extract_data(exp.path.bsp);
 %     exp_create_details(exp_ID);    
 %     exp_sync_bsp2nlg(exp_ID);
@@ -60,8 +66,32 @@ try
 %     exp_plot_pos_std_y(exp_ID);
     
 catch err
-    disp(err);
+    getReport(err)
+    err_list{ii_exp}.exp_ID = exp_ID;
+    err_list{ii_exp}.err = err;
 end
 	
-%     close all
+    close all
 end
+err_list = [err_list{:}];
+
+%% disp all exp with errors
+disp('------------------------------------------------')
+disp('------------------------------------------------')
+disp('------------------------------------------------')
+disp('List of errors')
+for ii_exp = 1:length(err_list)
+    disp(err_list(ii_exp).exp_ID)
+    getReport(err_list(ii_exp).err)
+end
+disp('------------------------------------------------')
+fprintf('%d/%d exps had error!\nSee details above:\n', length(err_list), height(exp_t));
+{err_list.exp_ID}'
+
+
+
+%% close diary!
+diary off
+
+
+

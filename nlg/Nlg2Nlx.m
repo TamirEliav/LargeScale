@@ -24,9 +24,6 @@ if ~exist(Nlg_InDir,'dir')
 end
 if exist(Nlx_OutDir,'dir')
     if forcecalc
-%         % rename existing output dir
-%         Nlx_OutDir_OLD_rename = sprintf([Nlx_OutDir '_OLD_%s'],datetime(datetime,'Format','yyyymmdd_HHmmss'));
-%         movefile(Nlx_OutDir, Nlx_OutDir_OLD_rename);
         % delete existing output dir
         warning('NLX output dir already existing and you chose to override it, deleting old NLX dir!')
         rmdir(Nlx_OutDir,'s')
@@ -139,8 +136,6 @@ end
 
 
 %% Apply clock difference correction (Transceiver vs. logger time)
-% TODO: plot figure showing the clocks drift
-
 % CD = clock difference
 disp('3. correcting for clock diff...');
 
@@ -173,7 +168,7 @@ if use_clock_diff_correction
     end
     
     % plot figure to make a check that the clock correction was OK
-    figure
+    figure('Units','normalized','Position',[0 0 1 1])
     subplot(1,2,1)
     plot(CD_event_ts__logger_time, CD_values.*1e-3, 'o-');
     xlabel('Logger time (usec)')
@@ -188,10 +183,11 @@ if use_clock_diff_correction
     suptitle(main_dir)
     fig_file = fullfile(Nlx_OutDir, 'Clock_diff_correction');
     saveas(gcf, fig_file , 'tif')
+    
+    % save the linear model
 end
 
 %% write event file in Nlx format
-
 disp('4. writing event file...');
 NlxEventFile = fullfile(Nlx_OutDir, 'EVENTS.nev');
 Mat2NlxEV(NlxEventFile, 1, 1, [], [1 0 0 0 1 0] , events_TS', EventStrings');
@@ -274,8 +270,6 @@ header_neural{contains(header_neural,'ADMaxValue')}         = sprintf('-ADMaxVal
 header_neural{contains(header_neural,'InputRange')}         = sprintf('-InputRange %g', InputRange);
 header_neural{contains(header_neural,'ADBitVolts')}         = sprintf('-ADBitVolts %.24f', ADBitVolts);
 header_neural{contains(header_neural,'InputInverted')}      = sprintf('-InputInverted %s', InputInvertedStr);
-header_neural{contains(header_neural,'SamplingFrequency')}  = sprintf('-SamplingFrequency %g', fs);
-header_neural{contains(header_neural,'SamplingFrequency')}  = sprintf('-SamplingFrequency %g', fs);
 header_motion{contains(header_motion,'SamplingFrequency')}  = sprintf('-SamplingFrequency %g', fs_acc);
 
 disp('6. Nlg -> Nlx...');
@@ -465,12 +459,13 @@ for ii_file_start_entry = 1:length(FileStarted_TS)
     end
     
     %% change to uVolt units and invert
-    data = data.*uVolt_per_bit;
+    data = data.*uVolt_per_bit; % convert nlg bits to uVolt
     if is_invert_data
         % invert data
         data = -data;
     end
-    
+    % convert uVolt to nlx bit
+    data = data ./ ADBitVolts ./ 1e6;
     
     %% write data chunks to Nlx file format
     %     file_TS_usec = FileStarted_TS(ii_file_start_entry);
@@ -483,15 +478,14 @@ for ii_file_start_entry = 1:length(FileStarted_TS)
         file_name = ['CSC' num2str(cnl) '.ncs'];
         out_file = fullfile(Nlx_OutDir, file_name);
         
-        %         we do this because Nlx functions have bugs with writing header
-        %         when using append... (this way works...)
+        % we do this because Nlx functions have bugs with writing header
+        % when using append... (this way works...)
         if exist(out_file, 'file')
             append_flag = 1;
         else
             append_flag = 0;
         end
-        %append_flag
-        
+        header_neural{contains(header_neural,'AcqEntName')}      = sprintf('-AcqEntName CSC%d', cnl);
         Mat2NlxCSC(out_file, append_flag, 1, 0, [1 0 0 0 1 1], blocks_timestamps_usec, cnl_data_blocks, header_neural );
     end
 end
