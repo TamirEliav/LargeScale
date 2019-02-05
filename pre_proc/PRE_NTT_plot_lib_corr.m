@@ -21,7 +21,7 @@ wvfrms = wvfrms .* ADBitVolts' .* 1e6; % convert bits to uVolts
 %% load library
 % read params struct (should be in the same folder as the NTT file)
 [FILEPATH,NAME,EXT] = fileparts(file_IN);
-params_file = fullfile(FILEPATH, 'params');
+params_file = fullfile(FILEPATH, 'params.mat');
 if exist(params_file,'file')
     load(params_file);
 else
@@ -55,7 +55,6 @@ rrr = max(rrr,[],1);
 CellNumbers_list = unique(CellNumbers);
 nUnits = length(CellNumbers_list);
 figure('Units','normalized','Position',[0 0 1 1]);
-% pnl = panel('h',nUnits);
 max_col = 4;
 ncol = min(nUnits,max_col);
 nrow = ceil(nUnits/max_col);
@@ -69,7 +68,10 @@ for ii_unit = 1:nUnits
     ylabel('Counts')
     title(['unit ' num2str(unitID)])
 end
+h=suptitle(file_IN);
+h.FontSize=14;
 saveas(gcf, file_OUT, 'tif');
+close(gcf)
 
 end
 

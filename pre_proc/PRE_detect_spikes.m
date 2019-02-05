@@ -1,27 +1,38 @@
-function PRE_detect_spikes(exp_ID)
+function PRE_detect_spikes(exp_ID,forcecalc)
+
+%% defaults
+if nargin==1; forcecalc = 0; end
 
 %% get exp info
-[exp_path,exp_info] = DS_get_path(exp_ID);
-% active_TT_channels = reshape(eval(exp_info.activeChannels)',[],1)';
-active_TT_channels = eval(exp_info.activeChannels);
+exp = exp_load_data(exp_ID,'details','path');
 
 %% set params
-dir_IN = exp_path.spikes_raw;
-dir_OUT = exp_path.spikes_detection;
+dir_IN = exp.path.spikes_raw;
+dir_OUT = exp.path.spikes_detection;
 clear detect_params
-params.thr_uV = 50;
-params.ref_ch = eval(exp_info.refCh);
+params.ref_ch = exp.details.refCh;
+params.active_TT_channels = exp.details.activeChannels;
+params.TT_to_use = exp.details.TT_to_use;
 params.t_start_end = [];
-% params.t_start_end = [74190421000	74737334000]; % b0148_d170720 pre-sleep
-% params.t_start_end = [33197649000	33847970000]; % b0079_d160913 pre-sleep
+% params.t_start_end = exp_get_sessions_ti(exp_ID,'Sleep1');
+% params.thr_type = 'uVolt';
+params.thr_type = 'median'; % using median(abs(signal)) * factor
+% params.thr = 50;
+params.thr = 7;
 params.use_neg_thr = 0;
-params.TT_to_use = eval(exp_info.TT_to_use);
 % params.merge_thr_crs_width = 4;
-% params.lib_spike_shapes = 'library_of_acceptable_spike_shapes.mat';
-% params.lib_corr_thr = 0.8;
-params.active_TT_channels = active_TT_channels;
+params.lib_spike_shapes = 'library_of_acceptable_spike_shapes_new.mat';
+params.lib_corr_thr = 0.8;
+params.min_sep_events = 15;
+params.CD_detect_win_len = 32;
+params.CD_invalid_win_len = 32*2;
+params.CD_n_TT_thr = 4;
+% params.CD_n_ch_thr = 9;
+% params.CD_n_TT_thr  = length(params.TT_to_use);
+% params.CD_n_ch_thr = 0.5 * sum(params.active_TT_channels(:)); % at least on half of the channels
+params.is_save_artifacts = 1;
 
 %% run!
-Nlx_detect_spikes_CSC(dir_IN,dir_OUT,params)
+Nlx_detect_spikes_CSC3(dir_IN,dir_OUT,params,forcecalc)
 
 end

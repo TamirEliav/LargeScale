@@ -935,7 +935,7 @@ tic; mean(abs(x)); toc
 clear;clc
 % load exp summary and choose exps
 exp_t = DS_get_exp_summary();
-bat_num = 2289;
+bat_num = 34;
 exp_t(~contains(exp_t.recordingArena, '200m'),:) = [];
 exp_t(exp_t.position_data_exist==0,:) = [];
 exp_t(exp_t.neural_data_exist==0,:) = [];
@@ -963,7 +963,7 @@ h.FontSize = 16;
 for TT=1:4
     pnl(1,TT).select();
     title(sprintf('TT %d',TT))
-    plot(dates, squeeze(abs_median(TT,:,:)),'.-')
+    plot(dates, squeeze(abs_median(TT,:,:)),'.-', 'LineWidth',2);
     xlabel('Date')
     ylabel('median(abs(raw data)) [uVolt]')
     ylim([0 10])
@@ -974,7 +974,7 @@ h.FontSize = 16;
 for TT=1:4
     pnl(2,TT).select();
     title(sprintf('TT %d',TT))
-    plot(dates, squeeze(reref_abs_median (TT,:,:)),'.-')
+    plot(dates, squeeze(reref_abs_median (TT,:,:)),'.-', 'LineWidth',2);
     xlabel('Date')
     ylabel('median(abs(raw data)) [uVolt]')
     ylim([0 10])
@@ -996,8 +996,15 @@ fs = fs/2;
 plot(ts,signal)
 nlx_csc_write(file_out , signal, ts, fs)
 
-
-
+%% nested diary
+diary off
+diary('diary1'); diary on
+disp('external')
+diary('diary2'); diary on
+disp('internal')
+diary off
+diary off
+% can't use nested diary (over-write!)
 
 
 

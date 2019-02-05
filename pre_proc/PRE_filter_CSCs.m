@@ -1,12 +1,9 @@
 function PRE_filter_CSCs(exp_ID, forcecalc)
 
 %% defaults
-if nargin==1
-    forcecalc = 0;
-end
+if nargin==1; forcecalc = 0; end
 
 %% params
-fwin = 2;         % we will run over the data in 2-min windows but save           % Same as we use for filtering ripples
 passband_spikes   = [600 6000];        % Filter for spikes
 passband_LFP      = [0.5 400];         % Filter for LFPs
 LFP_resamlpe_fs     = 2000;
@@ -37,7 +34,6 @@ if run_LFP_filtering
     t_start_end = [];
     clear filter_params
     filter_params.passband  = passband_LFP;
-    filter_params.fwin      = fwin;
     filter_params.resample_fs = LFP_resamlpe_fs;
     filter_params
     
@@ -70,7 +66,6 @@ if run_SPIKES_filtering
     t_start_end = [];
     clear filter_params
     filter_params.passband  = passband_spikes;
-    filter_params.fwin      = fwin;
     filter_params
     parfor ii_ch = 1:length(active_channels)
         if ~active_channels(ii_ch)

@@ -1,4 +1,4 @@
-function Nlx_detect_spikes_CSC3(dir_IN,dir_OUT,params)
+function Nlx_detect_spikes_CSC3(dir_IN, dir_OUT, params, forcecalc)
 
 %% 
 % Tamir,
@@ -10,20 +10,29 @@ function Nlx_detect_spikes_CSC3(dir_IN,dir_OUT,params)
 % 1. detected spikes
 % 2. spikes that were detected but thrown away after library comparison
 
+%% input validation
+if nargin<4; forcecalc = 0; end
+if ~exist(dir_IN,'dir')
+    error('input folder does not exist');
+end
+if exist(dir_OUT,'dir')
+    if forcecalc
+        % delete existing output dir
+        warning('spikes detection output dir already existing and you chose to override it, deleting old spikes detection dir!');
+        rmdir(dir_OUT,'s')
+    else
+        error('spikes detection output folder already exist, use forcecalc to override it!');
+    end
+end
+% at this point we should not have the output dir, so let's create it!
+mkdir(dir_OUT)
+
 %% open log file
 log_name_str = ['spikes_detection_' datestr(clock, 'yyyy-mm-dd HH-MM-SS') '.txt'];
 log_name_out = fullfile(dir_OUT, log_name_str );
 if ~exist(dir_OUT,'dir'), mkdir(dir_OUT); end 
 diary off; diary(log_name_out); diary on
-
-%%
-% % % forcerecalc = 0;
-% % % 
-% % % %%
-% % % if exist(dir_OUT,'dir') && ~forcerecalc
-% % %     disp(['Detect-spikes was already done in: ',dir_OUT]);
-% % %     return; 
-% % % end
+start_runtime_tic = tic;
 
 %% default params
 % % % % dir_IN = 'L:\Analysis\pre_proc\0148\20170607\spikes_raw';
@@ -59,9 +68,18 @@ TT_ch_exist = cellfun(@(x)(~isempty(x)), TT_files_raw);
 num_TTs = size(TT_files_raw,1);
 
 %% arrange params
-if length(params.thr_uV) == 1
-    params.thr_uV = repmat(params.thr_uV, size(TT_ch_exist))
+% "inflate" thr for all channels
+if size(params.thr,1) == 1
+    % same for all TTs!
+    params.thr = repmat(params.thr, size(TT_ch_exist))
+elseif size(params.thr,2) == 1
+    % per TT (same for all channels in that TT...)
+    params.thr = repmat(params.thr, [1 size(TT_ch_exist,2)]);
+elseif all(size(params.thr)==size(TT_ch_exist))
+    error('wrong input dimensions!');
 end
+params.thr_uV     = nan(size(TT_ch_exist)); % will be filled later 
+params.thr_median = nan(size(TT_ch_exist)); % will be filled later 
 
 if length(params.use_neg_thr) == 1
     params.use_neg_thr = repmat(params.use_neg_thr, size(TT_ch_exist))
@@ -93,17 +111,12 @@ for TT = params.TT_to_use
         continue;
     end
     
-%     if params.ref_ch(1) == TT
-%         disp(['TT' TT ' is using for reference, skipping...'])
-%         continue;
-%     end
-    
     %% load raw data (CSCs)
     fprintf('\t Loading raw data \n')
     tic
     act_ch = find(params.active_TT_channels(TT, :));
     non_act_ch = find(~params.active_TT_channels(TT, :));
-    csc = [];
+    csc = []; % TODO: consider pre-allocating this large array! (need to dummy read one channel to know the size)
     timestamps = [];
     for ch = act_ch
         filename = TT_files_raw{TT,ch};
@@ -125,32 +138,34 @@ for TT = params.TT_to_use
     for ch = act_ch
         thr = params.thr_uV(TT,ch);
         use_neg_thr = params.use_neg_thr(TT,ch);
-        % report stats (choosen thr vs. median/std)
+        % calc channel stats
         stats.TT_ch_std(TT,ch) = std(csc(ch,:));
         stats.TT_ch_abs_median(TT,ch) = median(abs(csc(ch,:)));
-        stats.thr_div_abs_median(ch,TT) = thr / stats.TT_ch_abs_median(TT,ch);
-        stats.thr_div_std(ch,TT) = thr / stats.TT_ch_std(TT,ch);
+        
+        switch params.thr_type 
+            case 'uVolt'
+                params.thr_uV(TT,ch) = params.thr(TT,ch);
+                params.thr_median(TT,ch) = params.thr(TT,ch) / stats.TT_ch_abs_median(TT,ch);
+            case 'median'
+                params.thr_median(TT,ch) = params.thr(TT,ch);
+                params.thr_uV(TT,ch) = params.thr_median(TT,ch) .* stats.TT_ch_abs_median(TT,ch);
+            otherwise
+                error('unsupported thr type!');
+        end
+        thr = params.thr_uV(TT,ch);
         
         events_pos_pks_IX = [];
         events_neg_pks_IX = [];
         % detect positive events
-        tic
         [~,events_pos_pks_IX] = findpeaks(csc(ch,:),'MinPeakHeight',thr);
-        toc
         % detect negative events
-        tic
         if params.use_neg_thr
             [~,events_neg_pks_IX] = findpeaks(-csc(ch,:),'MinPeakHeight',thr);
         end
-        toc
-        tic
         events_pks_IX = sort([events_pos_pks_IX events_neg_pks_IX], 'ascend');
-        toc
-        tic
         % remove spikes from beginning or end of data
         events_pks_IX(events_pks_IX < params.AlignSample) = [];
         events_pks_IX(events_pks_IX + params.nSamples-params.AlignSample > length(timestamps)) = [];
-        toc
         TT_ch_events_IX{ch} = events_pks_IX;
     end
     time_measure.thr_crs(TT) = toc;
@@ -234,9 +249,22 @@ for TT = params.TT_to_use
     TT_spikes_IX = TT_events_IX(TT_events_lib_thrded);
     TT_invalid_lib_IX = TT_events_IX(~TT_events_lib_thrded);
     
-    %% detect possible artifact (by high voltage)
+    %% remove duplicates (within window)
+    M = zeros(4,length(timestamps));
     for ch = act_ch
-        artifact_thr = 6 .* stats.TT_ch_std(TT,ch);
+        M(ch,TT_spikes_IX) = csc(ch,TT_spikes_IX);
+    end
+    M = max(abs(M));
+    
+    [~,new_spikes_IX] = findpeaks(M, 'MinPeakDistance',params.min_sep_events, 'MinPeakHeight',min(params.thr_uV(TT,:)));
+    TT_min_sep_win_removed = setdiff(TT_spikes_IX,new_spikes_IX);
+    TT_spikes_IX = new_spikes_IX;
+    clear M;
+    
+    %% detect possible artifact (by high voltage) - later for coincidence detection
+    for ch = act_ch
+%         artifact_thr = 6 .* stats.TT_ch_std(TT,ch);
+        artifact_thr = params.thr_uV(TT,ch);
         TT_high_amp_art_IX{ch} =  find(abs(csc(ch,:)) > artifact_thr);
     end
     
@@ -246,9 +274,10 @@ for TT = params.TT_to_use
     all_TT.TT_events_IX{TT} = TT_events_IX;
     all_TT.wvfrms{TT} = wvfrms;
     all_TT.TT_events_lib_thrded{TT} = TT_events_lib_thrded;
-    all_TT.TT_spikes_IX{TT} = TT_spikes_IX;
     all_TT.TT_invalid_lib_IX{TT} = TT_invalid_lib_IX;
+    all_TT.TT_min_sep_win{TT} = TT_min_sep_win_removed;
     all_TT.TT_high_amp_art_IX{TT} = TT_high_amp_art_IX;
+    all_TT.TT_spikes_IX{TT} = TT_spikes_IX;
     
 end
 
@@ -271,6 +300,8 @@ if do_coincidence_detection && (length(params.TT_to_use) > 1)
         high_amp_art_IX = cat(2, TT_high_amp_art_IX{:});
         mask_temp = zeros(size(timestamps));
         mask_temp(high_amp_art_IX) = 1;
+        mask_temp = conv(mask_temp, ones(1,params.CD_detect_win_len), 'same'); % convolve each source with some window
+        mask_temp(mask_temp>1) = 1;
         mask = mask+mask_temp;
     end
     nSourceEvent_thr = params.CD_n_TT_thr;
@@ -299,7 +330,6 @@ if do_coincidence_detection && (length(params.TT_to_use) > 1)
 % %     mask = sum(mask);
 % %     nSourceEvent_thr = params.CD_n_TT_thr;
 
-    mask = conv(mask, ones(1,params.CD_detect_win_len), 'same'); % sum across TT and convolve with CD detection window
     mask = mask >= nSourceEvent_thr ; % apply min number of sources for detection (sources = TT or ch)
     mask = conv(mask, ones(1,params.CD_invalid_win_len), 'same'); % convolve dections with the invalidation window (we are after detection!)
     mask = mask>0; % now in mask we have 1 for CD invalidation
@@ -353,21 +383,106 @@ for TT = params.TT_to_use
     Samples = all_TT.wvfrms{TT}(:,:,events_IX);
     write_NTT_file(filename_out, Timestamps, Samples, [], fs)
     
+    % 2. all detected events, marked by units: 
+    %   0 valid spikes
+    %   1 lib removed
+    %   2 duplicates removed (min_sep_win)
+    %   3 CD removed
+    Timestamps = timestamps(all_TT.TT_events_IX{TT});
+    Samples = all_TT.wvfrms{TT};
+    [~,valid_spikes_events_IX] = ismember(all_TT.TT_spikes_IX{TT},          all_TT.TT_events_IX{TT});
+    [~,lib_removed_events_IX]  = ismember(all_TT.TT_invalid_lib_IX{TT},     all_TT.TT_events_IX{TT});
+    [~,min_sep_win_events_IX]  = ismember(all_TT.TT_min_sep_win{TT},        all_TT.TT_events_IX{TT});
+    [~,CD_removed_events_IX]   = ismember(all_TT.spikes_CD_invalid_IX{TT},  all_TT.TT_events_IX{TT});
+    CellNumbers = zeros(size(Timestamps));
+    CellNumbers(valid_spikes_events_IX) = 0;
+    CellNumbers(lib_removed_events_IX) = 1;
+    CellNumbers(min_sep_win_events_IX) = 2;
+    CellNumbers(CD_removed_events_IX) = 3;
+    
+    %% Generate figures for the detected artifacts 
+    % (even if user didn't want to save those in NTT file)
+    %% artifact waveforms
+    figure('Units','normalized','Position',[0 0 1 1]);
+    pnl = panel();
+    pnl.pack(3,4);
+    pnl.margin = [30 30 20 20];
+    pnl.de.margin = 10;
+    h=pnl.title(NTT_filename);
+    h.Interpreter = 'none';
+    h.Position = [0.5 1.03];
+    h.FontSize = 14;
+    unit_colors = {'r','g','b'};
+    unit_labels = {'lib','min sep','Coincidence'};
+    max_points_plot = 1000;
+    for unit=1:3
+        h=pnl(unit).ylabel(unit_labels{unit});
+        h.Position = [-0.03 0.5];
+        h.FontSize = 13;
+        for ch=1:4
+            pnl(unit,ch).select();
+            IX = find(CellNumbers==unit);
+            rng(0);
+            n = length(IX);
+            k = min(max_points_plot,n);
+            subset_IX = randsample(n,k);
+            plot(squeeze(Samples(:,ch,IX(subset_IX))), 'Color',unit_colors{unit});
+            text(1,1, sprintf('n=%d',length(IX)), 'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
+        end
+    end
+    pnl(3,1).select();
+    xlabel('Samples')
+    ylabel('{\mu}Volt')
+    linkaxes( pnl.de.axis , 'xy');
+    pnl(1,4).select();
+    text(1.1,1.1,sprintf('max waveforms=%d',max_points_plot),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
+    filename_out = fullfile(dir_OUT,strrep(NTT_filename,'.NTT','_artifacts_waveforms'));
+    saveas(gcf, filename_out, 'tif')
+    close(gcf)
+    %% artifact clusters
+    figure('Units','normalized','Position',[0 0 1 1]);
+    pnl = panel();
+    pnl.pack(3,6);
+    pnl.margin = [30 30 20 20];
+    pnl.de.margin = 15;
+    h=pnl.title(NTT_filename);
+    h.Interpreter = 'none';
+    h.Position = [0.5 1.03];
+    h.FontSize = 14;
+    unit_colors = {'r','g','b'};
+    unit_labels = {'lib','min sep','Coincidence'};
+    featues_pairs = [1 2;1 3;1 4;2 3;2 4;3 4];
+    max_points_plot = 10000;
+    for unit=1:3
+        h=pnl(unit).ylabel(unit_labels{unit});
+        h.Position = [-0.03 0.5];
+        h.FontSize = 13;
+        for ii_pair = 1:size(featues_pairs,1)
+            pnl(unit,ii_pair).select(); hold on;
+            IX = find(CellNumbers==unit);
+            rng(0);
+            n = length(IX);
+            k = min(max_points_plot,n);
+            subset_IX = randsample(n,k);
+            x = squeeze(Samples(params.AlignSample, featues_pairs(ii_pair,1), IX(subset_IX)));
+            y = squeeze(Samples(params.AlignSample, featues_pairs(ii_pair,2), IX(subset_IX)));
+            plot(x,y, '.', 'Color',unit_colors{unit});
+%             plot([0 0], get(gca,'ylim'),'color',0.8.*[1 1 1])
+%             plot(get(gca,'xlim'),[0 0], 'color',0.8.*[1 1 1])
+            text(1,1, sprintf('n=%d',length(IX)), 'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
+            xlabel(sprintf('ch%d (%s)', featues_pairs(ii_pair,1), '{\mu}V'))
+            ylabel(sprintf('ch%d (%s)', featues_pairs(ii_pair,2), '{\mu}V'))
+        end
+    end
+    pnl(1,size(featues_pairs,1)).select();
+    text(1.1,1.1,sprintf('max points=%d',max_points_plot),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
+    filename_out = fullfile(dir_OUT,strrep(NTT_filename,'.NTT','_artifacts_clusters'));
+    saveas(gcf, filename_out, 'tif')
+    close(gcf)
+    
+    %% save artifacts in NTT file
     if params.is_save_artifacts
-        % 2. all detected events, marked by units: 
-        %   0 valid spikes
-        %   1 lib removed
-        %   2 CD removed
         filename_out = fullfile(dir_OUT,strrep(NTT_filename,'.NTT','_with_artifacts.NTT'));
-        Timestamps = timestamps(all_TT.TT_events_IX{TT});
-        Samples = all_TT.wvfrms{TT};
-        [~,valid_spikes_events_IX] = ismember(all_TT.TT_spikes_IX{TT},          all_TT.TT_events_IX{TT});
-        [~,lib_removed_events_IX]  = ismember(all_TT.TT_invalid_lib_IX{TT},     all_TT.TT_events_IX{TT});
-        [~,CD_removed_events_IX]   = ismember(all_TT.spikes_CD_invalid_IX{TT},  all_TT.TT_events_IX{TT});
-        CellNumbers = zeros(size(Timestamps));
-        CellNumbers(valid_spikes_events_IX) = 0;
-        CellNumbers(lib_removed_events_IX) = 1;
-        CellNumbers(CD_removed_events_IX) = 2;
         write_NTT_file(filename_out, Timestamps, Samples, CellNumbers, fs);
     end
     
@@ -375,20 +490,13 @@ for TT = params.TT_to_use
 end % end looping over tetrodes
 time_measure.write_NTTs = toc;
 
-%% report timing
-time_measure_fields = fieldnames(time_measure);
-total_runtime = 0;
-for ii_field = 1:length(time_measure_fields)
-    total_runtime = total_runtime + sum(time_measure.(time_measure_fields{ii_field}));
-end
-time_measure.total_runtime = total_runtime;
+%% total run-time
+time_measure.total_runtime = toc(start_runtime_tic);
+
+%% report parmas/stats/run-time
+fn_structdisp(stats)
 fn_structdisp(time_measure)
-
-%% report used parmas
-fn_structdisp(stats)
-
-%% report results stats (num spikes detected / CD / lib / ...)
-fn_structdisp(stats)
+fn_structdisp(params)
 
 %% save some meta-data to .mat file (params,stats)
 params_fileout = fullfile(dir_OUT,'params');

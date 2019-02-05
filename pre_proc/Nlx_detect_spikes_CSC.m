@@ -1,4 +1,4 @@
-function Nlx_detect_spikes_CSC(dir_IN,dir_OUT,params)
+function Nlx_detect_spikes_CSC(dir_IN, dir_OUT, params, forcecalc)
 
 %% 
 % Tamir,
@@ -10,20 +10,28 @@ function Nlx_detect_spikes_CSC(dir_IN,dir_OUT,params)
 % 1. detected spikes
 % 2. spikes that were detected but thrown away after library comparison
 
+%% input validation
+if nargin<4; forcecalc = 0; end
+if ~exist(dir_IN,'dir')
+    error('input folder does not exist');
+end
+if exist(dir_OUT,'dir')
+    if forcecalc
+        % delete existing output dir
+        warning('spikes detection output dir already existing and you chose to override it, deleting old spikes detection dir!');
+        rmdir(dir_OUT,'s')
+    else
+        error('spikes detection output folder already exist, use forcecalc to override it!');
+    end
+end
+% at this point we should not have the output dir, so let's create it!
+mkdir(dir_OUT)
+
 %% open log file
 log_name_str = ['spikes_detection_' datestr(clock, 'yyyy-mm-dd HH-MM-SS') '.txt'];
 log_name_out = fullfile(dir_OUT, log_name_str );
 if ~exist(dir_OUT,'dir'), mkdir(dir_OUT); end 
 diary off; diary(log_name_out); diary on
-
-%%
-% % % forcerecalc = 0;
-% % % 
-% % % %%
-% % % if exist(dir_OUT,'dir') && ~forcerecalc
-% % %     disp(['Detect-spikes was already done in: ',dir_OUT]);
-% % %     return; 
-% % % end
 
 %% default params
 % % % % dir_IN = 'L:\Analysis\pre_proc\0148\20170607\spikes_raw';
