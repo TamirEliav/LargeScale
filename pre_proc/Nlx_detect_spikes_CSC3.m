@@ -5,10 +5,10 @@ function Nlx_detect_spikes_CSC3(dir_IN, dir_OUT, params, forcecalc)
 % 01/2018
 % Adopted from Didi, Arseny and Michael 
 % 
-% Here we detect the spikes for each tetrode save them.
+% Here we detect the spikes for each tetrode and save them.
 % Output is 2 NTT files containing:
 % 1. detected spikes
-% 2. spikes that were detected but thrown away after library comparison
+% 2. detected spikes + events that were detected but removed along the process
 
 %% input validation
 if nargin<4; forcecalc = 0; end
@@ -71,18 +71,24 @@ num_TTs = size(TT_files_raw,1);
 % "inflate" thr for all channels
 if size(params.thr,1) == 1
     % same for all TTs!
-    params.thr = repmat(params.thr, size(TT_ch_exist))
+    params.thr = repmat(params.thr, size(TT_ch_exist));
 elseif size(params.thr,2) == 1
     % per TT (same for all channels in that TT...)
     params.thr = repmat(params.thr, [1 size(TT_ch_exist,2)]);
-elseif all(size(params.thr)==size(TT_ch_exist))
+elseif any(size(params.thr)~=size(TT_ch_exist))
     error('wrong input dimensions!');
 end
 params.thr_uV     = nan(size(TT_ch_exist)); % will be filled later 
 params.thr_median = nan(size(TT_ch_exist)); % will be filled later 
 
-if length(params.use_neg_thr) == 1
-    params.use_neg_thr = repmat(params.use_neg_thr, size(TT_ch_exist))
+if size(params.use_neg_thr,1) == 1
+    % same for all TTs!
+    params.use_neg_thr = repmat(params.use_neg_thr, size(TT_ch_exist));
+elseif size(params.use_neg_thr,2) == 1
+    % per TT (same for all channels in that TT...)
+    params.use_neg_thr = repmat(params.use_neg_thr, [1 size(TT_ch_exist,2)]);
+elseif any(size(params.use_neg_thr)~=size(TT_ch_exist))
+    error('wrong input dimensions!');
 end
 
 %% init time measure and stats
@@ -400,82 +406,97 @@ for TT = params.TT_to_use
     CellNumbers(min_sep_win_events_IX) = 2;
     CellNumbers(CD_removed_events_IX) = 3;
     
-    %% Generate figures for the detected artifacts 
+    %% Generate figures for the detected spikes+artifacts 
     % (even if user didn't want to save those in NTT file)
-    %% artifact waveforms
+    unit_colors = {0.7.*[1 1 1],'r','g','b'};
+    unit_labels = {'detected','lib','min sep','Coincidence'};
+    unit_numbers = [0 1 2 3];
+    features_pairs = [1 2;1 3;1 4;2 3;2 4;3 4];
+    max_points_plot_wvfrm = 2000;
+    max_points_plot_cluster = 50000;
+    max_volt_plot = 500;
+    %% waveforms
     figure('Units','normalized','Position',[0 0 1 1]);
     pnl = panel();
-    pnl.pack(3,4);
+    pnl.pack(4,4);
     pnl.margin = [30 30 20 20];
     pnl.de.margin = 10;
     h=pnl.title(NTT_filename);
     h.Interpreter = 'none';
     h.Position = [0.5 1.03];
     h.FontSize = 14;
-    unit_colors = {'r','g','b'};
-    unit_labels = {'lib','min sep','Coincidence'};
-    max_points_plot = 1000;
-    for unit=1:3
-        h=pnl(unit).ylabel(unit_labels{unit});
+    for ii_unit = 1:length(unit_numbers)
+        unit = unit_numbers(ii_unit);
+        h=pnl(ii_unit).ylabel(unit_labels{ii_unit});
         h.Position = [-0.03 0.5];
         h.FontSize = 13;
         for ch=1:4
-            pnl(unit,ch).select();
+            pnl(ii_unit,ch).select();
             IX = find(CellNumbers==unit);
             rng(0);
             n = length(IX);
-            k = min(max_points_plot,n);
+            k = min(max_points_plot_wvfrm,n);
             subset_IX = randsample(n,k);
-            plot(squeeze(Samples(:,ch,IX(subset_IX))), 'Color',unit_colors{unit});
+            plot(squeeze(Samples(:,ch,IX(subset_IX))), 'Color',unit_colors{ii_unit});
+            xlimits = get(gca,'xlim');
+            ylimits = get(gca,'ylim');
+            xlimits = min(abs(xlimits),max_volt_plot).*sign(xlimits);
+            ylimits = min(abs(ylimits),max_volt_plot).*sign(ylimits);
+            set(gca,'xlim',xlimits);
+            set(gca,'ylim',ylimits);
             text(1,1, sprintf('n=%d',length(IX)), 'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
+            if ii_unit == length(unit_numbers)
+                xlabel(sprintf('ch%d',ch))
+            end
         end
     end
-    pnl(3,1).select();
+    pnl(length(unit_numbers),1).select();
     xlabel('Samples')
     ylabel('{\mu}Volt')
-    linkaxes( pnl.de.axis , 'xy');
+    linkaxes( pnl.de.axis , 'x');
     pnl(1,4).select();
-    text(1.1,1.1,sprintf('max waveforms=%d',max_points_plot),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
+    text(1.1,1.1,sprintf('max waveforms=%d',max_points_plot_wvfrm),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
     filename_out = fullfile(dir_OUT,strrep(NTT_filename,'.NTT','_artifacts_waveforms'));
     saveas(gcf, filename_out, 'tif')
     close(gcf)
-    %% artifact clusters
+    %% clusters
     figure('Units','normalized','Position',[0 0 1 1]);
     pnl = panel();
-    pnl.pack(3,6);
+    pnl.pack(4,6);
     pnl.margin = [30 30 20 20];
     pnl.de.margin = 15;
     h=pnl.title(NTT_filename);
     h.Interpreter = 'none';
     h.Position = [0.5 1.03];
     h.FontSize = 14;
-    unit_colors = {'r','g','b'};
-    unit_labels = {'lib','min sep','Coincidence'};
-    featues_pairs = [1 2;1 3;1 4;2 3;2 4;3 4];
-    max_points_plot = 10000;
-    for unit=1:3
-        h=pnl(unit).ylabel(unit_labels{unit});
+    for ii_unit = 1:length(unit_numbers)
+        unit = unit_numbers(ii_unit);
+        h=pnl(ii_unit).ylabel(unit_labels{ii_unit});
         h.Position = [-0.03 0.5];
         h.FontSize = 13;
-        for ii_pair = 1:size(featues_pairs,1)
-            pnl(unit,ii_pair).select(); hold on;
+        for ii_pair = 1:size(features_pairs,1)
+            pnl(ii_unit,ii_pair).select(); hold on;
             IX = find(CellNumbers==unit);
             rng(0);
             n = length(IX);
-            k = min(max_points_plot,n);
+            k = min(max_points_plot_cluster,n);
             subset_IX = randsample(n,k);
-            x = squeeze(Samples(params.AlignSample, featues_pairs(ii_pair,1), IX(subset_IX)));
-            y = squeeze(Samples(params.AlignSample, featues_pairs(ii_pair,2), IX(subset_IX)));
-            plot(x,y, '.', 'Color',unit_colors{unit});
-%             plot([0 0], get(gca,'ylim'),'color',0.8.*[1 1 1])
-%             plot(get(gca,'xlim'),[0 0], 'color',0.8.*[1 1 1])
+            x = squeeze(Samples(params.AlignSample, features_pairs(ii_pair,1), IX(subset_IX)));
+            y = squeeze(Samples(params.AlignSample, features_pairs(ii_pair,2), IX(subset_IX)));
+            plot(x,y, '.', 'Color',unit_colors{ii_unit});
+            xlimits = get(gca,'xlim');
+            ylimits = get(gca,'ylim');
+            xlimits = min(abs(xlimits),max_volt_plot).*sign(xlimits);
+            ylimits = min(abs(ylimits),max_volt_plot).*sign(ylimits);
+            set(gca,'xlim',xlimits);
+            set(gca,'ylim',ylimits);
             text(1,1, sprintf('n=%d',length(IX)), 'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
-            xlabel(sprintf('ch%d (%s)', featues_pairs(ii_pair,1), '{\mu}V'))
-            ylabel(sprintf('ch%d (%s)', featues_pairs(ii_pair,2), '{\mu}V'))
+            xlabel(sprintf('ch%d (%s)', features_pairs(ii_pair,1), '{\mu}V'))
+            ylabel(sprintf('ch%d (%s)', features_pairs(ii_pair,2), '{\mu}V'))
         end
     end
-    pnl(1,size(featues_pairs,1)).select();
-    text(1.1,1.1,sprintf('max points=%d',max_points_plot),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
+    pnl(1,size(features_pairs,1)).select();
+    text(1.1,1.1,sprintf('max points=%d',max_points_plot_cluster),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
     filename_out = fullfile(dir_OUT,strrep(NTT_filename,'.NTT','_artifacts_clusters'));
     saveas(gcf, filename_out, 'tif')
     close(gcf)

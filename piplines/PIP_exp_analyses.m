@@ -48,10 +48,12 @@ for ii_exp = 1:height(exp_t)
     
     %%
 try
+    exp_create_details(exp_ID);
     exp=exp_load_data(exp_ID,'details','path');
-    Nlg2Nlx(exp.path.raw,forcecalc);
-    PRE_filter_CSCs(exp_ID, forcecalc);
-    exp_calc_CSC_RAW_stats(exp_ID);
+%     Nlg2Nlx(exp.path.raw,forcecalc);
+%     PRE_filter_CSCs(exp_ID, forcecalc);
+%     exp_calc_CSC_RAW_stats(exp_ID);
+    PRE_detect_spikes(exp_ID,forcecalc);
     
 %     bsp_extract_data(exp.path.bsp);
 %     exp_create_details(exp_ID);    
