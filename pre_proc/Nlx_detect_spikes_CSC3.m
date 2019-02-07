@@ -548,7 +548,7 @@ if isempty(CellNumbers)
 end
 %     csc header
 ADMaxValue = 32767;
-InputRange = max(Samples(:));
+InputRange = max(abs(Samples(:)));
 ADC = InputRange / ADMaxValue / 1e6;
 Samples = Samples ./ ADC ./ 1e6;
 ADC_str = sprintf('%.24f',ADC);
