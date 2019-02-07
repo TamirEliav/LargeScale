@@ -34,12 +34,15 @@ params.is_save_artifacts = 1;
 
 
 %% loop over params
-for thr = [6 6.5 7]
-    for lib_corr_thr = [0.8 0.85]
-        params.thr = thr;
-        params.lib_corr_thr = lib_corr_thr;
-        dir_OUT = [exp.path.spikes_detection sprintf('_thr=%1.1f_use_neg_thr=%d_lib_corr=%.2f',params.thr,params.use_neg_thr,params.lib_corr_thr)];
-        Nlx_detect_spikes_CSC3(dir_IN,dir_OUT,params,forcecalc);
+for use_neg_thr = [0 1]
+    for thr = [7]
+        for lib_corr_thr = [0.8]
+            params.use_neg_thr = use_neg_thr;
+            params.thr = thr;
+            params.lib_corr_thr = lib_corr_thr;
+            dir_OUT = [exp.path.spikes_detection sprintf('_thr=%1.1f_use_neg_thr=%d_lib_corr=%.2f',params.thr,params.use_neg_thr,params.lib_corr_thr)];
+            Nlx_detect_spikes_CSC3(dir_IN,dir_OUT,params,forcecalc);
+        end
     end
 end
 
