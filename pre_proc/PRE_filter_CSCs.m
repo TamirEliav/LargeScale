@@ -17,16 +17,17 @@ active_channels = active_channels(:);
 
 %% extract LFPs and save them
 run_LFP_filtering = 1;
-if run_LFP_filtering
-    if exist(exp.path.LFP,'dir')
-        if forcecalc
-            % delete existing output dir
-            warning('LFP output dir already existing and you chose to override it, deleting old LFP dir!')
-            rmdir(exp.path.LFP,'s')
-        else
-            error('LFP output folder already exist, use forcecalc to override it!');
-        end
+if exist(exp.path.LFP,'dir')
+    if forcecalc
+        % delete existing output dir
+        warning('LFP output dir already existing and you chose to override it, deleting old LFP dir!')
+        rmdir(exp.path.LFP,'s')
+    else
+        warning('LFP output folder already exist, use forcecalc to override it!');
+        run_LFP_filtering = 0;
     end
+end
+if run_LFP_filtering
     % at this point we should not have the LFP output dir, so let's create it!
     mkdir(exp.path.LFP)
     fprintf('Filtering LFPs for %s', exp_ID)
@@ -49,16 +50,17 @@ end
 
 %% exctract high-pass for spike detection
 run_SPIKES_filtering = 1;
-if run_SPIKES_filtering
-    if exist(exp.path.spikes_raw,'dir')
-        if forcecalc
-            % delete existing output dir
-            warning('spikes_raw output dir already existing and you chose to override it, deleting old spikes_raw dir!')
-            rmdir(exp.path.spikes_raw,'s')
-        else
-            error('spikes_raw output folder already exist, use forcecalc to override it!');
-        end
+if exist(exp.path.spikes_raw,'dir')
+    if forcecalc
+        % delete existing output dir
+        warning('spikes_raw output dir already existing and you chose to override it, deleting old spikes_raw dir!')
+        rmdir(exp.path.spikes_raw,'s')
+    else
+        warning('spikes_raw output folder already exist, use forcecalc to override it!');
+        run_SPIKES_filtering = 0;
     end
+end
+if run_SPIKES_filtering
     % at this point we should not have the LFP output dir, so let's create it!
     mkdir(exp.path.spikes_raw)
     fprintf('Filtering spikes_raw for %s', exp_ID)

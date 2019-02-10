@@ -1006,9 +1006,43 @@ diary off
 diary off
 % can't use nested diary (over-write!)
 
-
+%% plx2ntt 
+PLX_filename = 'D:\__TEMP\plx2ntt\spikes_b0034_d180304_TT4.plx';
+NTT_filename_out = 'D:\__TEMP\plx2ntt\spikes_b0034_d180304_TT4+.NTT';
+NTT_filename_header = 'D:\__TEMP\plx2ntt\spikes_b0034_d180304_TT4.NTT';
+plexon_plx2ntt(PLX_filename, NTT_filename_out, NTT_filename_header)
 
 %%
+clear;clc
+rng(0);
+sdf = randn(1,1e6);
+% sdf1 = sdf + 1;
+% sdf2 = sdf + 0.5;
+sdf1 = randn(1,1e6) + 2;
+sdf2 = randn(1,1e6) + 1;
+sdf3 = sdf1-sdf2;
+median(abs(sdf1))
+median(abs(sdf2))
+median(abs(sdf3))
+
+%% try filter design
+clear; clc
+filter_params.passband  = [600 6000];
+% filter_params.type = 'butter';
+% filter_params.type = 'fir1';
+filter_params.type = 'firpm';
+for order = [301]
+    filter_params.order = order;
+    t_start_end = [39968960821 40164431783];
+    file_IN = 'D:\__TEMP\filtering\CSC8.ncs';
+    file_OUT = ['D:\__TEMP\filtering\' sprintf('CSC8_filtered_%d-%d_%s_order_%d.ncs',filter_params.passband, filter_params.type,filter_params.order)];
+    Nlx_filter_CSC2(file_IN, file_OUT, t_start_end, filter_params);
+end
+
+
+
+
+
 
 
 

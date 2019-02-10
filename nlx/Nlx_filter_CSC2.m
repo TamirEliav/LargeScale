@@ -30,9 +30,21 @@ end
 [signal, ts, fs, params] = Nlx_csc_read(file_IN, t_start_end);
 
 %% filter!
-Wn   = filter_params.passband / (fs/2);           
-filt = fir1(filter_params.order, Wn,'bandpass' );       
-signal = filtfilt(filt,1,signal); 
+Wn   = filter_params.passband / (fs/2);
+switch filter_params.type 
+    case 'fir1'
+        b = fir1(filter_params.order, Wn,'bandpass');
+        a = 1;
+    case 'butter'
+        [b,a] = butter(filter_params.order,Wn,'bandpass');
+    case 'firpm'
+        freq = [0 filter_params.passband fs/2];
+        amp  = [0 1 1 0   ];
+        Wn   = freq / (fs/2);
+        b = firpm(filter_params.order,Wn,amp);
+        a = 1;
+end
+signal = filtfilt(b,a,signal); 
 
 %% re-sample the filtered data if needed
 if isfield(filter_params,'resample_fs')
