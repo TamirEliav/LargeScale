@@ -1,26 +1,25 @@
 function cell_calc_time_AC(cell_ID)
 
 %% load cell/exp data
-cell = cell_load_data(cell_ID,'details','FE','fields');
-% exp = exp_load_data(cell.details.exp_ID,'details');
+cell = cell_load_data(cell_ID,'details','FE','fields','spikes');
+exp = exp_load_data(cell.details.exp_ID,'details');
 prm = PARAMS_GetAll();
+
+%%
+calc_AC = @(ts)(cumpute_time_AC(ts*1e-6, ...
+                         prm.oscillations.time_AC.bin_size,...
+                         prm.oscillations.time_AC.win_size));
 
 %% in-flight 
 FE = [cell.FE{:}];
 spikes_ts = [FE.spikes_ts];
-AC = cumpute_time_AC(spikes_ts*1e-6, ...
-                     prm.oscillations.time_AC.bin_size,...
-                     prm.oscillations.time_AC.win_size);
-time_AC.in_flight = AC;
+time_AC.in_flight = calc_AC(spikes_ts);
 
 %% by flight direction
 for ii_dir = 1:2
     FE = cell.FE{ii_dir};
     spikes_ts = [FE.spikes_ts];
-    AC = cumpute_time_AC(spikes_ts*1e-6, ...
-                         prm.oscillations.time_AC.bin_size,...
-                         prm.oscillations.time_AC.win_size);
-    time_AC.by_dir(ii_dir) = AC;
+    time_AC.by_dir(ii_dir) = calc_AC(spikes_ts);
 end
 
 %% TODO: fix cases with no fields
@@ -31,24 +30,20 @@ if length(fields)==0
 else
     %% in-field
     spikes_ts = [fields.spikes_ts];
-    AC = cumpute_time_AC(spikes_ts*1e-6, ...
-                         prm.oscillations.time_AC.bin_size,...
-                         prm.oscillations.time_AC.win_size);
-    time_AC.in_field = AC;
+    time_AC.in_field = calc_AC(spikes_ts);
 
     %% by fields
     for ii_field = 1:length(fields)
         spikes_ts = [fields(ii_field).spikes_ts];
-        AC = cumpute_time_AC(spikes_ts*1e-6, ...
-                             prm.oscillations.time_AC.bin_size,...
-                             prm.oscillations.time_AC.win_size);
-        time_AC.by_fields(ii_field) = AC;
+        time_AC.by_fields(ii_field) = calc_AC(spikes_ts);
     end
-
-    time_AC.by_fields = [];
 end
 
 %% sleep
+sleep_ti = exp_get_sessions_ti(exp.details.exp_ID, 'Sleep1', 'Sleep2');
+spikes_sleep_IX = get_data_in_ti(cell.spikes.ts, sleep_ti);
+spikes_sleep_ts = cell.spikes.ts(spikes_sleep_IX);
+time_AC.sleep = calc_AC(spikes_sleep_ts);
 
 %% resting on balls
 

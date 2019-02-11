@@ -10,7 +10,7 @@ dir_colors = prm.graphics.colors.flight_directions;
 fig_size = [30 20];
 figure('Units','centimeters','Position',[5 5 fig_size], 'PaperPosition',[0 0 fig_size]);
 pnl = panel();
-pnl.pack('v',2);
+pnl.pack('v',3);
 
 %% plot (flight + by directions)
 pnl(1).select(); hold on
@@ -20,8 +20,9 @@ for ii_dir = 1:2
     plot_AC(cell.time_AC.by_dir(ii_dir), {'color',c, 'LineWidth',1});
 end
 legend({'in-flight';'dir1';'dir2'})
+title('in-flight by directions')
 
-%% plot (flight by directions)
+%% plot (flight by fields)
 pnl(2).select(); hold on
 if ~(isempty(cell.time_AC.in_field) | isempty(cell.time_AC.by_fields) )
     plot_AC(cell.time_AC.in_field, {'color','k', 'LineWidth',1.5});
@@ -40,8 +41,15 @@ if ~(isempty(cell.time_AC.in_field) | isempty(cell.time_AC.by_fields) )
     hleg.Position([1:2]) = hax.Position([1:2])+[0.8 0.2];
     hleg.Position([3:4]) = [0.03 0.2];
 end
+title('in-flight by fields')
 
-end
+%% plot (flight by directions)
+pnl(3).select(); hold on
+plot_AC(cell.time_AC.sleep, {'color','k', 'LineWidth',1});
+title('Sleep')
+
+
+end % function
 
 
 function plot_AC(AC, line_prop)
