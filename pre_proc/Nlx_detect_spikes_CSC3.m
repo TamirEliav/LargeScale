@@ -21,7 +21,8 @@ if exist(dir_OUT,'dir')
         warning('spikes detection output dir already existing and you chose to override it, deleting old spikes detection dir!');
         rmdir(dir_OUT,'s')
     else
-        error('spikes detection output folder already exist, use forcecalc to override it!');
+        warning('spikes detection output folder already exist, use forcecalc to override it!');
+        return;
     end
 end
 % at this point we should not have the output dir, so let's create it!

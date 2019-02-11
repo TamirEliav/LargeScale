@@ -23,7 +23,7 @@ params.use_neg_thr = 0;
 % params.merge_thr_crs_width = 4;
 params.lib_spike_shapes = 'library_of_acceptable_spike_shapes_new.mat';
 params.lib_corr_thr = 0.8;
-params.min_sep_events = 15;
+params.min_sep_events = 24;
 params.CD_detect_win_len = 32;
 params.CD_invalid_win_len = 32*2;
 params.CD_n_TT_thr = 4;
@@ -34,22 +34,25 @@ params.is_save_artifacts = 1;
 
 
 %% loop over params
-for use_neg_thr = [0 1]
+for use_neg_thr = [0]
     for thr = [7]
         for lib_corr_thr = [0.8]
-            params.use_neg_thr = use_neg_thr;
-            params.thr = thr;
-            params.lib_corr_thr = lib_corr_thr;
-            dir_OUT = [exp.path.spikes_detection sprintf('_thr=%1.1f_use_neg_thr=%d_lib_corr=%.2f',params.thr,params.use_neg_thr,params.lib_corr_thr)];
-            Nlx_detect_spikes_CSC3(dir_IN,dir_OUT,params,forcecalc);
+            for min_sep_win = [24]
+                params.use_neg_thr = use_neg_thr;
+                params.thr = thr;
+                params.lib_corr_thr = lib_corr_thr;
+                params.min_sep_events = min_sep_win;
+                dir_OUT = [exp.path.spikes_detection ...
+                    sprintf('_thr=%1.1f_use_neg_thr=%d_lib_corr=%.2f_sep_win=%d',...
+                            params.thr,...
+                            params.use_neg_thr,...
+                            params.lib_corr_thr,...
+                            params.min_sep_events)];
+                Nlx_detect_spikes_CSC3(dir_IN,dir_OUT,params,forcecalc);
+            end
         end
     end
 end
-
-%% run without negative thr
-% params.use_neg_thr = 1;
-% dir_OUT = [exp.path.spikes_detection sprintf('_use_neg_thr=%d',params.use_neg_thr)];
-% Nlx_detect_spikes_CSC3(dir_IN,dir_OUT,params,forcecalc);
 
 
 end
