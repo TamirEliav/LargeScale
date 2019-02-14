@@ -82,6 +82,18 @@ end
 params.thr_uV     = nan(size(TT_ch_exist)); % will be filled later 
 params.thr_median = nan(size(TT_ch_exist)); % will be filled later 
 
+if size(params.CD_thr,1) == 1
+    % same for all TTs!
+    params.CD_thr = repmat(params.CD_thr, size(TT_ch_exist));
+elseif size(params.CD_thr,2) == 1
+    % per TT (same for all channels in that TT...)
+    params.CD_thr = repmat(params.CD_thr, [1 size(TT_ch_exist,2)]);
+elseif any(size(params.CD_thr)~=size(TT_ch_exist))
+    error('wrong input dimensions!');
+end
+params.CD_thr_uV     = nan(size(TT_ch_exist)); % will be filled later 
+params.CD_thr_median = nan(size(TT_ch_exist)); % will be filled later 
+
 if size(params.use_neg_thr,1) == 1
     % same for all TTs!
     params.use_neg_thr = repmat(params.use_neg_thr, size(TT_ch_exist));
@@ -143,19 +155,21 @@ for TT = params.TT_to_use
     tic
     TT_ch_events_IX = {};
     for ch = act_ch
-        thr = params.thr_uV(TT,ch);
-        use_neg_thr = params.use_neg_thr(TT,ch);
         % calc channel stats
         stats.TT_ch_std(TT,ch) = std(csc(ch,:));
         stats.TT_ch_abs_median(TT,ch) = median(abs(csc(ch,:)));
-        
+        % set thr according to type
         switch params.thr_type 
             case 'uVolt'
                 params.thr_uV(TT,ch) = params.thr(TT,ch);
                 params.thr_median(TT,ch) = params.thr(TT,ch) / stats.TT_ch_abs_median(TT,ch);
+                params.CD_thr_uV(TT,ch) = params.CD_thr(TT,ch);
+                params.CD_thr_median(TT,ch) = params.CD_thr(TT,ch) / stats.TT_ch_abs_median(TT,ch);
             case 'median'
                 params.thr_median(TT,ch) = params.thr(TT,ch);
                 params.thr_uV(TT,ch) = params.thr_median(TT,ch) .* stats.TT_ch_abs_median(TT,ch);
+                params.CD_thr_median(TT,ch) = params.CD_thr(TT,ch);
+                params.CD_thr_uV(TT,ch) = params.CD_thr_median(TT,ch) .* stats.TT_ch_abs_median(TT,ch);
             otherwise
                 error('unsupported thr type!');
         end
@@ -166,7 +180,7 @@ for TT = params.TT_to_use
         % detect positive events
         [~,events_pos_pks_IX] = findpeaks(csc(ch,:),'MinPeakHeight',thr);
         % detect negative events
-        if params.use_neg_thr
+        if params.use_neg_thr(TT,ch)
             [~,events_neg_pks_IX] = findpeaks(-csc(ch,:),'MinPeakHeight',thr);
         end
         events_pks_IX = sort([events_pos_pks_IX events_neg_pks_IX], 'ascend');
@@ -268,10 +282,9 @@ for TT = params.TT_to_use
     TT_spikes_IX = new_spikes_IX;
     clear M;
     
-    %% detect possible artifact (by high voltage) - later for coincidence detection
+    %% detect possible artifact - later for coincidence detection
     for ch = act_ch
-%         artifact_thr = 6 .* stats.TT_ch_std(TT,ch);
-        artifact_thr = params.thr_uV(TT,ch);
+        artifact_thr = params.CD_thr_uV(TT,ch);
         TT_high_amp_art_IX{ch} =  find(abs(csc(ch,:)) > artifact_thr);
     end
     
