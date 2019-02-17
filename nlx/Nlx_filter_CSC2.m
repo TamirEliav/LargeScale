@@ -30,21 +30,35 @@ end
 [signal, ts, fs, params] = Nlx_csc_read(file_IN, t_start_end);
 
 %% filter!
-Wn   = filter_params.passband / (fs/2);
 switch filter_params.type 
     case 'fir1'
+        Wn   = filter_params.passband / (fs/2);
         b = fir1(filter_params.order, Wn,'bandpass');
         a = 1;
+        signal = filtfilt(b,a,signal);
+    case 'highpassfir1'
+        Wn   = filter_params.passband / (fs/2);
+        b = fir1(filter_params.order, Wn,'high');
+        a = 1;
+        signal = filtfilt(b,a,signal);
     case 'butter'
+        Wn   = filter_params.passband / (fs/2);
         [b,a] = butter(filter_params.order,Wn,'bandpass');
+        signal = filtfilt(b,a,signal);
     case 'firpm'
+        Wn   = filter_params.passband / (fs/2);
         freq = [0 filter_params.passband fs/2];
         amp  = [0 1 1 0   ];
         Wn   = freq / (fs/2);
         b = firpm(filter_params.order,Wn,amp);
         a = 1;
+        signal = filtfilt(b,a,signal);
+    case 'custom'
+        custom_filt = designfilt(filter_params.designfilt_input{:},'SampleRate', fs);
+        signal = filtfilt(custom_filt,signal);
+    otherwise
+            error('no such filter type supported!')
 end
-signal = filtfilt(b,a,signal); 
 
 %% re-sample the filtered data if needed
 if isfield(filter_params,'resample_fs')
@@ -60,6 +74,7 @@ if isfield(filter_params,'resample_fs')
 end
 
 %% write filtered data to file
+% TODO: add filter params to NLX header (as a comment?!)
 if isfield(filter_params,'resample_fs')
     nlx_csc_write(file_OUT, signal, ts_resample, fs_resample, params.header)
 else

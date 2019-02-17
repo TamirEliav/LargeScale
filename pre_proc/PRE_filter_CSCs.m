@@ -67,12 +67,27 @@ if run_SPIKES_filtering
     
     t_start_end = [];
     clear filter_params
-    filter_params.passband  = passband_spikes;
-    filter_params
+    switch 3
+        case 1 % original from Nachum post-doc
+            filter_params.passband  = passband_spikes;
+        case 2 % from Aronov
+            filter_params.type = 'custom';
+            stopfreq = 750;
+            passfreq = 1000;
+            filter_params.designfilt_input = {'highpassfir',...
+                'StopbandFrequency', stopfreq,...
+                'PassbandFrequency', passfreq,...
+                'StopbandAttenuation', 60,...
+                'PassbandRipple', 1};
+        case 3 % simply the original filter without the lowpass (no cutoff @ 6kHz)
+            filter_params.type = 'highpassfir1';
+            filter_params.passband  = passband_spikes(1);
+    end
+    
     parfor ii_ch = 1:length(active_channels)
-        if ~active_channels(ii_ch)
-            continue;
-        end
+%         if ~active_channels(ii_ch)
+%             continue;
+%         end
         TT = ceil(ii_ch/4);
         ch_num = mod(ii_ch-1,4)+1;
         file_IN = fullfile(exp.path.nlx,['CSC' num2str(ii_ch-1) '.ncs']);
