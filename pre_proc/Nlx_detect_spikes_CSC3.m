@@ -315,7 +315,7 @@ if do_coincidence_detection && (length(params.TT_to_use) > 1)
     % option 1 - using all detected event pooled for each TT from all channels -
     % uVolt thr different from spikes
     mask = zeros(size(timestamps));
-    for ii_TT = 1:length(all_TT.TT_high_amp_art_IX)
+    for ii_TT = params.TT_to_use
         TT_high_amp_art_IX = all_TT.TT_high_amp_art_IX{ii_TT};
         high_amp_art_IX = cat(2, TT_high_amp_art_IX{:});
         mask_temp = zeros(size(timestamps));
