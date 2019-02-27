@@ -18,6 +18,7 @@ switch opt
 case 1
     IX = find(any(t>ti(:,1)&t<ti(:,2),1));
 case 2
+    IX = {}; % init
     for ii = 1:size(ti,1)
         IX{ii} = find(t>ti(ii,1) & t<ti(ii,2));
     end

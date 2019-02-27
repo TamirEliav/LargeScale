@@ -6,7 +6,11 @@ function [density_mat, data_bin] = density_mat_1D(data,bin_centers)
 % the case for which the size of data is not a vector is usually for
 % shuffled spikes case. for this case thr caluclation is made separately 
 % for each row of data, hence  density_mat is a matrix. 
-
+if isempty(data)
+    data_bin = nan(size(data));
+    density_mat = nan(size(bin_centers));
+    return;
+end
 size_data = size(data);
 if min(size_data)==1
     
