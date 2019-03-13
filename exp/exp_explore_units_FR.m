@@ -174,6 +174,9 @@ for ii_dir = 1:2
     h=title(directions_str{ii_dir}); h.FontSize = 12;
 end
 
+% link xlim
+linkaxes(pnl.de.axis, 'x');
+
 % link visability property
 plotbrowser('on')
 Link = {};
