@@ -1031,7 +1031,7 @@ filter_params.passband  = [600 6000];
 % filter_params.type = 'butter';
 % filter_params.type = 'fir1';
 filter_params.type = 'firpm';
-for order = [301]
+for order = [8]
     filter_params.order = order;
     t_start_end = [39968960821 40164431783];
     file_IN = 'D:\__TEMP\filtering\CSC8.ncs';
@@ -1040,9 +1040,133 @@ for order = [301]
 end
 
 
+%% play with linking show/hide properties across axes
+clear;clc
+figure
+h(1) = subplot(1,2,1);
+hold on
+h1=plot(1:10, 'k')
+h2=plot(2:11, 'r')
+h(2) = subplot(1,2,2);
+hold on
+h3=plot(1:10, 'k')
+h4=plot(2:11, 'r')
+
+linkprop([h1 h3], 'Visible')
+% h1.Visible = 'off'
+plotbrowser('on')
 
 
+%% 06/03/2019 - test artifacts in the logger from bespoon RF (-> it was flash write artifacts!!!!!)
+clear;clc
+exp_ID = 'b9861_d180603';
+exp=exp_load_data(exp_ID,'details','path','pos');
+fs_bsp = exp.pos.raw.fs;
+ts_bsp = 1/fs_bsp;
+M_avg = [];
+M_abs_avg = [];
+M_std = [];
+for TT=2
+    for ch=3
+        % load raw data
+        fprintf('TT%dch%d\n',TT,ch)
+        filename = sprintf('spikes_%s_TT%d_ch%d.ncs',exp_ID, TT, ch);
+        filename = fullfile(exp.path.spikes_raw, filename);
+        [signal, ts, fs, params] = Nlx_csc_read(filename, []);
+        bsp_ts = exp.pos.raw.ts_nlg_usec;
+%         ti = exp_get_sessions_ti(exp_ID,'Sleep1');
+%         [~,~,bsp_ts,~] = get_data_in_ti(bsp_ts, ti);
+        trigger_IX = find_nearest_point(bsp_ts, ts);
+%         trigger_IX = trigger_IX(1:2:end);
+%         n = 6000;
+%         trigger_IX = find_nearest_point(linspace(ti(1),ti(2),n), ts);
+%         test_fs = n/(diff(ti)*1e-6)
+        win_len = [0 1/fs_bsp];
+        window_num_samples = round(win_len.*fs);
+        [trig_signal] = trigger_signal_by_IX(signal, trigger_IX, window_num_samples);
+        M_avg(TT,ch,:) = mean(trig_signal,1);
+        M_abs_avg(TT,ch,:) = mean(abs(trig_signal),1);
+        M_std(TT,ch,:) = std(trig_signal,1,1);
+    end
+end
+
+%%
+opt = 1;
+switch opt
+    case 1
+        M = M_avg;
+        thr = 0.23;
+        M_str = 'averaged triggered on bsp time';
+    case 2
+        M = M_abs_avg;
+        M_str = 'averaged absolute triggered on bsp time';
+    case 3
+        M = M_std;
+        thr = 100;
+        M_str = 'std triggered on bsp time';
+end
+for TT=2
+    figure
+    for ch=3
+        subplot(2,2,ch);
+        title(sprintf('ch %d',ch))
+        t = linspace(win_len(1),win_len(2),size(M_avg,3));
+        signal_STA = squeeze(M(TT,ch,:));
+        signal_STA = smooth(signal_STA,10);
+        findpeaks(signal_STA,t, 'MinPeakHeight', thr);
+        [pks,locs,w,p] = findpeaks(signal_STA,t, 'MinPeakHeight', thr);
+        xlabel('Time lag from Bespoon acquisition (sec)')
+        ylabel('Voltage (uVolt)')
+        h=suptitle({'neural channel (filtered>600Hz)';M_str;exp_ID});
+        h.Interpreter = 'none';
+    end
+end
+
+%%
+maxlag = 2*round(fs/fs_bsp);
+[c,lags] = xcorr(abs(signal), maxlag);
+lags_in_sec = lags./fs;
+
+%%
+plot(lags_in_sec,c)
+xlabel('Time (s)')
+
+%%
+filename_out = 'D:\__TEMP\New folder (6)\bsp_ts.ntt';
+Timestamps = bsp_ts';
+Samples = triang(32).*200-100;
+Samples = repelem(Samples,1, 4, length(Timestamps));
+% Samples = ones(32,4,length(Timestamps));
+CellNumbers = zeros(size(Timestamps));
+nlx_ntt_write(filename_out, Timestamps, Samples, CellNumbers, fs);
+
+%% 19/03/2019 - explore same interneuron recorded for two days
+clear
+clc
+cells(1) = load('L:\Analysis\Results\cells\FR_map\b2289_d180514_TT1_SS01_cell_FR_map.mat')
+cells(2) = load('L:\Analysis\Results\cells\FR_map\b2289_d180515_TT1_SS01_cell_FR_map.mat')
+map1 = [cells(1).FR_map(1).all.PSTH cells(1).FR_map(2).all.PSTH];
+map2 = [cells(2).FR_map(1).all.PSTH cells(2).FR_map(2).all.PSTH];
+corr(map1',map2','rows','pairwise')
+
+dx = 0.2;
+fs = 1/dx;
+window = round(25*fs);
+noverlap = round(window/2);
+figure
+hold on
+% pnl = panel();
+% pnl.pack(2,2);
+for ii_cell = 1:2
+    for ii_dir = 1:2
+        map = cells(ii_cell).FR_map(ii_dir).all.PSTH;
+        map(isnan((map))) = 0;
+%         pnl(ii_cell,ii_dir).select();
+        [Pxx,F] = pwelch(map, window, noverlap,window,fs);
+        plot(F,log(abs(Pxx)))
+    end
+end
 
 
-
+%%
 

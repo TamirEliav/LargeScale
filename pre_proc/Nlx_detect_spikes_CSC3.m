@@ -445,7 +445,7 @@ for TT = params.TT_to_use
         h.Position = [-0.03 0.5];
         h.FontSize = 13;
         for ch=1:4
-            pnl(ii_unit,ch).select();
+            pnl(ii_unit,ch).select(); hold on
             IX = find(CellNumbers==unit);
             rng(0);
             n = length(IX);
@@ -454,15 +454,32 @@ for TT = params.TT_to_use
             plot(squeeze(Samples(:,ch,IX(subset_IX))), 'Color',unit_colors{ii_unit});
             xlimits = get(gca,'xlim');
             ylimits = get(gca,'ylim');
-            xlimits = min(abs(xlimits),max_volt_plot).*sign(xlimits);
             ylimits = min(abs(ylimits),max_volt_plot).*sign(ylimits);
-            set(gca,'xlim',xlimits);
             set(gca,'ylim',ylimits);
+            plot(xlimits, repelem(params.thr_uV(TT,ch),2),'-m');
+            if params.use_neg_thr(TT,ch)
+                plot(xlimits, repelem(-params.thr_uV(TT,ch),2),'-m');
+            end
             text(1,1, sprintf('n=%d',length(IX)), 'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
+            switch ii_unit
+                case 1
+                    text(.02,1, sprintf('thr=%.1f (%.fuV)',params.thr_median(TT,ch),params.thr_uV(TT,ch)), 'Units','normalized','HorizontalAlignment','left','VerticalAlignment','bottom');
+                case 2
+                    text(.02,1, sprintf('lib thr=%.2f',params.lib_corr_thr), 'Units','normalized','HorizontalAlignment','left','VerticalAlignment','bottom');
+                case 3
+                    text(.02,1, sprintf('min sep=%d',params.min_sep_events), 'Units','normalized','HorizontalAlignment','left','VerticalAlignment','bottom');
+                case 4
+                    text(.02,1, sprintf('CD thr=%.1f (%.fuV)',params.CD_thr_median(TT,ch),params.CD_thr_uV(TT,ch)), 'Units','normalized','HorizontalAlignment','left','VerticalAlignment','bottom');
+            end
             if ii_unit == length(unit_numbers)
                 xlabel(sprintf('ch%d',ch))
             end
         end
+    end
+    for ch=1:4
+        ylimits = get(pnl(1,ch).axis,'ylim');
+        linkaxes( [pnl(1,ch).axis pnl(2,ch).axis pnl(3,ch).axis pnl(4,ch).axis], 'xy');
+        set(pnl(1,ch).axis,'ylim', ylimits);
     end
     pnl(length(unit_numbers),1).select();
     xlabel('Samples')
@@ -508,6 +525,13 @@ for TT = params.TT_to_use
             xlabel(sprintf('ch%d (%s)', features_pairs(ii_pair,1), '{\mu}V'))
             ylabel(sprintf('ch%d (%s)', features_pairs(ii_pair,2), '{\mu}V'))
         end
+    end
+    for ii_pair = 1:size(features_pairs,1)
+        xlimits = get(pnl(1,ii_pair).axis,'xlim');
+        ylimits = get(pnl(1,ii_pair).axis,'ylim');
+        linkaxes( [pnl(1,ii_pair).axis pnl(2,ii_pair).axis pnl(3,ii_pair).axis pnl(4,ii_pair).axis], 'xy');
+        set(pnl(1,ii_pair).axis,'xlim', xlimits);
+        set(pnl(1,ii_pair).axis,'ylim', ylimits);
     end
     pnl(1,size(features_pairs,1)).select();
     text(1.1,1.1,sprintf('max points=%d',max_points_plot_cluster),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');

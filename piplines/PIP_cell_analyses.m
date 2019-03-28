@@ -9,12 +9,13 @@ log_name_out = fullfile('L:\Analysis\Results\pipelines', log_name_str );
 
 %% 
 cell_list = {
-'b0034_d180306_TT4_SS01',...
+% 'b2289_d180619_TT4_SS01',...
+'b2289_d180619_TT4_SS02',...
 };
 
 %% load cells summary and choose cells
 cells_t = DS_get_cells_summary();
-cells_t(~strcmp(cells_t.brain_area, 'dCA1'),:)=[];
+% cells_t(~strcmp(cells_t.brain_area, 'CA1'),:)=[];
 % cells_t(~ismember(cells_t.bat, [79,148,34,9861] ),:) = [];
 % cells_t(~ismember(cells_t.bat, [34] ),:) = [];
 % cells_t(cells_t.date~='10/03/2018', :)=[];
@@ -42,12 +43,12 @@ try
     cell_calc_stats(cell_ID);
     cell_plot_map_fields(cell_ID);
     
-%     cell_calc_time_AC(cell_ID);
-%     cell_plot_time_AC(cell_ID);
+    cell_calc_time_AC(cell_ID);
+    cell_plot_time_AC(cell_ID);
     toc
     
 catch err
-    disp(err)
+    getReport(err)
 end
 
 % pause

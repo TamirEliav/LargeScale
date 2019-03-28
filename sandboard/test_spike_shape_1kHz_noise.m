@@ -143,7 +143,8 @@ clear;clc
 % load cells from different filtering/spike-shape lib
 %         cells{1} = load('L:\Analysis\Results\cells\spikes\b9861_d180519_TT1_SS02_cell_spikes.mat');
 %         cells{2} = load('L:\Analysis\Results\cells\spikes\b9861_d180519_TT1_SS01_cell_spikes.mat');
-cell_cmpr_opt = 4;
+for cell_cmpr_opt = 1:5
+    fprintf('cell #%d',cell_cmpr_opt);
 switch cell_cmpr_opt
     case 1
         cells{1} = load('L:\Analysis\Results\pre_proc\comparing_new_filtering\cells\OLD_filtering_OLD_lib\b9861_d180519_TT1_SS01_cell_spikes.mat');
@@ -161,6 +162,10 @@ switch cell_cmpr_opt
         cells{1} = load('L:\Analysis\Results\pre_proc\comparing_new_filtering\cells\OLD_filtering_OLD_lib\b9861_d180519_TT1_SS04_cell_spikes.mat');
         cells{2} = load('L:\Analysis\Results\pre_proc\comparing_new_filtering\cells\NEW_filtering_OLD_lib\b9861_d180519_TT1_SS04_cell_spikes.mat');
         best_ch = 4;
+    case 5
+        cells{1} = load('L:\Analysis\Results\pre_proc\comparing_new_filtering\comparing_filters_shir\b0079_d160929_TT2_SS01_cell_spikes__OLD_FILTER.mat');
+        cells{2} = load('L:\Analysis\Results\pre_proc\comparing_new_filtering\comparing_filters_shir\b0079_d160929_TT2_SS01_cell_spikes__NEW_FILTER.mat');
+        best_ch = 4;
 end
 legend_str = {'original filtering (bandpass)';'new filtering (highpass)'};
 
@@ -173,7 +178,7 @@ for ii_cell = 1:length(cells)
     avg_wv = squeeze( mean(wvfrms(:,best_ch,:),3) );
     range(avg_wv)
     plot(avg_wv);
-%     text(0.8,1.1-0.05*ii_cell,sprintf('n=%d',size(wvfrms,3)),'Units','normalized')
+    text(0.8,1.1-0.05*ii_cell,sprintf('n=%d',size(wvfrms,3)),'Units','normalized')
 end
 legend(legend_str)
 title('spikes shape')
@@ -186,7 +191,7 @@ hold on
 for ii_cell = 1:length(cells)
     wvfrms = cells{ii_cell}.spikes.waveforms;
     rrr = PRE_calc_lib_corr(wvfrms, library_of_acceptable_spike_shapes);
-    h=histogram(rrr);
+    h=histogram(rrr,'Normalization','pdf');
     median(rrr)
 end
 legend(legend_str)
@@ -200,7 +205,7 @@ hold on
 for ii_cell = 1:length(cells)
     wvfrms = cells{ii_cell}.spikes.waveforms;
     rrr = PRE_calc_lib_corr(wvfrms, library_of_acceptable_spike_shapes);
-    h=histogram(rrr);
+    h=histogram(rrr,'Normalization','pdf');
     median(rrr)
 %     text(0.8,0.8,sprintf('n=%d',size(wv,3)),'Units','normalized')
 end
@@ -212,6 +217,7 @@ filename_out = fullfile('L:\Analysis\Results\pre_proc\comparing_new_filtering\ce
 saveas(gcf, filename_out, 'tif');
 saveas(gcf, filename_out, 'fig');
 close all
+end
 
 %%
 

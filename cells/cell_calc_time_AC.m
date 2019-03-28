@@ -22,8 +22,14 @@ for ii_dir = 1:2
     time_AC.by_dir(ii_dir) = calc_AC(spikes_ts);
 end
 
-%% TODO: fix cases with no fields
-fields = [cell.fields{:}];
+%% by fields
+fields = [];
+if ~isempty(cell.fields{1})
+    fields = [fields cell.fields{1}];
+end
+if ~isempty(cell.fields{2})
+    fields = [fields cell.fields{2}];
+end
 if length(fields)==0
     time_AC.in_field = [];
     time_AC.by_fields = [];
@@ -45,7 +51,7 @@ spikes_sleep_IX = get_data_in_ti(cell.spikes.ts, sleep_ti);
 spikes_sleep_ts = cell.spikes.ts(spikes_sleep_IX);
 time_AC.sleep = calc_AC(spikes_sleep_ts);
 
-%% resting on balls
+%% TODO: add resting on balls
 
 %% all recorded spikes
 

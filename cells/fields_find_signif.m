@@ -1,12 +1,13 @@
 function fields = fields_find_signif(FE, fields, prm)
 
+%%
+[fields(:).signif] = disperse( repelem(false,length(fields)) ); % pre-define field 'signif' to allow parfor
 if length(fields)==0
     return;
 end
     
 
 %%
-[fields(:).signif] = disperse( repelem(false,length(fields)) ); % pre-define field 'signif' to allow parfor
 parfor ii_field = 1:length(fields)
     
     %% create FE struct specifically for the flights passed through the field

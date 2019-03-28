@@ -1,6 +1,8 @@
 function fields = fields_remove_overlaps(FR_map, fields, prm)
 
     if length(fields)<=1
+         % define field 'overlap_edges' to have the same struct
+        [fields(:).overlap_edges] = disperse( repelem(nan,length(fields)) );
         return;
     end
 

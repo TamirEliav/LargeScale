@@ -5,7 +5,7 @@ clear;clc
 
 %% load exp summary and choose exps
 exp_t = DS_get_exp_summary();
-bat_num = 34;
+bat_num = 148;
 exp_t(~contains(exp_t.recordingArena, '200m'),:) = [];
 exp_t(exp_t.position_data_exist==0,:) = [];
 exp_t(exp_t.neural_data_exist==0,:) = [];
@@ -58,6 +58,7 @@ dir_OUT = 'L:\Analysis\Results\pre_proc';
 if ~exist(dir_OUT,'dir') ;mkdir(dir_OUT); end
 fig_filename = fullfile(dir_OUT, sprintf('csc_raw_stats_bat_%04d',bat_num));
 saveas(gcf,fig_filename, 'tif')
+saveas(gcf,fig_filename, 'fig')
 
 
 
