@@ -246,6 +246,7 @@ for TT = params.TT_to_use
         xxx_lags = xxx_lags_shifts(ii_shift, :);
         ccc = corr(largest_waveforms(xxx_lags,:), library_of_acceptable_spike_shapes(:,2:end-1)');
         rrr(ii_shift,:) = max(ccc,[],2);
+        clear ccc;
     end
     rrr = max(rrr,[],1);
     TT_events_lib_thrded = ( rrr >=  params.lib_corr_thr );
