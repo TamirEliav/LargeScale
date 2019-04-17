@@ -4,6 +4,9 @@ function exp_explore_units_FR(NTT_file)
 if nargin==0
     [NTT_filename NTT_path] = uigetfile(fullfile('L:\Analysis\pre_proc','*.NTT'), 'choose NTT file');
     NTT_file = fullfile(NTT_path, NTT_filename);
+elseif isdir(NTT_file)
+    [NTT_filename NTT_path] = uigetfile(fullfile(NTT_file,'*.NTT'), 'choose NTT file');
+    NTT_file = fullfile(NTT_path, NTT_filename);
 end
 
 %% get exp_ID from NTT filename
@@ -143,7 +146,7 @@ for ii_dir = 1:2
     for ii_cell = 1:length(cells)
         cell = cells(ii_cell);
         h = plot(cell.FR_map(ii_dir).bin_centers, cell.FR_map(ii_dir).PSTH,...
-            'Color', units_colors(ii_cell,:), 'LineWidth',1.5);
+            'Color', units_colors(cell.cellNum,:), 'LineWidth',1.5);
         obj_handles_units{1,ii_dir,ii_cell} = h;
         if ~isempty(h)
             h.DisplayName = sprintf('unit %d (%s)', cell.cellNum, 'a'+cell.cellNum-1);
@@ -161,10 +164,11 @@ for ii_dir = 1:2
     for ii_cell = 1:length(cells)
         cell = cells(ii_cell);
         cell_FE = cell.FE{ii_dir};
-        h = plot([cell_FE.spikes_pos],[cell_FE.spikes_ts], '.', 'Color', units_colors(ii_cell,:));
+        h = plot([cell_FE.spikes_pos],[cell_FE.spikes_ts], '.', 'Color', units_colors(cell.cellNum,:));
         obj_handles_units{2,ii_dir,ii_cell} = h;
         if ~isempty(h)
             h.DisplayName = sprintf('unit %d (%s)', cell.cellNum, 'a'+cell.cellNum-1);
+            h.UserData = [cell_FE.spikes_ts];
         end
     end
     ylim(ti)
@@ -187,6 +191,8 @@ end
 setappdata(gcf, 'LinkUnits', Link);
 Link = linkprop(obj_handles_pos, 'Visible');
 setappdata(gcf, 'LinkPosition', Link);
+setappdata(gcf, 'obj_handles_units', obj_handles_units);
+setappdata(gcf, 'NTT_file', NTT_file);
 
 % save figure
 file_out = fullfile(dir_out, 'maps_all_units');

@@ -9,8 +9,12 @@ log_name_out = fullfile('L:\Analysis\Results\pipelines', log_name_str );
 
 %% 
 cell_list = {
-% 'b2289_d180619_TT4_SS01',...
-'b2289_d180619_TT4_SS02',...
+'b0148_d170711_TT4_SS01',...
+'b0148_d170711_TT4_SS02',...
+'b0148_d170711_TT4_SS03',...
+'b0148_d170711_TT4_SS04',...
+'b0148_d170711_TT4_SS05',...
+'b0148_d170711_TT1_SS01',...
 };
 
 %% load cells summary and choose cells
@@ -18,6 +22,7 @@ cells_t = DS_get_cells_summary();
 % cells_t(~strcmp(cells_t.brain_area, 'CA1'),:)=[];
 % cells_t(~ismember(cells_t.bat, [79,148,34,9861] ),:) = [];
 % cells_t(~ismember(cells_t.bat, [34] ),:) = [];
+% cells_t(~ismember(cells_t.bat, [148] ),:) = [];
 % cells_t(cells_t.date~='10/03/2018', :)=[];
 cells_t(~contains(cells_t.cell_ID, cell_list),:) = [];
 cells_t
@@ -52,7 +57,7 @@ catch err
 end
 
 % pause
-%     close all
+    close all
     
 end
 

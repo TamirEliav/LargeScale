@@ -1169,4 +1169,72 @@ end
 
 
 %%
+clear
+clc
+index = @(a,b)(abs(a-b)./(a+b));
+x = 0.5:0.1:20;
+y = 0.5:0.1:20;
+y=1;
+[X,Y] = meshgrid(x,y);
+Z = index(X,Y);
+figure
+mesh(X,Y,Z)
 
+
+%%
+clear
+clc
+file_IN = 'D:\__TEMP\New folder (18)\CSC14.ncs';
+ts_limits = [74468891905 74470238429];
+[signal, ts, fs, params] = Nlx_csc_read(file_IN, [ts_limits]);
+
+% filter_params.type = 'highpassfir1';
+% filter_params.passband  = [600];
+% filter_params.order = 12;
+% Wn   = filter_params.passband / (fs/2);
+% b = fir1(filter_params.order, Wn,'high');
+% % b = fir1(filter_params.order, Wn,'bandpass');
+% a = 1;
+
+stopfreq = 400;
+passfreq = 700;
+custom_filt_params = {'highpassfir',...
+    'StopbandFrequency', stopfreq,...
+    'PassbandFrequency', passfreq,...
+    'StopbandAttenuation', 60,...
+    'PassbandRipple', 1,...
+    'SampleRate', fs};
+custom_filt = designfilt(custom_filt_params{:});
+order = filtord(custom_filt);
+signal1 = filtfilt(custom_filt,signal);
+file_OUT1 = ['D:\__TEMP\New folder (18)\' sprintf('CSC14_filtfilt_custom_order_%d_%d_%d.ncs', order, stopfreq, passfreq)];
+nlx_csc_write(file_OUT1, signal1, ts, fs, params.header);
+
+% file_OUT1 = ['D:\__TEMP\New folder (18)\' sprintf('CSC14_filtfilt_order_%d.ncs',filter_params.order)];
+% signal1 = filtfilt(b,a,signal);
+% nlx_csc_write(file_OUT1, signal1, ts, fs, params.header);
+
+% file_OUT2 = ['D:\__TEMP\New folder (18)\' sprintf('CSC14_filter_order_%d.ncs',filter_params.order)];
+% signal2 = filter(b,a,signal);
+% nlx_csc_write(file_OUT2, signal2, ts, fs, params.header);
+            
+%% playing with brush
+clear
+clc
+figure
+hold on
+h1 = plot(1:10,'r');
+h2 = plot(11:20,'b');
+%%
+clc
+h1.BrushData
+h2.BrushData
+h=gca
+
+
+
+
+
+
+
+%%

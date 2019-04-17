@@ -22,7 +22,7 @@ exp_t(~ismember(exp_t.batNum, [148] ),:) = [];
 % exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
 % exp_t(exp_t.date > datetime('17/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
 exp_t(~contains(exp_t.exp_ID, exp_list),:) = [];
-% exp_t = flip(exp_t);
+exp_t = flip(exp_t);
 exp_t 
 
 %%

@@ -37,7 +37,8 @@ mkdir(Nlx_OutDir)
 %% parameters setting
 num_channels = 16;
 data_cnl_ind = [0:15]; % note that this numbering system is of the neurologger which means channels 0-15
-DATA_file_prefix = 'NEUR0';
+% DATA_file_prefix = 'NEUR0';
+DATA_file_prefix = 'NEUR_';
 % DATA_file_prefix = 'BACK';
 zero_DC_level_bit = 2048;
 is_invert_data = true;
