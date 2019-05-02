@@ -1231,6 +1231,103 @@ h1.BrushData
 h2.BrushData
 h=gca
 
+%% 29/04/2019 - make sure all cell details are valid
+clear; clc
+cells_t = DS_get_cells_summary();
+for ii_cell = 1:height(cells_t)
+    %%
+    cell = cells_t(ii_cell,:);
+    cell_ID1 = cell.cell_ID{1};
+    cell_ID2 = sprintf('b%04d_d%s_TT%d_SS%02d', ...
+        cell.bat,...
+        datestr(cell.date,'yymmdd'),...
+        cell.TT,...
+        cell.unit);
+    if ~strcmp(cell_ID1 , cell_ID2 )
+        fprintf('problem with %s (%d)\n', cell_ID1 , ii_cell)
+    end
+end
+disp('finished')
+
+
+%% 30/04/2019 - play with conv/imfilter (test nan and edge effects)
+clear
+clc
+% rng(0);
+x = randn(1,100)+10;
+x(50:60) = nan;
+x(1:10) = x(1:10)+10;
+x = [nan(1,10) x];
+nanx = isnan(x);
+IX    = 1:numel(x);
+x(nanx) = interp1(IX(~nanx), x(~nanx), IX(nanx), 'nearest', 'extrap');
+% x(1) = 10;
+% win = gausswin(10,5);
+win = fspecial('gaussian',20,1);
+x2 = imfilter(x,win,'same','conv','symmetric');
+% x2 = imfilter(x,win,'same','conv',4);
+
+x(nanx) = nan;
+x2(nanx) = nan;
+
+% figure
+cla
+hold on
+plot(x)
+plot(x2)
+xlim([1 length(x)])
+% ylim([0 30])
+
+%% 01/05/2019 - look at time spent across the population
+clear
+clc
+cells_t = DS_get_cells_summary();
+cells_t(~ismember(cells_t.bat, [79,9861,2289] ),:) = [];
+cells = cellfun(@(c)(cell_load_data(c,'FR_map','details')), cells_t.cell_ID, 'UniformOutput',0);
+cells = [cells{:}];
+FR_maps = [cells.FR_map];
+M = [];
+for ii_cell = 1:length(cells)
+    M(ii_cell,1,:) = cells(ii_cell).FR_map(1).all.time_spent;
+    M(ii_cell,2,:) = cells(ii_cell).FR_map(2).all.time_spent;
+end
+
+figure
+x = cells(1).FR_map(1).all.bin_centers;
+subplot(2,1,1); hold on
+plot(x, squeeze(M(:,1,:))')
+plot(x, squeeze(mean(M(:,1,:),1))','k','LineWidth',2)
+subplot(2,1,2); hold on
+plot(x,squeeze(M(:,2,:))');
+plot(x, squeeze(mean(M(:,2,:),1))','k','LineWidth',2)
+
+%% 01/05/2019 - test parfor behavior
+clear
+clc
+parfor ii=1:5
+    func1(ii)
+%     disp(ii)
+%     figure(ii)
+%     plot(0:1,0:1)
+%     text(0.5,0.5,num2str(ii));
+%     pause(ii)
+    close all
+end
+
+function func1(ii)
+%     ii = rand(1,1);
+    disp(ii)
+    figure
+    plot(0:1,0:1)
+    text(0.5,0.5,num2str(ii));
+    pause(ii)
+    saveas(gcf,sprintf('fig%d',ii),'tif');
+end
+
+%%
+
+
+
 
 
 

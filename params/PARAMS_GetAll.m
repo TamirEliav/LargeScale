@@ -54,6 +54,7 @@ prm.oscillations.time_AC.win_size = 2;
 % prm.LFP.flight_rhythm.resample_fs = 1000;
 
 prm.FR_map.bin_size = 0.2;
+prm.FR_map.bin_limits = [0 200];
 prm.FR_map.ker_SD = 0.5;
 prm.FR_map.min_time_spent_per_meter = 0.75;
 prm.FR_map.ker_type = 'gaussian';

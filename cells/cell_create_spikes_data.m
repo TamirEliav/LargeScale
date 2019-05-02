@@ -15,9 +15,13 @@ exp=exp_load_data(cell.details.exp_ID, 'path');
 
 NTT_file = fullfile(exp.path.spikes_sorting,...
                     ['spikes_' cell.details.TT_ID '.NTT']);
-
-[Timestamps, CellNumbers, Samples, Header] = ...
-     Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 1, [] );
+if isempty(cell.details.stable_ts)
+    [Timestamps, CellNumbers, Samples, Header] = ...
+         Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 1, [] );
+else
+    [Timestamps, CellNumbers, Samples, Header] = ...
+         Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 4, cell.details.stable_ts );
+end
 
 %% parse header
 ADBitVolts = sscanf(Header{contains(Header,'ADBitVolts')},'-ADBitVolts %f %f %f %f');

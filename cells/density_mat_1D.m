@@ -34,7 +34,7 @@ if min(size_data)==1
     data_bin = bin_centers(dd);
     % data_bin holds the bin center for every data point, e.g. the spike's bin location
     
-    density_mat = accumarray(dd(:),1,[length(bin_centers),1]);
+    density_mat = accumarray(dd(:),1,[length(bin_centers),1])';
     
 else
     bin_size = bin_centers(2) - bin_centers(1);

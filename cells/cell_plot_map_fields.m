@@ -57,6 +57,10 @@ for ii_dir = 1:2
     FE = cell.FE{ii_dir};
     plot([FE.pos],       [FE.ts],        '.', 'Color', 0.9.*[1 1 1])
     plot([FE.spikes_pos],[FE.spikes_ts], '.', 'Color', dir_colors{ii_dir})
+    xlimits = get(gca, 'xlim');
+    if ~isempty(cell.details.stable_ts)
+        plot(repmat(xlimits,[2 1])', repmat(cell.details.stable_ts, [ 2 1] ),'--', 'Color','k');
+    end
     ylim(ti)
     rescale_plot_data('y',[1e-6/60 ti(1)])
     
@@ -165,15 +169,19 @@ ylimits = get(gca,'ylim');
 for ii_session = 1:length(exp.details.session_names)
     sname = exp.details.session_names{ii_session};
     ti = exp.details.session_ts(ii_session,:);
-    plot(repelem(ti(1),2), ylimits,'--m');
-    plot(repelem(ti(2),2), ylimits,'--m')
+    plot(repelem(ti(1),2), ylimits,'-m');
+    plot(repelem(ti(2),2), ylimits,'-m')
     text(mean(ti), ylimits(2)+0.05*diff(ylimits), sname,'HorizontalAlignment','center','FontWeight','bold');
 end
 xlimits = exp.details.session_ts([1 end]);
 xlimits = xlimits + [-1 1].*range(xlimits)*0.025;
 xlim(xlimits);
-% align time to behave session
- 
+% add stability ts
+ylimits = get(gca,'ylim');
+if ~isempty(cell.details.stable_ts)
+    plot( repmat(cell.details.stable_ts, [2 1]), repmat(ylimits,[2 1])', '--', 'Color','k');
+end
+% align time to behave session (time zero)
 behave_ti = exp_get_sessions_ti(exp.details.exp_ID,'Behave');
 rescale_plot_data('x',[1e-6/60 behave_ti(1)])
 xlimits = get(gca,'xlim'); % workaround
@@ -183,13 +191,13 @@ ylabel('Firing rate (Hz)')
 % plot spikes peak vs. time
 wvfms=[cell.spikes.waveforms];
 [~,max_ch_IX] = max(max(squeeze(mean(wvfms,3))));
-spikes_peaks = squeeze(max(wvfms(:,max_ch_IX,:),[],1));
+spikes_peaks = squeeze(range(wvfms(:,max_ch_IX,:),1));
 yyaxis right
 hold on
-plot(cell.spikes.ts, spikes_peaks,'.','MarkerSize',4);
+plot(cell.spikes.ts, spikes_peaks,'.','MarkerSize',4, 'Color',[1 0 0]);
 ylim([0 max(spikes_peaks)*1.1])
 rescale_plot_data('x',[1e-6/60 behave_ti(1)])
-ylabel('Spikes peak (\muV)')
+ylabel('Spikes size(\muV)')
 
 % set xlim again (workaround)
 xlim(xlimits);
@@ -228,6 +236,7 @@ stats_table_data =  {...
     'meanFR all',       [], [], stats_all.meanFR_all,    'Hz';...
     'meanFR air',       [], [], stats_all.meanFR_flight, 'Hz';...
     'num flights',      stats_dir.num_full_flights, stats_all.num_full_flights, '';...
+    'ClusterQuality',   [], [], cell.details.ClusterQuality,                    '';...
 };
 columnname =   {'Parameter', 'dir1', 'dir2', 'all', 'units'};
 columnformat = {'char', 'numeric', 'numeric', 'numeric', 'char'}; 
@@ -255,6 +264,12 @@ for ii_col = 1:length(t.ColumnFormat)
     end
 end
 end
+%% set table background color
+% first lets set the alternating colors
+t.BackgroundColor(1:2:size(t.Data,1),:) = 1;
+t.BackgroundColor(2:2:size(t.Data,1),:) = 0.94;
+t.BackgroundColor(24,:) = interp1([0 1 2],[1 0 0 ; 1 1 0; 0 1 0], cell.details.ClusterQuality);
+
 %% save figure
 h=pnl.title(cell_ID); h.FontSize=16; h.Interpreter='none';h.Position=[0.5 1.03];
 fig_filename = fullfile('L:\Analysis\Results\cells\figures', [cell_ID '_map_fields']);

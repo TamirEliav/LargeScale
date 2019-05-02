@@ -95,7 +95,7 @@ mkdir(dir_out);
 %% fig 1 - spikes and FR maps from all units together!
 figure('Units','normalized','Position',[0 0 1 1]);
 pnl = panel();
-pnl.pack('h',[50 50],'v',[35 65])
+pnl.pack('h',[40 40 20],'v',[35 65])
 pnl.margin = [15 25 15 15];
 pnl.title(NTT_file)
 
@@ -171,15 +171,48 @@ for ii_dir = 1:2
             h.UserData = [cell_FE.spikes_ts];
         end
     end
-    ylim(ti)
-    rescale_plot_data('y',[1e-6/60 ti(1)])
+    ylim(Timestamps([1 end]))
+    rescale_plot_data('y',[1e-6/60 ti(1)]);
     xlabel('Position (m)')
     ylabel('Time (min)')
     h=title(directions_str{ii_dir}); h.FontSize = 12;
 end
 
-% link xlim
-linkaxes(pnl.de.axis, 'x');
+% link xlim (position)
+% linkaxes(pnl.de.axis, 'x');
+
+% plot spikes voltage by time (vertical)
+pnl(3,2).select();hold on
+set(gca,'Color','k');
+for ii_cell = 1:length(cells)
+    cell = cells(ii_cell);
+    % get the index of the channel with the highest voltage
+    [~,ch_IX]=max(range(cell.spikes.waveforms,1),[],2);
+    ch_max_IX = median(ch_IX(:));
+    spikes_voltage = squeeze(range(cell.spikes.waveforms(:,ch_max_IX,:),1));
+    h = plot(spikes_voltage, cell.spikes.ts, '.', 'Color', units_colors(cell.cellNum,:), 'MarkerSize',1);
+    obj_handles_units{3,1,ii_cell} = h;
+    if ~isempty(h)
+        h.DisplayName = sprintf('unit %d (%s)', cell.cellNum, 'a'+cell.cellNum-1);
+    end
+end
+ylim(Timestamps([1 end]));
+rescale_plot_data('y',[1e-6/60 ti(1)]);
+
+% link time
+linkaxes([pnl(1,2).axis pnl(2,2).axis pnl(3,2).axis], 'y');
+
+% add popup menu to select time units
+c = uicontrol(gcf,'Style','popupmenu');
+c.Units = 'normalized';
+c.Position = [0.9 0.6 0.05 0.05];
+c.String = {'minutes','usec'};
+c.Value = 1;
+c.UserData.LastValue = c.Value;
+c.UserData.BehaveTs = ti;
+c.UserData.TotalRecTs = Timestamps([1 end]);
+c.UserData.ax_h = [pnl(1,2).axis pnl(2,2).axis pnl(3,2).axis];
+c.Callback = @TimeUnitSelect;
 
 % link visability property
 plotbrowser('on')
@@ -223,6 +256,42 @@ saveas(gcf, file_out, 'tif')
 
 end
 
+%% function selection for popup menu (time units)
+% select time units: 
+% (1) minutes from behave start
+% (2) usec for all recordings time
+function TimeUnitSelect(src,event)
+c =src;
+if c.UserData.LastValue == c.Value
+    return;
+else
+    c.UserData.LastValue = c.Value;
+end
+ylimits = c.UserData.TotalRecTs([1 end]);
+t0 = c.UserData.BehaveTs(1);
+switch c.String{c.Value}
+    case 'minutes'
+        gain_offset = [1e-6/60 t0];
+        ylimits = (ylimits - t0).*1e-6/60;
+        ylabel_str = 'Time (min)';
+    case 'usec'
+        gain_offset = [1e6*60 -t0*1e-6/60];
+        ylabel_str = 'Time (usec)';
+end
+for h = c.UserData.ax_h
+    axes(h);
+    rescale_plot_data('y',gain_offset);
+    ylim(ylimits);
+    ylabel(ylabel_str)
+end
+end
+
+
+
+
+
+
+%%
 
 
 

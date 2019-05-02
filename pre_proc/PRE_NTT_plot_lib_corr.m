@@ -27,7 +27,7 @@ if exist(params_file,'file')
 else
     % set defaults
     params.lib_spike_shapes = 'library_of_acceptable_spike_shapes_new.mat';
-    params.lib_corr_thr = 0.9;
+    params.lib_corr_thr = 0.8;
     params.AlignSample = 8;
 end
 load(params.lib_spike_shapes)
