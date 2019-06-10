@@ -19,12 +19,17 @@ time_spent = pos_counts*(1/pos_fs);
 
 %% apply minimum time spent
 mask = time_spent>=min_time_spent;
-CC = bwconncomp(mask);
-for ii_cmp = 1:CC.NumObjects
-    if length(CC.PixelIdxList{ii_cmp}) < 3
-        mask(CC.PixelIdxList{ii_cmp}) = 0;
-    end
+if sum(mask) <= 1
+    PSTH = nan(size(mask));
+    spike_density_filtered = nan(size(mask));
+    time_spent_filtered = nan(size(mask));
+    return
 end
+% take only the main continuous component of valid bins
+CC = bwconncomp(mask);
+[~,max_IX] = max(cellfun(@length, CC.PixelIdxList));
+mask(:) = 0;
+mask(CC.PixelIdxList{max_IX}) = 1;
 
 %% create filter kernel
 hsize = 1 + (5*ker_SD/bin_size);% %ceil(5*(param.general.sigma_PF_smoothing*3));

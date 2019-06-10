@@ -85,9 +85,9 @@ if run_SPIKES_filtering
     end
     
     parfor ii_ch = 1:length(active_channels)
-%         if ~active_channels(ii_ch)
-%             continue;
-%         end
+        if ~active_channels(ii_ch)
+            continue;
+        end
         TT = ceil(ii_ch/4);
         ch_num = mod(ii_ch-1,4)+1;
         file_IN = fullfile(exp.path.nlx,['CSC' num2str(ii_ch-1) '.ncs']);

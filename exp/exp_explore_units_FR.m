@@ -194,6 +194,7 @@ for ii_cell = 1:length(cells)
     obj_handles_units{3,1,ii_cell} = h;
     if ~isempty(h)
         h.DisplayName = sprintf('unit %d (%s)', cell.cellNum, 'a'+cell.cellNum-1);
+        h.UserData = cell.spikes.ts;
     end
 end
 ylim(Timestamps([1 end]));
@@ -226,6 +227,10 @@ Link = linkprop(obj_handles_pos, 'Visible');
 setappdata(gcf, 'LinkPosition', Link);
 setappdata(gcf, 'obj_handles_units', obj_handles_units);
 setappdata(gcf, 'NTT_file', NTT_file);
+
+% set brush callback
+bO = brush(gcf);
+set(bO, 'ActionPostCallback', @MyBrushFunc);
 
 % save figure
 file_out = fullfile(dir_out, 'maps_all_units');
@@ -261,32 +266,51 @@ end
 % (1) minutes from behave start
 % (2) usec for all recordings time
 function TimeUnitSelect(src,event)
-c =src;
-if c.UserData.LastValue == c.Value
-    return;
-else
-    c.UserData.LastValue = c.Value;
-end
-ylimits = c.UserData.TotalRecTs([1 end]);
-t0 = c.UserData.BehaveTs(1);
-switch c.String{c.Value}
-    case 'minutes'
-        gain_offset = [1e-6/60 t0];
-        ylimits = (ylimits - t0).*1e-6/60;
-        ylabel_str = 'Time (min)';
-    case 'usec'
-        gain_offset = [1e6*60 -t0*1e-6/60];
-        ylabel_str = 'Time (usec)';
-end
-for h = c.UserData.ax_h
-    axes(h);
-    rescale_plot_data('y',gain_offset);
-    ylim(ylimits);
-    ylabel(ylabel_str)
-end
+    c =src;
+    if c.UserData.LastValue == c.Value
+        return;
+    else
+        c.UserData.LastValue = c.Value;
+    end
+    ylimits = c.UserData.TotalRecTs([1 end]);
+    t0 = c.UserData.BehaveTs(1);
+    switch c.String{c.Value}
+        case 'minutes'
+            gain_offset = [1e-6/60 t0];
+            ylimits = (ylimits - t0).*1e-6/60;
+            ylabel_str = 'Time (min)';
+        case 'usec'
+            gain_offset = [1e6*60 -t0*1e-6/60];
+            ylabel_str = 'Time (usec)';
+    end
+    for h = c.UserData.ax_h
+        axes(h);
+        rescale_plot_data('y',gain_offset);
+        ylim(ylimits);
+        ylabel(ylabel_str)
+    end
 end
 
-
+%% callback function for brush selection
+function MyBrushFunc(varargin)
+    %% get selected data (with brush) - from position plots
+    hfigdata = getappdata(gcf);
+    hlines = [hfigdata.obj_handles_units{2,:,:}];
+    brush_ts = [];
+    for ii = 1:length(hlines)
+        IX = find(hlines(ii).BrushData);
+        brush_ts = [brush_ts hlines(ii).UserData(IX)];
+    end
+    
+    %% set selected data (with brush) - for spikes voltage plots
+    hfigdata = getappdata(gcf);
+    hlines = [hfigdata.obj_handles_units{3,:,:}];
+    for ii = 1:length(hlines)
+        spikes_ts = hlines(ii).UserData;
+        data_to_brush = ismember(spikes_ts, brush_ts);
+        hlines(ii).BrushData = double(data_to_brush);
+    end
+end
 
 
 

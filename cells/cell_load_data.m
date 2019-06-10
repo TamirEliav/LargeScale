@@ -12,8 +12,9 @@ field_options = {
     'shuffle',
     'signif',
     'meanFR',
-    'stats',
     'time_AC',
+    'stats',
+    'inclusion',
     };
 
 %% parse input

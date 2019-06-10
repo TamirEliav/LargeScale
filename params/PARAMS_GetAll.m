@@ -64,7 +64,7 @@ prm.FR_map.shuffles_max_shift = 30;
 prm.fields.FR_thr = 1;
 prm.fields.overlap_href = 0.5; % href=horizontal reference
 prm.fields.width_href = 0.2;
-prm.fields.width_prc = [5 95];
+prm.fields.width_prc = [5 95]; % TODO: consider chaning to 2.5-97.5 %
 prm.fields.min_spikes = 10;
 prm.fields.min_flights_with_spikes = 5;
 prm.fields.min_flights_with_spikes_prc = 0.2;
@@ -81,6 +81,8 @@ prm.signif.SI_thr = 0.5;
 prm.signif.SI_thr_shuffle = 99;
 prm.signif.odd_even_FR_map_corr_thr = 0.5;
 
+prm.inclusion.min_full_flights = 5;
+prm.inclusion.min_spikes_air   = 50;
 
 prm.graphics.colors.flight_directions = {...
     [0         0.4470    0.7410];...

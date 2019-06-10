@@ -24,7 +24,7 @@ for ii_dir = 1:2
     fields_all = [fields_all fields_to_add];
 end
 
-%%
+%% by dir
 stats_per_dir = repelem(struct(),2);
 for ii_dir = 1:2
 
@@ -62,12 +62,12 @@ for ii_dir = 1:2
     stats_per_dir(ii_dir).spikes_prc_field = 100.* stats_per_dir(ii_dir).spikes_num_field / stats_per_dir(ii_dir).spikes_num_air;
 end
 
-%%
+%% all
 stats_all = struct();
 
 stats_all.IsoDist = cell.spikes.Isolation_dis;
 stats_all.L_Ratio = cell.spikes.L_Ratio;
-stats_all.meanFR_all     = cell.meanFR.all_sessions;
+stats_all.meanFR_all     = cell.meanFR.all;
 stats_all.meanFR_flight  = cell.meanFR.in_flight;
 stats_all.num_flights      = length(FE_all);
 stats_all.num_full_flights = sum([FE_all.distance] > prm.flight.full_min_distance );

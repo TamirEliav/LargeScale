@@ -5,7 +5,11 @@ clc
 log_name_str = ['exp_analysis ' datestr(clock, 'yyyy-mm-dd HH-MM-SS') '.txt'];
 log_name_out = fullfile('L:\Analysis\Results\pipelines', log_name_str );
 diary off; diary(log_name_out); diary on
-% TODO: save script code to log
+% log script code
+disp('-------------------------------------------------------------------')
+p = mfilename('fullpath')
+code_txt = fileread([p '.m'])
+disp('-------------------------------------------------------------------')
 
 %%
 exp_list = {

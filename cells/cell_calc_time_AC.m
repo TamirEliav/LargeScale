@@ -73,7 +73,9 @@ if isempty(ts)
     return;
 end
 
-edges = ts(1) : bin_size : ts(end);
+start_ts = min(ts) - bin_size;
+end_ts   = max(ts) + bin_size;
+edges = start_ts : bin_size : end_ts;
 [N,edges] = histcounts(ts,edges);
 maxlag = round(win_size/bin_size);
 [c, lags] = xcorr(N, maxlag);

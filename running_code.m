@@ -1314,17 +1314,22 @@ parfor ii=1:5
     close all
 end
 
-function func1(ii)
-%     ii = rand(1,1);
-    disp(ii)
-    figure
-    plot(0:1,0:1)
-    text(0.5,0.5,num2str(ii));
-    pause(ii)
-    saveas(gcf,sprintf('fig%d',ii),'tif');
-end
+% function func1(ii)
+% %     ii = rand(1,1);
+%     disp(ii)
+%     figure
+%     plot(0:1,0:1)
+%     text(0.5,0.5,num2str(ii));
+%     pause(ii)
+%     saveas(gcf,sprintf('fig%d',ii),'tif');
+% end
 
-%%
+%% 19/05/2019 - copy good cells to new folder
+dir_IN = 'L:\Analysis\Results\cells\figures';
+dir_OUT = 'L:\Analysis\Results\cells\figures\good_cluster_CA1';
+tmpl_list = cells_t.cell_ID;
+ext = 'tif';
+util_copy_files_by_template(dir_IN, dir_OUT, tmpl_list, ext);
 
 
 
