@@ -15,6 +15,7 @@ else
 end
 exp = exp_load_data(details.exp_ID,'details');
 details.brain_area = exp.details.TT_loc{details.TT};
+details.depth = exp.details.depth(details.TT);
 
 %% save cell details
 filename_cell_details = ['L:\Analysis\Results\cells\details\' cell_ID '_cell_details' ];

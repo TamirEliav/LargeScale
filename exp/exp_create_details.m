@@ -13,6 +13,7 @@ details.refCh = eval(details.refCh);
 details.TT_to_use = eval(details.TT_to_use);
 details.sync_jump_ts = eval(details.sync_jump_ts);
 details.TT_loc = eval(details.TT_loc);
+details.depth = eval(details.depth);
 
 %% save exp details
 filename_exp_details = ['L:\Analysis\Results\exp\details\' exp_ID '_exp_details' ];
