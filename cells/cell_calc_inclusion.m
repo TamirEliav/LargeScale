@@ -11,6 +11,7 @@ for ii_dir = 1:2
     conditions(2) = cell.stats.dir(ii_dir).spikes_num_air   >= prm.inclusion.min_spikes_air;
     inclusion(ii_dir).conditions = conditions;
     inclusion(ii_dir).TF = all(conditions);
+    inclusion(ii_dir).pyr = cell.stats.all.meanFR_all < prm.inclusion.interneuron_FR_thr;
 end
 
 %% save data to file

@@ -9,6 +9,7 @@ field_options = {
     'LM',           0
     'pos_y_std',    1
     'csc_raw_stats',1
+    'wingbeat',     1
     };
 
 %% parse input

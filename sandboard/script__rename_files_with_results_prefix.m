@@ -4,6 +4,7 @@ clc
 
 %%
 feature = 'fields_ratio';
+% feature = 'smallest_field';
 dir_IN = 'L:\Analysis\Results\cells\figures\';
 dir_OUT = fullfile( dir_IN , feature );
 pattern = '*_map_fields.tif';

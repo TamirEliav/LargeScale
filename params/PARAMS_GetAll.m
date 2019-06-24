@@ -72,6 +72,7 @@ prm.fields.local_shuffle.margin = 0.5; % relative to field width
 prm.fields.local_shuffle.n_shuffles = 1000;
 prm.fields.local_shuffle.max_shift = 30;
 prm.fields.local_shuffle.signif_SI_prc = 95;
+prm.fields.valid_speed_pos = [10 187.5];
 
 prm.Ipos.time_bin_size = 0.050;
 prm.Ipos.pos_bin_size = 1;
@@ -81,8 +82,9 @@ prm.signif.SI_thr = 0.5;
 prm.signif.SI_thr_shuffle = 99;
 prm.signif.odd_even_FR_map_corr_thr = 0.5;
 
-prm.inclusion.min_full_flights = 5;
-prm.inclusion.min_spikes_air   = 50;
+prm.inclusion.min_full_flights = 10; % >=
+prm.inclusion.min_spikes_air   = 50; % >=
+prm.inclusion.interneuron_FR_thr = 5; % 5 Hz for mean FR over entire session
 
 prm.graphics.colors.flight_directions = {...
     [0         0.4470    0.7410];...

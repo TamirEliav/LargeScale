@@ -9,7 +9,7 @@ dir_colors = prm.graphics.colors.flight_directions;
 %% create figure
 figure('Units','normalized','Position',[0 0 1 1]);
 pnl = panel();
-pnl.pack('h',[30 50 20])
+pnl.pack('h',[35 45 20])
 pnl(1).pack('v',2)
 pnl(1,1).pack('v',2)
 pnl(1,2).pack('v',2)
@@ -17,10 +17,10 @@ pnl(2).pack('v',2)
 pnl(3).pack('v',[80 20])
 pnl.margin = [15 25 15 15];
 pnl(1).margin = 10;
-pnl(1).de.margin = 10;
-% pnl(1,1).margin = 10;
-pnl(1,1).de.margin = 7;
-pnl(1,2).margin = 20;
+pnl(1).de.margin = 20;
+pnl(1,1).margin = 10;
+pnl(1,1).de.margin = 10;
+pnl(1,2).margin = 10;
 pnl(1,2).de.margin = 5;
 
 
@@ -38,7 +38,12 @@ for ii_dir = 1:2
         field = fields(ii_field);
         plot(field.loc, field.peak, 'k*', 'MarkerSize', 4)
         plot(field.edges_href, repelem(prm.fields.width_href * field.peak,2), 'k')
-        text(field.loc, field.peak, sprintf('%2.2f\n%2.2f',field.width_href,field.width_prc),...
+        text(field.loc, field.peak,...
+            sprintf('{\\color{magenta}%d}\n{\\color{red}%2.0f%%}\n%2.2f\n%2.2f',....
+            length(field.spikes_ts),...
+            field.num_flights_with_spikes_prc*100,...
+            field.width_href,...
+            field.width_prc),...
             'FontSize',7,'HorizontalAlignment','center','VerticalAlignment','bottom');
     end
     
@@ -46,8 +51,12 @@ for ii_dir = 1:2
     plot_LM(exp.LM);
     
     % labels
-    xlabel('Position (m)')
+%     xlabel('Position (m)')
     ylabel('Firing rate (Hz)')
+    set(gca,'TickDir','out');
+    if ii_dir == 1
+        set(gca,'XTickLabel',[]);
+    end
 end
 
 %% trajectory + spikes
@@ -68,8 +77,15 @@ for ii_dir = 1:2
     plot_LM(exp.LM);
     
     % labels
-    xlabel('Position (m)')
+%     xlabel('Position (m)')
     ylabel('Time (min)')
+    set(gca,'TickDir','out');
+    if ii_dir == 1
+        set(gca,'XTickLabel',[]);
+    end
+    if ii_dir == 2
+        xlabel('Position (m)')
+    end
 end
 
 %% link position axes
@@ -271,7 +287,7 @@ t.BackgroundColor(2:2:size(t.Data,1),:) = 0.94;
 t.BackgroundColor(24,:) = interp1([0 1 2],[1 0 0 ; 1 1 0; 0 1 0], cell.details.ClusterQuality);
 
 %% save figure
-h=pnl.title(cell_ID); h.FontSize=16; h.Interpreter='none';h.Position=[0.5 1.03];
+h=pnl.title(sprintf('%s (%d)',cell_ID,cell.details.cell_num)); h.FontSize=16; h.Interpreter='none';h.Position=[0.5 1.03];
 fig_filename = fullfile('L:\Analysis\Results\cells\figures', [cell_ID '_map_fields']);
 saveas(gcf,fig_filename,'tif')
 % saveas(gcf,fig_filename,'fig')

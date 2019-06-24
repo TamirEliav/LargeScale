@@ -22,7 +22,7 @@ exp_t(~contains(exp_t.recordingArena, '200m'),:) = [];
 exp_t(exp_t.position_data_exist==0,:) = [];
 exp_t(exp_t.neural_data_exist==0,:) = [];
 % exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = [];
-% exp_t(~ismember(exp_t.batNum, [148] ),:) = [];
+exp_t(~ismember(exp_t.batNum, [34] ),:) = [];
 % exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
 % exp_t(exp_t.date > datetime('17/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
 % exp_t(~contains(exp_t.exp_ID, exp_list),:) = [];
@@ -40,7 +40,7 @@ for ii_exp = 1:height(exp_t)
     
     %%
 try
-    exp_create_details(exp_ID);
+%     exp_create_details(exp_ID);
 %     exp=exp_load_data(exp_ID,'details','path');
 %     Nlg2Nlx(exp.path.raw,forcecalc);
 %     PRE_filter_CSCs(exp_ID, forcecalc);
@@ -59,7 +59,10 @@ try
 % 
 %     exp_calc_pos_std_y(exp_ID);
 %     exp_plot_pos_std_y(exp_ID);
-    
+
+%     wingbeat_detect(exp_ID)
+    wingbeat_plot_map(exp_ID)
+
 catch err
     getReport(err)
     err_list{ii_exp}.exp_ID = exp_ID;
