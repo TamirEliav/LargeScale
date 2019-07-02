@@ -3,6 +3,7 @@ clear
 clc
 
 %% load exp summary and choose exps
+prm = PARAMS_GetAll();
 exp_t = DS_get_exp_summary();
 exp_t(~contains(exp_t.recordingArena, '200m'),:) = [];
 exp_t(exp_t.position_data_exist==0,:) = [];
@@ -16,27 +17,49 @@ exps  = [exps{:}];
 nExp = length(exps);
 
 %%
-prm = PARAMS_GetAll();
-bins_edges = prm.FR_map.bin_limits(1) : prm.FR_map.bin_size : prm.FR_map.bin_limits(2);
-bins_centers = (bins_edges(1:end-1) + bins_edges(2:end))/2;
+bins_centers = exps(1).flight.speed_traj(1).bins_centers;
 nBins = length(bins_centers);
-vel_mean_all = nan(nExp, 2, nBins); % nExp X direction X bins
-vel_median_all = nan(nExp, 2, nBins); % nExp X direction X bins
+vel_mean_all = nan(nExp, 2, nBins);         % nExp X direction X bins
+vel_median_all = nan(nExp, 2, nBins);       % nExp X direction X bins
+vel_median_median_all = nan(nExp,2);        % nExp X direction
+vel_low_speed_edge_prc_all = nan(nExp,2,2); % nExp X direction X edges
 for ii_exp = 1:nExp
     flight = exps(ii_exp).flight;
-    directions = [1 -1];
     for ii_dir = 1:2
-        IX = [flight.FE.direction] == directions(ii_dir);
-        flights = flight.FE(IX);
-        IX = discretize([flights.pos], bins_edges);
-        vel_mean = accumarray(IX', [flights.vel]',[nBins 1], @mean,nan);
-        vel_median = accumarray(IX', [flights.vel]',[nBins 1], @median,nan);
-        vel_mean_all(ii_exp, ii_dir, :) = vel_mean;
-        vel_median_all(ii_exp, ii_dir, :) = vel_median;
+        vel_mean_all(ii_exp, ii_dir, :) = exps(ii_exp).flight.speed_traj(ii_dir).vel_mean;
+        vel_median_all(ii_exp, ii_dir, :) = exps(ii_exp).flight.speed_traj(ii_dir).vel_median;
+        vel_low_speed_edge_prc_all(ii_exp, ii_dir, :) = exps(ii_exp).flight.speed_traj(ii_dir).vel_low_speed_edge_prc;
     end
 end
 
-%% create figure
+%% figure for histograms of edge vel prc
+figure('Units','normalized','Position',[0.2 0.2 0.5 0.5]);
+subplot(2,1,1)
+hold on
+for ii_dir = 1:2
+    for ii_edge = 1:2
+        histogram(vel_low_speed_edge_prc_all(:,ii_dir,ii_edge),30);
+    end
+end
+grps_str = {'ball1 takeoff';'ball1 landing';'ball2 takeoff';'ball2 landing'};
+legend(grps_str);
+xlabel('low velocity edge ratio from median velocity')
+ylabel('counts');
+title('all bats')
+subplot(2,1,2)
+sdf=reshape(vel_low_speed_edge_prc_all,nExp,4);
+[~,lh] = violin(sdf,'xlabel',grps_str');
+lh.FontSize = 10;
+lh.Position = [0.85 0.4 0.1 0.1];
+ylabel({'low velocity edge ratio';'from median velocity'})
+
+figname = 'flight_patterns_low_vel_edge_ratio';
+dir_out = 'L:\Analysis\Results\population\flight_pattern';
+figname = fullfile(dir_out, figname);
+saveas(gcf, figname, 'tif');
+saveas(gcf, figname, 'fig');
+
+%% create figure for speed trajectories
 figure('Units','normalized','Position',[0 0 1 1]);
 pnl = panel();
 pnl.pack('v',2);
@@ -48,7 +71,12 @@ h.Position = [0.5 1.05];
 exps_bat = arrayfun(@(x)(x.batNum), [exps.details]);
 bats = unique(exps_bat);
 colors = brewermap(length(bats),'Set1');
-% add LM
+% add low velocity (invalid) area
+for ii_pnl = 1:2
+    pnl(ii_pnl).select(); hold on
+    area([0 prm.fields.valid_speed_pos(1)],   [10 10], 'FaceColor', 0.9*[1 1 1], 'FaceAlpha', 0.5, 'BaseValue',-10, 'LineStyle','none')
+    area([prm.fields.valid_speed_pos(2) 200], [10 10], 'FaceColor', 0.9*[1 1 1], 'FaceAlpha', 0.5, 'BaseValue',-10, 'LineStyle','none')
+end
 exp = exp_load_data(exps(1).details.exp_ID,'details','LM');
 h_lgnd1=[];
 h_lgnd2=[];
@@ -75,13 +103,13 @@ pnl(1).select(); hold on
 plot_LM(exp.LM);
 pnl(2).select(); hold on
 plot_LM(exp.LM);
-legend(h_lgnd1,"bat "+bats);
-legend(h_lgnd2,"bat "+bats);
+legend(h_lgnd1,"bat "+bats, 'Location','best');
+legend(h_lgnd2,"bat "+bats, 'Location','best');
 xlabel('Position (m)')
 ylabel('Velocity (m/s)')
 linkaxes(pnl.de.axis, 'xy')
 % plotbrowser
-figname = 'flight_patterns';
+figname = 'flight_patterns_vel_trajectories';
 dir_out = 'L:\Analysis\Results\population\flight_pattern';
 figname = fullfile(dir_out, figname);
 saveas(gcf, figname, 'tif');
@@ -96,7 +124,7 @@ function plot_LM(LM)
 ylimits = get(gca,'ylim');
 for ii_LM=1:length(LM)
     x = LM(ii_LM).pos_proj;
-    plot(repelem(x,2) , ylimits, '-', 'color', 0.9.*[1 1 1], 'LineWidth',0.5)
+    plot(repelem(x,2) , ylimits, '-', 'color', 0.6.*[1 1 1], 'LineWidth',0.5)
     text(x, ylimits(2)+0.02*diff(ylimits), LM(ii_LM).name, 'Rotation', 45, 'FontSize',6)
 end
 

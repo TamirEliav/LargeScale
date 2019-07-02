@@ -21,8 +21,8 @@ exp_t = DS_get_exp_summary();
 exp_t(~contains(exp_t.recordingArena, '200m'),:) = [];
 exp_t(exp_t.position_data_exist==0,:) = [];
 exp_t(exp_t.neural_data_exist==0,:) = [];
-% exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = [];
-exp_t(~ismember(exp_t.batNum, [34] ),:) = [];
+exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = [];
+% exp_t(~ismember(exp_t.batNum, [34] ),:) = [];
 % exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
 % exp_t(exp_t.date > datetime('17/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
 % exp_t(~contains(exp_t.exp_ID, exp_list),:) = [];
@@ -54,6 +54,8 @@ try
 
 %     exp_create_position(exp_ID);
 %     POS_detect_flight(exp_ID);
+%     exp_calc_pos_std_y(exp_ID)
+    exp_calc_speed_traj(exp_ID)
 %     exp_plot_position(exp_ID);
 %     POS_plot_flight(exp_ID);
 % 
@@ -61,7 +63,7 @@ try
 %     exp_plot_pos_std_y(exp_ID);
 
 %     wingbeat_detect(exp_ID)
-    wingbeat_plot_map(exp_ID)
+%     wingbeat_plot_map(exp_ID)
 
 catch err
     getReport(err)

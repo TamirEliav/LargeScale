@@ -7,7 +7,6 @@ field_options = {
     'pos',          1
     'flight',       1
     'LM',           0
-    'pos_y_std',    1
     'csc_raw_stats',1
     'wingbeat',     1
     };

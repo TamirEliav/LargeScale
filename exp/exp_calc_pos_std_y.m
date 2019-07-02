@@ -50,14 +50,11 @@ for ii_dir = 1:2
     pos_y_std(ii_dir).trim_prc = trim_prc ;
 end
 
-%% save strcut
-filename_exp_pos_y_std = ['L:\Analysis\Results\exp\pos_y_std\' exp_ID '_exp_pos_y_std' ];
-save(filename_exp_pos_y_std, 'pos_y_std');
-
-
-
-
-
+%% save updated flight struct
+flight = exp.flight;
+flight.pos_y_std = pos_y_std;
+file_name = fullfile('L:\Analysis\Results\exp\flight',[exp_ID '_exp_flight']);
+save(file_name,'flight');
 
 
 end

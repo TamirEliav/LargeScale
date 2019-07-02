@@ -89,6 +89,23 @@ prm.inclusion.interneuron_FR_thr = 5; % 5 Hz for mean FR over entire session
 prm.graphics.colors.flight_directions = {...
     [0         0.4470    0.7410];...
     [0.8500    0.3250    0.0980]};
-
+bats_colors_mapping = {
+    79,   [0.8941    0.1020    0.109];
+    148,  [0.2157    0.4941    0.721];
+    34,   [0.3020    0.6863    0.290];
+    2289, [0.5961    0.3059    0.639];
+    9861, [1.0000    0.4980    0    ];
+    };
+M = containers.Map([bats_colors_mapping{:,1}],...
+                    bats_colors_mapping(:,2));
+prm.graphics.colors.bats = M; % this is a colormap
+                
+                
 end
+
+
+
+
+
+
 

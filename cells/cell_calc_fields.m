@@ -21,8 +21,6 @@ for ii_dir = 1:2
     [fields(:).width_href]   = disperse(widths);
     [fields(:).edges_href]   = disperse(edges);
 
-    %% TODO: remove fields with not enough spikes
-
     %% remove overlapping, lower fields
     fields = fields_remove_overlaps(FR_map, fields, prm);
     

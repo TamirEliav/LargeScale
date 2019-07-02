@@ -25,6 +25,20 @@ else
 	fields2load = varargin;
 end
 
+%% allow cell_num as input instead of cell ID
+if isnumeric(cell_ID)
+    cell_num = cell_ID;
+    cells_t = DS_get_cells_summary();
+    IX = find(cells_t.cell_num == cell_num);
+    if isempty(IX)
+        error(sprintf('cell number %d does not exist!',field_name, cell_num))
+    end
+    cell_ID = cells_t.cell_ID{IX};
+end
+if ~ischar(cell_ID)
+    error("wrong cell_ID input: "+cell_ID)
+end
+
 %%
 cell_data=struct();
 for ii_field = 1:length(fields2load)

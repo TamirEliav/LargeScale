@@ -1331,12 +1331,46 @@ tmpl_list = cells_t.cell_ID;
 ext = 'tif';
 util_copy_files_by_template(dir_IN, dir_OUT, tmpl_list, ext);
 
+%% play with dictionary
+c = containers.Map;
+c(79) = [1 0 1];
+c(34) = [1 0 ];
+keys(c)
+values(c)
 
+%%
+bats_colors_mapping = {
+    79,     'r';
+    148,    'g';
+    34,     [1 0 0];
+    2289,   'c';
+    9861,   'm';
+    }
+M = containers.Map([bats_colors_mapping{:,1}],...
+                    bats_colors_mapping(:,2));
+M(34)
+M(79)
 
-
+%%
+clear;clc
+prm = PARAMS_GetAll();
+bats = keys(prm.graphics.colors.bats);
+figure
+hold on
+for ii_bat = 1:length(keys(prm.graphics.colors.bats))
+    bat = bats{ii_bat};
+    c = prm.graphics.colors.bats(bat)
+    plot(randn(1,10),'Color', c,'LineWidth',2);
+end
+legend("bat "+bats);
 
 
 
 
 
 %%
+
+
+
+
+
