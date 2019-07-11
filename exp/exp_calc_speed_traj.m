@@ -12,14 +12,28 @@ flight = exp.flight;
 directions = [1 -1];
 speed_traj = struct();
 for ii_dir = 1:2
-    IX = [flight.FE.direction] == directions(ii_dir);
-    flights = flight.FE(IX);
-    IX = discretize([flights.pos], bins_edges);
-    vel_mean = accumarray(IX', [flights.vel]',[nBins 1], @mean,nan);
-    vel_median = accumarray(IX', [flights.vel]',[nBins 1], @median,nan);
+    dir_IX = [flight.FE.direction] == directions(ii_dir);
+    flights = flight.FE(dir_IX);
+
+    pos_all = [flights.pos];
+    vel_all = [flights.vel];
+    speed_all = abs(vel_all);
+    
+    subs = discretize([flights.pos], bins_edges);
+    vel_mean   = accumarray(subs', vel_all', [nBins 1], @mean,   nan);
+    vel_median = accumarray(subs', vel_all', [nBins 1], @median, nan);
+    vel_std    = accumarray(subs', vel_all', [nBins 1], @std,    nan);
+
+    speed_cv.raw = std(speed_all) / mean(speed_all);
+    speed_cv.across_pos = nanstd(vel_median) / abs(nanmean(vel_median));
+    IX = get_data_in_ti(pos_all, prm.fields.valid_speed_pos);
+    speed_cv.raw_high_speed = std(speed_all(IX)) / mean(speed_all(IX));
+    IX = get_data_in_ti(bins_centers, prm.fields.valid_speed_pos);
+    speed_cv.across_pos_high_speed =  nanstd(vel_median(IX)) / abs(nanmean(vel_median(IX)));
+    
     m = nanmedian(vel_median);
-    m1 = interp1(bins_centers, vel_median, prm.fields.valid_speed_pos(1));
-    m2 = interp1(bins_centers, vel_median, prm.fields.valid_speed_pos(2));
+    m1 = interp1(bins_centers, vel_median, prm.fields.valid_speed_pos(1)); % ball 1
+    m2 = interp1(bins_centers, vel_median, prm.fields.valid_speed_pos(2)); % ball 2
     
     speed_traj(ii_dir).bins_centers = bins_centers;
     speed_traj(ii_dir).vel_mean = vel_mean;
@@ -27,6 +41,7 @@ for ii_dir = 1:2
     speed_traj(ii_dir).vel_median_median = m;
     speed_traj(ii_dir).vel_low_speed_edge = [m1 m2];
     speed_traj(ii_dir).vel_low_speed_edge_prc = [m1 m2]./m;
+    speed_traj(ii_dir).speed_cv = speed_cv;
 end
 
 %% save updated flight struct

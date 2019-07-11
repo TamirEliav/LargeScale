@@ -28,6 +28,7 @@ exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = [];
 % exp_t(~contains(exp_t.exp_ID, exp_list),:) = [];
 % exp_t = flip(exp_t);
 exp_t 
+whos exp_t 
 
 %%
 forcecalc = 1;
