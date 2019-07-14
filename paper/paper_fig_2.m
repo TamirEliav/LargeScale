@@ -43,7 +43,7 @@ set(gcf, 'Renderer', 'painters');
 
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
-%% create panels
+% create panels
 panel_A_size_raster = [5 1];
 panel_A_size_FR_map = [5 1];
 panel_A_pos = [2 14];
@@ -62,17 +62,18 @@ end
 panel_A = panel_A(:,3:-1:1,:);
 panel_A = reshape(panel_A,[9 3]);
 
-panel_BCDE_size = [3 3];
-panel_B = axes('position', [ 2  9 panel_BCDE_size ]);
-panel_C = axes('position', [ 6  9 panel_BCDE_size ]);
-panel_D = axes('position', [10  9 panel_BCDE_size ]);
-panel_E = axes('position', [14  9 panel_BCDE_size ]);
+panel_BCDE_size = [2 2];
+panel_B = axes('position', [ 2  10.5 panel_BCDE_size ]);
+panel_C = axes('position', [ 5  10.5 panel_BCDE_size ]);
+panel_D = axes('position', [ 8  10.5 panel_BCDE_size ]);
+panel_E = axes('position', [ 11 10.5 panel_BCDE_size ]);
 
-panel_FGH_size = [3 3];
-panel_F = axes('position', [2   4 panel_FGH_size ]);
-panel_G = axes('position', [6   4 panel_FGH_size ]);
-panel_H = axes('position', [10  4 panel_FGH_size ]);
-panel_I = axes('position', [14  4 3 3]);
+panel_FGH_size = [2 2];
+panel_F = axes('position', [2   7.5 panel_FGH_size ]);
+panel_G = axes('position', [5   7.5 panel_FGH_size ]);
+panel_H = axes('position', [8   7.5 panel_FGH_size ]);
+panel_I(1) = axes('position', [14  7.5 3 3]);
+panel_I(2) = axes('position', [16  9.5 3 3]);
 
 %%
 prm = PARAMS_GetAll();
@@ -96,6 +97,7 @@ for ii_cell = 1:9
     
     % map+fields
     axes(panel_A(ii_cell, 1));
+    cla
     maps=[cell.FR_map.all];
     x = maps(1).bin_centers;
     y = cat(1,maps.PSTH);
@@ -124,6 +126,8 @@ for ii_cell = 1:9
     end
     
     % cell details
+    text(0.5,1.05, "cell "+ii_cell,...
+        'Units','normalized','HorizontalAlignment','center','VerticalAlignment','bottom','FontSize',7);
     text(1,1.05,...
         sprintf('%.1f    %.1f',...
                 cell.stats.all.field_largest,...
@@ -134,17 +138,24 @@ for ii_cell = 1:9
     FEs = [cell.FE];
     for ii_dir=1:2
         axes(panel_A(ii_cell, ii_dir+1));
+        cla
         FE = FEs{ii_dir};
         x = [FE.spikes_pos];
-%         y = [FE.spikes_ts];
-        [FE.number2] = disperse(1:length(FE));
-        y = arrayfun(@(FE)(FE.number2*ones(1,FE.num_spikes)),FE,'UniformOutput',0);
-        y = [y{:}];
+        y = [FE.spikes_ts];
+%         [FE.number2] = disperse(1:length(FE));
+%         y = arrayfun(@(FE)(FE.number2*ones(1,FE.num_spikes)),FE,'UniformOutput',0);
+%         y = [y{:}];
         plot(x,y,'.','Color',c{ii_dir},'MarkerSize',0.05);
+        behave_session_ts = exp_get_sessions_ti(cell.details.exp_ID,'Behave');
+        t0 = behave_session_ts(1);
+        rescale_plot_data('y', [1e-6/60 t0]);
         box off
         h=gca;
-        h.YTick = [0 max(y)];
+        m = ceil(max((y-t0)*1e-6/60));
+        h.YTick = [0 m];
+        h.YTickLabel = {'',num2str(m)};
         h.XLim = [0 200];
+        h.YLim = [0 m]+[-1 1];
         switch ii_dir
             case 1
                 h.XTick = [];
@@ -156,7 +167,21 @@ for ii_cell = 1:9
         
     end
 end
+% add direction arrows
+arrow_x = [0.1 0.15];
+arrow_y = repelem(0.96,2);
+clear h
+h(1)=annotation('arrow',arrow_x,      arrow_y,     'Color', prm.graphics.colors.flight_directions{1});
+h(2)=annotation('arrow',flip(arrow_x),arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{2});
+[h.HeadWidth] = disperse([5 5]);
+[h.HeadLength] = disperse([5 5]);
 
+%%
+axes(panel_A(7, 3));
+xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.35]);
+ylabel('Time (min)',   'Units','normalized','Position',[-0.1 1]);
+
+%%
 axes(panel_A(1, 1));
 text(-0.15,1.15, 'A', 'Units','normalized','FontWeight','bold');
 
@@ -201,7 +226,7 @@ for ii_dir = 1:2
     h.FaceColor = prm.graphics.colors.flight_directions{ii_dir};
 end
 xlabel({'No. of fields';'per direction'})
-ylabel('count')
+ylabel('Count')
 
 %%
 axes(panel_C);
@@ -220,12 +245,15 @@ for ii_dir = 1:2
 end
 h = histogram(fields_size );
 h.FaceColor = 0.5*[1 1 1];
+ha=gca;
+ha.YScale = 'log';
 xlabel('Field Size (m)')
-ylabel('count')
+ylabel('Count')
 
 %%
 % figure
 axes(panel_D);
+cla
 hold on
 text(-0.15,1.15, 'D', 'Units','normalized','FontWeight','bold');
 LS_field_size = nan(2,length(cells));
@@ -240,19 +268,25 @@ end
 LS_field_size(:,any(isnan(LS_field_size))) = [];
 % plot(SL_size,'.-')
 % hv = violinplot(LS_field_size',{'Smallest field','Largest field'});
+rng(1);
 hv = violinplot(LS_field_size');
+[hv.ViolinColor] = disperse(repelem({'none'},length(hv)));
+hs=[hv.ScatterPlot];
+[hs.Marker]          = disperse(repelem({'.'},length(hs)));
+[hs.SizeData]        = disperse(repelem(25,length(hs)));
+[hs.MarkerFaceColor] = disperse(repelem({0.5*[1 1 1]},length(hs)));
+[hs.MarkerEdgeColor] = disperse(repelem({0.5*[1 1 1]},length(hs)));
 ha=gca;
 ylimits = ha.YLim;
 ha.XTickLabel = {};
 text([1 2],repelem(ylimits(1)-0.04*diff(ylimits),2),{{'Smallest';'field'},{'Largest';'field'}},...
     'HorizontalAlignment','center','VerticalAlignment','top','FontSize',7);
-hs = [hv.ScatterPlot];
-[hs.SizeData] = disperse([20 20]);
 % xlabel('')
 ylabel('Field size (m)')
 
 %%
 axes(panel_E);
+cla
 hold on
 text(-0.15,1.15, 'E', 'Units','normalized','FontWeight','bold');
 LS_field_ratio_all = nan(1,length(cells));
@@ -278,7 +312,9 @@ h(2).BinEdges = edges;
 % h(1).NumBins = 15;
 % h.FaceColor = prm.graphics.colors.flight_directions{ii_dir};
 % legend({'per cell';'per direction'})
-xlabel('Ratio largest/smallest field')
+ha=gca;
+ha.YScale = 'log';
+xlabel({'Fields ratio';'largest/smallest'})
 ylabel('Count')
 
 %%
@@ -296,22 +332,31 @@ sparsity(isnan(sparsity)) = [];
 
 %%
 axes(panel_F);
+cla
 hold on
 text(-0.15,1.15, 'F', 'Units','normalized','FontWeight','bold');
 h = histogram(SI);
+h.NumBins = 7;
+% h.FaceColor = 0.3*[1 1 1];
+h.FaceColor = 'k';
+% h.FaceAlpha = 0.6;
 xlabel('Spatial information (bits/spike)')
 ylabel('Count')
 
 %%
 axes(panel_G);
+cla
 hold on
 text(-0.15,1.15, 'G', 'Units','normalized','FontWeight','bold');
 h = histogram(sparsity);
-xlabel('sparsity')
+h.NumBins = 10;
+h.FaceColor = 'k';
+xlabel('Sparsity')
 ylabel('Count')
 
 %%
 axes(panel_H);
+cla
 hold on
 text(-0.15,1.15, 'H', 'Units','normalized','FontWeight','bold');
 maps_dir_corr = [];
@@ -323,13 +368,16 @@ for ii_cell = 1:length(cells)
 end
 % maps_dir_corr(~all(signif')) = [];
 h = histogram(maps_dir_corr);
-xlabel('map correlation')
+h.FaceColor = 'k';
+ha= gca;
+ha.XLim = [-1 1];
+ha.XTick = -1:0.5:1;
+ha.TickDir = 'out';
+ha.TickLength = [0.03 0.03];
+xlabel('Map correlation')
 ylabel('Count')
 
-%%
-axes(panel_I);
-hold on
-text(-0.15,1.15, 'I', 'Units','normalized','FontWeight','bold');
+%% panel I - prepare data
 distances_all = [];
 field_size_diff_all = [];
 for ii_cell = 1:length(cells)
@@ -343,15 +391,34 @@ for ii_cell = 1:length(cells)
         field_size_diff_all = [field_size_diff_all diff([fields.width_prc])];
     end
 end
+
+%% main panel I
+axes(panel_I(1));
+cla
+hold on
+text(-0.15,1.15, 'I', 'Units','normalized','FontWeight','bold');
 plot(distances_all, abs(field_size_diff_all), 'k.' );
 xlabel('Distance between fields (m)')
 ylabel('{\Delta} Field size (m)')
 
 
+%% panel I inset
+axes(panel_I(2));
+cla
+hold on
+plot(distances_all, abs(field_size_diff_all), 'k.' );
+ha = gca;
+ha.XLim = [0 40];
+% ha.XLim = [0 40];
+% xlabel('Distance between fields (m)')
+% ylabel('{\Delta} Field size (m)')
+
+
+
 %% print/save the figure
 fig_name_out = fullfile(res_dir, fig_name_str);
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
-% print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
+print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
 disp('figure was successfully saved to pdf/tiff/fig formats');
 

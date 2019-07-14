@@ -196,6 +196,7 @@ x = x./1e3;
 y = 100.*ones(size(x));
 y(end-3:end) = [90 70 30 10];
 plot(x,y,'.-','LineWidth',2,'MarkerSize',14);
+box off
 ylim([0 110]);
 ha=gca;
 ha.XLim = [0 1];
@@ -210,7 +211,8 @@ text(-0.2,1.1, 'D', 'Units','normalized','FontWeight','bold');
 
 %% show images
 logger_image_filename = 'D:\Tamir\PROJECTS\Neurologger\miniBat\pics\minibat_good_pic.jpg';
-tunnel_view_image_file = 'L:\Videos_Photos\tunnel_area_various\20170111_170850_downsampled.jpg';
+% tunnel_view_image_file = 'L:\Videos_Photos\tunnel_area_various\20170111_170850_downsampled.jpg';
+tunnel_view_image_file = 'L:\Videos_Photos\TAZOT_HAMAMA\taza3.jpg';
 bespoon_image_file = 'L:\Videos_Photos\2016_ICN_poster\VirtualBox_ubuntu_21_03_2016_11_16_53 - Copy.png';
 tunnel_section_file = 'L:\resources\tunnel_section.png';
 
@@ -274,25 +276,30 @@ panel_I_example_list = {
 'b9861_d180709';
 };
 exp = exp_load_data(panel_I_example_list{panel_I_example_option},'flight');
-for ii_dir = 1:2
+for ii_dir = [1 2] 
     c = prm.graphics.colors.flight_directions{ii_dir};
-    sdf = exp.flight.pos_y_std(ii_dir);
-    plot(sdf.xy(:,1), sdf.xy(:,2), '.', 'Color',c, 'MarkerSize',.0001);
-    h=shadedErrorBar(sdf.bin_centers, sdf.ymean, sdf.ystd, 'lineprops',{'Color',c});
-    h.patch.FaceAlpha = 0;
+    ydev = exp.flight.pos_y_std(ii_dir);
+    x = ydev.xy(:,1);
+    y = ydev.xy(:,2);
+    ymean = interp1(ydev.bin_centers, ydev.ymean, x);
+    y = y-ymean;
+    plot(x, y, '.', 'Color',c, 'MarkerSize',.0001);
+%     h=shadedErrorBar(ydev.bin_centers, ydev.ymean, ydev.ystd, 'lineprops',{'Color',c});
+%     h.patch.FaceAlpha = 0;
 end
-xlabel('X Position (cm)');
-ylabel('Y Position (cm)');
+xlabel('Linearized Position (cm)','Units','normalized','Position',[0.5 -0.2]);
+% ylabel('Y Position (cm)');
+ylabel('Y deviation (cm)');
 ha = gca;
 ha.XLim = [0 200];
 ha.YLim = [-1.5 1.5];
 ha.XTick = [0:50:200];
 ha.YTick = [-2:1:2];
 ha.TickDir='out';
-ha.TickLength = [0.03 0.03];
-ha.XRuler.TickLabelGapMultiplier = -0.2;
+ha.TickLength = [0.01 0.01];
+ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
-text(-0.1,1.1, 'H', 'Units','normalized','FontWeight','bold');
+text(-0.1,1.1, 'I', 'Units','normalized','FontWeight','bold');
 
 %% behavioral trajectory is 1D (small y deviations) - population
 axes(panel_I(2));
@@ -314,34 +321,73 @@ exps_flight = [exps.flight];
 pos_y_dev_all = cat(1,exps_flight.pos_y_std);
 speed_traj_all = cat(1,exps_flight.speed_traj);
 ystd_median_all = arrayfun(@(x)(x.ystd_median), pos_y_dev_all);
+
+%%
+axes(panel_I(2));
+cla
 hold on
+% arrange data
+data = {};
 for ii_bat = 1:length(bats)
     bat = bats(ii_bat);
     c = prm.graphics.colors.bats(bat);
     bat_exp_IX = ismember([exps_details.batNum],bat);
     bat_exp_ydev = pos_y_dev_all(bat_exp_IX,:);
+    valid_pos_IX = get_data_in_ti(bat_exp_ydev(1).bin_centers, prm.fields.valid_speed_pos);
     ystd_bat_all = cat(1,bat_exp_ydev.ystd); % pooling directions together!
-    x = bat_exp_ydev(1).bin_centers;
-    y = mean(ystd_bat_all);
-    y = median(ystd_bat_all);
-    err = std(ystd_bat_all)./sqrt(size(ystd_bat_all,1));
-%     plot(x,y,'Color',c,'LineWidth',2);
-    h=shadedErrorBar(x,y,err);
-    h.mainLine.Color = c;
-    h.patch.FaceColor = c;
-    [h.edge.Color] = disperse({c;c});
-    ylimits = get(gca,'ylim');
-    ylimits(1) = 0;
-    ylim(ylimits);
+    ystd_bat_all = ystd_bat_all(:,valid_pos_IX); % take only valid positions
+    ystd_bat_all = ystd_bat_all(:)';% pooling over all positions!
+    ystd_bat_all = ystd_bat_all.*100; % convert to cm
+    data{ii_bat} = ystd_bat_all;
 end
-% legend("bat"+bats)
-xlabel('Position (m)');
-ylabel('Y deviation (cm)');
-set(gca,'ytick',[]);
-text(-0.1,1.1, 'I', 'Units','normalized','FontWeight','bold');
+% t2 = table2cell(t);
+x = [data{:}];
+grps = repelem(1:length(bats), cellfun(@length,data));
+
+% plot!
+cmap = prm.graphics.colors.bats;
+c = arrayfun(@(x)(cmap(x)), bats,'UniformOutput',0);
+% yvar_pop_plot = 'violin';
+% yvar_pop_plot = 'boxplot';
+yvar_pop_plot = 'median_std';
+switch yvar_pop_plot 
+    case 'violin'
+        hv=violinplot(x,grps);
+        [hv.BoxWidth] = disperse(repelem(0.02,length(hv)));
+        [hv.EdgeColor ] = disperse(repelem({'none'},length(hv)));
+        hs = [hv.ScatterPlot];
+        [hs.SizeData] = disperse(repelem(5,length(hs)));
+        hm = [hv.MedianPlot];
+        [hm.SizeData] = disperse(repelem(10,length(hm)));
+        ha.YLim = [0 90];
+        ha.YTick = [0:30:90];
+    case 'boxplot'
+        boxplot(x,grps)
+        box off
+        ha.YLim = [0 90];
+        ha.YTick = [0:30:90];
+    case 'median_std'
+        medians = cellfun(@median,data);
+        stds    = cellfun(@std,data);
+        errorbar(medians,stds,'-o','MarkerSize',3);
+        ha.YLim = [0 40];
+        ha.YTick = [0:20:40];
+end
+ha=gca;
+ha.XTickLabel = bats;
+ha.XLim = [0.5 length(bats)+.5];
+ha.TickDir='out';
+ha.TickLength = [0.01 0.01];
+ha.XRuler.TickLabelGapMultiplier = -0.3;
+ha.YRuler.TickLabelGapMultiplier = 0.001;
+
+xlabel('Bats');
+ylabel('Y variability (cm)');
+% text(-0.15,1.1, 'I', 'Units','normalized','FontWeight','bold');
 
 %% speed trajectory very constant along the flight - example
 axes(panel_J); 
+cla
 hold on
 panel_speed_option = 4;
 panel_speed_options = {
@@ -360,7 +406,7 @@ y = abs(y);
 ylimits = [0 9];
 area([0 prm.fields.valid_speed_pos(1)],     ylimits([2 2]),'FaceColor',0.9*[1 1 1],'EdgeColor','none')
 area([  prm.fields.valid_speed_pos(2) 200], ylimits([2 2]),'FaceColor',0.9*[1 1 1],'EdgeColor','none')
-plot(x,y,'.','Color', 'k');
+plot(x,y,'.','Color', 'k','MarkerSize',1);
 % plot(prm.fields.valid_speed_pos([1 1]), ylimits,'--m','LineWidth',2)
 % plot(prm.fields.valid_speed_pos([2 2]), ylimits,'--m','LineWidth',2)
 set(gca,'xtick',0:50:200,'ytick',[-10 0 8],'xlim',[0 200])
@@ -381,12 +427,12 @@ for ii_dir = 1:2
     h=histogram(cv);
     h.BinEdges = linspace(0,0.1,20);
     h.FaceColor = dir_colors{ii_dir};
-    h.Normalization = 'probability';
+    h.Normalization = 'Count';
     h.FaceAlpha = 0.5;
 end
 xlabel('CV of speed');
 ylabel('Counts');
-text(-0.1,1.1, 'K', 'Units','normalized','FontWeight','bold');
+text(-0.2,1.1, 'K', 'Units','normalized','FontWeight','bold');
 
 %% number of laps
 axes(panel_L);
@@ -405,7 +451,7 @@ for ii_dir = 1:2
 end
 xlabel('No. of laps');
 ylabel('Counts');
-text(-0.1,1.1, 'L', 'Units','normalized','FontWeight','bold');
+text(-0.2,1.1, 'L', 'Units','normalized','FontWeight','bold');
 
 %% Total distance 
 axes(panel_M);
@@ -425,9 +471,6 @@ if 1
         h.Normalization = 'Count';
         h.FaceAlpha = 0.5;
     end
-    xlabel('Total Distance (km)');
-    ylabel('Counts');
-    text(-0.1,1.1, 'M', 'Units','normalized','FontWeight','bold');
 else
     %% Total distance (pooling directions)
     dir_colors = prm.graphics.colors.flight_directions;
@@ -438,10 +481,10 @@ else
     h.FaceColor = dir_colors{ii_dir};
     h.Normalization = 'Count';
     h.FaceColor = 0.5*[1 1 1];
-    xlabel('Total Distance (km)');
-    ylabel('Counts');
-    text(-0.1,1.1, 'M', 'Units','normalized','FontWeight','bold');
 end
+xlabel('Total Distance (km)');
+ylabel('Counts');
+text(-0.2,1.1, 'M', 'Units','normalized','FontWeight','bold');
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, fig_name_str);
