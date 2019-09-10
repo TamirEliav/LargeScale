@@ -101,7 +101,7 @@ cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclus
 cells = [cells{:}];
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
-%%
+%% plot population fields distribution - lines and edges
 axes(panel_A(1,2));
 cla
 hold on
@@ -160,6 +160,7 @@ for ii_dir = 1:2
     end
     ylim([0 length(cells_dir)+1])
     
+    % plot peak/edges distribution
     axes(panel_A(ii_dir,2));
     cla
 %     yyaxis right
@@ -178,7 +179,7 @@ for ii_dir = 1:2
 %     hl.Position = ha.Position.*[1 1 0.3 0.1] + ha.Position([3 4 1 2]).*[0.3 0.8 0 0];
 end
 
-%%
+%% plot FR maps ordered by field location (heatmap)
 axes(panel_B(1));
 hold on
 text(-0.07,1.08, 'B', 'Units','normalized','FontWeight','bold');
