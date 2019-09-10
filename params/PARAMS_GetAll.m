@@ -78,7 +78,7 @@ prm.Ipos.time_bin_size = 0.050;
 prm.Ipos.pos_bin_size = 1;
 prm.Ipos.pos_bin_limits = [0 200];
 
-prm.signif.SI_thr = 0.5;
+prm.signif.SI_thr = 0.25;
 prm.signif.SI_thr_shuffle = 99;
 prm.signif.odd_even_FR_map_corr_thr = 0.5;
 
