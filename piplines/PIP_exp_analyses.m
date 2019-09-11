@@ -56,9 +56,10 @@ try
 %     exp_create_position(exp_ID);
 %     POS_detect_flight(exp_ID);
 %     exp_calc_pos_std_y(exp_ID)
-    exp_calc_speed_traj(exp_ID)
+%     exp_calc_speed_traj(exp_ID)
 %     exp_plot_position(exp_ID);
 %     POS_plot_flight(exp_ID);
+    POS_test_join_short_flights_with_gap(exp_ID)
 % 
 %     exp_calc_pos_std_y(exp_ID);
 %     exp_plot_pos_std_y(exp_ID);

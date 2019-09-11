@@ -293,8 +293,8 @@ t.BackgroundColor(2:2:size(t.Data,1),:) = 0.94;
 t.BackgroundColor(24,:) = interp1([0 1 2],[1 0 0 ; 1 1 0; 0 1 0], cell.details.ClusterQuality);
 
 %% save figure
-h=pnl.title(sprintf('%s (%d)',cell_ID,cell.details.cell_num)); h.FontSize=16; h.Interpreter='none';h.Position=[0.5 1.03];
-fig_filename = fullfile('L:\Analysis\Results\cells\figures', sprintf('%s(%d)_map_fields',cell_ID,cell.details.cell_num));
+h=pnl.title(sprintf('%s (%d)',cell.details.cell_ID,cell.details.cell_num)); h.FontSize=16; h.Interpreter='none';h.Position=[0.5 1.03];
+fig_filename = fullfile('L:\Analysis\Results\cells\figures', sprintf('%s(%d)_map_fields',cell.details.cell_ID,cell.details.cell_num));
 saveas(gcf,fig_filename,'tif')
 % saveas(gcf,fig_filename,'fig')
 

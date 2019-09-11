@@ -10,6 +10,7 @@ directions = [1 -1];
 session_ti = exp_get_sessions_ti(exp_ID, 'Behave');
 vel_limits = [-1 1].*12;
 pos_limits = [0 200];
+dir_colors = prm.graphics.colors.flight_directions;
 
 %%
 figure('Units','normalized','Position',[0 0 1 1])
@@ -17,6 +18,7 @@ pnl = panel();
 pnl.pack('h',[60 40])
 pnl(1).pack('h',2)
 pnl(2).pack('v',3)
+pnl(2,3).pack('h',3)
 pnl.margin = [20 30 20 15];
 pnl.de.margin = 15;
 % h=pnl.title( sprintf('%s             bsp tag ID: %d, fs=%0.2f', exp_ID, exp.details.bsp_tag_ID, exp.pos.raw.fs) );
@@ -26,7 +28,6 @@ h.Interpreter = 'none'; h.FontSize=16; h.Position = [0.5 1.03];
 %% plot - position by flight number
 pnl(1,1).select();
 hold on
-dir_colors = prm.graphics.colors.flight_directions;
 for ii_dir = 1:2
     IX = find([FE.direction] == directions(ii_dir));
     x = [FE(IX).pos];
@@ -42,7 +43,6 @@ ylabel('flight#')
 %% plot - position by time
 pnl(1,2).select();
 hold on
-dir_colors = prm.graphics.colors.flight_directions;
 for ii_dir = 1:2
     IX = find([FE.direction] == directions(ii_dir));
     x = [FE(IX).pos];
@@ -60,7 +60,6 @@ ylabel('Time (min)')
 %% plot - velocity by time
 pnl(2,1).select();
 hold on
-dir_colors = prm.graphics.colors.flight_directions;
 for ii_dir = 1:2
     IX = find([FE.direction] == directions(ii_dir));
     x = [FE(IX).ts];
@@ -75,7 +74,6 @@ ylabel('Velocity (m/s)')
 %% plot - velocity vs. position
 pnl(2,2).select();
 hold on
-dir_colors = prm.graphics.colors.flight_directions;
 for ii_dir = 1:2
     IX = find([FE.direction] == directions(ii_dir));
     x = [FE(IX).pos];
@@ -87,8 +85,42 @@ xlim(pos_limits)
 xlabel('Position (m)')
 ylabel('Velocity (m/s)')
 
+%% Distance histograms
+pnl(2,3,1).select();
+cla
+hold on
+for ii_dir = 1:2
+    IX = find([FE.direction] == directions(ii_dir));
+    h=histogram([FE(IX).distance]);
+    h.BinEdges = linspace(0,200,14);
+    h.FaceColor = dir_colors{ii_dir};
+end
+ha = gca;
+ha.XTick = 0:50:200;
+xlabel('Flight distance (m)')
+ylabel('Counts')
+
+%% Duration histograms
+pnl(2,3,2).select();
+cla
+hold on
+for ii_dir = 1:2
+    IX = find([FE.direction] == directions(ii_dir));
+    durations = [FE(IX).duration];
+    h=histogram(durations);
+    m = 35;
+%     m = max(m,max(durations));
+    h.BinEdges = linspace(0,m,14);
+    h.FaceColor = dir_colors{ii_dir};
+end
+ha = gca;
+ha.XTick = 0:10:30;
+xlabel('Flight duration (s)')
+ylabel('Counts')
+
+
 %% add text details
-pnl(2,3).select();
+pnl(2,3,3).select();
 h=text(0.1,0.9,{...
     sprintf('speed low thr = %d m/s', exp.flight.speed_low_thr),...
     sprintf('speed high thr = %d m/s', exp.flight.speed_high_thr),...
