@@ -9,11 +9,15 @@ prm = PARAMS_GetAll();
 cell.spikes.pos = interp1(exp.pos.proc_1D.ts, exp.pos.proc_1D.pos,       cell.spikes.ts, 'linear');
 cell.spikes.vel = interp1(exp.pos.proc_1D.ts, exp.pos.proc_1D.vel_csaps, cell.spikes.ts, 'linear');
 
+%% take only full flights
+IX = find([exp.flight.FE.distance] > prm.flight.full_min_distance);
+FE_full = exp.flight.FE(IX);
+
 %% for cell that are partially stable (for part of the total recording), take only the elevant part!!
 if ~isempty(cell.details.stable_ts)
-    FE_ts = [exp.flight.FE.start_ts; exp.flight.FE.end_ts]';
+    FE_ts = [FE_full.start_ts; FE_full.end_ts]';
     valid_FE = all(FE_ts > cell.details.stable_ts(1)  & FE_ts < cell.details.stable_ts(2),2);
-    exp.flight.FE(~valid_FE) = []; % remove invalid FE
+    FE_full(~valid_FE) = []; % remove invalid FE
 end
 
 %%
@@ -21,8 +25,8 @@ FE_by_dir = {};
 directions = [1 -1];
 for ii_dir = 1:length(directions)
     %%
-    FE_dir_IX = find([exp.flight.FE.direction]==directions(ii_dir));
-    FE = exp.flight.FE(FE_dir_IX);
+    FE_dir_IX = find([FE_full.direction]==directions(ii_dir));
+    FE = FE_full(FE_dir_IX);
     
     %% add spikes data to FE struct
     ti = [FE.start_ts; FE.end_ts]';

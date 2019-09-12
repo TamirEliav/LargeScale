@@ -1,7 +1,7 @@
 function cell_calc_fields_properties(cell_ID)
 
 %% load cell/exp data
-cell = cell_load_data(cell_ID,'details','FE','FR_map','fields');
+cell = cell_load_data(cell_ID,'details','FR_map','fields');
 exp = exp_load_data(cell.details.exp_ID,'details','flight');
 prm = PARAMS_GetAll();
 

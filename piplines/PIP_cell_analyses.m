@@ -39,23 +39,25 @@ cells(~ismember([cells.ClusterQuality], [2])) = [];
 cells_t = cells_t({cells.cell_ID},:);
 
 %% filter cells - mean FR
-cells = cellfun(@(c)(cell_load_data(c,'stats')), cells_t.cell_ID, 'UniformOutput',0);
-cells = [cells{:}];
-cells = [cells.stats];
-cells = [cells.all];
-cells_t([cells.meanFR_all]>prm.inclusion.interneuron_FR_thr,:) = []; % take pyramidal
-% cells_t([cells.meanFR_all]<prm.inclusion.interneuron_FR_thr,:) = []; % take interneurons
+% % % cells = cellfun(@(c)(cell_load_data(c,'stats')), cells_t.cell_ID, 'UniformOutput',0);
+% % % cells = [cells{:}];
+% % % cells = [cells.stats];
+% % % cells = [cells.all];
+% % % cells_t([cells.meanFR_all]>prm.inclusion.interneuron_FR_thr,:) = []; % take pyramidal
+% % % % cells_t([cells.meanFR_all]<prm.inclusion.interneuron_FR_thr,:) = []; % take interneurons
 
 %% disp final cells table
 cells_t 
 whos cells_t 
 
 %% run over cells
+cells_list = cells_t.cell_ID;
+cells_list = {err_list.cell_ID}'; % uncomment to re-run error
 err_list = {};
-for ii_cell = 1:height(cells_t)
+for ii_cell = 1:length(cells_list)
     %%
-    cell_ID = cells_t.cell_ID{ii_cell};
-    fprintf('cell %d/%d %s\n', ii_cell, height(cells_t), cell_ID);
+    cell_ID = cells_list{ii_cell};
+    fprintf('cell %d/%d %s\n', ii_cell, length(cells_list), cell_ID);
         
     %%
 try
@@ -64,17 +66,17 @@ try
 %     cell_create_spikes_data(cell_ID);
 %     
 %     cell_calc_time_stability(cell_ID);
-%     cell_create_flight_data(cell_ID);
-%     cell_calc_FR_map(cell_ID);
-%     cell_calc_FR_map_shuffles(cell_ID);
-%     cell_calc_Ipos(cell_ID);
-%     cell_calc_fields(cell_ID);
-%     cell_calc_fields_properties(cell_ID);
-%     cell_calc_significant(cell_ID);
-%     cell_calc_mean_FR(cell_ID);
-%     cell_calc_stats(cell_ID);
-%     cell_calc_inclusion(cell_ID);
-%     cell_calc_time_AC(cell_ID);
+    cell_create_flight_data(cell_ID);
+    cell_calc_FR_map(cell_ID);
+    cell_calc_FR_map_shuffles(cell_ID);
+    cell_calc_Ipos(cell_ID);
+    cell_calc_fields(cell_ID);
+    cell_calc_fields_properties(cell_ID);
+    cell_calc_significant(cell_ID);
+    cell_calc_mean_FR(cell_ID);
+    cell_calc_stats(cell_ID);
+    cell_calc_inclusion(cell_ID);
+    cell_calc_time_AC(cell_ID);
     
     cell_plot_map_fields(cell_ID);
 %     cell_plot_time_AC(cell_ID);
@@ -103,7 +105,7 @@ for ii_cell = 1:length(err_list)
     getReport(err_list(ii_cell).err)
 end
 disp('------------------------------------------------')
-fprintf('%d/%d cells had error!\nSee details above\n', length(err_list), height(cells_t));
+fprintf('%d/%d cells had error!\nSee details above\n', length(err_list), length(cells_list));
 if ~isempty(err_list)
     {err_list.cell_ID}'
 end

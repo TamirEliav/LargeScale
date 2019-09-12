@@ -1364,13 +1364,12 @@ for ii_bat = 1:length(keys(prm.graphics.colors.bats))
 end
 legend("bat "+bats);
 
-
-
-
-
-%%
-
-
-
-
+%% check even/odd corr values
+cells = cellfun(@(x)(cell_load_data(x,'details','FR_map')), cells_t.cell_ID, 'UniformOutput', false);
+cells = [cells{:}];
+sdf=[cells.FR_map];
+sdf2=[sdf.corr_odd_even];
+ccc = [sdf2.rho];
+histogram(ccc)
+sum(isnan(ccc))
 

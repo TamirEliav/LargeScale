@@ -49,6 +49,11 @@ end
 %%
 function xfilt = nanfilt(x,mask,ker)
 
+if sum(mask)<=1
+    xfilt = x;
+    return;
+end
+
 IX = 1:numel(x);
 x(~mask) = interp1(IX(mask), x(mask), IX(~mask), 'nearest', 'extrap');
 xfilt = imfilter(x,ker,'same','conv','symmetric');
