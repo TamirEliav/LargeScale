@@ -8,12 +8,13 @@ prm = PARAMS_GetAll();
 bins_edges = prm.FR_map.bin_limits(1) : prm.FR_map.bin_size : prm.FR_map.bin_limits(2);
 bins_centers = (bins_edges(1:end-1) + bins_edges(2:end))/2;
 nBins = length(bins_centers);
-flight = exp.flight;
+FE = exp.flight.FE;
+FE = FE([FE.distance]>prm.flight.full_min_distance); % take only full filghts
 directions = [1 -1];
 speed_traj = struct();
 for ii_dir = 1:2
-    dir_IX = [flight.FE.direction] == directions(ii_dir);
-    flights = flight.FE(dir_IX);
+    dir_IX = [FE.direction] == directions(ii_dir);
+    flights = FE(dir_IX);
 
     pos_all = [flights.pos];
     vel_all = [flights.vel];
@@ -45,6 +46,7 @@ for ii_dir = 1:2
 end
 
 %% save updated flight struct
+flight = exp.flight;
 flight.speed_traj = speed_traj;
 file_name = fullfile('L:\Analysis\Results\exp\flight',[exp_ID '_exp_flight']);
 save(file_name,'flight');
