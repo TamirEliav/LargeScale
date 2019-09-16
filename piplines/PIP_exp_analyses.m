@@ -62,9 +62,10 @@ try
 
 %     POS_test_join_short_flights_with_gap(exp_ID)
 
-    exp_calc_speed_traj(exp_ID);
-    exp_calc_pos_std_y(exp_ID);
-    exp_plot_pos_std_y(exp_ID);
+%     exp_calc_speed_traj(exp_ID);
+%     exp_calc_pos_std_y(exp_ID);
+%     exp_plot_pos_std_y(exp_ID);
+    exp_plot_xyz_pos(exp_ID)
 
 %     wingbeat_detect(exp_ID)
 %     wingbeat_plot_map(exp_ID)
