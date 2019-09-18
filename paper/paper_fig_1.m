@@ -4,6 +4,11 @@
 clear 
 clc
 
+%% choose data options
+panel_G_opt = 6;
+panel_H_opt = 7;
+panel_J_opt = 10;
+
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
@@ -50,15 +55,14 @@ panel_B(1) = axes('position', [ 4 24.5  panel_B_size]);
 panel_B(2) = axes('position', [ 4 23.5  panel_B_size]);
 panel_B(3) = axes('position', [ 4 22.5  panel_B_size]);
 panel_B(4) = axes('position', [ 4 21.5  panel_B_size]);
-panel_C    = axes('position', [15 21  4 4]);
-% panel_D    = axes('position', [ 1 21  2 2]);
-panel_E    = axes('position', [ 1 18 8 2.3]);
-panel_F    = axes('position', [ -0.5 13 9 5]);
-panel_G    = axes('position', [10 18 2 2]);
-panel_H    = axes('position', [10 14.25 3 3]);
-panel_I(1) = axes('position', [13 18 6 2]);
-panel_I(2) = axes('position', [14 14.5 3 2.5]);
-panel_J    = axes('position', [ 1 10.25 6 2.5]);
+panel_C    = axes('position', [15 21.4  4 4]);
+panel_D    = axes('position', [ 1 18 8 2.3]);
+panel_E    = axes('position', [ -0.5 13 9 5]);
+panel_F    = axes('position', [10 18 2 2]);
+panel_G    = axes('position', [13.6 18 6 2]);
+panel_H    = axes('position', [10 14.25 2.5 2.5]);
+panel_I    = axes('position', [13.5 14.5 3 2.5]);
+panel_J    = axes('position', [ 1 10.25 6 2]);
 panel_K    = axes('position', [ 8.5 10.25 2.5 2]);
 panel_L    = axes('position', [12.5 10.25 2.5 2]);
 panel_M    = axes('position', [16.5 10.25 2.5 2]);
@@ -93,7 +97,7 @@ end
 % plot the data
 for ch = 1:4
     axes(panel_B(ch));
-    plot(ts,signal(ch,:),'k','LineWidth',1);
+    plot(ts,signal(ch,:),'k','LineWidth',0.5);
     box off
     set(gca,'Visible','Off')
     xlim(ts([1 end]))
@@ -110,8 +114,10 @@ scale_line_width = 1;
 xa = xlimits(1) + [0 scale_ms*1e3];
 ya = ylimits(1) + [0 scale_uVolt ];
 [xaf,yaf] = ds2nfu(xa,ya);
-xaf = xaf + 0.01;
-yaf = yaf - 0.02;
+% xaf = xaf + 0.01;
+% yaf = yaf - 0.02;
+xaf = xaf - 0.035;
+yaf = yaf + 0.02;
 annotation('line',    xaf([1 2]),yaf([1 1]),'Linewidth',scale_line_width); % time
 annotation('line',    xaf([1 1]),yaf([1 2]),'Linewidth',scale_line_width)  % voltage
 h=annotation('textbox',[mean(xaf) mean(yaf)-0.003 0 0],'String',sprintf('%dms',scale_ms));
@@ -206,27 +212,7 @@ AZ_EL(4,:) = [876 -12];
 viewing_option = 4;
 view(AZ_EL(viewing_option,:));
 end
-text(-0.05,1.05, 'C', 'Units','normalized','FontWeight','bold');
-
-%% ----------- panel D - logger reception------------------
-% axes(panel_D)
-% x = 0:100:1000;
-% x = x./1e3;
-% y = 100.*ones(size(x));
-% y(end-3:end) = [90 70 30 10];
-% plot(x,y,'.-','LineWidth',2,'MarkerSize',14);
-% box off
-% ylim([0 110]);
-% ha=gca;
-% ha.XLim = [0 1];
-% ha.YLim = [0 110];
-% ha.XTick = [0 0.5 1];
-% ha.YTick = [0 100];
-% ha.XRuler.TickLabelGapMultiplier = -0.3;
-% ha.YRuler.TickLabelGapMultiplier = 0.001;
-% xlabel('Distance (km)',  'Units','normalized','Position',[0.5  -0.15])
-% ylabel('Signal (%)',     'Units','normalized','Position',[-0.1 0.45])
-% text(-0.35,1.05, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.2,0.95, 'C', 'Units','normalized','FontWeight','bold');
 
 %% show images
 % logger_image_filename = 'D:\Tamir\PROJECTS\Neurologger\miniBat\pics\minibat_good_pic.jpg';
@@ -238,7 +224,7 @@ tunnel_view_image_file = 'L:\Videos_Photos\TAZOT_HAMAMA\taza4.jpg';
 axes(panel_A);
 image = imread(logger_image_filename);
 imshow(image);
-text(-0.35,1, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.35,1.2, 'A', 'Units','normalized','FontWeight','bold');
 % add scale bar
 scale_mm = 10;
 pixel_mm_ratio = 720/11; % 720 pixels is measured manually using ginput amd sd card width is 11mm
@@ -255,7 +241,7 @@ annotation('line', xaf,yaf, 'Linewidth',scale_line_width);
 h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dmm',scale_mm),...
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
 
-axes(panel_E);
+axes(panel_D);
 image = imread(tunnel_view_image_file);
 imshow(image);
 axis image
@@ -276,37 +262,79 @@ h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dm'
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
 text(-0.1,1, 'D', 'Units','normalized','FontWeight','bold');
 
-%%
-axes(panel_H)
+%% tunnel section behavior (ZY)
+axes(panel_I)
 cla
 axis equal
 hold on
-text(-0.25,1.1, 'G', 'Units','normalized','FontWeight','bold');
+text(-0.15,1, 'I', 'Units','normalized','FontWeight','bold');
 % plot tunnel section lines
-plot([-1.25 -1.25],[0 1.7],'k')
-plot([ 1.25  1.25],[0 1.7],'k')
-plot([ 1.25 0],[1.7 2.35],'k')
-plot([-1.25 0],[1.7 2.35],'k')
+% TODO: measure REAL dimensions in the tunnel
+plot([-1.25 -1.25],[0 1.7],'k','LineWidth',2);
+plot([ 1.25  1.25],[0 1.7],'k','LineWidth',2);
+plot([ 1.25 0],[1.7 2.35],'k','LineWidth',2);
+plot([-1.25 0],[1.7 2.35],'k','LineWidth',2);
+plot([-1.25 1.25],[0 0],'k','LineWidth',2);
+% add Y/Z arrows
+xlimits = get(gca,'xlim');
+ylimits = get(gca,'ylim');
+xa = -1.5 + [0 0.75];
+ya = -0.25 + [0 0.75];
+[xaf,yaf] = ds2nfu(xa,ya);
+xaf = xaf;
+yaf = yaf;
+h(1)=annotation('arrow',xaf,yaf([1 1]), 'Color', 'k');
+h(2)=annotation('arrow',xaf([1 1]),yaf, 'Color', 'k');
+[h.HeadWidth] = disperse([5 5]);
+[h.HeadLength] = disperse([5 5]);
+[h.LineWidth] = disperse([2 2]);
+h=annotation('textbox', [mean(xaf) mean(yaf) 0 0]+[-0.005 -0.025 0 0], 'String', 'Y',...
+    'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
+h=annotation('textbox', [mean(xaf) mean(yaf) 0 0]+[-0.03 -0.005 0 0], 'String', 'Z',...
+    'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
+h.Text.Rotation = 90;
+% add scale bar
+scale_m = 0.5;
+scale_line_width = 3;
+xlimits = get(gca,'xlim');
+ylimits = get(gca,'ylim');
+xa = xlimits(1) + [0 scale_m];
+ya = ylimits(1) + [0 0];
+[xaf,yaf] = ds2nfu(xa,ya);
+xaf = xaf + 0.09;
+yaf = yaf - 0.01;
+annotation('line', xaf,yaf, 'Linewidth',scale_line_width);
+h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dcm',scale_m*100),...
+    'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
+
+% panel_H_opt = 1;
+panel_H_data_options = {
+    'b0034_d180313', 1, 160;...
+    'b0034_d180314', 1, 175;...
+    'b0079_d160928', 1, 135;...
+    'b9861_d180626', 1, 167;...
+    'b9861_d180628', 1, 159;...
+    'b9861_d180709', 1, 154;...
+    'b9861_d180711', 1, 159;...
+    };
 YZ_dev_plot_opt = 'data';
 % YZ_dev_plot_opt = 'illustration';
 switch YZ_dev_plot_opt
     case 'data'
-%         exp_ID = 'b0034_d180313';
-        exp_ID = 'b0079_d160928';
-        direction = 1;
-%         x0 = 160;
-        x0 = 135;
+        exp_ID = panel_H_data_options{panel_H_opt,1};
+        direction = panel_H_data_options{panel_H_opt,2};
+        x0 = panel_H_data_options{panel_H_opt,3};
         load("L:\Analysis\Results\exp\pos_XYZ\"+exp_ID+"_pos_XYZ.mat");
         YZ0 = XYZ.YZ_by_dir{direction};
         YZ_mean = nanmean(YZ0,1);
 %         YZ_mean(1,1,:) = 0;
         YZ0 = YZ0 - YZ_mean; % remove data mean
-        YZ0 = YZ0 + [0 1.5]; % add back "fixed" mean
-        plot(YZ0(:,1,x0),YZ0(:,2,x0),'.');
+        YZ0 = YZ0 + [0 1.5]; % add back fixed mean
+        plot(YZ0(:,1,x0),YZ0(:,2,x0),'.','Color',prm.graphics.colors.flight_directions{direction});
+        set(gca,'Visible','off');
     case 'illustration'
         rng(0)
         plot(0.1*randn(1,20),1.5+0.1*randn(1,20),'.b')
-        % annotation('rectangle')
         % compute points corresponding to axis-oriented ellipse
         r1 = 0.4;
         r2 = 0.4;
@@ -326,15 +354,15 @@ switch YZ_dev_plot_opt
         text(0,0.5,'Illustration','HorizontalAlignment','center')
 end
 xlim([-1.5 1.5])
-ylim([-0 2.5])
+ylim([ 0 2.5])
 xlabel('Width (m)')
 ylabel('Height (m)')
 ha=gca;
 ha.XRuler.TickLabelGapMultiplier = -0.5;
 ha.YRuler.TickLabelGapMultiplier = 0;
 
-%%
-axes(panel_F);
+%% bespoon localization (anchors+tag+tunnel)
+axes(panel_E);
 cla
 text(-0.1175, 1, 'E', 'Units','normalized','FontWeight','bold');
 axis equal
@@ -386,21 +414,36 @@ for ii_anchor = 1:size(anchors_pos,1)
 %     plot([anchor_pos(1) xy(1)], [anchor_pos(2) xy(2)],'-g')
 end
 plot(xy(1),xy(2),'.b','MarkerSize',15)
-xlim([1285 1515])
+xlim([1280 1515])
 ylim([2360 2541])
 pause(eps)
 view(9,90); % rotate this axis to match the TAZA rotation
 % view(0,90);
 pause(eps)
 
-%% add legend
-leg_pos = get(panel_F,'position');
+% add scale bar
+scale_m = 20;
+scale_line_width = 3;
+xlimits = get(gca,'xlim');
+ylimits = get(gca,'ylim');
+xa = xlimits(1) + [0 scale_m];
+ya = ylimits(1) + [0 0];
+[xaf,yaf] = ds2nfu(xa,ya);
+xaf = xaf + 0.06;
+yaf = yaf + 0.1;
+annotation('line', xaf,yaf, 'Linewidth',scale_line_width);
+h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dm',scale_m),...
+    'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
+
+% add legend
+leg_pos = get(panel_E,'position');
 leg_pos(1:2) = leg_pos(1:2) + [0.65 0.88].*leg_pos(3:4);
 leg_pos(3:4) = [1 0.6];
 leg_ax = axes('position',leg_pos);
 hold on
-plot(0,1,'.b','MarkerSize',15)
-plot(0,2,'or','MarkerSize',2,'MarkerFaceColor',[1 0 0]);
+plot(0,1,'.b','MarkerSize',10)
+plot(0,2,'.r','MarkerSize',10);
+% plot(0,2,'or','MarkerSize',10,'MarkerFaceColor',[1 0 0]);
 text(0.25,1,'Bat','FontSize',7);
 text(0.25,2,'Antenna','FontSize',7);
 xlim([0 1])
@@ -410,7 +453,7 @@ set(gca,'Visible','off');
 set(gca,'XTick',[],'YTick',[]);
 
 %% bespoon localization precision
-axes(panel_G);
+axes(panel_F);
 cla
 hold on
 bespoon_loc_precision = load('L:\BeSpoon\testing\test_20180530__YOM_KEF_200m_static+dynamic+discretization\30-05-2018__calib_test_dynamic+non-jitter_jitter_with_kalman\data\outside_perpendicular_error.mat');
@@ -427,24 +470,25 @@ x = linspace(-50,50,100);
 y = normpdf(x,muHat,sigmaHat);
 plot(x,y,'k','LineWidth',1.5);
 text(0.65,0.85, sprintf('\x03C3=%.1fcm', sigmaHat), 'Units','normalized','FontSize',8);
-xlabel({'Positioning error (cm)'},'Units','normalized','Position',[0.5 -0.1]);
-ylabel('Probability','Units','normalized','Position',[-0.07 0.5]);
+xlabel({'Positioning error (cm)'},'Units','normalized','Position',[0.5 -0.2]);
+ylabel('PDF','Units','normalized','Position',[-0.07 0.5]);
 ha = gca;
 ha.XLim = [-40 40];
 ha.XTick = [-40:20:40];
 ha.YTick = ha.YLim;
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
-ha.XRuler.TickLabelGapMultiplier = -0.5;
+ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
-text(-0.28,1.1, 'F', 'Units','normalized','FontWeight','bold');
+text(-0.35,1.1, 'F', 'Units','normalized','FontWeight','bold');
 
 %% behavioral trajectory is 1D (small y deviations) - example
-axes(panel_I(1));
+axes(panel_G);
 cla
 hold on
-panel_I_example_option = 1;
-panel_I_example_list = {
+text(-0.1,1.1, 'G', 'Units','normalized','FontWeight','bold');
+% panel_G_opt = 1;
+panel_G_data_options = {
 'b0034_d180413';
 'b2289_d180514';
 'b2289_d180515';
@@ -452,7 +496,7 @@ panel_I_example_list = {
 'b9861_d180705';
 'b9861_d180709';
 };
-exp = exp_load_data(panel_I_example_list{panel_I_example_option},'flight');
+exp = exp_load_data(panel_G_data_options{panel_G_opt},'flight');
 for ii_dir = [1 2] 
     c = prm.graphics.colors.flight_directions{ii_dir};
     ydev = exp.flight.pos_y_std(ii_dir);
@@ -475,22 +519,18 @@ ha.TickDir='out';
 ha.TickLength = [0.01 0.01];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
-text(-0.1,1.1, 'H', 'Units','normalized','FontWeight','bold');
 
 % add direction arrows
 arrow_x = [0.80 0.85];
 arrow_y = repelem(0.74,2);
 clear h
-h(1)=annotation('arrow',arrow_x,      arrow_y,     'Color', prm.graphics.colors.flight_directions{1});
-h(2)=annotation('arrow',flip(arrow_x),arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{2});
+h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
+h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
 [h.HeadWidth] = disperse([5 5]);
 [h.HeadLength] = disperse([5 5]);
 
 
 %% behavioral trajectory is 1D (small y deviations) - population
-axes(panel_I(2));
-cla
-hold on
 % use exps that we recorded cells (TODO: consider using 
 cells_t = DS_get_cells_summary();
 bats = [79,148,34,9861,2289];
@@ -510,9 +550,9 @@ ystd_median_all = arrayfun(@(x)(x.ystd_median), pos_y_dev_all);
 
 %% cont...
 % TODO: take only exp from with cells included in analysis
-axes(panel_I(2));
+axes(panel_H);
 cla
-text(-0.3,1.1, 'I', 'Units','normalized','FontWeight','bold');
+text(-0.3,1.1, 'H', 'Units','normalized','FontWeight','bold');
 hold on
 % arrange data
 data = {};
@@ -549,13 +589,18 @@ switch yvar_pop_plot
             ystd_by_dir = ystd_by_dir .* 100; % convert to cm
             xi = linspace(0,50,100);
             ystd_density = ksdensity(ystd_by_dir,xi);
-            plot(xi,ystd_density,'Color',prm.graphics.colors.flight_directions{ii_dir});
-%             h=histogram(ystd_by_dir);
-%             h.Normalization = 'pdf';
+            plot(xi,ystd_density,'Color',prm.graphics.colors.flight_directions{ii_dir},'LineWidth',1.5);
         end
-        xlabel('Y s.d. (m)');
-        ylabel('density');
-        xlim([0 50])
+        xlabel('Y s.d. (cm)');
+        ylabel('PDF','Units','normalized','Position',[-0.1 0.5]);
+        ha=gca;
+        ha.XLim = [0 40];
+        ha.XTick = 0:10:40;
+        ha.YLim = [0 0.1];
+        ha.YTick = [0 0.1];
+        ha.TickLength = [0.03 0.03];
+        ha.XRuler.TickLabelGapMultiplier = -0.3;
+        ha.YRuler.TickLabelGapMultiplier = 0.001;
     case 'violin'
         hv=violinplot(x,grps);
         [hv.BoxWidth] = disperse(repelem(0.02,length(hv)));
@@ -597,19 +642,35 @@ switch yvar_pop_plot
         ylabel('Y s.d. (cm)');
 end
 
+% add direction arrows
+arrow_x = 0.53 + [0 0.03];
+arrow_y = repelem(0.60,2);
+clear h
+h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
+h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
+[h.HeadWidth] = disperse([5 5]);
+[h.HeadLength] = disperse([5 5]);
+
+
 %% speed trajectory very constant along the flight - example
 axes(panel_J); 
 cla
 hold on
-panel_speed_option = 4;
-panel_speed_options = {
-'b0079_d160913';
-'b0079_d160914';
-'b0079_d160915'; % many laps with no landing in the middle but different speed between directions
-'b2289_d180615'; % looks excellent but not many laps!
-'b0079_d160928';
+text(-0.1,1.1, 'J', 'Units','normalized','FontWeight','bold');
+% panel_J_opt = 4;
+panel_J_data_options = {
+    'b0034_d180313';
+    'b0034_d180315';
+    'b0079_d161003';
+    'b0148_d170613';
+    'b0148_d170615';
+    'b0148_d170626';
+    'b0148_d170802';
+    'b0148_d170807';
+    'b2289_d180520';    
+    'b2289_d180615';
 };
-exp_ID = panel_speed_options{panel_speed_option};
+exp_ID = panel_J_data_options{panel_J_opt};
 exp = exp_load_data(exp_ID,'flight');
 FE=exp.flight.FE;
 FE([exp.flight.FE.distance]<prm.flight.full_min_distance) = [];
@@ -628,13 +689,14 @@ set(gca,'tickdir','out','TickLength',repelem(0.01,2));
 ylim(ylimits);
 xlabel('Position (m)');
 ylabel('Speed (m/s)');
-text(-0.1,1.1, 'J', 'Units','normalized','FontWeight','bold');
+
 
 %% speed trajectory very constant along the flight - population
 % KLM - TODO: use only valid flights + signif place cell in that day!
 axes(panel_K);
 cla
 hold on
+text(-0.4,1.1, 'K', 'Units','normalized','FontWeight','bold');
 dir_colors = prm.graphics.colors.flight_directions;
 for ii_dir = 1:2
     cv = [speed_traj_all(:,ii_dir).speed_cv];
@@ -642,24 +704,26 @@ for ii_dir = 1:2
     cv = [cv.across_pos_high_speed];
     h=histogram(cv);
     h.BinEdges = linspace(0,0.1,20);
-    h.BinEdges = h.BinEdges + (ii_dir-1)*0.0008;
+    h.BinEdges = h.BinEdges + (ii_dir-1)*0.3*h.BinWidth;
     h.FaceColor = [1 1 1];
     h.EdgeColor = dir_colors{ii_dir};
     h.Normalization = 'Count';
     h.FaceAlpha = 0;
     h.LineWidth = 1;
 end
-set(gca,'TickLength',[0.03 0.03]);
-xlabel('CV of speed');
-ylabel('Counts');
-text(-0.3,1.1, 'K', 'Units','normalized','FontWeight','bold');
+ha=gca;
+ha.TickLength = [0.04 0.04];
+ha.XRuler.TickLabelGapMultiplier = -0.1;
+ha.YRuler.TickLabelGapMultiplier = 0;
+xlabel('CV of speed','Units','normalized','Position',[0.5 -0.25]);
+ylabel('Counts','Units','normalized','Position',[-0.2 0.5]);
 
 % add direction arrows
 arrow_x = [0.48 0.50];
 arrow_y = repelem(0.45,2);
 clear h
-h(1)=annotation('arrow',arrow_x,      arrow_y,     'Color', prm.graphics.colors.flight_directions{1});
-h(2)=annotation('arrow',flip(arrow_x),arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{2});
+h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
+h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
 [h.HeadWidth] = disperse([5 5]);
 [h.HeadLength] = disperse([5 5]);
 
@@ -667,6 +731,7 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y+0.01, 'Color', prm.graphics.colors
 axes(panel_L);
 cla
 hold on
+text(-0.4,1.1, 'L', 'Units','normalized','FontWeight','bold');
 dir_colors = prm.graphics.colors.flight_directions;
 directions = [-1 1];
 for ii_dir = 1:2
@@ -675,23 +740,36 @@ for ii_dir = 1:2
     nFlights = cellfun(@(FE)(sum([FE.distance]>prm.flight.full_min_distance)),FE_dir);
     h=histogram(nFlights);
     h.NumBins = 10;
-    h.BinEdges = h.BinEdges + (ii_dir-1)*1;
+    h.BinEdges = h.BinEdges + (ii_dir-1)*0.3*h.BinWidth;
     h.FaceColor = [1 1 1];
     h.EdgeColor = dir_colors{ii_dir};
     h.Normalization = 'Count';
     h.FaceAlpha = 0;
     h.LineWidth = 1;
 end
-set(gca,'TickLength',[0.03 0.03]);
-xlabel('No. of laps');
-ylabel('Counts');
-text(-0.3,1.1, 'L', 'Units','normalized','FontWeight','bold');
+ha=gca;
+ha.TickLength = [0.04 0.04];
+ha.XRuler.TickLabelGapMultiplier = -0.1;
+ha.YRuler.TickLabelGapMultiplier = 0;
+xlabel('No. of laps','Units','normalized','Position',[0.5 -0.25]);
+ylabel('Counts','Units','normalized','Position',[-0.2 0.5]);
+
+% add direction arrows
+arrow_x = 0.67 + [0 0.02];
+arrow_y = repelem(0.45,2);
+clear h
+h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
+h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
+[h.HeadWidth] = disperse([5 5]);
+[h.HeadLength] = disperse([5 5]);
 
 %% Total distance 
 axes(panel_M);
 cla 
 hold on
-if 1
+text(-0.4,1.1, 'M', 'Units','normalized','FontWeight','bold');
+total_dist_by_dir = 0;
+if total_dist_by_dir
     %% (per direction)
     dir_colors = prm.graphics.colors.flight_directions;
     directions = [-1 1];
@@ -702,7 +780,7 @@ if 1
         total_distance = total_distance .*1e-3; % to km
         h=histogram(total_distance);
         h.NumBins = 15;
-        h.BinEdges = h.BinEdges + (ii_dir-1)*0.1;
+        h.BinEdges = h.BinEdges + (ii_dir-1)*0.3*h.BinWidth;
         h.FaceColor = [1 1 1];
         h.EdgeColor = dir_colors{ii_dir};
         h.Normalization = 'Count';
@@ -715,17 +793,39 @@ else
     total_distance = cellfun(@(FE)(sum([FE.distance])),{exps_flight.FE});
     total_distance = total_distance .*1e-3; % to km
     h=histogram(total_distance);
-    h.NumBins = 13;
-    h.FaceColor = dir_colors{ii_dir};
+    
+%     h.NumBins = 15;
+    h.BinEdges = linspace(0,25,15);
+    h.FaceColor = [1 1 1];
+    h.EdgeColor = 'k';
     h.Normalization = 'Count';
-    h.FaceColor = 0.5*[1 1 1];
+    h.FaceAlpha = 0;
+    h.LineWidth = 1;
+    ha=gca;
+    ha.XLim = [0 25];
+    ha.XTick = [0:5:25];
 end
-set(gca,'TickLength',[0.03 0.03]);
-xlabel('Total Distance (km)');
-ylabel('Counts');
-text(-0.3,1.1, 'M', 'Units','normalized','FontWeight','bold');
+ha=gca;
+ha.TickLength = [0.04 0.04];
+ha.XRuler.TickLabelGapMultiplier = -0.1;
+ha.YRuler.TickLabelGapMultiplier = 0;
+xlabel('Distance flown (km)','Units','normalized','Position',[0.5 -0.25]);
+ylabel('Counts','Units','normalized','Position',[-0.2 0.5]);
+
+%%
+data_opt_str = {
+    'data options:'
+    sprintf('panel G - option %d: %s               ',panel_G_opt,panel_G_data_options{panel_G_opt});
+    sprintf('panel H - option %d: %s, dir=%d, x0=%d',panel_H_opt,panel_H_data_options{panel_H_opt,:});
+    sprintf('panel J - option %d: %s               ',panel_J_opt,panel_J_data_options{panel_J_opt});
+    
+    };
+annotation('textbox', [0.2 0.2 0.6 0.1], 'String',data_opt_str, 'HorizontalAlignment','Left','Interpreter','none','FitBoxToText','on');
 
 %% print/save the figure
+fig_name_str = fig_name_str+"_G_opt"+panel_G_opt;
+fig_name_str = fig_name_str+"_H_opt"+panel_H_opt;
+fig_name_str = fig_name_str+"_J_opt"+panel_J_opt;
 fig_name_out = fullfile(res_dir, fig_name_str);
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');

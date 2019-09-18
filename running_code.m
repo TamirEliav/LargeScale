@@ -1499,9 +1499,76 @@ plot(1:10)
 
 
 
+%% fig 1 - find panel J example (speed trajectory)
+prm = PARAMS_GetAll();
+for ii_exp = 1:height(exp_t)
+    %% get exp data
+    ii_exp 
+    exp_ID = exp_t.exp_ID{ii_exp};
+    exp = exp_load_data(exp_ID,'details','flight');
+    FE = exp.flight.FE;
+    FE = FE([FE.distance]>prm.flight.full_min_distance);
+    
+    %% plot
+    figure('Units','centimeters','Position',[5 5 15 20])
+    pnl=panel();
+    pnl.pack('v',3);
+    pnl.margin = [15 15 5 10 ];
+    pnl.de.margin = 10;
+    h=pnl.title(exp.details.exp_ID);
+    h.Interpreter = 'none';
+    h.FontSize = 16;
+    h.Position = [0.5 1];
+    
+    pnl(1).select();
+    hold on
+    directions = [1 -1];
+    for ii_dir = 1:2
+        FE_dir = FE([FE.direction]==directions(ii_dir));
+        plot([FE_dir.pos],[FE_dir.vel],'.', 'Color',prm.graphics.colors.flight_directions{ii_dir});
+    end
+    ylabel('velocity (m/s)')
+    text(1,1.05,"n="+length(FE),'Units','normalized','HorizontalAlignment','right','FontSize',14);
+    
+    pnl(2).select();
+    hold on
+    plot([FE_dir.pos],abs([FE_dir.vel]),'.k','MarkerSize',1);
+    ylabel('Speed (m/s)')
+    ylim([0 10])
+    
+    pnl(3).select();
+    hold on
+    for ii_dir = [1 2] 
+        c = prm.graphics.colors.flight_directions{ii_dir};
+        ydev = exp.flight.pos_y_std(ii_dir);
+        x = ydev.xy(:,1);
+        y = ydev.xy(:,2);
+        ymean = interp1(ydev.bin_centers, ydev.ymean, x);
+        y = y-ymean;
+        plot(x, y, '.', 'Color',c, 'MarkerSize',.0001);
+    end
+    xlabel('X position (m)')
+    ylabel('Y (m)')
+    
+    figname = fullfile('L:\paper_figures\speed_trajectory', exp.details.exp_ID+"_speed_trajectory");
+    saveas(gcf, figname, 'tif');
+    close all
+end
+
+%%
 
 
 
+
+
+
+
+
+
+
+
+
+%%
 
 
 
