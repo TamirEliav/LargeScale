@@ -83,7 +83,7 @@ trace_ts_list = [
     74986863162,...
     74986792310,...
     72188230643,...
-    71432461878
+    71432461878 % in flight!
     ];
 traces_ts = trace_ts_list(trace_ts_opt) + [0 trace_duration]*1e6;
 % load channels data
@@ -156,9 +156,17 @@ clusters_colors = clusters_colors ./255;
 % clusters_colors = clusters_colors(randperm(size(clusters_colors,1)),:);
 
 %% ---------------------- spikes clusters ---------------------------------
+% the spikes trace is during flight
+% the clusters are from sleep session before behavior
+% TODO: show nachum different examples...
+% 1. all spikes
+% 2. all spikes during flight (in-air)
+% 3. 1st half session during flight
+% 4. 2nd half session during flight
+
 if 1
 NTT_file = 'L:\Analysis\pre_proc\0148\20170625\spikes_sorting\spikes_b0148_d170625_TT4.NTT';
-limits_ts = [70019176845 70816687098];
+limits_ts = [70019176845 70816687098]; % sleep session
 % limits_ts = [];
 if isempty(limits_ts)
     [Timestamps, CellNumbers, Samples, Header] = Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 1, [] );

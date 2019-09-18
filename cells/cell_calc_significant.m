@@ -16,13 +16,13 @@ for ii_dir = 1:2
     TF = TF & has_valid_field;
     TF = TF & SI_thr_signif;
     TF = TF & SI_shuffle_signif;
+    % TODO: what about inclusion criteria? should it go here?!
     
     signif(ii_dir).TF = TF;
     signif(ii_dir).SI_thr = prm.signif.SI_thr;
     signif(ii_dir).SI_thr_shuffle = prm.signif.SI_thr_shuffle;
     signif(ii_dir).SI_thr_signif = SI_thr_signif;
     signif(ii_dir).SI_shuffle_signif = SI_shuffle_signif;
-    signif(ii_dir).odd_even_FR_map_corr_thr = prm.signif.odd_even_FR_map_corr_thr;
 end
 
 %% save data to file

@@ -1556,8 +1556,18 @@ for ii_exp = 1:height(exp_t)
 end
 
 %%
-
-
+figure
+subplot(121)
+plot(abs(field_vel_all) , field_size_all ,'.k')
+xlabel('speed (m/s)')
+ylabel('Size (m)')
+title('speed at peak of place field')
+subplot(122)
+plot(abs(field_vel2_all) , field_size_all ,'.k')
+xlabel('speed (m/s)')
+ylabel('Size (m)')
+title('speed averaged over in-field spikes')
+linkaxes(findobj(gcf,'Type','Axe'))
 
 
 

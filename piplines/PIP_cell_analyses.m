@@ -52,7 +52,7 @@ whos cells_t
 
 %% run over cells
 cells_list = cells_t.cell_ID;
-cells_list = {err_list.cell_ID}'; % uncomment to re-run error
+% cells_list = {err_list.cell_ID}'; % uncomment to re-run error cell list
 err_list = {};
 for ii_cell = 1:length(cells_list)
     %%
@@ -66,19 +66,19 @@ try
 %     cell_create_spikes_data(cell_ID);
 %     
 %     cell_calc_time_stability(cell_ID);
-    cell_create_flight_data(cell_ID);
-    cell_calc_FR_map(cell_ID);
-    cell_calc_FR_map_shuffles(cell_ID);
-    cell_calc_Ipos(cell_ID);
-    cell_calc_fields(cell_ID);
-    cell_calc_fields_properties(cell_ID);
-    cell_calc_significant(cell_ID);
-    cell_calc_mean_FR(cell_ID);
+%     cell_create_flight_data(cell_ID);
+%     cell_calc_FR_map(cell_ID);
+%     cell_calc_FR_map_shuffles(cell_ID);
+%     cell_calc_Ipos(cell_ID);
+%     cell_calc_fields(cell_ID);
+%     cell_calc_fields_properties(cell_ID);
+%     cell_calc_significant(cell_ID);
+%     cell_calc_mean_FR(cell_ID);
     cell_calc_stats(cell_ID);
-    cell_calc_inclusion(cell_ID);
-    cell_calc_time_AC(cell_ID);
+%     cell_calc_inclusion(cell_ID);
+%     cell_calc_time_AC(cell_ID);
     
-    cell_plot_map_fields(cell_ID);
+%     cell_plot_map_fields(cell_ID);
 %     cell_plot_time_AC(cell_ID);
     toc
     

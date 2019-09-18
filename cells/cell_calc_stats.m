@@ -16,7 +16,7 @@ for ii_dir = 1:2
         continue
     end
     fields_to_add = fields{ii_dir};
-    % TODO: workaround to solve the problem that sometimes I don't have the
+    % workaround to solve the problem that sometimes I don't have the
     % field 'overlap_edges'... maybe change that in 'cell_calc_fields'...
     if isfield(fields_to_add,'overlap_edges')
         fields_to_add = rmfield(fields_to_add,'overlap_edges');
@@ -101,7 +101,7 @@ else
 end
 % for scale stats, consider only fields outside the low speed area 
 fields_valid_speed = fields_all(valid_speed);
-if length(fields_all) > 0
+if length(fields_valid_speed) > 0
     stats_all.field_largest     = max([fields_valid_speed.width_prc]);
     stats_all.field_smallest    = min([fields_valid_speed.width_prc]);
     stats_all.field_ratio_LS    = max([fields_valid_speed.width_prc]) / min([fields_valid_speed.width_prc]);
