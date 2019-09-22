@@ -26,6 +26,7 @@ disp('======================================================');
 disp('');
 
 %% create figure
+% =========================================================================
 % figure_size_cm = [21.0 29.7]; % ~A4
 figure_size_cm = [21.6 27.9]; % ~US letter
 figure ;
@@ -39,47 +40,26 @@ set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 figure_size_cm]);
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]); % position on screen...
 set(gcf, 'Renderer', 'painters');
-
+annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none');
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
-%% create panels
-panel_A_size = [8 11];
-panel_B_size = [8 11];
-panel_C_size = [8 2];
-panel_D_size = [2 2];
-panel_E_size = [8 2];
-panel_F_size = [2 2];
-panel_G_size = [4 3];
-panel_H_size = [4 3];
-panel_A(1,1) = axes('position', [ 2  13 panel_A_size ]);
-panel_A(2,1) = axes('position', [ 11 13 panel_A_size ]);
-panel_A(1,2) = axes('position', [ 2  13+panel_A_size(2) panel_A_size.*[1 .2] ]);
-panel_A(2,2) = axes('position', [ 11 13+panel_A_size(2) panel_A_size.*[1 .2] ]);
-panel_B(1) = axes('position', [ 2   1 panel_B_size ]);
-panel_B(2) = axes('position', [ 11  1 panel_B_size ]);
-% panel_C(1) = axes('position', [ 2   5 panel_C_size ]);
-% panel_C(2) = axes('position', [ 11  5 panel_C_size ]);
-% panel_D(1,1) = axes('position', [ 2  1 panel_D_size ]);
-% panel_D(1,2) = axes('position', [ 5  1 panel_D_size ]);
-% panel_D(1,3) = axes('position', [ 8  1 panel_D_size ]);
-% panel_D(2,1) = axes('position', [11  1 panel_D_size ]);
-% panel_D(2,2) = axes('position', [14  1 panel_D_size ]);
-% panel_D(2,3) = axes('position', [17  1 panel_D_size ]);
-% panel_E(1) = axes('position', [ 2  1 panel_E_size ]);
-% panel_E(2) = axes('position', [ 11 1 panel_E_size ]);
-% panel_F(1,1) = axes('position', [ 2  6 panel_F_size ]);
-% panel_F(1,2) = axes('position', [ 5  6 panel_F_size ]);
-% panel_F(1,3) = axes('position', [ 8  6 panel_F_size ]);
-% panel_F(2,1) = axes('position', [11  6 panel_F_size ]);
-% panel_F(2,2) = axes('position', [14  6 panel_F_size ]);
-% panel_F(2,3) = axes('position', [17  6 panel_F_size ]);
-% panel_G = axes('position', [2 2 panel_H_size ]);
-% panel_H = axes('position', [8 2 panel_H_size ]);
+% create panels
+panel_A_size = [7 3];
+panel_B_size = [3 3];
+panel_C_size = [7 3];
+panel_D_size = [3 3];
+panel_A(1) = axes('position', [ 2 22 panel_A_size]);
+panel_A(2) = axes('position', [ 2 18 panel_A_size]);
+panel_B(1) = axes('position', [11 22 panel_B_size]);
+panel_B(2) = axes('position', [11 18 panel_B_size]);
+panel_C(1) = axes('position', [ 2 13.5 panel_C_size]);
+panel_C(2) = axes('position', [ 2  9.5 panel_C_size]);
+panel_D(1) = axes('position', [11 13.5 panel_D_size]);
+panel_D(2) = axes('position', [11  9.5 panel_D_size]);
 
-% error
 
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 %% load population data
+% =========================================================================
 prm = PARAMS_GetAll();
 cells_t = DS_get_cells_summary();
 bats = [79,148,34,9861,2289];
@@ -99,201 +79,362 @@ cells_ID([stats.meanFR_all]>prm.inclusion.interneuron_FR_thr)=[];
 clear cells stats cells_details cells_t
 cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+whos cells
 
-%% plot population fields distribution - lines and edges
-axes(panel_A(1,2));
-cla
-hold on
-text(-0.12,1, 'A', 'Units','normalized','FontWeight','bold');
-% xlabel('Position (m)')
-% ylabel('Cell no.')
+% load LM data
+exp_ID = 'b2289_d180615';
+exp = exp_load_data(exp_ID,'LM');
+LM = exp.LM;
+LM([1 2 end]) = [];
 
-axes(panel_A(1,1));
-cla
-hold on
-text(-0.07,1.1, 'A', 'Units','normalized','FontWeight','bold');
-% xlabel('Position (m)')
-ylabel('Cell no.')
-
-vline_w = 1;
-vline_h = 1*[-1 1];
-
-color_edges_L = 'g';
-color_edges_R = 'r';
-color_peaks = 'm';
-
-% color_edges_L = 'g';
-% color_edges_R = [255 127 0]/255;
-% color_peaks = 'm';
-
-% color_edges_L = [102,194,165]/255;
-% color_edges_R = [166,216,84]/255;
-% color_peaks = 'm';
-
+%% panel A - field pos CDF
+% =========================================================================
+% figure
 for ii_dir = 1:2
-    axes(panel_A(ii_dir,1));
+%     subplot(1,2,ii_dir)
+    axes(panel_A(ii_dir));
     cla
-%     yyaxis left
     hold on
+    
+    % arrange data
     signif = cat(1,cells.signif);
     cells_dir = cells([signif(:,ii_dir).TF]);
-    stats = cat(1,cells_dir.stats);
-    stats = cat(1,stats.dir);
-    SI = [stats(:,ii_dir).SI_bits_spike];
-    [SI,sort_IX] = sort(SI,'descend');
-    cells_dir = cells_dir(sort_IX);
-    fields_edges = [];
-    fields_peaks = [];
-    for ii_cell = 1:length(cells_dir)
-        cell = cells_dir(ii_cell);
-        fields = cell.fields{ii_dir};
-        x = cat(1,fields.edges_prc);
-        fields_edges = [fields_edges ; x];
-        y = ii_cell;
-        plot( x',[y y],'-','Color',prm.graphics.colors.flight_directions{ii_dir},'LineWidth',0.5);
-        plot( x(:,[1 1])', y+vline_h,'-','Color',color_edges_L,'LineWidth',vline_w);
-        plot( x(:,[2 2])', y+vline_h,'-','Color',color_edges_R,'LineWidth',vline_w);
-        x = cat(1,fields.loc);
-        fields_peaks = [fields_peaks ; x];
-        plot( [x x]', y+vline_h,'-','Color',color_peaks,'LineWidth',vline_w);
-    end
-    ylim([0 length(cells_dir)+1])
+    fields = cellfun(@(x)(x{ii_dir}), {cells_dir.fields},'UniformOutput',0);
+    fields =[fields{:}];
+    fields( [fields.in_low_speed_area] ) = []; % TODO: decide if we want those fields near the landing balls
     
-    % plot peak/edges distribution
-    axes(panel_A(ii_dir,2));
-    cla
-%     yyaxis right
-    hold on
-    x = 0:0.2:200;
-    [f,xi] = ksdensity(fields_peaks,x,'Kernel','normal','Bandwidth',1.5);
-    plot(xi,f, '-', 'LineWidth',0.01, 'Color',color_peaks);
-    [f,xi] = ksdensity(fields_edges(:,1),x,'Kernel','normal','Bandwidth',1.5);
-    plot(xi,f, '-', 'LineWidth',0.01, 'Color',color_edges_L);
-    [f,xi] = ksdensity(fields_edges(:,2),x,'Kernel','normal','Bandwidth',1.5);
-    plot(xi,f, '-', 'LineWidth',0.01, 'Color',color_edges_R);
-    ha = gca;
-    ha.XLim = [0 200];
-    ha.XTickLabel = {};
-%     hl=columnlegend(3,{' peak      ','         left ',' right '});
-%     hl.Position = ha.Position.*[1 1 0.3 0.1] + ha.Position([3 4 1 2]).*[0.3 0.8 0 0];
+    % plot cdf
+    h = cdfplot([fields.loc]);
+    h.Color = prm.graphics.colors.flight_directions{ii_dir};
+    h.LineWidth = 0.5;
+    title('')
+    ha=gca;
+    ha.GridLineStyle = 'none';
+    
+    % plot LM
+    ypos = 0.02;
+    angle = 45;
+    ylimits = get(gca,'ylim');
+    for ii_LM=1:length(LM)
+        x = LM(ii_LM).pos_proj;
+        name = LM(ii_LM).name;
+        h=xline(x, '-', 'color', 0.9.*[1 1 1], 'LineWidth',0.5);
+%         text(x, ylimits(2)+ypos*diff(ylimits), LM(ii_LM).name, 'Rotation', 45, 'FontSize',8);
+    end
+    
+    % labels & graphics
+    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.17]);
+    ylabel('CDF', 'Units','normalized','Position',[-0.05 0.5]);
+    ha= gca;
+    ha.TickDir='out';
+    ha.TickLength = [0.015 0.015];
+    ha.YTick = ha.YLim;
+    ha.XRuler.TickLabelGapMultiplier = -0.3;
+    ha.YRuler.TickLabelGapMultiplier = 0.001;
 end
 
-%% plot FR maps ordered by field location (heatmap)
-axes(panel_B(1));
-hold on
-text(-0.07,1.08, 'B', 'Units','normalized','FontWeight','bold');
-xlabel('Position (m)')
-ylabel('Field no.')
+axes(panel_A(1));
+text(-0.13,1.1, 'A', 'Units','normalized','FontWeight','bold');
+
+%% add arrows indicating over-represented LM
+axes(panel_A(1));
+xa = [70 80] - 1;
+ya = [0.45 0.4] + 0.01;
+[xaf,yaf] = ds2nfu(xa,ya);
+h=annotation('arrow', xaf,yaf);
+h.HeadWidth=5;
+h.HeadLength = 5;
+h.LineStyle='none';
+
+axes(panel_A(2));
+xa = [70 80] - 1;
+ya = [0.45 0.4] + 0.04;
+[xaf,yaf] = ds2nfu(xa,ya);
+h=annotation('arrow', xaf,yaf);
+h.HeadWidth=5;
+h.HeadLength = 5;
+h.LineStyle='none';
+
+
+
+
+%% panel B - field vs. LM position
+% =========================================================================
+% figure
 for ii_dir = 1:2
+%     subplot(1,2,ii_dir)
     axes(panel_B(ii_dir));
+    cla
     hold on
-    xlabel('Position (m)')
+    
+    %% arrange data - same as in panel C
+    signif = cat(1,cells.signif);
+    cells_dir = cells([signif(:,ii_dir).TF]);
+    fields = cellfun(@(x)(x{ii_dir}), {cells_dir.fields},'UniformOutput',0);
+    fields =[fields{:}];
+    switch ii_dir
+        case 1
+            start_ind = 1;
+            end_ind = 2;
+            interp_next = 'next';
+            interp_prev = 'previous';
+        case 2
+            start_ind = 2;
+            end_ind = 1;
+            interp_next = 'previous';
+            interp_prev = 'next';
+    end
+    edges = cat(1,fields.edges_prc);
+    [fields.start] = disperse(edges(:,start_ind));
+    [fields.end]   = disperse(edges(:,end_ind  ));
+  
+    [fields.LM_nearest_by_peak]  = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.loc]  , 'nearest'));
+    [fields.LM_nearest_by_start] = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.start] , 'nearest'));
+    [fields.LM_nearest_by_end]   = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.end]   , 'nearest'));
+    [fields.LM_next_by_peak]  = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.loc]  , interp_next));
+    [fields.LM_next_by_start] = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.start] , interp_next));
+    [fields.LM_next_by_end]   = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.end]   , interp_next));
+    [fields.LM_prev_by_peak]  = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.loc]  , interp_prev));
+    [fields.LM_prev_by_start] = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.start] , interp_prev));
+    [fields.LM_prev_by_end]   = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.end]   , interp_prev));
+    
+    % remove fields near balls
+    fields([fields.in_low_speed_area])=[];
+    fields(isnan([fields.LM_nearest_by_peak])) = [];
+    
+    %% shuffle!
+    rng(0);
+    shuffle.n = 10000;
+    limits = [min([LM.pos_proj]) max([LM.pos_proj])];
+%     limits = prm.fields.valid_speed_pos;
+    M = [[fields.loc];[fields.start];[fields.end]];
+    shifts = rand(size(M,2), shuffle.n);
+    shifts = shifts .* diff(limits);
+    shifts = shiftdim(shifts,-1);
+    M = M + shifts;
+    M = reshape(M,size(M,1), []); % pool shuffles x fields together
+    % circularly correct according to the peak
+    peaks_corrected = limits(1) + mod(M(1,:), diff(limits));
+    shift_correction = peaks_corrected - M(1,:);
+    M = M + shift_correction;
+    % remove shuffled fields same as we removed real fields 
+    invalid = M(1,:)<limits(1) | M(1,:)>limits(2);
+    M(:,invalid) = [];
+    shuffle.peaks = M(1,:);
+    shuffle.start = M(2,:);
+    shuffle.end   = M(3,:);
+    % get relevant landmarks
+    shuffle.LM_nearest_by_peak  = interp1([LM.pos_proj], [LM.pos_proj], shuffle.peaks, 'nearest');
+    shuffle.LM_nearest_by_start = interp1([LM.pos_proj], [LM.pos_proj], shuffle.start, 'nearest');
+    shuffle.LM_nearest_by_end   = interp1([LM.pos_proj], [LM.pos_proj], shuffle.end,   'nearest');
+    shuffle.LM_next_by_peak  = interp1([LM.pos_proj], [LM.pos_proj], shuffle.peaks, interp_next);
+    shuffle.LM_next_by_start = interp1([LM.pos_proj], [LM.pos_proj], shuffle.start, interp_next);
+    shuffle.LM_next_by_end   = interp1([LM.pos_proj], [LM.pos_proj], shuffle.end,   interp_next);
+    shuffle.LM_prev_by_peak  = interp1([LM.pos_proj], [LM.pos_proj], shuffle.peaks, interp_prev);
+    shuffle.LM_prev_by_start = interp1([LM.pos_proj], [LM.pos_proj], shuffle.start, interp_prev);
+    shuffle.LM_prev_by_end   = interp1([LM.pos_proj], [LM.pos_proj], shuffle.end,   interp_prev);
+        
+    %% plot 
+    c = prm.graphics.colors.flight_directions{ii_dir};
+    x1 = [fields.loc] - [fields.LM_nearest_by_peak];
+    h1 = histogram( x1 );
+    h1.Normalization = 'pdf';
+%     h1.NumBins = h1.NumBins * 2;
+    h1.FaceColor = c;
+    x2 = shuffle.peaks - shuffle.LM_nearest_by_peak;
+    h2 = histogram( x2 );
+%     h2.BinEdges = h1.BinEdges;
+    h2.Normalization = 'pdf';
+    h2.DisplayStyle = 'stairs';
+    h2.EdgeColor = 'k';
+    h2.LineWidth = 2;
+    [H,P,KSSTAT] = kstest2(x1,x2);
+    text(1,1,sprintf('p=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
+    xline(0,'-','LineWidth',2);
+    
+    % labels & graphics
+    ha= gca;
+    ha.TickDir='out';
+    ha.TickLength = [0.03 0.03];
+    ha.YTick = ha.YLim;
+    ha.XRuler.TickLabelGapMultiplier = -0.3;
+    ha.YRuler.TickLabelGapMultiplier = 0.001;
+    xlabel('Distance from landmark (m)', 'Units','normalized','Position',[0.5 -0.13])
+    ylabel('PDF', 'Units','normalized','Position',[-0.08 0.5])
+    
+    % labels & graphics
+    ha= gca;
+    ha.TickDir='out';
+    ha.TickLength = [0.03 0.03];
+    ha.YTick = ha.YLim;
+    ha.XRuler.TickLabelGapMultiplier = -0.3;
+    ha.YRuler.TickLabelGapMultiplier = 0.001;
+    xlabel('Distance from landmark (m)', 'Units','normalized','Position',[0.5 -0.13])
+    ylabel('PDF', 'Units','normalized','Position',[-0.08 0.5])
+end
+
+axes(panel_B(1));
+text(-0.3,1.1, 'B', 'Units','normalized','FontWeight','bold');
+
+
+%% panel C - field size vs. pos
+% =========================================================================
+% figure
+for ii_dir = 1:2
+%     subplot(1,2,ii_dir)
+    axes(panel_C(ii_dir));
+    cla
+    hold on
+    
+    % arrange data
+    signif = cat(1,cells.signif);
+    cells_dir = cells([signif(:,ii_dir).TF]);
+    fields = cellfun(@(x)(x{ii_dir}), {cells_dir.fields},'UniformOutput',0);
+    fields =[fields{:}];
+    fields( [fields.in_low_speed_area] ) = []; % TODO: decide if we want those fields near the landing balls
+    
+    % plot cdf
+    c = prm.graphics.colors.flight_directions{ii_dir};
+    x = [fields.loc];
+    y = [fields.width_prc];
+    y_clipping = 25;
+    y(y>y_clipping) = y_clipping;
+    plot(x,y,'.','MarkerSize',4, 'Color',c);
+        
+    % plot LM
+    ypos = 0.02;
+    angle = 45;
+    ylimits = get(gca,'ylim');
+    for ii_LM=1:length(LM)
+        x = LM(ii_LM).pos_proj;
+        name = LM(ii_LM).name;
+        h=xline(x, '-', 'color', 0.9.*[1 1 1], 'LineWidth',0.5);
+%         text(x, ylimits(2)+ypos*diff(ylimits), LM(ii_LM).name, 'Rotation', 45, 'FontSize',8);
+    end
+    
+    % labels & graphics
+    xlabel('position (m)', 'Units','normalized','Position',[0.5 -0.17]);
+    ylabel('Field size (m)', 'Units','normalized','Position',[-0.05 0.5]);
+    ha= gca;
+    ha.TickDir='out';
+    ha.TickLength = [0.015 0.015];
+    ha.XTick = [0:50:200];
+    ha.YLim = [0 y_clipping];
+    ha.YTick = ha.YLim;
+    ha.XRuler.TickLabelGapMultiplier = -0.3;
+    ha.YRuler.TickLabelGapMultiplier = 0.001;
+end
+
+axes(panel_C(1));
+text(-0.13,1.1, 'C', 'Units','normalized','FontWeight','bold');
+
+
+%% panel D - field size - near vs. far from LM
+% =========================================================================
+% figure
+for ii_dir = 1:2
+%     subplot(1,2,ii_dir)
+    axes(panel_D(ii_dir));
+    cla
+    hold on
     
     %% arrange data
     signif = cat(1,cells.signif);
     cells_dir = cells([signif(:,ii_dir).TF]);
-    pop_data = struct('field',{}, 'PSTH',{}, 'fields',{});
-    ii_field = 1;
-    for ii_cell = 1:length(cells_dir)
-        cell = cells_dir(ii_cell);
-        fields = cell.fields{ii_dir};
-        for jj_field = 1:length(fields)
-            pop_data(ii_field).field = fields(jj_field);
-            pop_data(ii_field).PSTH = cell.FR_map(ii_dir).all.PSTH;
-            pop_data(ii_field).fields = fields;
-            ii_field = ii_field + 1;
-        end
+    fields = cellfun(@(x)(x{ii_dir}), {cells_dir.fields},'UniformOutput',0);
+    fields =[fields{:}];
+    switch ii_dir
+        case 1
+            start_ind = 1;
+            end_ind = 2;
+            interp_next = 'next';
+            interp_prev = 'previous';
+        case 2
+            start_ind = 2;
+            end_ind = 1;
+            interp_next = 'previous';
+            interp_prev = 'next';
     end
-    locs = arrayfun(@(x)(x.loc), [pop_data.field]);
-    [locs, sort_IX] = sort(locs,'ascend');
-    pop_data = pop_data(sort_IX);
+    edges = cat(1,fields.edges_prc);
+    [fields.start] = disperse(edges(:,start_ind));
+    [fields.end]   = disperse(edges(:,end_ind  ));
+  
+    [fields.LM_nearest_by_peak]  = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.loc]  , 'nearest'));
+    [fields.LM_nearest_by_start] = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.start] , 'nearest'));
+    [fields.LM_nearest_by_end]   = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.end]   , 'nearest'));
+    [fields.LM_next_by_peak]  = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.loc]  , interp_next));
+    [fields.LM_next_by_start] = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.start] , interp_next));
+    [fields.LM_next_by_end]   = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.end]   , interp_next));
+    [fields.LM_prev_by_peak]  = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.loc]  , interp_prev));
+    [fields.LM_prev_by_start] = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.start] , interp_prev));
+    [fields.LM_prev_by_end]   = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.end]   , interp_prev));
     
-    PSTH_pos_bins = cell.FR_map(ii_dir).all.bin_centers;
-    M = nan(length(pop_data),length(PSTH_pos_bins));
-    for ii_field = 1:length(pop_data)
-        PSTH = pop_data(ii_field).PSTH;
-        PSTH = PSTH ./ pop_data(ii_field).field.peak;
-%         PSTH = PSTH ./ (pop_data(ii_field).field.peak*prm.fields.width_href);
-        M(ii_field, :) = PSTH;
-    end
+    % remove fields near balls
+    fields([fields.in_low_speed_area])=[];
+    fields(isnan([fields.LM_nearest_by_peak])) = [];
     
-%     exp_list = arrayfun(@(x)(x.exp_ID), [cells_dir.details],'UniformOutput',0);
-%     exps = cellfun(@(exp_ID)(exp_load_data(exp_ID,'details','LM','flight')), exp_list ,'UniformOutput',0);
-%     exps = [exps{:}];
-%     vel_all = arrayfun(@(x)(x.speed_traj(ii_dir).vel_median), [exps.flight],'UniformOutput',0);
-%     vel_all =cat(2,vel_all{:});
-%     speed_all = abs(vel_all);
-%     speed_mean = nanmean(abs(vel_all),2);
-
-    %% plot
-    m = 1.5;
-    M(M>m) = m;
-    imagesc(PSTH_pos_bins,1:size(M,1),M)
-%     colorbar
-    set(gca,'CLim',[0 m]);
-    colormap parula
-%     colormap jet
-    ylim([0 size(M,1)+1])
+    %% plot 
+    c = prm.graphics.colors.flight_directions{ii_dir};
+    x = abs([fields.loc] - [fields.LM_nearest_by_peak]);
+    y = [fields.width_prc];
+    thr = median(x);
+%     thr = 5;
+    y1 = y(x<thr);
+    y2 = y(x>=thr);
     
-% %     yyaxis right
-% %     x = exps(1).flight.speed_traj.bins_centers;
-% % %     plot(x, speed_all )
-% %     plot(x, speed_mean, 'k','LineWidth',2)
-
-%     exp = exp_load_data(cell.details.exp_ID,'LM');
-%     plot_LM(exp.LM)
+    fprintf('y1: n=%d/%d (%2.0f%%)\r',length(y1),length(y),100*length(y1)/length(y));
+    fprintf('y2: n=%d/%d (%2.0f%%)\r',length(y2),length(y),100*length(y2)/length(y));
     
+    nBins = 25;
+    h1 = histogram( y1 );
+    h1.NumBins = nBins;
+    h1.Normalization = 'pdf';
+    h1.DisplayStyle = 'stairs';
+    h1.EdgeColor = c;
+    h1.LineWidth = 1;
+    h2 = histogram( y2 );
+    h2.NumBins = nBins;
+    h2.Normalization = 'pdf';
+    h2.DisplayStyle = 'stairs';
+    h2.EdgeColor = c;
+    h2.LineWidth = 2;
+    [H,P,KSSTAT] = kstest2(y1,y2);
+    text(1,1,sprintf('p=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
     
+    % labels & graphics
+    ha= gca;
+    ha.TickDir='out';
+    ha.TickLength = [0.03 0.03];
+    ha.YTick = ha.YLim;
+    ha.XLim = [0 20];
+    ha.XRuler.TickLabelGapMultiplier = -0.3;
+    ha.YRuler.TickLabelGapMultiplier = 0.001;
+    xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.13]);
+    ylabel('PDF', 'Units','normalized','Position',[-0.08 0.5]);
+    legend_pos = [ha.Position([1 2])+[2.2 0.5].*ha.Position([3 4]) 0.1 0.03];
+    legend({'<thr';'>thr'},'Location','eastoutside','Units','centimeters','Position',legend_pos);
+    text(2.2,0.15, {"thr="+thr;...
+                    sprintf('y1: n=%d/%d (%2.0f%%)',length(y1),length(y),100*length(y1)/length(y));...
+                    sprintf('y2: n=%d/%d (%2.0f%%)',length(y2),length(y),100*length(y2)/length(y))
+        }, 'Units','normalized','HorizontalAlignment','center');
 end
 
-%%
-if 0
-%%
-axes(panel_C(1));
-hold on
-text(-0.07,1.1, 'C', 'Units','normalized','FontWeight','bold');
-xlabel('')
-ylabel('')
+axes(panel_D(1));
+text(-0.3,1.1, 'D', 'Units','normalized','FontWeight','bold');
 
 
-%%
-axes(panel_D(1,1));
-hold on
-text(-0.25,1.15, 'D', 'Units','normalized','FontWeight','bold');
-xlabel('')
-ylabel('')
-
-%%
-axes(panel_E(1));
-hold on
-text(-0.07,1.1, 'E', 'Units','normalized','FontWeight','bold');
-xlabel('')
-ylabel('')
+%% add direction arrows
+arrow_x = 0.1 +[0 0.05];
+arrow_y = repelem(0.96,2);
+clear h
+h(1)=annotation('arrow',arrow_x,      arrow_y+0.008,  'Color', prm.graphics.colors.flight_directions{1});
+h(2)=annotation('arrow',flip(arrow_x),arrow_y      ,  'Color', prm.graphics.colors.flight_directions{2});
+[h.HeadWidth] = disperse([5 5]);
+[h.HeadLength] = disperse([5 5]);
 
 
-%%
-axes(panel_F(1,1));
-hold on
-text(-0.25,1.15, 'F', 'Units','normalized','FontWeight','bold');
-xlabel('')
-ylabel('')
 
-%%
-axes(panel_G);
-hold on
-text(-0.13,1.1, 'G', 'Units','normalized','FontWeight','bold');
-xlabel('')
-ylabel('')
 
-%%
-axes(panel_H);
-hold on
-text(-0.15,1.1, 'H', 'Units','normalized','FontWeight','bold');
-xlabel('')
-ylabel('')
-
-end
 
 
 %% print/save the figure
@@ -308,14 +449,6 @@ disp('figure was successfully saved to pdf/tiff/fig formats');
 
 
 
-%% local function to plot lines for landmarks
-function plot_LM(LM)
 
-ylimits = get(gca,'ylim');
-for ii_LM=1:length(LM)
-    x = LM(ii_LM).pos_proj;
-    plot(repelem(x,2) , ylimits, '-', 'color', 0.9.*[1 1 1], 'LineWidth',0.5)
-    text(x, ylimits(2)+0.02*diff(ylimits), LM(ii_LM).name, 'Rotation', 45, 'FontSize',8)
-end
+%%
 
-end

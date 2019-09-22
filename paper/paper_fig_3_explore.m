@@ -495,15 +495,20 @@ for ii_dir = 1:2
     pnl(ii_dir,1).select()
     x = abs([fields.LM_prev_by_peak]-[fields.LM_next_by_peak]);
     y = [fields.width_prc];
+    rng(0);
+    plot(x, y, '.', 'Color',c); % no jitter
+%     plot(x+0.5*(rand(size(x))-.5), y, '.', 'Color',c); % uniform jitter
+%     plot(x+0.1*randn(size(x)), y, '.', 'Color',c); % gaussian jitter
     lm = fitlm(x,y);
-    plot(x, y, '.', 'Color',c)
-    h=plot(lm);
-    h(1).Color = c;
-    h(1).Marker = '.';
+%     h=plot(lm);
+%     h(1).Color = c;
+%     h(1).Marker = '.';
     text(0.1,0.9,sprintf('R^2=%f, pval=%f',lm.Rsquared.Ordinary,lm.Coefficients.pValue(2)),'Units','normalized');
     xlabel('Inter Landmark distance (m)')
     ylabel('Field Size (m)')
     title("direction"+ii_dir,'Units','normalized','Position',[0.5 1.07])
+    h=gca;
+    h.Position(3) = 0.70*h.Position(3);
     
     %% violin plots
     pnl(ii_dir,2).select()
