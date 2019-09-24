@@ -43,18 +43,19 @@ set(gcf, 'Renderer', 'painters');
 annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none');
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
+color_by_bat = 0;
+
 % create panels
 panels_size = [4 4];
 panel_A = axes('position', [ 2 20 panels_size]);
 panel_B = axes('position', [ 7 20 panels_size]);
-panel_C = axes('position', [12 20 panels_size]);
-panel_D = axes('position', [ 2 14 panels_size]);
-panel_E = axes('position', [ 7 14 panels_size]);
-panel_F = axes('position', [12 14 panels_size]);
-panel_G = axes('position', [ 2  8 panels_size]);
-panel_H = axes('position', [ 7  8 panels_size]);
-panel_I = axes('position', [12  8 panels_size]);
-panel_legend_bat_colors = axes('position', [17 20 3 4]);
+panel_C = axes('position', [ 2 14 panels_size]);
+panel_D = axes('position', [ 7 14 panels_size]);
+% panel_E = axes('position', [ 2  8 panels_size]);
+% panel_F = axes('position', [ 7  8 panels_size]);
+if color_by_bat
+    panel_legend_bat_colors = axes('position', [17 20 3 4]);
+end
 
 %% load population data
 % =========================================================================
@@ -88,116 +89,81 @@ signif_both_dir_IX = all(pop_signif_TF,2);
 signif_at_least_one_dir_IX = any(pop_signif_TF,2);
 pop_details = cat(1,cells.details);
 pop_bat_number = [pop_details.bat];
-pop_bat_color = arrayfun(@(x)(prm.graphics.colors.bats(x)),pop_bat_number,'UniformOutput',0);
-
-%%
-% % % pop_data_field_count = nan(2,length(cells));
-% % % pop_data_field_size_mean = nan(2,length(cells));
-% % % pop_data_field_size_median = nan(2,length(cells));
-% % % pop_data_field_size_max = nan(2,length(cells));
-% % % pop_data_field_size_min = nan(2,length(cells));
-% % % pop_data_ratio_LS = nan(2,length(cells));
-% % % pop_data_SI = nan(2,length(cells));
-% % % pop_data_sparsity = nan(2,length(cells));
-% % % % arrange data
-% % % for ii_dir = 1:2
-% % %     for ii_cell = 1:length(cells)
-% % %         cell = cells(ii_cell);
-% % %         if ~cell.signif(ii_dir).TF
-% % %             continue;
-% % %         end
-% % %         fields = cell.fields{ii_dir};
-% % %         fields( [fields.in_low_speed_area] ) = []; % TODO: decide if we want those fields near the landing balls
-% % %         pop_data_field_count(ii_dir,ii_cell) = length(fields);
-% % %         pop_data_field_size_mean(ii_dir,ii_cell) = mean([fields.width_prc]);
-% % %         pop_data_field_size_median(ii_dir,ii_cell) = median([fields.width_prc]);
-% % %         pop_data_field_size_max(ii_dir,ii_cell) = max([fields.width_prc]);
-% % %         pop_data_field_size_min(ii_dir,ii_cell) = min([fields.width_prc]);
-% % %         pop_data_field_size_min(ii_dir,ii_cell) = min([fields.width_prc]);
-% % %     end
-% % %     
-% % % end
+if color_by_bat 
+    pop_bat_color = arrayfun(@(x)(prm.graphics.colors.bats(x)),pop_bat_number,'UniformOutput',0);
+else
+    pop_bat_color = arrayfun(@(x)([0 0 0]),pop_bat_number,'UniformOutput',0);
+end
 
 %% bat color legend panel
-axes(panel_legend_bat_colors);
-cla
-hold on
-cmap = prm.graphics.colors.bats;
-bats_num = cmap.keys;
-bats_num = [bats_num{:}];
-bats_colors = cmap.values;
-for ii_bat = 1:length(bats_num)
-    plot(1, ii_bat, '.', 'Color', bats_colors{ii_bat}, 'MarkerSize', 15);
-    text(2, ii_bat, "bat "+bats_num(ii_bat))
-end
-xlim([0.5 10])
-set(gca,'Visible','off')
+if color_by_bat 
+    axes(panel_legend_bat_colors);
+    cla
+    hold on
+    cmap = prm.graphics.colors.bats;
+    bats_num = cmap.keys;
+    bats_num = [bats_num{:}];
+    bats_colors = cmap.values;
+    for ii_bat = 1:length(bats_num)
+        plot(1, ii_bat, '.', 'Color', bats_colors{ii_bat}, 'MarkerSize', 15);
+        text(2, ii_bat, "bat "+bats_num(ii_bat))
+    end
+    xlim([0.5 10])
+    set(gca,'Visible','off')
+end 
 
-%% panel A - number of cells signif
+%% panel A - number of fields
 axes(panel_A);
 cla
 hold on
-
-% histogram(randn(1,100))
-% histogram(categorical(pop_bat_number));
-histogram(categorical(pop_bat_number(signif_at_least_one_dir_IX)));
-histogram(categorical(pop_bat_number(signif_both_dir_IX)));
-
 text(-0.1,1.1, 'A', 'Units','normalized','FontWeight','bold');
-xlabel('Bat')
-ylabel('No. cells')
-legend({'signif one dir';'signif both dir'},'Location','northoutside','Position',[0.15 0.91 0.03 0.02])
 
+x = [pop_stats_dir(signif_both_dir_IX,1).field_num];
+y = [pop_stats_dir(signif_both_dir_IX,2).field_num];
+c = cat(1,pop_bat_color{signif_both_dir_IX});
+plot_jitter_sigma = 0.16;
+rng(0);
+h=scatter(  x+plot_jitter_sigma*randn(size(x)),...
+            y+plot_jitter_sigma*randn(size(y)),5,c,'filled');
 
-%% panel B - Fields count
+[r,rpval] = corr(x',y','type','Pearson');
+[rho,rhopval] = corr(x',y','type','Spearman');
+signtest_pval = signtest(x,y);
+stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
+                sprintf('rho=%.2f,P=%g',rho,rhopval);
+                sprintf('sign test: P=%g',signtest_pval)};
+text(0.05,1, stats_str, 'units',...
+    'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+
+xlabel('dir1')
+ylabel('dir2')
+title('No. of fields')
+axis equal
+xlim([0 20])
+ylim([0 20])
+h=refline(1,0);
+h.Color = 0.5*[1 1 1];
+
+%% panel B - Fields Size (median)
 axes(panel_B);
 cla
 hold on
 text(-0.1,1.1, 'B', 'Units','normalized','FontWeight','bold');
 
-x = [pop_stats_dir(signif_both_dir_IX,1).field_num];
-y = [pop_stats_dir(signif_both_dir_IX,2).field_num];
-c = cat(1,pop_bat_color{signif_both_dir_IX});
-plot_jitter_sigma = 0.18;
-x = x + plot_jitter_sigma*randn(size(x));
-y = y + plot_jitter_sigma*randn(size(y));
-h=scatter(x,y,5,c,'filled');
-
-xlabel('dir1')
-ylabel('dir2')
-title('Fields count')
-axis equal
-xlim([0 20])
-ylim([0 20])
-
-%% panel C - Fields Size (mean)
-axes(panel_C);
-cla
-hold on
-text(-0.1,1.1, 'C', 'Units','normalized','FontWeight','bold');
-
-x = [pop_stats_dir(signif_both_dir_IX,1).field_size_mean];
-y = [pop_stats_dir(signif_both_dir_IX,2).field_size_mean];
-c = cat(1,pop_bat_color{signif_both_dir_IX});
-h=scatter(x,y,5,c,'filled');
-
-xlabel('dir1')
-ylabel('dir2')
-title('Fields size (mean)')
-axis equal
-xlim([0 max([x y])+1])
-ylim([0 max([x y])+1])
-
-%% panel D - Fields Size (median)
-axes(panel_D);
-cla
-hold on
-text(-0.1,1.1, 'D', 'Units','normalized','FontWeight','bold');
-
 x = [pop_stats_dir(signif_both_dir_IX,1).field_size_median];
 y = [pop_stats_dir(signif_both_dir_IX,2).field_size_median];
 c = cat(1,pop_bat_color{signif_both_dir_IX});
 h=scatter(x,y,5,c,'filled');
+
+[r,rpval] = corr(x',y','type','Pearson','rows','complete');
+[rho,rhopval] = corr(x',y','type','Spearman','rows','complete');
+signtest_pval = signtest(x,y);
+stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
+                sprintf('rho=%.2f,P=%g',rho,rhopval);
+                sprintf('sign test: P=%g',signtest_pval)};
+text(0.05,1, stats_str, 'units',...
+    'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+
 
 xlabel('dir1')
 ylabel('dir2')
@@ -205,96 +171,125 @@ title('Fields size (median)')
 axis equal
 xlim([0 max([x y])+1])
 ylim([0 max([x y])+1])
+h=refline(1,0);
+h.Color = 0.5*[1 1 1];
 
-%% panel E - Fields Size (Largest)
-axes(panel_E);
+%% panel C - ratio largest/smallest
+axes(panel_C);
 cla
 hold on
-text(-0.1,1.1, 'D', 'Units','normalized','FontWeight','bold');
-
-x = [pop_stats_dir(signif_both_dir_IX,1).field_largest];
-y = [pop_stats_dir(signif_both_dir_IX,2).field_largest];
-c = cat(1,pop_bat_color{signif_both_dir_IX});
-h=scatter(x,y,5,c,'filled');
-
-xlabel('dir1')
-ylabel('dir2')
-title('Fields size (largest)')
-axis equal
-xlim([0 max([x y])+1])
-ylim([0 max([x y])+1])
-
-%% panel F - Fields Size (mean)
-axes(panel_F);
-cla
-hold on
-text(-0.1,1.1, 'F', 'Units','normalized','FontWeight','bold');
-
-x = [pop_stats_dir(signif_both_dir_IX,1).field_smallest];
-y = [pop_stats_dir(signif_both_dir_IX,2).field_smallest];
-c = cat(1,pop_bat_color{signif_both_dir_IX});
-h=scatter(x,y,5,c,'filled');
-
-xlabel('dir1')
-ylabel('dir2')
-title('Fields size (smallest)')
-axis equal
-xlim([0 max([x y])+1])
-ylim([0 max([x y])+1])
-
-%% panel G - ratio largest/smallest
-axes(panel_G);
-cla
-hold on
-text(-0.1,1.1, 'G', 'Units','normalized','FontWeight','bold');
+text(-0.1,1.1, 'C', 'Units','normalized','FontWeight','bold');
 
 x = [pop_stats_dir(signif_both_dir_IX,1).field_ratio_LS];
 y = [pop_stats_dir(signif_both_dir_IX,2).field_ratio_LS];
 c = cat(1,pop_bat_color{signif_both_dir_IX});
 h=scatter(x,y,5,c,'filled');
 
+[r,rpval] = corr(x',y','type','Pearson','rows','complete');
+[rho,rhopval] = corr(x',y','type','Spearman','rows','complete');
+signtest_pval = signtest(x,y);
+stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
+                sprintf('rho=%.2f,P=%g',rho,rhopval);
+                sprintf('sign test: P=%g',signtest_pval)};
+text(0.05,1, stats_str, 'units',...
+    'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+
 xlabel('dir1')
 ylabel('dir2')
-title('ratio L/S')
+title('Ratio L/S')
 axis equal
 xlim([1 max([x y])+1])
 ylim([1 max([x y])+1])
+h=refline(1,0);
+h.Color = 0.5*[1 1 1];
 
-%% panel H - spatial info
-axes(panel_H);
+%% panel D - spatial info
+axes(panel_D);
 cla
 hold on
-text(-0.1,1.1, 'H', 'Units','normalized','FontWeight','bold');
+text(-0.1,1.1, 'D', 'Units','normalized','FontWeight','bold');
 
 x = [pop_stats_dir(signif_both_dir_IX,1).SI_bits_spike];
 y = [pop_stats_dir(signif_both_dir_IX,2).SI_bits_spike];
 c = cat(1,pop_bat_color{signif_both_dir_IX});
 h=scatter(x,y,5,c,'filled');
 
+[r,rpval] = corr(x',y','type','Pearson');
+[rho,rhopval] = corr(x',y','type','Spearman');
+signtest_pval = signtest(x,y);
+stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
+                sprintf('rho=%.2f,P=%g',rho,rhopval);
+                sprintf('sign test: P=%g',signtest_pval)};
+text(0.05,1, stats_str, 'units',...
+    'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+
 xlabel('dir1')
 ylabel('dir2')
-title('spatial info')
+title('Spatial info')
 axis equal
 xlim([0 max([x y])+1])
 ylim([0 max([x y])+1])
+h=refline(1,0);
+h.Color = 0.5*[1 1 1];
 
-%% panel I - sparsity
-axes(panel_I);
-cla
-hold on
-text(-0.1,1.1, 'I', 'Units','normalized','FontWeight','bold');
+%% panel E - AC width
+% % % axes(panel_E);
+% % % cla
+% % % hold on
+% % % text(-0.1,1.1, 'E', 'Units','normalized','FontWeight','bold');
+% % % 
+% % % x = [pop_stats_dir(signif_both_dir_IX,1).AC_width];
+% % % y = [pop_stats_dir(signif_both_dir_IX,2).AC_width];
+% % % c = cat(1,pop_bat_color{signif_both_dir_IX});
+% % % h=scatter(x,y,5,c,'filled');
+% % % 
+% % % [r,rpval] = corr(x',y','type','Pearson');
+% % % [rho,rhopval] = corr(x',y','type','Spearman');
+% % % signtest_pval = signtest(x,y);
+% % % stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
+% % %                 sprintf('rho=%.2f,P=%g',rho,rhopval);
+% % %                 sprintf('sign test: P=%g',signtest_pval)};
+% % % text(0.05,1, stats_str, 'units',...
+% % %     'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+% % % 
+% % % xlabel('dir1')
+% % % ylabel('dir2')
+% % % title('Spatial info')
+% % % axis equal
+% % % xlim([0 max([x y])+1])
+% % % ylim([0 max([x y])+1])
+% % % h=refline(1,0);
+% % % h.Color = 0.5*[1 1 1];
 
-x = [pop_stats_dir(signif_both_dir_IX,1).sparsity];
-y = [pop_stats_dir(signif_both_dir_IX,2).sparsity];
-c = cat(1,pop_bat_color{signif_both_dir_IX});
-h=scatter(x,y,5,c,'filled');
+%% panel F - AC width (zoom in)
+% % % axes(panel_F);
+% % % cla
+% % % hold on
+% % % text(-0.1,1.1, 'F', 'Units','normalized','FontWeight','bold');
+% % % 
+% % % x = [pop_stats_dir(signif_both_dir_IX,1).AC_width];
+% % % y = [pop_stats_dir(signif_both_dir_IX,2).AC_width];
+% % % c = cat(1,pop_bat_color{signif_both_dir_IX});
+% % % h=scatter(x,y,5,c,'filled');
+% % % 
+% % % [r,rpval] = corr(x',y','type','Pearson');
+% % % [rho,rhopval] = corr(x',y','type','Spearman');
+% % % signtest_pval = signtest(x,y);
+% % % stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
+% % %                 sprintf('rho=%.2f,P=%g',rho,rhopval);
+% % %                 sprintf('sign test: P=%g',signtest_pval)};
+% % % text(0.05,1, stats_str, 'units',...
+% % %     'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+% % % 
+% % % xlabel('dir1')
+% % % ylabel('dir2')
+% % % title('Spatial info')
+% % % axis equal
+% % % xlim([0 20])
+% % % ylim([0 20])
+% % % h=refline(1,0);
+% % % h.Color = 0.5*[1 1 1];
 
-xlabel('dir1')
-ylabel('dir2')
-title('sparsity')
-axis equal
-xlim([0 1])
-ylim([0 1])
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, fig_name_str);

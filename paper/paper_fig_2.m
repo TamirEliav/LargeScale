@@ -71,7 +71,7 @@ panel_BCDE_size = [2 2];
 panel_B = axes('position', [ 2  10.5 panel_BCDE_size ]);
 panel_C = axes('position', [ 5  10.5 panel_BCDE_size ]);
 panel_D = axes('position', [ 8  10.5 panel_BCDE_size ]);
-panel_E = axes('position', [ 11 10.5 panel_BCDE_size ]);
+panel_E = axes('position', [ 11 10.5 panel_BCDE_size.*[1.2 1] ]);
 
 panel_FGH_size = [2 2];
 panel_F = axes('position', [2   7  panel_FGH_size ]);
@@ -236,8 +236,6 @@ for ii_dir = 1:2
         if ~cell.signif(ii_dir).TF % check signif per direction
             continue;
         end
-        % TODO: this include the fields in the low speed areas, make sure
-        % we want this!
         nFields(ii_dir,ii_cell) = cell.stats.dir(ii_dir).field_num;
     end
     h = histogram(nFields(ii_dir,:));
@@ -300,9 +298,6 @@ for ii_cell = 1:length(cells)
     if ~all([cell.signif.TF]) % at least one direction is significant
         continue;
     end
-    % TODO: what to do if we have only 1 field?!?!
-    % TODO: note that for this panel we pool directions, but for the next
-    % one we also separate directions
     LS_field_size(1,ii_cell) = cell.stats.all.field_smallest;
     LS_field_size(2,ii_cell) = cell.stats.all.field_largest;
 end
@@ -341,24 +336,26 @@ LS_field_ratio_dir = nan(2,length(cells));
 for ii_cell = 1:length(cells)
     cell = cells(ii_cell);
     if any([cell.signif.TF]) % check at least one direction is signif
+        % TODO: we only check signif here, but not in the cell_stats code
+        % where we actuall calcualte cell.stats.all.field_ratio_LS! 
         LS_field_ratio_all(ii_cell) = cell.stats.all.field_ratio_LS;
     end
     for ii_dir = 1:2
         if cell.signif(ii_dir).TF % check signif per direction
-            LS_field_ratio_dir(:,ii_cell) = cell.stats.dir(ii_dir).field_ratio_LS;
+            LS_field_ratio_dir(ii_dir,ii_cell) = cell.stats.dir(ii_dir).field_ratio_LS;
         end
     end
 end
 LS_field_ratio_dir = LS_field_ratio_dir(:);
-LS_field_ratio_dir(isnan(LS_field_ratio_dir)) = [];
-LS_field_ratio_all(isnan(LS_field_ratio_all)) = [];
+% LS_field_ratio_dir(isnan(LS_field_ratio_dir)) = [];
+% LS_field_ratio_all(isnan(LS_field_ratio_all)) = [];
 edges = linspace(1,ceil(max(max(LS_field_ratio_all))),9);
 clear h
-h(1) = histogram(LS_field_ratio_dir);
+% h(1) = histogram(LS_field_ratio_dir);
 h(2) = histogram(LS_field_ratio_all);
-h(1).BinEdges = edges;
+% h(1).BinEdges = edges;
 h(2).BinEdges = edges;
-h(1).FaceColor = 'g';
+% h(1).FaceColor = 'g';
 h(2).FaceColor = 0.5*[1 1 1];
 % h(1).BinLimits = [1 h(1).BinLimits([2])];
 % h(2).BinLimits = [1 h(2).BinLimits([2])];
@@ -366,11 +363,11 @@ h(2).FaceColor = 0.5*[1 1 1];
 % h.FaceColor = prm.graphics.colors.flight_directions{ii_dir};
 % legend({'per cell';'per direction'})
 ha=gca;
-% ha.YScale = 'log';
-ha.YScale = 'linear';
-% ha.XLim = [0 35];
-ha.YLim = [0 10];
-% ha.YLim = [0 260];
+ha.YScale = 'log';
+% ha.YScale = 'linear';
+ha.XLim = [0 25];
+% ha.YLim = [0 10];
+ha.YLim = [7e-1 260];
 % ha.XTick = [0:5:35];
 ha.YTick = [1 10 100];
 ha.TickDir='out';
@@ -401,7 +398,7 @@ hold on
 text(-0.15,1.15, 'F', 'Units','normalized','FontWeight','bold');
 h = histogram(SI);
 h.NumBins = 12;
-h.FaceColor = 'k';
+h.FaceColor = 0.5*[1 1 1];
 ha=gca;
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
@@ -417,7 +414,7 @@ hold on
 text(-0.15,1.15, 'G', 'Units','normalized','FontWeight','bold');
 h = histogram(sparsity);
 h.NumBins = 10;
-h.FaceColor = 'k';
+h.FaceColor = 0.5*[1 1 1];
 ha=gca;
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
@@ -427,20 +424,40 @@ xlabel('Sparsity', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('Count', 'Units','normalized','Position',[-0.2 0.5])
 
 %% panel H - map correlations histogram
-axes(panel_H);
+figure
+% axes(panel_H);
 cla
 hold on
 text(-0.15,1.15, 'H', 'Units','normalized','FontWeight','bold');
-maps_dir_corr = [];
-for ii_cell = 1:length(cells)
-        cell = cells(ii_cell);
-        maps_dir_corr(ii_cell) = corr(...
-             cell.FR_map(1).all.PSTH',...
-             cell.FR_map(2).all.PSTH','rows', 'complete');
+
+% arrange data
+signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
+FR_maps_all = cat(1,cells.FR_map);
+FR_maps_all = reshape([FR_maps_all.all],size(FR_maps_all,1),size(FR_maps_all,2),[]);
+M = cat(1,FR_maps_all.PSTH);
+M = reshape(M,size(FR_maps_all,1),size(FR_maps_all,2),[]);
+signif = repmat(signif,1,1,size(M,3));
+M(~signif) = nan;
+ccc = corr(squeeze(M(:,1,:))', squeeze(M(:,2,:))' ,'rows', 'pairwise');
+data = diag(ccc);
+switch 2
+    case 1 % compare all PSTH from other cells/dir
+        M2 = reshape(M,size(M,1)*size(M,2),[]);
+        ccc_shuffle = corr(M2' ,'rows', 'pairwise');
+        mask = tril(true(size(ccc_shuffle)),-1);
+        shuffle = ccc_shuffle(mask);
+    case 2 % compare only different cells betweeb different directions
+        mask = tril(true(size(ccc)),-1);
+        shuffle = ccc(mask);
 end
-% maps_dir_corr(~all(signif')) = [];
-h = histogram(maps_dir_corr);
-h.FaceColor = 'k';
+
+% plot
+edges = -1:0.1:1;
+histogram(data,    'Normalization','pdf','BinEdges',edges,'FaceColor', 0.5*[1 1 1]);
+histogram(shuffle, 'Normalization','pdf','BinEdges',edges,'DisplayStyle','stairs','EdgeColor','k','LineWidth',1.5);
+[h,pKS] = kstest2(diag(ccc), ccc_shuffle(mask));
+text(0.9,0.9, sprintf('P_{KS}=%.2f',pKS),'Units','normalized','FontSize',7);
+
 ha= gca;
 ha.XLim = [-1 1];
 ha.XTick = -1:0.5:1;
@@ -452,7 +469,7 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel('Map correlation', 'Units','normalized','Position',[0.5 -0.17])
-ylabel('Count', 'Units','normalized','Position',[-0.2 0.5])
+ylabel('PDF', 'Units','normalized','Position',[-0.2 0.5])
 
 %% panels I&J - prepare data
 distances_all = [];
@@ -480,10 +497,12 @@ axes(panel_I);
 cla
 hold on
 text(-0.2,1.1, 'I', 'Units','normalized','FontWeight','bold');
-plot(abs(field_vel_all) , field_size_all ,'.k', 'MarkerSize',3)
-% plot(abs(field_vel2_all) , field_size_all ,'.k')
+x = abs(field_vel_all);
+% x = abs(field_vel2_all);
+y =  field_size_all;
+plot(x ,y, '.k', 'MarkerSize',3)
 ha = gca;
-ha.XLim = [4 10];
+ha.XLim = [4.5 9.5];
 ha.YLim = [0 35];
 ha.XTick = [5 7 9];
 ha.YTick = [0 10 20 30];
@@ -493,6 +512,19 @@ ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel('Speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]) 
 ylabel('Field size (m)', 'units','normalized', 'Position',[-0.15 0.5])
+IX = find(x>=ha.XLim(1) & x<=ha.XLim(end));
+[r,rpval] = corr(x(IX)', y(IX)','type','Pearson');
+[rho,rhopval] = corr(x(IX)', y(IX)','type','Spearman');
+lm = fitlm(x(IX),y(IX));
+% ksdensity([x(IX);y(IX)]','PlotFcn','contour');
+panel_I_stat_res_str = {
+    'panel I statistics:'
+    sprintf('xlim=%.1f-%.1f',ha.XLim)
+    sprintf('pearson r=%d, pval=%d',r,rpval)
+    sprintf('spearman rho=%d, pval=%d',rho,rhopval)
+    };
+annotation('textbox', [0.5 0.1 0.6 0.1], 'String',panel_I_stat_res_str,...
+    'HorizontalAlignment','Left','Interpreter','none','FitBoxToText','on');
 
 %% panel J - field diff(size) vs. distance
 axes(panel_J(1));

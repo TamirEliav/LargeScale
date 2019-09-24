@@ -5,8 +5,8 @@ clear
 clc
 
 %% choose data options
-panel_G_opt = 6;
-panel_H_opt = 7;
+panel_G_opt = 1;
+panel_I_opt = 6;
 panel_J_opt = 10;
 
 %% define output files
@@ -316,7 +316,7 @@ h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dcm
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
 
 % panel_H_opt = 1;
-panel_H_data_options = {
+panel_I_data_options = {
     'b0034_d180313', 1, 160;...
     'b0034_d180314', 1, 175;...
     'b0079_d160928', 1, 135;...
@@ -329,9 +329,9 @@ YZ_dev_plot_opt = 'data';
 % YZ_dev_plot_opt = 'illustration';
 switch YZ_dev_plot_opt
     case 'data'
-        exp_ID = panel_H_data_options{panel_H_opt,1};
-        direction = panel_H_data_options{panel_H_opt,2};
-        x0 = panel_H_data_options{panel_H_opt,3};
+        exp_ID = panel_I_data_options{panel_I_opt,1};
+        direction = panel_I_data_options{panel_I_opt,2};
+        x0 = panel_I_data_options{panel_I_opt,3};
         load("L:\Analysis\Results\exp\pos_XYZ\"+exp_ID+"_pos_XYZ.mat");
         YZ0 = XYZ.YZ_by_dir{direction};
         YZ_mean = nanmean(YZ0,1);
@@ -497,7 +497,7 @@ hold on
 text(-0.1,1.1, 'G', 'Units','normalized','FontWeight','bold');
 % panel_G_opt = 1;
 panel_G_data_options = {
-'b0034_d180413';
+'b0034_d180413'; % TODO: verify this option is from a CA1 day!!!!
 'b2289_d180514';
 'b2289_d180515';
 'b2289_d180518';
@@ -539,7 +539,7 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors
 
 
 %% behavioral trajectory is 1D (small y deviations) - population
-% use exps that we recorded cells (TODO: consider using 
+% TODO: use exps that we recorded cells
 cells_t = DS_get_cells_summary();
 bats = [79,148,34,9861,2289];
 cells_t(~ismember(cells_t.bat, bats ),:) = [];
@@ -789,7 +789,7 @@ if total_dist_by_dir
         h=histogram(total_distance);
         h.NumBins = 15;
         h.BinEdges = h.BinEdges + (ii_dir-1)*0.3*h.BinWidth;
-        h.FaceColor = [1 1 1];
+        h.FaceColor = 0.5.*[1 1 1];
         h.EdgeColor = dir_colors{ii_dir};
         h.Normalization = 'Count';
         h.FaceAlpha = 0;
@@ -804,10 +804,9 @@ else
     
 %     h.NumBins = 15;
     h.BinEdges = linspace(0,25,15);
-    h.FaceColor = [1 1 1];
+    h.FaceColor = 0.5.*[1 1 1];
     h.EdgeColor = 'k';
     h.Normalization = 'Count';
-    h.FaceAlpha = 0;
     h.LineWidth = 1;
     ha=gca;
     ha.XLim = [0 25];
@@ -824,7 +823,7 @@ ylabel('Counts','Units','normalized','Position',[-0.2 0.5]);
 data_opt_str = {
     'data options:'
     sprintf('panel G - option %d: %s               ',panel_G_opt,panel_G_data_options{panel_G_opt});
-    sprintf('panel H - option %d: %s, dir=%d, x0=%d',panel_H_opt,panel_H_data_options{panel_H_opt,:});
+    sprintf('panel I - option %d: %s, dir=%d, x0=%d',panel_I_opt,panel_I_data_options{panel_I_opt,:});
     sprintf('panel J - option %d: %s               ',panel_J_opt,panel_J_data_options{panel_J_opt});
     
     };
@@ -832,7 +831,7 @@ annotation('textbox', [0.2 0.2 0.6 0.1], 'String',data_opt_str, 'HorizontalAlign
 
 %% print/save the figure
 fig_name_str = fig_name_str+"_G_opt"+panel_G_opt;
-fig_name_str = fig_name_str+"_H_opt"+panel_H_opt;
+fig_name_str = fig_name_str+"_I_opt"+panel_I_opt;
 fig_name_str = fig_name_str+"_J_opt"+panel_J_opt;
 fig_name_out = fullfile(res_dir, fig_name_str);
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');

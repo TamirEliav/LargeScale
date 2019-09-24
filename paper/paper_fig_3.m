@@ -118,7 +118,7 @@ for ii_dir = 1:2
     for ii_LM=1:length(LM)
         x = LM(ii_LM).pos_proj;
         name = LM(ii_LM).name;
-        h=xline(x, '-', 'color', 0.9.*[1 1 1], 'LineWidth',0.5);
+        h=xline(x, '-', 'color', 0.5.*[1 1 1], 'LineWidth',1);
 %         text(x, ylimits(2)+ypos*diff(ylimits), LM(ii_LM).name, 'Rotation', 45, 'FontSize',8);
     end
     
@@ -137,6 +137,7 @@ axes(panel_A(1));
 text(-0.13,1.1, 'A', 'Units','normalized','FontWeight','bold');
 
 %% add arrows indicating over-represented LM
+if 0
 axes(panel_A(1));
 xa = [70 80] - 1;
 ya = [0.45 0.4] + 0.01;
@@ -154,7 +155,7 @@ h=annotation('arrow', xaf,yaf);
 h.HeadWidth=5;
 h.HeadLength = 5;
 h.LineStyle='none';
-
+end
 
 
 
@@ -204,6 +205,7 @@ for ii_dir = 1:2
     
     %% shuffle!
     rng(0);
+    shuffle = struct();
     shuffle.n = 10000;
     limits = [min([LM.pos_proj]) max([LM.pos_proj])];
 %     limits = prm.fields.valid_speed_pos;
@@ -249,7 +251,7 @@ for ii_dir = 1:2
     h2.EdgeColor = 'k';
     h2.LineWidth = 2;
     [H,P,KSSTAT] = kstest2(x1,x2);
-    text(1,1,sprintf('p=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
+    text(1,1,sprintf('P_{KS}=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
     xline(0,'-','LineWidth',2);
     
     % labels & graphics
@@ -269,7 +271,7 @@ for ii_dir = 1:2
     ha.YTick = ha.YLim;
     ha.XRuler.TickLabelGapMultiplier = -0.3;
     ha.YRuler.TickLabelGapMultiplier = 0.001;
-    xlabel('Distance from landmark (m)', 'Units','normalized','Position',[0.5 -0.13])
+    xlabel({'Distance to nearest landmark (m)'}, 'Units','normalized','Position',[0.5 -0.13])
     ylabel('PDF', 'Units','normalized','Position',[-0.08 0.5])
 end
 
@@ -291,16 +293,19 @@ for ii_dir = 1:2
     cells_dir = cells([signif(:,ii_dir).TF]);
     fields = cellfun(@(x)(x{ii_dir}), {cells_dir.fields},'UniformOutput',0);
     fields =[fields{:}];
-    fields( [fields.in_low_speed_area] ) = []; % TODO: decide if we want those fields near the landing balls
+    fields( [fields.in_low_speed_area] ) = [];
     
     % plot cdf
     c = prm.graphics.colors.flight_directions{ii_dir};
     x = [fields.loc];
     y = [fields.width_prc];
-    y_clipping = 25;
+    y_clipping = 20;
     y(y>y_clipping) = y_clipping;
-    plot(x,y,'.','MarkerSize',4, 'Color',c);
-        
+%     plot(x,y,'.','MarkerSize',4, 'Color',c);
+    plot(x(y< y_clipping), y(y< y_clipping),'.','MarkerSize',4, 'Color',c);
+    plot(x(y>=y_clipping), y(y>=y_clipping),'o','MarkerSize',4, 'Color',c);
+%     yline(20)
+    
     % plot LM
     ypos = 0.02;
     angle = 45;
@@ -332,6 +337,8 @@ text(-0.13,1.1, 'C', 'Units','normalized','FontWeight','bold');
 %% panel D - field size - near vs. far from LM
 % =========================================================================
 % figure
+axes(panel_D(1));
+text(-0.3,1.1, 'D', 'Units','normalized','FontWeight','bold');
 for ii_dir = 1:2
 %     subplot(1,2,ii_dir)
     axes(panel_D(ii_dir));
@@ -377,8 +384,8 @@ for ii_dir = 1:2
     c = prm.graphics.colors.flight_directions{ii_dir};
     x = abs([fields.loc] - [fields.LM_nearest_by_peak]);
     y = [fields.width_prc];
-    thr = median(x);
-%     thr = 5;
+%     thr = median(x);
+    thr = 5;
     y1 = y(x<thr);
     y2 = y(x>=thr);
     
@@ -399,7 +406,7 @@ for ii_dir = 1:2
     h2.EdgeColor = c;
     h2.LineWidth = 2;
     [H,P,KSSTAT] = kstest2(y1,y2);
-    text(1,1,sprintf('p=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
+    text(1,1,sprintf('P_{KS}=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
     
     % labels & graphics
     ha= gca;
@@ -411,16 +418,24 @@ for ii_dir = 1:2
     ha.YRuler.TickLabelGapMultiplier = 0.001;
     xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.13]);
     ylabel('PDF', 'Units','normalized','Position',[-0.08 0.5]);
-    legend_pos = [ha.Position([1 2])+[2.2 0.5].*ha.Position([3 4]) 0.1 0.03];
-    legend({'<thr';'>thr'},'Location','eastoutside','Units','centimeters','Position',legend_pos);
-    text(2.2,0.15, {"thr="+thr;...
-                    sprintf('y1: n=%d/%d (%2.0f%%)',length(y1),length(y),100*length(y1)/length(y));...
-                    sprintf('y2: n=%d/%d (%2.0f%%)',length(y2),length(y),100*length(y2)/length(y))
-        }, 'Units','normalized','HorizontalAlignment','center');
+%     legend_pos = [ha.Position([1 2])+[2.2 0.5].*ha.Position([3 4]) 0.1 0.03];
+%     legend({'<thr';'>thr'},'Location','eastoutside','Units','centimeters','Position',legend_pos);
+%     text(2.2,0.15, {"thr="+thr;...
+%                     sprintf('y1: n=%d/%d (%2.0f%%)',length(y1),length(y),100*length(y1)/length(y));...
+%                     sprintf('y2: n=%d/%d (%2.0f%%)',length(y2),length(y),100*length(y2)/length(y))
+%         }, 'Units','normalized','HorizontalAlignment','center');
+    
+    % add legend
+    leg_ax = axes('position', [ha.Position([1 2])+[0.65 0.5].*ha.Position([3 4]) [0.2 0.3].*ha.Position([3 4])]);
+    hold on
+    plot([1 2],[1 1], 'Color',c, 'LineWidth',1);
+    plot([1 2],[2 2], 'Color',c, 'LineWidth',2);
+    xlim([0 3]);
+    ylim([0 3]);
+    text(3,1, "Distance$<$"   +thr+"m",'FontSize',7,'Interpreter','latex')
+    text(3,2, "Distance$\geq$"+thr+"m",'FontSize',7,'Interpreter','latex')
+    set(gca,'Visible','off');
 end
-
-axes(panel_D(1));
-text(-0.3,1.1, 'D', 'Units','normalized','FontWeight','bold');
 
 
 %% add direction arrows
