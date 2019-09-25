@@ -1,4 +1,4 @@
-%% Large Scale - fig 2 - Behavioral and neural recordings from bats fliying over large spatial scales.
+%% Large Scale - fig 3
 
 %%
 clear 
@@ -85,7 +85,7 @@ whos cells
 exp_ID = 'b2289_d180615';
 exp = exp_load_data(exp_ID,'LM');
 LM = exp.LM;
-LM([1 2 end]) = [];
+LM( contains({LM.name},{'ball','enter'}) ) = [];
 
 %% panel A - field pos CDF
 % =========================================================================
@@ -101,7 +101,7 @@ for ii_dir = 1:2
     cells_dir = cells([signif(:,ii_dir).TF]);
     fields = cellfun(@(x)(x{ii_dir}), {cells_dir.fields},'UniformOutput',0);
     fields =[fields{:}];
-    fields( [fields.in_low_speed_area] ) = []; % TODO: decide if we want those fields near the landing balls
+    fields( [fields.in_low_speed_area] ) = [];
     
     % plot cdf
     h = cdfplot([fields.loc]);

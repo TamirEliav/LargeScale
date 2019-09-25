@@ -521,6 +521,79 @@ figname = 'fields_size_vs_inter_LM_dist';
 file_out = fullfile(dir_out,figname);
 saveas(gcf, file_out, 'tif')
 
+%% field count vs. inter-LM-distance
+% =========================================================================
+figure('Units','normalized','Position',[0.2 0.2 0.4 0.5])
+pnl = panel();
+pnl.pack('h',2);
+pnl.margin = [15 15 15 20];
+h=pnl.title('No. of fields size vs. inter-landmarks-distance');
+h.FontSize = 16;
+h.Position = [0.5 1.07];
+LM = exp.LM;
+LM( contains({LM.name},{'ball','enter'}) ) = [];
+for ii_dir = 1:2
+    %% arrange data
+    signif = cat(1,cells.signif);
+    cells_dir = cells([signif(:,ii_dir).TF]);
+    fields = cellfun(@(x)(x{ii_dir}), {cells_dir.fields},'UniformOutput',0);
+    fields =[fields{:}];
+    switch ii_dir
+        case 1
+            start_ind = 1;
+            end_ind = 2;
+            interp_next = 'next';
+            interp_prev = 'previous';
+        case 2
+            start_ind = 2;
+            end_ind = 1;
+            interp_next = 'previous';
+            interp_prev = 'next';
+    end
+    edges = cat(1,fields.edges_prc);
+    [fields.start] = disperse(edges(:,start_ind));
+    [fields.end]   = disperse(edges(:,end_ind  ));
+  
+    [fields.LM_nearest_by_peak]  = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.loc]  , 'nearest'));
+    [fields.LM_nearest_by_start] = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.start] , 'nearest'));
+    [fields.LM_nearest_by_end]   = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.end]   , 'nearest'));
+    [fields.LM_next_by_peak]  = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.loc]  , interp_next));
+    [fields.LM_next_by_start] = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.start] , interp_next));
+    [fields.LM_next_by_end]   = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.end]   , interp_next));
+    [fields.LM_prev_by_peak]  = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.loc]  , interp_prev));
+    [fields.LM_prev_by_start] = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.start] , interp_prev));
+    [fields.LM_prev_by_end]   = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields.end]   , interp_prev));
+    
+    % remove fields near balls
+    fields([fields.in_low_speed_area])=[];
+    fields(isnan([fields.LM_nearest_by_peak])) = [];
+    
+    %% scatter plot with linear fit
+    c = prm.graphics.colors.flight_directions{ii_dir};
+    x = abs([fields.LM_prev_by_peak]-[fields.LM_next_by_peak]);
+    y = [fields.width_prc];
+    [C,IA,IC] = unique(x);
+    n = accumarray(IC,y,[],@length);
+    m = length(y) / range([fields.LM_next_by_peak]);
+    
+    pnl(ii_dir).select()
+    plot(C,n,'.','Color',c);
+    
+    xlabel('Inter Landmark distance (m)');
+    ylabel('No. of fields');
+    ha=gca;
+    ha.XLim(1) = 0;
+    ha.YLim(1) = 0;
+    h=refline(m,0);
+    h.Color = 0.5*[1 1 1];
+    text(0,1,"slope="+m+" (total no. of fields / area covered)",'HorizontalAlignment','left','VerticalAlignment','top','Units','normalized');
+    title("direction "+ii_dir);
+end
+% save figure
+figname = 'No_of_fields_vs_inter_LM_dist';
+file_out = fullfile(dir_out,figname);
+saveas(gcf, file_out, 'tif')
+
 
 %% Fields locations cdf
 % =========================================================================
