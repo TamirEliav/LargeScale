@@ -538,17 +538,44 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors
 [h.HeadLength] = disperse([5 5]);
 
 
-%% behavioral trajectory is 1D (small y deviations) - population
-% TODO: use exps that we recorded cells
+%% load population data
+% get list of significant cells (at least in one direction)
+% ---------------------------------------------------------
 cells_t = DS_get_cells_summary();
+% choose bats
 bats = [79,148,34,9861,2289];
 cells_t(~ismember(cells_t.bat, bats ),:) = [];
+% choose good clusters from CA1
 cells = cellfun(@(c)(cell_load_data(c,'details')), cells_t.cell_ID, 'UniformOutput',0);
 cells = [cells{:}];
 cells = [cells.details];
 cells(~contains({cells.brain_area}, 'CA1')) = [];
 cells(~ismember([cells.ClusterQuality], [2])) = [];
-exp_list = unique({cells.exp_ID}'); % get the relevant exp list
+% choose pyramidal cells only
+cells = cellfun(@(c)(cell_load_data(c,'details','stats')), {cells.cell_ID}, 'UniformOutput',0);
+cells = [cells{:}];
+stats = [cells.stats];
+stats = [stats.all];
+cells([stats.meanFR_all]>prm.inclusion.interneuron_FR_thr)=[];
+% choose only signif cells (in any direction)
+cells_details = [cells.details];
+cells = cellfun(@(c)(cell_load_data(c,'details','signif')), {cells_details.cell_ID}, 'UniformOutput',0);
+cells = [cells{:}];
+signif = cat(1,cells.signif);
+signif = arrayfun(@(x)(x.TF), signif);
+signif = any(signif,2);
+cells(~signif)=[];
+
+% load the final list of cells
+cells_details = [cells.details];
+clear cells stats signif cells_t
+cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map')), {cells_details.cell_ID}, 'UniformOutput',0);
+cells = [cells{:}];
+
+% load exp data
+cells_details = [cells.details];
+exps_IDs = {cells_details.exp_ID};
+exp_list = unique(exps_IDs);
 exps = cellfun(@(x)(exp_load_data(x,'details','flight')), exp_list);
 exps_details = [exps.details];
 exps_flight = [exps.flight];
@@ -556,8 +583,7 @@ pos_y_dev_all = cat(1,exps_flight.pos_y_std);
 speed_traj_all = cat(1,exps_flight.speed_traj);
 ystd_median_all = arrayfun(@(x)(x.ystd_median), pos_y_dev_all);
 
-%% cont...
-% TODO: take only exp from with cells included in analysis
+%% behavioral trajectory is 1D (small y deviations) - population
 axes(panel_H);
 cla
 text(-0.3,1.1, 'H', 'Units','normalized','FontWeight','bold');
@@ -699,8 +725,7 @@ xlabel('Position (m)');
 ylabel('Speed (m/s)');
 
 
-%% speed trajectory very constant along the flight - population
-% KLM - TODO: use only valid flights + signif place cell in that day!
+%% panel K - speed trajectory very constant along the flight - population
 axes(panel_K);
 cla
 hold on
@@ -735,7 +760,7 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors
 [h.HeadWidth] = disperse([5 5]);
 [h.HeadLength] = disperse([5 5]);
 
-%% number of laps
+%% panel L - number of laps
 axes(panel_L);
 cla
 hold on
@@ -771,7 +796,7 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors
 [h.HeadWidth] = disperse([5 5]);
 [h.HeadLength] = disperse([5 5]);
 
-%% Total distance 
+%% panel M - Total distance 
 axes(panel_M);
 cla 
 hold on

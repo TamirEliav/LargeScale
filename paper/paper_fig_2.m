@@ -1,11 +1,6 @@
 %% Large Scale - fig 2 - Behavioral and neural recordings from bats fliying over large spatial scales.
 
 %%
-% TODO: make sure to use only included cells
-% TODO: check conditions for which data we are taking in the histograms
-% panels (B->end)
-
-%%
 clear 
 clc
 
@@ -232,8 +227,8 @@ nFields = nan(2,length(cells));
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
         cell = cells(ii_cell);
-        % TODO: check signif definition!
-        if ~cell.signif(ii_dir).TF % check signif per direction
+        % check signif per direction
+        if ~cell.signif(ii_dir).TF
             continue;
         end
         nFields(ii_dir,ii_cell) = cell.stats.dir(ii_dir).field_num;
@@ -335,13 +330,13 @@ LS_field_ratio_all = nan(1,length(cells));
 LS_field_ratio_dir = nan(2,length(cells));
 for ii_cell = 1:length(cells)
     cell = cells(ii_cell);
-    if any([cell.signif.TF]) % check at least one direction is signif
-        % TODO: we only check signif here, but not in the cell_stats code
-        % where we actuall calcualte cell.stats.all.field_ratio_LS! 
+    % pooled stats - check at least one direction is signif
+    if any([cell.signif.TF])
         LS_field_ratio_all(ii_cell) = cell.stats.all.field_ratio_LS;
     end
+    % per dir stats - check signif per direction
     for ii_dir = 1:2
-        if cell.signif(ii_dir).TF % check signif per direction
+        if cell.signif(ii_dir).TF 
             LS_field_ratio_dir(ii_dir,ii_cell) = cell.stats.dir(ii_dir).field_ratio_LS;
         end
     end
@@ -424,8 +419,8 @@ xlabel('Sparsity', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('Count', 'Units','normalized','Position',[-0.2 0.5])
 
 %% panel H - map correlations histogram
-figure
-% axes(panel_H);
+% figure
+axes(panel_H);
 cla
 hold on
 text(-0.15,1.15, 'H', 'Units','normalized','FontWeight','bold');
@@ -455,7 +450,7 @@ end
 edges = -1:0.1:1;
 histogram(data,    'Normalization','pdf','BinEdges',edges,'FaceColor', 0.5*[1 1 1]);
 histogram(shuffle, 'Normalization','pdf','BinEdges',edges,'DisplayStyle','stairs','EdgeColor','k','LineWidth',1.5);
-[h,pKS] = kstest2(diag(ccc), ccc_shuffle(mask));
+[h,pKS] = kstest2(data, shuffle);
 text(0.9,0.9, sprintf('P_{KS}=%.2f',pKS),'Units','normalized','FontSize',7);
 
 ha= gca;

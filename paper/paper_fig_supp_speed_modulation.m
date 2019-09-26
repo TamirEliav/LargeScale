@@ -95,9 +95,9 @@ pop_bat_number = [pop_details.bat];
 
 %% panels A&B
 % =========================================================================
-% averaging_method = 'mean';
+averaging_method = 'mean';
 % averaging_method = 'median';
-averaging_method = 'AC_width';
+% averaging_method = 'AC_width';
 stats_str = {};
 for ii_bat = 1:length(bats)
 

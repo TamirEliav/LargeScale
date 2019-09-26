@@ -342,7 +342,7 @@ text(-0.3,1.1, 'D', 'Units','normalized','FontWeight','bold');
 for ii_dir = 1:2
 %     subplot(1,2,ii_dir)
     axes(panel_D(ii_dir));
-    cla
+%     cla
     hold on
     
     %% arrange data
@@ -436,7 +436,6 @@ for ii_dir = 1:2
     text(3,2, "Distance$\geq$"+thr+"m",'FontSize',7,'Interpreter','latex')
     set(gca,'Visible','off');
 end
-
 
 %% add direction arrows
 arrow_x = 0.1 +[0 0.05];

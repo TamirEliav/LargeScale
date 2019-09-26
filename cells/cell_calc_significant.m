@@ -24,7 +24,7 @@ for ii_dir = 1:2
     % has enough full flights
     has_min_flights = length(cell.FE{ii_dir}) >= prm.inclusion.min_full_flights;
     % has enough spikes during flight
-    has_min_spikes = length(cell.FE{ii_dir}) >= prm.inclusion.min_spikes_air;
+    has_min_spikes = sum([cell.FE{ii_dir}.num_spikes]) >= prm.inclusion.min_spikes_air;
     
     %% apply all conditions
     TF = true;
