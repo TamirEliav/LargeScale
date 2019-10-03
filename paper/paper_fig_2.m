@@ -63,15 +63,15 @@ panel_A = panel_A(:,3:-1:1,:);
 panel_A = reshape(panel_A,[9 3]);
 
 panel_BCDE_size = [2 2];
-panel_B = axes('position', [ 2  10.5 panel_BCDE_size ]);
-panel_C = axes('position', [ 5  10.5 panel_BCDE_size ]);
-panel_D = axes('position', [ 8  10.5 panel_BCDE_size ]);
-panel_E = axes('position', [ 11 10.5 panel_BCDE_size.*[1.2 1] ]);
+panel_B = axes('position', [ 2.0  10.5 panel_BCDE_size ]);
+panel_C = axes('position', [ 5.3  10.5 panel_BCDE_size ]);
+panel_D = axes('position', [ 8.6  10.5 panel_BCDE_size ]);
+panel_E = axes('position', [11.9  10.5 panel_BCDE_size.*[1.2 1] ]);
 
 panel_FGH_size = [2 2];
-panel_F = axes('position', [2   7  panel_FGH_size ]);
-panel_G = axes('position', [5   7  panel_FGH_size ]);
-panel_H = axes('position', [8   7  panel_FGH_size ]);
+panel_F = axes('position', [2.0  7  panel_FGH_size ]);
+panel_G = axes('position', [5.3  7  panel_FGH_size ]);
+panel_H = axes('position', [8.6  7  panel_FGH_size ]);
 panel_I = axes('position', [2 2.5 3 3]);
 panel_J(1) = axes('position', [6.5 2.5 3.0 3.0]);
 panel_J(2) = axes('position', [8.0 4.0 1.5 1.5]);
@@ -190,9 +190,11 @@ end
 for ii = [1 4 7]
     axes(panel_A(ii, 3));
     ylabel('Time (min)',   'Units','normalized','Position',[-0.1 1]);
+    axes(panel_A(ii, 1));
+    ylabel({'F.R.';'(Hz)'},   'Units','normalized','Position',[-0.1 0.5]);
 end
 axes(panel_A(1, 1));
-text(-0.15,1.15, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.2,1.6, 'A', 'Units','normalized','FontWeight','bold');
 
 
 
@@ -221,8 +223,9 @@ cells = [cells{:}];
 %% panel B - field count histogram
 % figure
 axes(panel_B);
+cla
 hold on
-text(-0.15,1.15, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.15, 'B', 'Units','normalized','FontWeight','bold');
 nFields = nan(2,length(cells));
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -236,8 +239,8 @@ for ii_dir = 1:2
     h = histogram(nFields(ii_dir,:));
     h.FaceColor = prm.graphics.colors.flight_directions{ii_dir};
 end
-xlabel({'No. of fields';'per direction'},'Units','normalized','Position',[0.5 -0.22]);
-ylabel('Count')
+xlabel({'No. of fields';'per direction'},'Units','normalized','Position',[0.5 -0.18]);
+ylabel('Counts')
 ha = gca;
 % ha.XLim = [0 35];
 % ha.YLim = [0 40];
@@ -251,8 +254,9 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 %% panel C - field size histogram
 % figure
 axes(panel_C);
+cla
 hold on
-text(-0.15,1.15, 'C', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.15, 'C', 'Units','normalized','FontWeight','bold');
 fields_size = [];
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -270,7 +274,7 @@ h.FaceColor = 0.5*[1 1 1];
 ha=gca;
 ha.YScale = 'log';
 xlabel('Field Size (m)')
-ylabel('Count')
+ylabel('Counts','Units','normalized','Position',[-0.25 0.5])
 ha = gca;
 % ha.XLim = [0 35];
 % ha.YLim = [0 40];
@@ -286,7 +290,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 axes(panel_D);
 cla
 hold on
-text(-0.15,1.15, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.37,1.15, 'D', 'Units','normalized','FontWeight','bold');
 LS_field_size = nan(2,length(cells));
 for ii_cell = 1:length(cells)
     cell = cells(ii_cell);
@@ -315,17 +319,21 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XTick = [1 2];
 ha.XTickLabel = {};
+ha.XRuler.TickLabelGapMultiplier = -0.35;
+ha.YRuler.TickLabelGapMultiplier = 0.001;
 text([1 2],repelem(ylimits(1)-0.04*diff(ylimits),2),{{'Smallest';'field'},{'Largest';'field'}},...
     'HorizontalAlignment','center','VerticalAlignment','top','FontSize',7);
 % xlabel('')
-ylabel('Field size (m)')
+ylabel('Field size (m)','Units','normalized','Position',[-0.21 0.5])
+
+
 
 %% panel E - field ratio (largest/smallest)
 % figure
 axes(panel_E);
 cla
 hold on
-text(-0.15,1.15, 'E', 'Units','normalized','FontWeight','bold');
+text(-0.35,1.15, 'E', 'Units','normalized','FontWeight','bold');
 LS_field_ratio_all = nan(1,length(cells));
 LS_field_ratio_dir = nan(2,length(cells));
 for ii_cell = 1:length(cells)
@@ -360,7 +368,7 @@ h(2).FaceColor = 0.5*[1 1 1];
 ha=gca;
 ha.YScale = 'log';
 % ha.YScale = 'linear';
-ha.XLim = [0 25];
+ha.XLim = [0 27];
 % ha.YLim = [0 10];
 ha.YLim = [7e-1 260];
 % ha.XTick = [0:5:35];
@@ -369,8 +377,8 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
-xlabel({'Fields ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
-ylabel('Count')
+xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
+ylabel('Counts','Units','normalized','Position',[-0.21 0.5])
 
 %% arragne population SI/sparsity
 signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
@@ -400,7 +408,7 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel({'Spatial information';'(bits/spike)'}, 'Units','normalized','Position',[0.5 -0.17]);
-ylabel('Count')
+ylabel('Counts')
 
 %% panel G - sparsity histogram
 axes(panel_G);
@@ -416,7 +424,7 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel('Sparsity', 'Units','normalized','Position',[0.5 -0.17])
-ylabel('Count', 'Units','normalized','Position',[-0.2 0.5])
+ylabel('Counts', 'Units','normalized','Position',[-0.2 0.5])
 
 %% panel H - map correlations histogram
 % figure
@@ -450,8 +458,10 @@ end
 edges = -1:0.1:1;
 histogram(data,    'Normalization','pdf','BinEdges',edges,'FaceColor', 0.5*[1 1 1]);
 histogram(shuffle, 'Normalization','pdf','BinEdges',edges,'DisplayStyle','stairs','EdgeColor','k','LineWidth',1.5);
-[h,pKS] = kstest2(data, shuffle);
-text(0.9,0.9, sprintf('P_{KS}=%.2f',pKS),'Units','normalized','FontSize',7);
+[~,P_KS] = kstest2(data, shuffle);
+P_RankSum = ranksum(data, shuffle);
+% text(0.9,0.9, sprintf('P_{KS}=%.02f',P_KS),'Units','normalized','FontSize',7);
+text(1,0.9, sprintf('P=%.02f',P_RankSum),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
 
 ha= gca;
 ha.XLim = [-1 1];
@@ -464,7 +474,7 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel('Map correlation', 'Units','normalized','Position',[0.5 -0.17])
-ylabel('PDF', 'Units','normalized','Position',[-0.2 0.5])
+ylabel('Probability', 'Units','normalized','Position',[-0.2 0.5])
 
 %% panels I&J - prepare data
 distances_all = [];
@@ -491,7 +501,7 @@ end
 axes(panel_I);
 cla
 hold on
-text(-0.2,1.1, 'I', 'Units','normalized','FontWeight','bold');
+text(-0.24,1.1, 'I', 'Units','normalized','FontWeight','bold');
 x = abs(field_vel_all);
 % x = abs(field_vel2_all);
 y =  field_size_all;
@@ -512,20 +522,21 @@ IX = find(x>=ha.XLim(1) & x<=ha.XLim(end));
 [rho,rhopval] = corr(x(IX)', y(IX)','type','Spearman');
 lm = fitlm(x(IX),y(IX));
 % ksdensity([x(IX);y(IX)]','PlotFcn','contour');
+text(0.1,0.95,sprintf('R^2=%.03f',r^2),'Units','normalized','FontSize',8);
 panel_I_stat_res_str = {
     'panel I statistics:'
     sprintf('xlim=%.1f-%.1f',ha.XLim)
     sprintf('pearson r=%d, pval=%d',r,rpval)
     sprintf('spearman rho=%d, pval=%d',rho,rhopval)
     };
-annotation('textbox', [0.5 0.1 0.6 0.1], 'String',panel_I_stat_res_str,...
-    'HorizontalAlignment','Left','Interpreter','none','FitBoxToText','on');
+% annotation('textbox', [0.5 0.1 0.6 0.1], 'String',panel_I_stat_res_str,...
+%     'HorizontalAlignment','Left','Interpreter','none','FitBoxToText','on');
 
 %% panel J - field diff(size) vs. distance
 axes(panel_J(1));
 cla
 hold on
-text(-0.2,1.1, 'J', 'Units','normalized','FontWeight','bold');
+text(-0.24,1.1, 'J', 'Units','normalized','FontWeight','bold');
 plot(distances_all, abs(field_size_diff_all), 'k.' , 'MarkerSize',4);
 ha = gca;
 ha.TickDir='out';

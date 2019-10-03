@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_3';
+fig_name_str = 'Fig_3';
 fig_caption_str = 'Place cells are distributed uniformly across the tunnel, with slight over-representation at particular landmarks';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -45,7 +45,7 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 
 % create panels
 panel_A_size = [7 3];
-panel_B_size = [3 3];
+panel_B_size = [3 2.5];
 panel_C_size = [7 3];
 panel_D_size = [3 3];
 panel_A(1) = axes('position', [ 2 22 panel_A_size]);
@@ -56,7 +56,7 @@ panel_C(1) = axes('position', [ 2 13.5 panel_C_size]);
 panel_C(2) = axes('position', [ 2  9.5 panel_C_size]);
 panel_D(1) = axes('position', [11 13.5 panel_D_size]);
 panel_D(2) = axes('position', [11  9.5 panel_D_size]);
-
+panel_B_legend = axes('position', [14 23.3 2 1.3]);
 
 %% load population data
 % =========================================================================
@@ -106,7 +106,7 @@ for ii_dir = 1:2
     % plot cdf
     h = cdfplot([fields.loc]);
     h.Color = prm.graphics.colors.flight_directions{ii_dir};
-    h.LineWidth = 0.5;
+    h.LineWidth = 0.9;
     title('')
     ha=gca;
     ha.GridLineStyle = 'none';
@@ -118,13 +118,13 @@ for ii_dir = 1:2
     for ii_LM=1:length(LM)
         x = LM(ii_LM).pos_proj;
         name = LM(ii_LM).name;
-        h=xline(x, '-', 'color', 0.5.*[1 1 1], 'LineWidth',1);
+        h=xline(x, '-', 'color', 0.7.*[1 1 1], 'LineWidth',0.5);
 %         text(x, ylimits(2)+ypos*diff(ylimits), LM(ii_LM).name, 'Rotation', 45, 'FontSize',8);
     end
     
     % labels & graphics
     xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.17]);
-    ylabel('CDF', 'Units','normalized','Position',[-0.05 0.5]);
+    ylabel({'Cumulative';'fraction'}, 'Units','normalized','Position',[-0.025 0.5]);
     ha= gca;
     ha.TickDir='out';
     ha.TickLength = [0.015 0.015];
@@ -251,7 +251,7 @@ for ii_dir = 1:2
     h2.EdgeColor = 'k';
     h2.LineWidth = 2;
     [H,P,KSSTAT] = kstest2(x1,x2);
-    text(1,1,sprintf('P_{KS}=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
+    text(1,1,sprintf('P_{KS}=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',8);
     xline(0,'-','LineWidth',2);
     
     % labels & graphics
@@ -259,25 +259,42 @@ for ii_dir = 1:2
     ha.TickDir='out';
     ha.TickLength = [0.03 0.03];
     ha.YTick = ha.YLim;
-    ha.XRuler.TickLabelGapMultiplier = -0.3;
-    ha.YRuler.TickLabelGapMultiplier = 0.001;
-    xlabel('Distance from landmark (m)', 'Units','normalized','Position',[0.5 -0.13])
-    ylabel('PDF', 'Units','normalized','Position',[-0.08 0.5])
-    
-    % labels & graphics
-    ha= gca;
-    ha.TickDir='out';
-    ha.TickLength = [0.03 0.03];
-    ha.YTick = ha.YLim;
-    ha.XRuler.TickLabelGapMultiplier = -0.3;
-    ha.YRuler.TickLabelGapMultiplier = 0.001;
-    xlabel({'Distance to nearest landmark (m)'}, 'Units','normalized','Position',[0.5 -0.13])
-    ylabel('PDF', 'Units','normalized','Position',[-0.08 0.5])
+    ha.XRuler.TickLabelGapMultiplier = -0.5;
+    ha.YRuler.TickLabelGapMultiplier = -0.04;
+    xlabel({'Distance of fields';'to nearest landmark (m)'}, 'Units','normalized','Position',[0.5 -0.13])
+    ylabel('Probability', 'Units','normalized','Position',[-0.08 0.5])
 end
 
 axes(panel_B(1));
 text(-0.3,1.1, 'B', 'Units','normalized','FontWeight','bold');
 
+%% add panel B legend
+axes(panel_B_legend);
+cla
+hold on
+patch([1 1 2 2], 3*[1 1 1 1]+.3*[-1 1 1 -1], prm.graphics.colors.flight_directions{1},'EdgeColor','k');
+patch([1 1 2 2], 2*[1 1 1 1]+.3*[-1 1 1 -1], prm.graphics.colors.flight_directions{2},'EdgeColor','k');
+plot([1 2],      1*[1 1], 'k','LineWidth',2);
+text(2.3, 3, 'Data','FontSize',7,'HorizontalAlignment','left');
+text(2.3, 2, 'Data','FontSize',7,'HorizontalAlignment','left');
+text(2.3, 1, 'Shuffle','FontSize',7,'HorizontalAlignment','left');
+ha = annotation('arrow');  % store the arrow information in ha
+ha.Parent = gca;           % associate the arrow the the current axes
+ha.X = [5 7];          % the location in data units
+ha.Y = [3 3];   
+ha.LineWidth  = 1;          % make the arrow bolder for the picture
+ha.HeadWidth  = 4;
+ha.HeadLength = 4;
+ha = annotation('arrow');  % store the arrow information in ha
+ha.Parent = gca;           % associate the arrow the the current axes
+ha.X = [7 5];          % the location in data units
+ha.Y = [2 2];   
+ha.LineWidth  = 1;          % make the arrow bolder for the picture
+ha.HeadWidth  = 4;
+ha.HeadLength = 4;
+xlim([0 10]);
+ylim([0 4]);
+set(gca,'Visible','off');
 
 %% panel C - field size vs. pos
 % =========================================================================
@@ -303,7 +320,7 @@ for ii_dir = 1:2
     y(y>y_clipping) = y_clipping;
 %     plot(x,y,'.','MarkerSize',4, 'Color',c);
     plot(x(y< y_clipping), y(y< y_clipping),'.','MarkerSize',4, 'Color',c);
-    plot(x(y>=y_clipping), y(y>=y_clipping),'o','MarkerSize',4, 'Color',c);
+    plot(x(y>=y_clipping), y(y>=y_clipping),'o','MarkerSize',2, 'Color',c);
 %     yline(20)
     
     % plot LM
@@ -313,12 +330,12 @@ for ii_dir = 1:2
     for ii_LM=1:length(LM)
         x = LM(ii_LM).pos_proj;
         name = LM(ii_LM).name;
-        h=xline(x, '-', 'color', 0.9.*[1 1 1], 'LineWidth',0.5);
+        h=xline(x, '-', 'color', 0.7.*[1 1 1], 'LineWidth',0.5);
 %         text(x, ylimits(2)+ypos*diff(ylimits), LM(ii_LM).name, 'Rotation', 45, 'FontSize',8);
     end
     
     % labels & graphics
-    xlabel('position (m)', 'Units','normalized','Position',[0.5 -0.17]);
+    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.17]);
     ylabel('Field size (m)', 'Units','normalized','Position',[-0.05 0.5]);
     ha= gca;
     ha.TickDir='out';
@@ -327,7 +344,7 @@ for ii_dir = 1:2
     ha.YLim = [0 y_clipping];
     ha.YTick = ha.YLim;
     ha.XRuler.TickLabelGapMultiplier = -0.3;
-    ha.YRuler.TickLabelGapMultiplier = 0.001;
+    ha.YRuler.TickLabelGapMultiplier = 0.1;
 end
 
 axes(panel_C(1));
@@ -406,7 +423,7 @@ for ii_dir = 1:2
     h2.EdgeColor = c;
     h2.LineWidth = 2;
     [H,P,KSSTAT] = kstest2(y1,y2);
-    text(1,1,sprintf('P_{KS}=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
+    text(1,1,sprintf('P_{KS}=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',8);
     
     % labels & graphics
     ha= gca;
@@ -417,7 +434,7 @@ for ii_dir = 1:2
     ha.XRuler.TickLabelGapMultiplier = -0.3;
     ha.YRuler.TickLabelGapMultiplier = 0.001;
     xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.13]);
-    ylabel('PDF', 'Units','normalized','Position',[-0.08 0.5]);
+    ylabel('Probability', 'Units','normalized','Position',[-0.08 0.5]);
 %     legend_pos = [ha.Position([1 2])+[2.2 0.5].*ha.Position([3 4]) 0.1 0.03];
 %     legend({'<thr';'>thr'},'Location','eastoutside','Units','centimeters','Position',legend_pos);
 %     text(2.2,0.15, {"thr="+thr;...
@@ -432,8 +449,10 @@ for ii_dir = 1:2
     plot([1 2],[2 2], 'Color',c, 'LineWidth',2);
     xlim([0 3]);
     ylim([0 3]);
-    text(3,1, "Distance$<$"   +thr+"m",'FontSize',7,'Interpreter','latex')
-    text(3,2, "Distance$\geq$"+thr+"m",'FontSize',7,'Interpreter','latex')
+    text(3,1, "Distance<"+thr+"m",'FontSize',7);
+    text(3,2, "Distance>"+thr+"m",'FontSize',7);
+%     text(3,1, "Distance$<$"   +thr+"m",'FontSize',7,'Interpreter','latex')
+%     text(3,2, "Distance$\geq$"+thr+"m",'FontSize',7,'Interpreter','latex')
     set(gca,'Visible','off');
 end
 

@@ -12,7 +12,7 @@ panel_J_opt = 10;
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_1';
+fig_name_str = 'Fig_1';
 fig_caption_str = 'Behavioral and neural recordings from bats fliying over large spatial scales';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -57,7 +57,7 @@ panel_B(3) = axes('position', [ 4 22.5  panel_B_size]);
 panel_B(4) = axes('position', [ 4 21.5  panel_B_size]);
 panel_C    = axes('position', [15 21.4  4 4]);
 panel_D    = axes('position', [ 1 18 8 2.3]);
-panel_E    = axes('position', [ -0.5 13 9 5]);
+panel_E    = axes('position', [ -0.5 12.5 9 5]);
 panel_F    = axes('position', [10 18 2 2]);
 panel_G    = axes('position', [13.6 18 6 2]);
 panel_H    = axes('position', [10 14.25 2.5 2.5]);
@@ -124,14 +124,14 @@ h=annotation('textbox',[mean(xaf) mean(yaf)-0.003 0 0],'String',sprintf('%dms',s
 h.Text.HorizontalAlignment = 'Center';
 h.Text.VerticalAlignment = 'Top';
 h.Text.Position = [mean(xaf) yaf(1) 0];
-h.Text.FontSize = 8;
-h=annotation('textbox',[mean(xaf)-0.03 mean(yaf) 0 0],'String','');
+h.Text.FontSize = 7;
+h=annotation('textbox',[mean(xaf)-0.03 mean(yaf)+0.005 0 0],'String','');
 h.Text.Rotation = 90;
 h.Text.String = sprintf('%duV',scale_uVolt);
 h.Text.Position = [xaf(1) mean(yaf) 0];
 h.Text.HorizontalAlignment = 'Center';
 h.Text.VerticalAlignment = 'bottom';
-h.Text.FontSize = 8;
+h.Text.FontSize = 7;
 
 % add panel letter
 axes(panel_B(1));
@@ -232,7 +232,7 @@ tunnel_view_image_file = 'L:\Videos_Photos\TAZOT_HAMAMA\taza4.jpg';
 axes(panel_A);
 image = imread(logger_image_filename);
 imshow(image);
-text(-0.35,1.2, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.35,1.22, 'A', 'Units','normalized','FontWeight','bold');
 % add scale bar
 scale_mm = 10;
 pixel_mm_ratio = 720/11; % 720 pixels is measured manually using ginput amd sd card width is 11mm
@@ -268,7 +268,7 @@ yaf = yaf + 0.008;
 annotation('line', xaf,yaf, 'Linewidth',scale_line_width);
 h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dm',scale_m),...
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
-text(-0.1,1, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.085,1.22, 'D', 'Units','normalized','FontWeight','bold');
 
 %% tunnel section behavior (ZY)
 axes(panel_I)
@@ -278,11 +278,11 @@ hold on
 text(-0.15,1, 'I', 'Units','normalized','FontWeight','bold');
 % plot tunnel section lines
 % TODO: measure REAL dimensions in the tunnel
-plot([-1.25 -1.25],[0 1.7],'k','LineWidth',2);
-plot([ 1.25  1.25],[0 1.7],'k','LineWidth',2);
-plot([ 1.25 0],[1.7 2.35],'k','LineWidth',2);
-plot([-1.25 0],[1.7 2.35],'k','LineWidth',2);
-plot([-1.25 1.25],[0 0],'k','LineWidth',2);
+plot([-1.25 -1.25],[0 1.7],'k','LineWidth',1.5);
+plot([ 1.25  1.25],[0 1.7],'k','LineWidth',1.5);
+plot([ 1.25 0],[1.7 2.35],'k','LineWidth',1.5);
+plot([-1.25 0],[1.7 2.35],'k','LineWidth',1.5);
+plot([-1.25 1.25],[0 0],'k','LineWidth',1.5);
 % add Y/Z arrows
 xlimits = get(gca,'xlim');
 ylimits = get(gca,'ylim');
@@ -295,15 +295,19 @@ h(1)=annotation('arrow',xaf,yaf([1 1]), 'Color', 'k');
 h(2)=annotation('arrow',xaf([1 1]),yaf, 'Color', 'k');
 [h.HeadWidth] = disperse([5 5]);
 [h.HeadLength] = disperse([5 5]);
-[h.LineWidth] = disperse([2 2]);
-h=annotation('textbox', [mean(xaf) mean(yaf) 0 0]+[-0.005 -0.025 0 0], 'String', 'Y',...
+[h.LineWidth] = disperse([1.5 1.5]);
+% h=annotation('textbox', [mean(xaf) mean(yaf) 0 0]+[-0.005 -0.025 0 0], 'String', 'Y',...
+%     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
+% h=annotation('textbox', [mean(xaf) mean(yaf) 0 0]+[-0.03 -0.005 0 0], 'String', 'Z',...
+%     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
+h=annotation('textbox', [mean(xaf) mean(yaf) 0 0]+[+0.025 -0.015 0 0], 'String', 'Y',...
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
-h=annotation('textbox', [mean(xaf) mean(yaf) 0 0]+[-0.03 -0.005 0 0], 'String', 'Z',...
+h=annotation('textbox', [mean(xaf) mean(yaf) 0 0]+[-0.018 +0.02 0 0], 'String', 'Z',...
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
-h.Text.Rotation = 90;
+% h.Text.Rotation = 90;
 % add scale bar
 scale_m = 0.5;
-scale_line_width = 3;
+scale_line_width = 2;
 xlimits = get(gca,'xlim');
 ylimits = get(gca,'ylim');
 xa = xlimits(1) + [0 scale_m];
@@ -372,7 +376,7 @@ ha.YRuler.TickLabelGapMultiplier = 0;
 %% bespoon localization (anchors+tag+tunnel)
 axes(panel_E);
 cla
-text(-0.1175, 1, 'E', 'Units','normalized','FontWeight','bold');
+text(-0.11, 1, 'E', 'Units','normalized','FontWeight','bold');
 axis equal
 % axis normal
 pause(eps)
@@ -431,7 +435,7 @@ pause(eps)
 
 % add scale bar
 scale_m = 20;
-scale_line_width = 3;
+scale_line_width = 2;
 xlimits = get(gca,'xlim');
 ylimits = get(gca,'ylim');
 xa = xlimits(1) + [0 scale_m];
@@ -468,7 +472,7 @@ bespoon_loc_precision = load('L:\BeSpoon\testing\test_20180530__YOM_KEF_200m_sta
 err = bespoon_loc_precision.perpendicular_error;
 err = err.*100; % convert to cm
 h=histogram(err);
-h.NumBins = 45;
+h.NumBins = 15;
 h.Normalization = 'pdf';
 h.FaceColor = 0.5*[1 1 1];
 h.EdgeColor = 0.5*[1 1 1];
@@ -479,7 +483,7 @@ y = normpdf(x,muHat,sigmaHat);
 plot(x,y,'k','LineWidth',1.5);
 text(0.65,0.85, sprintf('\x03C3=%.1fcm', sigmaHat), 'Units','normalized','FontSize',8);
 xlabel({'Positioning error (cm)'},'Units','normalized','Position',[0.5 -0.2]);
-ylabel('PDF','Units','normalized','Position',[-0.07 0.5]);
+ylabel('Probability','Units','normalized','Position',[-0.07 0.5]);
 ha = gca;
 ha.XLim = [-40 40];
 ha.XTick = [-40:20:40];
@@ -487,14 +491,14 @@ ha.YTick = ha.YLim;
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
-ha.YRuler.TickLabelGapMultiplier = 0.001;
-text(-0.35,1.1, 'F', 'Units','normalized','FontWeight','bold');
+ha.YRuler.TickLabelGapMultiplier = 0.25;
+text(-0.4,1.15, 'F', 'Units','normalized','FontWeight','bold');
 
 %% behavioral trajectory is 1D (small y deviations) - example
 axes(panel_G);
 cla
 hold on
-text(-0.1,1.1, 'G', 'Units','normalized','FontWeight','bold');
+text(-0.1,1.15, 'G', 'Units','normalized','FontWeight','bold');
 % panel_G_opt = 1;
 panel_G_data_options = {
 'b0034_d180413'; % TODO: verify this option is from a CA1 day!!!!
@@ -626,7 +630,7 @@ switch yvar_pop_plot
             plot(xi,ystd_density,'Color',prm.graphics.colors.flight_directions{ii_dir},'LineWidth',1.5);
         end
         xlabel('Y s.d. (cm)');
-        ylabel('PDF','Units','normalized','Position',[-0.1 0.5]);
+        ylabel('Probability','Units','normalized','Position',[-0.1 0.5]);
         ha=gca;
         ha.XLim = [0 40];
         ha.XTick = 0:10:40;
@@ -736,7 +740,7 @@ for ii_dir = 1:2
 %     cv = [cv.raw_high_speed];
     cv = [cv.across_pos_high_speed];
     h=histogram(cv);
-    h.BinEdges = linspace(0,0.1,20);
+    h.BinEdges = linspace(0,0.1,13);
     h.BinEdges = h.BinEdges + (ii_dir-1)*0.3*h.BinWidth;
     h.FaceColor = [1 1 1];
     h.EdgeColor = dir_colors{ii_dir};
@@ -781,6 +785,8 @@ for ii_dir = 1:2
     h.LineWidth = 1;
 end
 ha=gca;
+ha.XLim(1) = 0;
+ha.XLim(2) = 65;
 ha.TickLength = [0.04 0.04];
 ha.XRuler.TickLabelGapMultiplier = -0.1;
 ha.YRuler.TickLabelGapMultiplier = 0;
@@ -812,7 +818,7 @@ if total_dist_by_dir
         total_distance = cellfun(@(FE)(sum([FE.distance])),FE_dir);
         total_distance = total_distance .*1e-3; % to km
         h=histogram(total_distance);
-        h.NumBins = 15;
+        h.NumBins = 10;
         h.BinEdges = h.BinEdges + (ii_dir-1)*0.3*h.BinWidth;
         h.FaceColor = 0.5.*[1 1 1];
         h.EdgeColor = dir_colors{ii_dir};
@@ -827,8 +833,8 @@ else
     total_distance = total_distance .*1e-3; % to km
     h=histogram(total_distance);
     
-%     h.NumBins = 15;
-    h.BinEdges = linspace(0,25,15);
+    nBinEdges = 12;
+    h.BinEdges = linspace(0,25,nBinEdges);
     h.FaceColor = 0.5.*[1 1 1];
     h.EdgeColor = 'k';
     h.Normalization = 'Count';
