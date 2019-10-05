@@ -2,7 +2,6 @@ function cell_calc_stats(cell_ID)
 
 %% load cell/exp data
 cell = cell_load_data(cell_ID);
-exp = exp_load_data(cell.details.exp_ID,'details');
 prm = PARAMS_GetAll();
 
 %% create struct
@@ -67,6 +66,12 @@ for ii_dir = 1:2
             stats_per_dir(ii_dir).field_CV          = nan;
             stats_per_dir(ii_dir).field_size_mean   = nan;
             stats_per_dir(ii_dir).field_size_median = nan;
+            stats_per_dir(ii_dir).field_largest_vel   = nan;
+            stats_per_dir(ii_dir).field_largest_vel2  = nan;
+            stats_per_dir(ii_dir).field_smallest_vel  = nan;
+            stats_per_dir(ii_dir).field_smallest_vel2 = nan;
+            stats_per_dir(ii_dir).field_ratio_LS_vel  = nan;
+            stats_per_dir(ii_dir).field_ratio_LS_vel2 = nan;
         case 1
             stats_per_dir(ii_dir).field_largest     = nan;
             stats_per_dir(ii_dir).field_smallest    = nan;
@@ -74,6 +79,12 @@ for ii_dir = 1:2
             stats_per_dir(ii_dir).field_CV          = nan;
             stats_per_dir(ii_dir).field_size_mean   = nanmean([fields_valid_speed.width_prc]);
             stats_per_dir(ii_dir).field_size_median = nanmedian([fields_valid_speed.width_prc]);
+            stats_per_dir(ii_dir).field_largest_vel   = nan;
+            stats_per_dir(ii_dir).field_largest_vel2  = nan;
+            stats_per_dir(ii_dir).field_smallest_vel  = nan;
+            stats_per_dir(ii_dir).field_smallest_vel2 = nan;
+            stats_per_dir(ii_dir).field_ratio_LS_vel  = nan;
+            stats_per_dir(ii_dir).field_ratio_LS_vel2 = nan;
         otherwise % #fields>=2
             stats_per_dir(ii_dir).field_largest     = max([fields_valid_speed.width_prc]);
             stats_per_dir(ii_dir).field_smallest    = min([fields_valid_speed.width_prc]);
@@ -81,6 +92,12 @@ for ii_dir = 1:2
             stats_per_dir(ii_dir).field_CV          = nanstd([fields_valid_speed.width_prc]) / nanmean([fields_valid_speed.width_prc]);
             stats_per_dir(ii_dir).field_size_mean   = nanmean([fields_valid_speed.width_prc]);
             stats_per_dir(ii_dir).field_size_median = nanmedian([fields_valid_speed.width_prc]);
+            stats_per_dir(ii_dir).field_largest_vel   = max([fields_valid_speed.vel]);
+            stats_per_dir(ii_dir).field_largest_vel2  = max([fields_valid_speed.vel2]);
+            stats_per_dir(ii_dir).field_smallest_vel  = min([fields_valid_speed.vel]);
+            stats_per_dir(ii_dir).field_smallest_vel2 = min([fields_valid_speed.vel2]);
+            stats_per_dir(ii_dir).field_ratio_LS_vel  = max([fields_valid_speed.vel]) / min([fields_valid_speed.vel]);
+            stats_per_dir(ii_dir).field_ratio_LS_vel2 = max([fields_valid_speed.vel2]) / min([fields_valid_speed.vel2]);
     end
     stats_per_dir(ii_dir).spikes_prc_field = 100.* stats_per_dir(ii_dir).spikes_num_field / stats_per_dir(ii_dir).spikes_num_air;
 end
@@ -119,6 +136,12 @@ switch length(fields_valid_speed)
         stats_all.field_CV          = nan;
         stats_all.field_size_mean   = nan;
         stats_all.field_size_median = nan;
+        stats_all.field_largest_vel   = nan;
+        stats_all.field_largest_vel2  = nan;
+        stats_all.field_smallest_vel  = nan;
+        stats_all.field_smallest_vel2 = nan;
+        stats_all.field_ratio_LS_vel  = nan;
+        stats_all.field_ratio_LS_vel2 = nan;
     case 1
         stats_all.field_largest     = nan;
         stats_all.field_smallest    = nan;
@@ -126,6 +149,12 @@ switch length(fields_valid_speed)
         stats_all.field_CV          = nan;
         stats_all.field_size_mean   = nanmean([fields_valid_speed.width_prc]);
         stats_all.field_size_median = nanmedian([fields_valid_speed.width_prc]);
+        stats_all.field_largest_vel   = nan;
+        stats_all.field_largest_vel2  = nan;
+        stats_all.field_smallest_vel  = nan;
+        stats_all.field_smallest_vel2 = nan;
+        stats_all.field_ratio_LS_vel  = nan;
+        stats_all.field_ratio_LS_vel2 = nan;
     otherwise % #fields>=2
         stats_all.field_largest     = max([fields_valid_speed.width_prc]);
         stats_all.field_smallest    = min([fields_valid_speed.width_prc]);
@@ -133,6 +162,12 @@ switch length(fields_valid_speed)
         stats_all.field_CV          = nanstd([fields_valid_speed.width_prc]) / nanmean([fields_valid_speed.width_prc]);
         stats_all.field_size_mean   = nanmean([fields_valid_speed.width_prc]);
         stats_all.field_size_median = nanmedian([fields_valid_speed.width_prc]);
+        stats_all.field_largest_vel   = max([fields_valid_speed.vel]);
+        stats_all.field_largest_vel2  = max([fields_valid_speed.vel2]);
+        stats_all.field_smallest_vel  = min([fields_valid_speed.vel]);
+        stats_all.field_smallest_vel2 = min([fields_valid_speed.vel2]);
+        stats_all.field_ratio_LS_vel  = max([fields_valid_speed.vel]) / min([fields_valid_speed.vel]);
+        stats_all.field_ratio_LS_vel2 = max([fields_valid_speed.vel2]) / min([fields_valid_speed.vel2]);
 end
 
 %% combine
@@ -140,7 +175,7 @@ stats.all = stats_all;
 stats.dir = stats_per_dir;
 
 %% save data to file
-filename = fullfile('L:\Analysis\Results\cells\stats',[cell_ID '_cell_stats']);
+filename = fullfile('L:\Analysis\Results\cells\stats',[cell.details.cell_ID '_cell_stats']);
 save(filename, 'stats');
 
 

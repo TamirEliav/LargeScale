@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_2';
+fig_name_str = 'Fig_2';
 fig_caption_str = 'Multi-scale spatial coding with many fields in individual dorsla-CA1 neurons';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -40,6 +40,7 @@ set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 figure_size_cm]);
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]); % position on screen...
 set(gcf, 'Renderer', 'painters');
+annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none');
 
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
@@ -66,15 +67,16 @@ panel_BCDE_size = [2 2];
 panel_B = axes('position', [ 2.0  10.5 panel_BCDE_size ]);
 panel_C = axes('position', [ 5.3  10.5 panel_BCDE_size ]);
 panel_D = axes('position', [ 8.6  10.5 panel_BCDE_size ]);
-panel_E = axes('position', [11.9  10.5 panel_BCDE_size.*[1.2 1] ]);
+panel_E = axes('position', [12.2  10.5 panel_BCDE_size.*[1.2 1] ]);
 
 panel_FGH_size = [2 2];
 panel_F = axes('position', [2.0  7  panel_FGH_size ]);
 panel_G = axes('position', [5.3  7  panel_FGH_size ]);
 panel_H = axes('position', [8.6  7  panel_FGH_size ]);
 panel_I = axes('position', [2 2.5 3 3]);
-panel_J(1) = axes('position', [6.5 2.5 3.0 3.0]);
-panel_J(2) = axes('position', [8.0 4.0 1.5 1.5]);
+panel_J = axes('position', [6 2.5 3 3]);
+panel_K(1) = axes('position', [10.5 2.5 3.0 3.0]);
+panel_K(2) = axes('position', [12.0 4.0 1.5 1.5]);
 
 
 %%
@@ -82,17 +84,11 @@ prm = PARAMS_GetAll();
 
 %% FR map + rasters - 9 examples
 cell_examples = {
-'b0079_d160928_TT2_SS01';
-'b0034_d180312_TT4_SS01';
-'b0034_d180312_TT3_SS02';
-'b0148_d170718_TT4_SS03';
-'b0148_d170608_TT4_SS01';
-'b0079_d160925_TT2_SS03';
-'b0148_d170626_TT4_SS01';
-'b0034_d180310_TT4_SS04';
-'b0034_d180310_TT4_SS04';
+433; 56; 51;
+609; 67; 477;
+419; 628; 337;
 };
-for ii_cell = 1:9
+for ii_cell = 1:length(cell_examples)
     cell_ID = cell_examples{ii_cell};
     cell = cell_load_data(cell_ID,'details','FR_map','fields','stats','FE');
     c = prm.graphics.colors.flight_directions;
@@ -121,22 +117,36 @@ for ii_cell = 1:9
             fields([fields.in_low_speed_area])=[];
         end
         for ii_field = 1:length(fields)
-            dir_offsets = [-0.1 -0.2];
+            dir_offsets = [-0.1 -0.17]+0.015;
             [xaf,yaf] = ds2nfu(fields(ii_field).edges_prc, repelem(dir_offsets(ii_dir)*range(h.YLim),2));
             annotation('line',xaf,yaf,'Linewidth', 2, 'Color', c{ii_dir});
         end
     end
     
     % cell details
-    cell_num_str_pos_list = [repelem(1.05,3) repelem(0.9,6)];
-    cell_num_str_pos = cell_num_str_pos_list(ii_cell);
-    text(0.5, cell_num_str_pos, "cell "+ii_cell,...
+    cell_num_str_pos_x   = [0.50 0.50 0.50 0.50 0.50 0.45 0.50 0.50 0.50];
+    cell_num_str_pos_y   = [1.05 1.05 1.05 0.85 0.90 0.90 0.90 0.90 0.90];
+    cell_stats_str_pos_x = [0.80 0.95 0.80 0.80 0.20 0.80 0.80 0.50 0.85];
+    cell_stats_str_pos_y = [1.20 1.05 1.15 0.90 0.95 1.10 1.10 0.90 0.90]+0.05;
+    text(cell_num_str_pos_x(ii_cell), cell_num_str_pos_y(ii_cell), "cell "+ ii_cell,...
         'Units','normalized','HorizontalAlignment','center','VerticalAlignment','bottom','FontSize',8);
-    text(1,1.00,...
-        sprintf('%.1f    %.1f',...
-                cell.stats.all.field_largest,...
-                cell.stats.all.field_smallest),...
-        'Units','normalized','HorizontalAlignment','right','VerticalAlignment','bottom','FontSize',7);
+    switch ii_cell
+        case {1,2,3,4,5,6,7,8}
+            cell_stats_str = {  sprintf('max=%.1fm', cell.stats.all.field_largest);...
+                                sprintf('min=%.1fm', cell.stats.all.field_smallest);...
+                                sprintf('ratio=%.1f', cell.stats.all.field_ratio_LS);...
+                             };
+            text(cell_stats_str_pos_x(ii_cell), cell_stats_str_pos_y(ii_cell)-0*0.23, cell_stats_str{1},...
+                'Units','normalized','HorizontalAlignment','center','VerticalAlignment','Top','FontSize',6);
+            text(cell_stats_str_pos_x(ii_cell), cell_stats_str_pos_y(ii_cell)-1*0.23, cell_stats_str{2},...
+                'Units','normalized','HorizontalAlignment','center','VerticalAlignment','Top','FontSize',6);
+            text(cell_stats_str_pos_x(ii_cell), cell_stats_str_pos_y(ii_cell)-2*0.23, cell_stats_str{3},...
+                'Units','normalized','HorizontalAlignment','center','VerticalAlignment','Top','FontSize',6);
+        case 9
+            cell_stats_str = {  sprintf('single field=%.1fm', cell.fields{1}.width_prc) };
+            text(cell_stats_str_pos_x(ii_cell), cell_stats_str_pos_y(ii_cell)-0*0.23, cell_stats_str{1},...
+                'Units','normalized','HorizontalAlignment','center','VerticalAlignment','Top','FontSize',6);
+    end
     
     % rasters
     FEs = [cell.FE];
@@ -145,20 +155,16 @@ for ii_cell = 1:9
         cla
         FE = FEs{ii_dir};
         x = [FE.spikes_pos];
-        y = [FE.spikes_ts];
-%         [FE.number2] = disperse(1:length(FE));
-%         y = arrayfun(@(FE)(FE.number2*ones(1,FE.num_spikes)),FE,'UniformOutput',0);
-%         y = [y{:}];
+        [FE.number2] = disperse(1:length(FE));
+        y = arrayfun(@(FE)(FE.number2*ones(1,FE.num_spikes)),FE,'UniformOutput',0);
+        y = [y{:}];
         plot(x,y,'.','Color',c{ii_dir},'MarkerSize',0.05);
-        behave_session_ts = exp_get_sessions_ti(cell.details.exp_ID,'Behave');
-        t0 = behave_session_ts(1);
-        rescale_plot_data('y', [1e-6/60 t0]);
         box off
         h=gca;
-        m = ceil(max((y-t0)*1e-6/60));
-        h.YTick = [0 m];
+        m = length(FE);
+        h.YTick = [1 m];
         h.XLim = [0 200];
-        h.YLim = [0 m]+[-1 1];
+        h.YLim = [0 m+1];
         switch ii_dir
             case 1
                 h.XTick = [];
@@ -166,12 +172,78 @@ for ii_cell = 1:9
             case 2
                 h.XTick = 0:50:200;
                 h.XRuler.TickLabelGapOffset = -2;
-                h.YTickLabel = {'0',num2str(m)};
+                h.YTickLabel = {'1',num2str(m)};
                 h.TickDir = 'out';
         end
         
     end
 end
+
+%% add zoom in panel
+% choose cell/dir/field to zoom
+ii_cell = 3;
+ii_dir = 1;
+ii_field = 2;
+cell_ID = cell_examples{ii_cell};
+cell = cell_load_data(cell_ID,'details','FR_map','fields','stats','FE');
+c = prm.graphics.colors.flight_directions;
+% add zoom lines
+axes(panel_A(ii_cell,1));
+x=[];
+y=[];
+x(1,:) = cell.fields{ii_dir}(ii_field).edges_href;
+x(2,:) = cell.fields{ii_dir}(ii_field).edges_href;
+% x(3,:) = [15;50];
+x(3,:) = cell.fields{ii_dir}(ii_field).edges_href + 10*[-1 1];
+y(1,:) =  4*[1;1];
+y(2,:) = 7*[1;1];
+y(3,:) = 14*[1;1];
+[xf, yf] = ds2nfu(x,y);
+for jj = 1:2
+    for ii = 1:2
+        hl = annotation('line');
+%         hl.Parent = gca;
+        hl.X = xf(ii+[0 1],jj);
+        hl.Y = yf(ii+[0 1],jj);
+        hl.LineWidth = 0.5;
+        hl.Color = 0.5*[1 1 1];
+    end
+end
+% create zoom panel + plot!
+POSf = ds2nfu([x(end,1)-0.4 y(end,1)-1 diff(x(end,:)) 20]);
+panel_A_zoom = axes('Units','normalized', 'position', POSf);
+cla
+hold on
+set(gca,'visible','off');
+FE = cell.FE{ii_dir};
+x = [FE.spikes_pos];
+[FE.number2] = disperse(1:length(FE));
+y = arrayfun(@(FE)(FE.number2*ones(1,FE.num_spikes)),FE,'UniformOutput',0);
+y = [y{:}];
+xlimits = cell.fields{ii_dir}(ii_field).edges_href;
+IX = find( x>xlimits(1) & x<xlimits(end) );
+x=x(IX);
+y=y(IX);
+ylimits = [min(y) max(y)]+[-3 1];
+plot(x,y,'.','Color',c{ii_dir},'MarkerSize',0.05);
+x = cell.fields{ii_dir}(ii_field).edges_prc;
+y = ylimits([1 1]);
+plot(x,y,'-','Color',c{ii_dir},'LineWidth',1);
+% m = length(FE);
+% % % maps=[cell.FR_map.all];
+% % % x = maps(ii_dir).bin_centers;
+% % % y = maps(ii_dir).PSTH;
+% % % y = y ./ cell.fields{ii_dir}(ii_field).peak .* (m);
+% % % y=normalize(y,'range').*m;
+% % % h=plot(x,y,'Color',c{ii_dir});
+box off
+h=gca;
+% h.XLim = [39.5 43];
+h.XLim = xlimits;
+% h.YLim = [0 m+1];
+h.YLim = ylimits;
+
+
 
 %% add direction arrows
 arrow_x = 0.1 +[0 0.05];
@@ -189,12 +261,13 @@ for ii = [7 8 9]
 end
 for ii = [1 4 7]
     axes(panel_A(ii, 3));
-    ylabel('Time (min)',   'Units','normalized','Position',[-0.1 1]);
+%     ylabel('Time (min)',   'Units','normalized','Position',[-0.1 1]);
+    ylabel('Flight no.',   'Units','normalized','Position',[-0.1 1]);
     axes(panel_A(ii, 1));
-    ylabel({'F.R.';'(Hz)'},   'Units','normalized','Position',[-0.1 0.5]);
+    ylabel({'F.R.';'(Hz)'},   'Units','normalized','Position',[-0.07 0.42]);
 end
 axes(panel_A(1, 1));
-text(-0.2,1.6, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.25,1.6, 'A', 'Units','normalized','FontWeight','bold');
 
 
 
@@ -225,7 +298,7 @@ cells = [cells{:}];
 axes(panel_B);
 cla
 hold on
-text(-0.4,1.15, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'B', 'Units','normalized','FontWeight','bold');
 nFields = nan(2,length(cells));
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -240,7 +313,7 @@ for ii_dir = 1:2
     h.FaceColor = prm.graphics.colors.flight_directions{ii_dir};
 end
 xlabel({'No. of fields';'per direction'},'Units','normalized','Position',[0.5 -0.18]);
-ylabel('Counts')
+ylabel('No. of cells')
 ha = gca;
 % ha.XLim = [0 35];
 % ha.YLim = [0 40];
@@ -256,7 +329,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 axes(panel_C);
 cla
 hold on
-text(-0.4,1.15, 'C', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'C', 'Units','normalized','FontWeight','bold');
 fields_size = [];
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -290,7 +363,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 axes(panel_D);
 cla
 hold on
-text(-0.37,1.15, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'D', 'Units','normalized','FontWeight','bold');
 LS_field_size = nan(2,length(cells));
 for ii_cell = 1:length(cells)
     cell = cells(ii_cell);
@@ -333,7 +406,7 @@ ylabel('Field size (m)','Units','normalized','Position',[-0.21 0.5])
 axes(panel_E);
 cla
 hold on
-text(-0.35,1.15, 'E', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.15, 'E', 'Units','normalized','FontWeight','bold');
 LS_field_ratio_all = nan(1,length(cells));
 LS_field_ratio_dir = nan(2,length(cells));
 for ii_cell = 1:length(cells)
@@ -378,7 +451,7 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
-ylabel('Counts','Units','normalized','Position',[-0.21 0.5])
+ylabel('No. of cells','Units','normalized','Position',[-0.21 0.5])
 
 %% arragne population SI/sparsity
 signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
@@ -395,10 +468,13 @@ sparsity = sparsity(:);
 sparsity(isnan(sparsity)) = [];
 
 %% panel F - spatial info histogram
+% TODO: check why I used to have cells with higher spatial info, maybe
+% because I used different inclusion/signif criteria, or because some how
+% now I have nans in my SI/FR_map calculation...?
 axes(panel_F);
 cla
 hold on
-text(-0.15,1.15, 'F', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'F', 'Units','normalized','FontWeight','bold');
 h = histogram(SI);
 h.NumBins = 12;
 h.FaceColor = 0.5*[1 1 1];
@@ -408,13 +484,13 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel({'Spatial information';'(bits/spike)'}, 'Units','normalized','Position',[0.5 -0.17]);
-ylabel('Counts')
+ylabel('No. of cells')
 
 %% panel G - sparsity histogram
 axes(panel_G);
 cla
 hold on
-text(-0.15,1.15, 'G', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'G', 'Units','normalized','FontWeight','bold');
 h = histogram(sparsity);
 h.NumBins = 10;
 h.FaceColor = 0.5*[1 1 1];
@@ -424,14 +500,14 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel('Sparsity', 'Units','normalized','Position',[0.5 -0.17])
-ylabel('Counts', 'Units','normalized','Position',[-0.2 0.5])
+ylabel('No. of cells', 'Units','normalized','Position',[-0.2 0.5])
 
 %% panel H - map correlations histogram
 % figure
 axes(panel_H);
 cla
 hold on
-text(-0.15,1.15, 'H', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'H', 'Units','normalized','FontWeight','bold');
 
 % arrange data
 signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
@@ -460,8 +536,8 @@ histogram(data,    'Normalization','pdf','BinEdges',edges,'FaceColor', 0.5*[1 1 
 histogram(shuffle, 'Normalization','pdf','BinEdges',edges,'DisplayStyle','stairs','EdgeColor','k','LineWidth',1.5);
 [~,P_KS] = kstest2(data, shuffle);
 P_RankSum = ranksum(data, shuffle);
-% text(0.9,0.9, sprintf('P_{KS}=%.02f',P_KS),'Units','normalized','FontSize',7);
-text(1,0.9, sprintf('P=%.02f',P_RankSum),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
+text(1.2,0.9, sprintf('P_{KS}=%.02f',P_KS),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
+% text(1,0.9, sprintf('P=%.02f',P_RankSum),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
 
 ha= gca;
 ha.XLim = [-1 1];
@@ -497,11 +573,11 @@ for ii_cell = 1:length(cells)
     end
 end
 
-%% panel I - field size vs. speed
+%% panel I - field size vs. speed (control)
 axes(panel_I);
 cla
 hold on
-text(-0.24,1.1, 'I', 'Units','normalized','FontWeight','bold');
+text(-0.27,1.1, 'I', 'Units','normalized','FontWeight','bold');
 x = abs(field_vel_all);
 % x = abs(field_vel2_all);
 y =  field_size_all;
@@ -532,11 +608,34 @@ panel_I_stat_res_str = {
 % annotation('textbox', [0.5 0.1 0.6 0.1], 'String',panel_I_stat_res_str,...
 %     'HorizontalAlignment','Left','Interpreter','none','FitBoxToText','on');
 
-%% panel J - field diff(size) vs. distance
-axes(panel_J(1));
+%% panel J - field size ratio vs. speed ratio (more direct control!)
+% figure
+axes(panel_J);
 cla
 hold on
-text(-0.24,1.1, 'J', 'Units','normalized','FontWeight','bold');
+text(-0.27,1.1, 'J', 'Units','normalized','FontWeight','bold');
+% arrange data
+cells_signif = cat(1,cells.signif);
+cells_signif = arrayfun(@(x)(x.TF), cells_signif);
+signif_IX = any(cells_signif,2);
+stats = [cells(signif_IX).stats];
+stats_all = [stats.all];
+% plot 
+x = abs([stats_all.field_ratio_LS_vel]);
+y = [stats_all.field_ratio_LS];
+plot(x, y, '.k');
+xlabel('Speed ratio')
+ylabel('Field size ratio')
+% set(gca,'yscale','log')
+% set(gca,'ytick',[1 2 3 5 10 15 20])
+% xlim([0.8 1.2])
+ylim([0.9 max(y)+1])
+
+%% panel K - field diff(size) vs. distance
+axes(panel_K(1));
+cla
+hold on
+text(-0.28,1.1, 'K', 'Units','normalized','FontWeight','bold');
 plot(distances_all, abs(field_size_diff_all), 'k.' , 'MarkerSize',4);
 ha = gca;
 ha.TickDir='out';
@@ -546,8 +645,8 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel('Distance between fields (m)', 'Units','normalized', 'Position',[0.5 -0.12]) 
 ylabel('{\Delta} Field size (m)', 'units','normalized', 'Position',[-0.15 0.5])
 
-% panel J inset
-axes(panel_J(2));
+% panel K inset
+axes(panel_K(2));
 cla
 hold on
 plot(distances_all, abs(field_size_diff_all), 'k.' , 'MarkerSize',3);
@@ -561,6 +660,8 @@ ha.TickLength = [0.02 0.02];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 
+
+
 %% print/save the figure
 fig_name_out = fullfile(res_dir, fig_name_str);
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
@@ -572,7 +673,23 @@ disp('figure was successfully saved to pdf/tiff/fig formats');
 
 
 
+
 %%
+
+
+
+
+
+
+
+
+
+
+
+%%
+
+
+
 
 
 

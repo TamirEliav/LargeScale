@@ -1573,7 +1573,55 @@ linkaxes(findobj(gcf,'Type','Axe'))
 
 
 
+%%
 
+%% multi-scale: control for speed changes !
+clc
+cells_signif = cat(1,cells.signif);
+cells_signif = arrayfun(@(x)(x.TF), cells_signif);
+signif_IX = any(cells_signif,2);
+stats = [cells(signif_IX).stats];
+stats_all = [stats.all];
+
+figure
+clear h
+
+subplot(131)
+hold on
+axis equal
+x = abs([stats_all.field_smallest_vel]);
+y = abs([stats_all.field_largest_vel]);
+h(1) = plot(x,y, '.k');
+refline(1,0)
+xlabel('speed at smallest field (m/s)')
+ylabel('speed at largest field (m/s)')
+p_ranksum=ranksum(x,y);
+text(0.1,0.95,sprintf('p ranksum=%.2f',p_ranksum),'Units','normalized')
+
+subplot(132)
+hold on
+x = abs([stats_all.field_ratio_LS_vel]);
+y = [stats_all.field_ratio_LS];
+h(2) = plot(x,y, '.k');
+xlabel('speed ratio')
+ylabel('size ratio')
+lm = fitlm(x,y)
+[r,p] = corr(x',y','rows','pairwise')
+text(0.1,0.95,sprintf('r=%.2f,p=%.3f',r,p),'Units','normalized')
+text(0.1,0.90,sprintf('R^2=%.3f',r^2),'Units','normalized')
+
+subplot(133)
+hold on
+x = abs([stats_all.field_ratio_LS_vel]);
+y = [stats_all.field_ratio_LS];
+h(3) = plot(x,y, '.k');
+xlabel('speed ratio')
+ylabel('size ratio (log)')
+set(gca,'yscale','log')
+set(gca,'ytick',[1 2 3 5 10 15 20])
+
+hlink = linkprop(h,'BrushData');
+setappdata(gcf, 'brush_data_link', hlink);
 
 
 

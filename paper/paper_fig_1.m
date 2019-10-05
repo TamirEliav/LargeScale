@@ -50,7 +50,7 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 
 % create panels
 panel_B_size = [9.5 1];
-panel_A    = axes('position', [ 1 23.2  2 2]);
+panel_A    = axes('position', [ 0.95 23.2  2 2]);
 panel_B(1) = axes('position', [ 4 24.5  panel_B_size]);
 panel_B(2) = axes('position', [ 4 23.5  panel_B_size]);
 panel_B(3) = axes('position', [ 4 22.5  panel_B_size]);
@@ -127,11 +127,14 @@ h.Text.Position = [mean(xaf) yaf(1) 0];
 h.Text.FontSize = 7;
 h=annotation('textbox',[mean(xaf)-0.03 mean(yaf)+0.005 0 0],'String','');
 h.Text.Rotation = 90;
-h.Text.String = sprintf('%duV',scale_uVolt);
+% h.Text.String = sprintf('%duV',scale_uVolt);
+h.Text.String = [ num2str(scale_uVolt) ' {\mu}V'];
 h.Text.Position = [xaf(1) mean(yaf) 0];
 h.Text.HorizontalAlignment = 'Center';
 h.Text.VerticalAlignment = 'bottom';
 h.Text.FontSize = 7;
+h.FitBoxToText='on';
+h.LineStyle='none';
 
 % add panel letter
 axes(panel_B(1));
@@ -232,7 +235,7 @@ tunnel_view_image_file = 'L:\Videos_Photos\TAZOT_HAMAMA\taza4.jpg';
 axes(panel_A);
 image = imread(logger_image_filename);
 imshow(image);
-text(-0.35,1.22, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.3,1.22, 'A', 'Units','normalized','FontWeight','bold');
 % add scale bar
 scale_mm = 10;
 pixel_mm_ratio = 720/11; % 720 pixels is measured manually using ginput amd sd card width is 11mm
@@ -376,7 +379,7 @@ ha.YRuler.TickLabelGapMultiplier = 0;
 %% bespoon localization (anchors+tag+tunnel)
 axes(panel_E);
 cla
-text(-0.11, 1, 'E', 'Units','normalized','FontWeight','bold');
+text(-0.08, 1, 'E', 'Units','normalized','FontWeight','bold');
 axis equal
 % axis normal
 pause(eps)
@@ -498,7 +501,7 @@ text(-0.4,1.15, 'F', 'Units','normalized','FontWeight','bold');
 axes(panel_G);
 cla
 hold on
-text(-0.1,1.15, 'G', 'Units','normalized','FontWeight','bold');
+text(-0.115,1.15, 'G', 'Units','normalized','FontWeight','bold');
 % panel_G_opt = 1;
 panel_G_data_options = {
 'b0034_d180413'; % TODO: verify this option is from a CA1 day!!!!
@@ -521,7 +524,7 @@ for ii_dir = [1 2]
 %     h.patch.FaceAlpha = 0;
 end
 xlabel('Position (m)','Units','normalized','Position',[0.5 -0.15]);
-ylabel('Y (m)');
+ylabel('Y (m)','Units','normalized','Position',[-0.055 0.5]);
 ha = gca;
 ha.XLim = [0 200];
 ha.YLim = [-1.5 1.5];
@@ -590,7 +593,7 @@ ystd_median_all = arrayfun(@(x)(x.ystd_median), pos_y_dev_all);
 %% behavioral trajectory is 1D (small y deviations) - population
 axes(panel_H);
 cla
-text(-0.3,1.1, 'H', 'Units','normalized','FontWeight','bold');
+text(-0.32,1.1, 'H', 'Units','normalized','FontWeight','bold');
 hold on
 % arrange data
 data = {};
@@ -725,8 +728,8 @@ plot(x,y,'.','Color', 'k','MarkerSize',1);
 set(gca,'xtick',0:50:200,'ytick',[-10 0 8],'xlim',[0 200])
 set(gca,'tickdir','out','TickLength',repelem(0.01,2));
 ylim(ylimits);
-xlabel('Position (m)');
-ylabel('Speed (m/s)');
+xlabel('Position (m)','Units','normalized','Position',[0.5 -0.25]);
+ylabel('Speed (m/s)','Units','normalized','Position',[-0.05 0.45]);
 
 
 %% panel K - speed trajectory very constant along the flight - population
@@ -751,9 +754,9 @@ end
 ha=gca;
 ha.TickLength = [0.04 0.04];
 ha.XRuler.TickLabelGapMultiplier = -0.1;
-ha.YRuler.TickLabelGapMultiplier = 0;
+ha.YRuler.TickLabelGapMultiplier = 0.2;
 xlabel('CV of speed','Units','normalized','Position',[0.5 -0.25]);
-ylabel('Counts','Units','normalized','Position',[-0.2 0.5]);
+ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
 % add direction arrows
 arrow_x = [0.48 0.50];
@@ -789,9 +792,9 @@ ha.XLim(1) = 0;
 ha.XLim(2) = 65;
 ha.TickLength = [0.04 0.04];
 ha.XRuler.TickLabelGapMultiplier = -0.1;
-ha.YRuler.TickLabelGapMultiplier = 0;
+ha.YRuler.TickLabelGapMultiplier = 0.2;
 xlabel('No. of laps','Units','normalized','Position',[0.5 -0.25]);
-ylabel('Counts','Units','normalized','Position',[-0.2 0.5]);
+ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
 % add direction arrows
 arrow_x = 0.67 + [0 0.02];
@@ -846,9 +849,9 @@ end
 ha=gca;
 ha.TickLength = [0.04 0.04];
 ha.XRuler.TickLabelGapMultiplier = -0.1;
-ha.YRuler.TickLabelGapMultiplier = 0;
+ha.YRuler.TickLabelGapMultiplier = 0.2;
 xlabel('Distance flown (km)','Units','normalized','Position',[0.5 -0.25]);
-ylabel('Counts','Units','normalized','Position',[-0.2 0.5]);
+ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
 %%
 data_opt_str = {
