@@ -131,18 +131,23 @@ for ii_dir = 1:2
 %     plot(x+0.5*(rand(size(x))-.5), y, '.', 'Color',c); % uniform jitter
     plot(x+0.1*randn(size(x)), y, '.', 'Color',c); % gaussian jitter
     lm = fitlm(x,y);
+    [r,p] = corr(x',y');
 %     h=plot(lm);
 %     h(1).Color = c;
 %     h(1).Marker = '.';
-    text(0.75,0.9,{  sprintf('R^2=%f',lm.Rsquared.Ordinary);...
-                    sprintf('pval=%f',lm.Coefficients.pValue(2))},...
-                    'Units','normalized', 'HorizontalAlignment','left');
-    xlabel('Inter Landmark distance (m)')
-    ylabel('Field Size (m)')
+    text(0.75,0.9,{  sprintf('r=%.2g',r);...
+                    sprintf('P=%.2g',p)},...
+                    'Units','normalized', 'HorizontalAlignment','left','FontSize',7);
+    xlabel('Inter-Landmark distance (m)')
+    ylabel('Field size (m)')
+    xlim([0 25]);
+    ylim([0 35]);
+    set(gca,'xtick',[0:5:25])
+    set(gca,'ytick',[0:5:35])
 
 end
-axes(panel_A(1));
-text(-0.13,1.1, 'A', 'Units','normalized','FontWeight','bold');
+% axes(panel_A(1));
+% text(-0.13,1.1, 'A', 'Units','normalized','FontWeight','bold');
 
 %% add direction arrows
 arrow_x = 0.22 +[0 0.05];

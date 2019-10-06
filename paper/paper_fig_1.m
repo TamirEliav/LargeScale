@@ -60,8 +60,8 @@ panel_D    = axes('position', [ 1 18 8 2.3]);
 panel_E    = axes('position', [ -0.5 12.5 9 5]);
 panel_F    = axes('position', [10 18 2 2]);
 panel_G    = axes('position', [13.6 18 6 2]);
-panel_H    = axes('position', [10 14.25 2.5 2.5]);
-panel_I    = axes('position', [13.5 14.5 3 2.5]);
+panel_H    = axes('position', [10 14 2.5 2.5]);
+panel_I    = axes('position', [13.5 14.25 3 2.5]);
 panel_J    = axes('position', [ 1 10.25 6 2]);
 panel_K    = axes('position', [ 8.5 10.25 2.5 2]);
 panel_L    = axes('position', [12.5 10.25 2.5 2]);
@@ -864,9 +864,9 @@ data_opt_str = {
 annotation('textbox', [0.2 0.2 0.6 0.1], 'String',data_opt_str, 'HorizontalAlignment','Left','Interpreter','none','FitBoxToText','on');
 
 %% print/save the figure
-fig_name_str = fig_name_str+"_G_opt"+panel_G_opt;
-fig_name_str = fig_name_str+"_I_opt"+panel_I_opt;
-fig_name_str = fig_name_str+"_J_opt"+panel_J_opt;
+% fig_name_str = fig_name_str+"_G_opt"+panel_G_opt;
+% fig_name_str = fig_name_str+"_I_opt"+panel_I_opt;
+% fig_name_str = fig_name_str+"_J_opt"+panel_J_opt;
 fig_name_out = fullfile(res_dir, fig_name_str);
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');

@@ -103,8 +103,8 @@ hold on
 text(-0.13,1.1, 'A', 'Units','normalized','FontWeight','bold');
 
 plot(Prox2dist_curve(1,:),Prox2dist_curve(2,:), 'k');
-plot([0 Prox2dist_curve(1,1)], Prox2dist_curve(2,[1 1]),'k')
-plot([0 Prox2dist_curve(1,end)], Prox2dist_curve(2,[end end]),'k')
+% plot([0 Prox2dist_curve(1,1)], Prox2dist_curve(2,[1 1]),'k')
+% plot([0 Prox2dist_curve(1,end)], Prox2dist_curve(2,[end end]),'k')
 
 cells_signif = pop_details(signif_at_least_one_dir_IX);
 cells_signif_color = {pop_bat_color{signif_at_least_one_dir_IX}};
@@ -115,8 +115,8 @@ scatter(TT_pos(:,1),TT_pos(:,2), 5, TT_pos_color)
 
 xlim([0,2000])
 ylim([0,4000]);
-xlabel('Proximo-distal (\mum)');
-ylabel('Longitudinal (\mum)');
+xlabel('Proximo-distal axis (\mum)');
+ylabel('Longitudinal axis (\mum)');
 
 %% panels BCD labels
 TT_pos_labels = {'Proximo-distal (\mum)';'Longitudinal (\mum)'};

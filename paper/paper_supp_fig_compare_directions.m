@@ -47,12 +47,9 @@ color_by_bat = 0;
 
 % create panels
 panels_size = [4 4];
-panel_A = axes('position', [ 2 20 panels_size]);
-panel_B = axes('position', [ 7 20 panels_size]);
-panel_C = axes('position', [ 2 14 panels_size]);
-panel_D = axes('position', [ 7 14 panels_size]);
-% panel_E = axes('position', [ 2  8 panels_size]);
-% panel_F = axes('position', [ 7  8 panels_size]);
+panel_A = axes('position', [ 2   20 panels_size]);
+panel_B = axes('position', [ 7.5 20 panels_size]);
+panel_C = axes('position', [13   20 panels_size]);
 if color_by_bat
     panel_legend_bat_colors = axes('position', [17 20 3 4]);
 end
@@ -116,7 +113,7 @@ end
 axes(panel_A);
 cla
 hold on
-text(-0.1,1.1, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.2,1.13, 'A', 'Units','normalized','FontWeight','bold');
 
 x = [pop_stats_dir(signif_both_dir_IX,1).field_num];
 y = [pop_stats_dir(signif_both_dir_IX,2).field_num];
@@ -127,17 +124,17 @@ h=scatter(  x+plot_jitter_sigma*randn(size(x)),...
             y+plot_jitter_sigma*randn(size(y)),5,c,'filled');
 
 [r,rpval] = corr(x',y','type','Pearson');
-[rho,rhopval] = corr(x',y','type','Spearman');
-signtest_pval = signtest(x,y);
-stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
-                sprintf('rho=%.2f,P=%g',rho,rhopval);
-                sprintf('sign test: P=%g',signtest_pval)};
-text(0.05,1, stats_str, 'units',...
-    'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+% [rho,rhopval] = corr(x',y','type','Spearman');
+% signtest_pval = signtest(x,y);
+% stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
+%                 sprintf('rho=%.2f,P=%g',rho,rhopval);
+%                 sprintf('sign test: P=%g',signtest_pval)};
+stats_str = {sprintf('r=%.2g',r); sprintf('P=%.2g',rpval)};
+text(0.1,0.95, stats_str, 'units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
 
-xlabel('dir1')
-ylabel('dir2')
-title('No. of fields')
+xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1});
+ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2});
+title('No. of fields','units','normalized','Position',[0.5 1.05])
 axis equal
 xlim([0 20])
 ylim([0 20])
@@ -148,7 +145,7 @@ h.Color = 0.5*[1 1 1];
 axes(panel_B);
 cla
 hold on
-text(-0.1,1.1, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.2,1.13, 'B', 'Units','normalized','FontWeight','bold');
 
 x = [pop_stats_dir(signif_both_dir_IX,1).field_size_median];
 y = [pop_stats_dir(signif_both_dir_IX,2).field_size_median];
@@ -156,58 +153,30 @@ c = cat(1,pop_bat_color{signif_both_dir_IX});
 h=scatter(x,y,5,c,'filled');
 
 [r,rpval] = corr(x',y','type','Pearson','rows','complete');
-[rho,rhopval] = corr(x',y','type','Spearman','rows','complete');
-signtest_pval = signtest(x,y);
-stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
-                sprintf('rho=%.2f,P=%g',rho,rhopval);
-                sprintf('sign test: P=%g',signtest_pval)};
-text(0.05,1, stats_str, 'units',...
+% [rho,rhopval] = corr(x',y','type','Spearman','rows','complete');
+% signtest_pval = signtest(x,y);
+% stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
+%                 sprintf('rho=%.2f,P=%g',rho,rhopval);
+%                 sprintf('sign test: P=%g',signtest_pval)};
+stats_str = {sprintf('r=%.2g',r); sprintf('P=%.2g',rpval)};
+text(0.1,0.95, stats_str, 'units',...
     'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
 
 
-xlabel('dir1')
-ylabel('dir2')
-title('Fields size (median)')
+xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1});
+ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2});
+title('Field size (median per neuron)','units','normalized','Position',[0.5 1.05])
 axis equal
 xlim([0 max([x y])+1])
 ylim([0 max([x y])+1])
 h=refline(1,0);
 h.Color = 0.5*[1 1 1];
 
-%% panel C - ratio largest/smallest
+%% panel C - spatial info
 axes(panel_C);
 cla
 hold on
-text(-0.1,1.1, 'C', 'Units','normalized','FontWeight','bold');
-
-x = [pop_stats_dir(signif_both_dir_IX,1).field_ratio_LS];
-y = [pop_stats_dir(signif_both_dir_IX,2).field_ratio_LS];
-c = cat(1,pop_bat_color{signif_both_dir_IX});
-h=scatter(x,y,5,c,'filled');
-
-[r,rpval] = corr(x',y','type','Pearson','rows','complete');
-[rho,rhopval] = corr(x',y','type','Spearman','rows','complete');
-signtest_pval = signtest(x,y);
-stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
-                sprintf('rho=%.2f,P=%g',rho,rhopval);
-                sprintf('sign test: P=%g',signtest_pval)};
-text(0.05,1, stats_str, 'units',...
-    'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
-
-xlabel('dir1')
-ylabel('dir2')
-title('Ratio L/S')
-axis equal
-xlim([1 max([x y])+1])
-ylim([1 max([x y])+1])
-h=refline(1,0);
-h.Color = 0.5*[1 1 1];
-
-%% panel D - spatial info
-axes(panel_D);
-cla
-hold on
-text(-0.1,1.1, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.2,1.13, 'C', 'Units','normalized','FontWeight','bold');
 
 x = [pop_stats_dir(signif_both_dir_IX,1).SI_bits_spike];
 y = [pop_stats_dir(signif_both_dir_IX,2).SI_bits_spike];
@@ -215,80 +184,23 @@ c = cat(1,pop_bat_color{signif_both_dir_IX});
 h=scatter(x,y,5,c,'filled');
 
 [r,rpval] = corr(x',y','type','Pearson');
-[rho,rhopval] = corr(x',y','type','Spearman');
-signtest_pval = signtest(x,y);
-stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
-                sprintf('rho=%.2f,P=%g',rho,rhopval);
-                sprintf('sign test: P=%g',signtest_pval)};
-text(0.05,1, stats_str, 'units',...
+% [rho,rhopval] = corr(x',y','type','Spearman');
+% signtest_pval = signtest(x,y);
+% stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
+%                 sprintf('rho=%.2f,P=%g',rho,rhopval);
+%                 sprintf('sign test: P=%g',signtest_pval)};
+stats_str = {sprintf('r=%.2g',r); sprintf('P=%.2g',rpval)};
+text(0.1,0.95, stats_str, 'units',...
     'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
 
-xlabel('dir1')
-ylabel('dir2')
-title('Spatial info')
+xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1});
+ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2});
+title('Spatial information','units','normalized','Position',[0.5 1.05])
 axis equal
 xlim([0 max([x y])+1])
 ylim([0 max([x y])+1])
 h=refline(1,0);
 h.Color = 0.5*[1 1 1];
-
-%% panel E - AC width
-% % % axes(panel_E);
-% % % cla
-% % % hold on
-% % % text(-0.1,1.1, 'E', 'Units','normalized','FontWeight','bold');
-% % % 
-% % % x = [pop_stats_dir(signif_both_dir_IX,1).AC_width];
-% % % y = [pop_stats_dir(signif_both_dir_IX,2).AC_width];
-% % % c = cat(1,pop_bat_color{signif_both_dir_IX});
-% % % h=scatter(x,y,5,c,'filled');
-% % % 
-% % % [r,rpval] = corr(x',y','type','Pearson');
-% % % [rho,rhopval] = corr(x',y','type','Spearman');
-% % % signtest_pval = signtest(x,y);
-% % % stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
-% % %                 sprintf('rho=%.2f,P=%g',rho,rhopval);
-% % %                 sprintf('sign test: P=%g',signtest_pval)};
-% % % text(0.05,1, stats_str, 'units',...
-% % %     'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
-% % % 
-% % % xlabel('dir1')
-% % % ylabel('dir2')
-% % % title('Spatial info')
-% % % axis equal
-% % % xlim([0 max([x y])+1])
-% % % ylim([0 max([x y])+1])
-% % % h=refline(1,0);
-% % % h.Color = 0.5*[1 1 1];
-
-%% panel F - AC width (zoom in)
-% % % axes(panel_F);
-% % % cla
-% % % hold on
-% % % text(-0.1,1.1, 'F', 'Units','normalized','FontWeight','bold');
-% % % 
-% % % x = [pop_stats_dir(signif_both_dir_IX,1).AC_width];
-% % % y = [pop_stats_dir(signif_both_dir_IX,2).AC_width];
-% % % c = cat(1,pop_bat_color{signif_both_dir_IX});
-% % % h=scatter(x,y,5,c,'filled');
-% % % 
-% % % [r,rpval] = corr(x',y','type','Pearson');
-% % % [rho,rhopval] = corr(x',y','type','Spearman');
-% % % signtest_pval = signtest(x,y);
-% % % stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
-% % %                 sprintf('rho=%.2f,P=%g',rho,rhopval);
-% % %                 sprintf('sign test: P=%g',signtest_pval)};
-% % % text(0.05,1, stats_str, 'units',...
-% % %     'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
-% % % 
-% % % xlabel('dir1')
-% % % ylabel('dir2')
-% % % title('Spatial info')
-% % % axis equal
-% % % xlim([0 20])
-% % % ylim([0 20])
-% % % h=refline(1,0);
-% % % h.Color = 0.5*[1 1 1];
 
 
 %% print/save the figure

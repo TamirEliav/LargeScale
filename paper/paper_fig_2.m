@@ -64,20 +64,18 @@ panel_A = panel_A(:,3:-1:1,:);
 panel_A = reshape(panel_A,[9 3]);
 
 panel_BCDE_size = [2 2];
-panel_B = axes('position', [ 2.0  10.5 panel_BCDE_size ]);
-panel_C = axes('position', [ 5.3  10.5 panel_BCDE_size ]);
-panel_D = axes('position', [ 8.6  10.5 panel_BCDE_size ]);
-panel_E = axes('position', [12.2  10.5 panel_BCDE_size.*[1.2 1] ]);
+panel_B = axes('position', [ 2.0  10.5 panel_BCDE_size]          );
+panel_C = axes('position', [ 5.3  10.5 panel_BCDE_size.*[1.4 1] ]);
+panel_D = axes('position', [ 9.4  10.5 panel_BCDE_size]          );
+panel_E = axes('position', [13.0  10.5 panel_BCDE_size.*[1.2 1] ]);
 
 panel_FGH_size = [2 2];
-panel_F = axes('position', [2.0  7  panel_FGH_size ]);
-panel_G = axes('position', [5.3  7  panel_FGH_size ]);
-panel_H = axes('position', [8.6  7  panel_FGH_size ]);
+panel_F = axes('position', [2.0  7  panel_FGH_size          ]);
+panel_G = axes('position', [5.3  7  panel_FGH_size          ]);
+panel_H = axes('position', [8.6  7  panel_FGH_size.*[1.3 1] ]);
 panel_I = axes('position', [2 2.5 3 3]);
-panel_J = axes('position', [6 2.5 3 3]);
-panel_K(1) = axes('position', [10.5 2.5 3.0 3.0]);
-panel_K(2) = axes('position', [12.0 4.0 1.5 1.5]);
-
+panel_J(1) = axes('position', [6.5 2.5 3.0 3.0]);
+panel_J(2) = axes('position', [8.0 4.0 1.5 1.5]);
 
 %%
 prm = PARAMS_GetAll();
@@ -187,7 +185,7 @@ ii_field = 2;
 cell_ID = cell_examples{ii_cell};
 cell = cell_load_data(cell_ID,'details','FR_map','fields','stats','FE');
 c = prm.graphics.colors.flight_directions;
-% add zoom lines
+% add zoom ("out") lines
 axes(panel_A(ii_cell,1));
 x=[];
 y=[];
@@ -209,8 +207,8 @@ for jj = 1:2
         hl.Color = 0.5*[1 1 1];
     end
 end
-% create zoom panel + plot!
-POSf = ds2nfu([x(end,1)-0.4 y(end,1)-1 diff(x(end,:)) 20]);
+% create zoom panel
+POSf = ds2nfu([x(end,1)-0.4 y(end,1)-2 diff(x(end,:)) 20]);
 panel_A_zoom = axes('Units','normalized', 'position', POSf);
 cla
 hold on
@@ -224,25 +222,17 @@ xlimits = cell.fields{ii_dir}(ii_field).edges_href;
 IX = find( x>xlimits(1) & x<xlimits(end) );
 x=x(IX);
 y=y(IX);
-ylimits = [min(y) max(y)]+[-3 1];
-plot(x,y,'.','Color',c{ii_dir},'MarkerSize',0.05);
+ylimits = [min(y) max(y)]+[-1 3];
+plot(x,y,'.','Color',c{ii_dir},'MarkerSize',2);
+% plot field size bar
 x = cell.fields{ii_dir}(ii_field).edges_prc;
-y = ylimits([1 1]);
+y = ylimits([end end]);
 plot(x,y,'-','Color',c{ii_dir},'LineWidth',1);
-% m = length(FE);
-% % % maps=[cell.FR_map.all];
-% % % x = maps(ii_dir).bin_centers;
-% % % y = maps(ii_dir).PSTH;
-% % % y = y ./ cell.fields{ii_dir}(ii_field).peak .* (m);
-% % % y=normalize(y,'range').*m;
-% % % h=plot(x,y,'Color',c{ii_dir});
+text(mean(x),mean(y)+1, sprintf('%.1fm',diff(x)), 'HorizontalAlignment','center','VerticalAlignment','bottom','FontSize',6);
 box off
 h=gca;
-% h.XLim = [39.5 43];
 h.XLim = xlimits;
-% h.YLim = [0 m+1];
 h.YLim = ylimits;
-
 
 
 %% add direction arrows
@@ -264,7 +254,7 @@ for ii = [1 4 7]
 %     ylabel('Time (min)',   'Units','normalized','Position',[-0.1 1]);
     ylabel('Flight no.',   'Units','normalized','Position',[-0.1 1]);
     axes(panel_A(ii, 1));
-    ylabel({'F.R.';'(Hz)'},   'Units','normalized','Position',[-0.07 0.42]);
+    ylabel({'Firing rate';'(Hz)'},   'Units','normalized','Position',[-0.07 0.42]);
 end
 axes(panel_A(1, 1));
 text(-0.25,1.6, 'A', 'Units','normalized','FontWeight','bold');
@@ -311,10 +301,17 @@ for ii_dir = 1:2
     end
     h = histogram(nFields(ii_dir,:));
     h.FaceColor = prm.graphics.colors.flight_directions{ii_dir};
+    nBinEdges = 17;
+    h.BinEdges = linspace(0,35,nBinEdges);
 end
 xlabel({'No. of fields';'per direction'},'Units','normalized','Position',[0.5 -0.18]);
 ylabel('No. of cells')
 ha = gca;
+ha.YScale = 'log';
+ha.YLim = [0.7 100];
+ha.XLim = [0 33];
+ha.XTick = [0:10:30];
+ha.YTick = [1 10 100];
 % ha.XLim = [0 35];
 % ha.YLim = [0 40];
 % ha.XTick = [0:5:35];
@@ -329,7 +326,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 axes(panel_C);
 cla
 hold on
-text(-0.45,1.15, 'C', 'Units','normalized','FontWeight','bold');
+text(-0.35,1.15, 'C', 'Units','normalized','FontWeight','bold');
 fields_size = [];
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -344,10 +341,12 @@ for ii_dir = 1:2
 end
 h = histogram(fields_size);
 h.FaceColor = 0.5*[1 1 1];
+% h.NumBins = 33;
+h.BinWidth = 1;
 ha=gca;
 ha.YScale = 'log';
 xlabel('Field Size (m)')
-ylabel('Counts','Units','normalized','Position',[-0.25 0.5])
+ylabel('Counts','Units','normalized','Position',[-0.2 0.5])
 ha = gca;
 % ha.XLim = [0 35];
 % ha.YLim = [0 40];
@@ -425,7 +424,9 @@ end
 LS_field_ratio_dir = LS_field_ratio_dir(:);
 % LS_field_ratio_dir(isnan(LS_field_ratio_dir)) = [];
 % LS_field_ratio_all(isnan(LS_field_ratio_all)) = [];
-edges = linspace(1,ceil(max(max(LS_field_ratio_all))),9);
+% edges = linspace(1,ceil(max(max(LS_field_ratio_all))),9);
+nBinEdges = 9;
+edges = logspace(0,log10(25),nBinEdges);
 clear h
 % h(1) = histogram(LS_field_ratio_dir);
 h(2) = histogram(LS_field_ratio_all);
@@ -441,11 +442,13 @@ h(2).FaceColor = 0.5*[1 1 1];
 ha=gca;
 ha.YScale = 'log';
 % ha.YScale = 'linear';
+ha.XScale = 'log';
 ha.XLim = [0 27];
 % ha.YLim = [0 10];
 ha.YLim = [7e-1 260];
 % ha.XTick = [0:5:35];
 ha.YTick = [1 10 100];
+ha.XTick = [1 2 5 10 20];
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
@@ -492,7 +495,7 @@ cla
 hold on
 text(-0.45,1.15, 'G', 'Units','normalized','FontWeight','bold');
 h = histogram(sparsity);
-h.NumBins = 10;
+h.NumBins = 15;
 h.FaceColor = 0.5*[1 1 1];
 ha=gca;
 ha.TickDir='out';
@@ -531,7 +534,8 @@ switch 2
 end
 
 % plot
-edges = -1:0.1:1;
+nBinEdges = 21;
+edges = linspace(-1,1,nBinEdges);
 histogram(data,    'Normalization','pdf','BinEdges',edges,'FaceColor', 0.5*[1 1 1]);
 histogram(shuffle, 'Normalization','pdf','BinEdges',edges,'DisplayStyle','stairs','EdgeColor','k','LineWidth',1.5);
 [~,P_KS] = kstest2(data, shuffle);
@@ -573,47 +577,12 @@ for ii_cell = 1:length(cells)
     end
 end
 
-%% panel I - field size vs. speed (control)
+%% panel J - field size ratio vs. speed ratio (direct control for speed!)
+% figure
 axes(panel_I);
 cla
 hold on
 text(-0.27,1.1, 'I', 'Units','normalized','FontWeight','bold');
-x = abs(field_vel_all);
-% x = abs(field_vel2_all);
-y =  field_size_all;
-plot(x ,y, '.k', 'MarkerSize',3)
-ha = gca;
-ha.XLim = [4.5 9.5];
-ha.YLim = [0 35];
-ha.XTick = [5 7 9];
-ha.YTick = [0 10 20 30];
-ha.TickDir='out';
-ha.TickLength = [0.02 0.02];
-ha.XRuler.TickLabelGapMultiplier = -0.3;
-ha.YRuler.TickLabelGapMultiplier = 0.001;
-xlabel('Speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]) 
-ylabel('Field size (m)', 'units','normalized', 'Position',[-0.15 0.5])
-IX = find(x>=ha.XLim(1) & x<=ha.XLim(end));
-[r,rpval] = corr(x(IX)', y(IX)','type','Pearson');
-[rho,rhopval] = corr(x(IX)', y(IX)','type','Spearman');
-lm = fitlm(x(IX),y(IX));
-% ksdensity([x(IX);y(IX)]','PlotFcn','contour');
-text(0.1,0.95,sprintf('R^2=%.03f',r^2),'Units','normalized','FontSize',8);
-panel_I_stat_res_str = {
-    'panel I statistics:'
-    sprintf('xlim=%.1f-%.1f',ha.XLim)
-    sprintf('pearson r=%d, pval=%d',r,rpval)
-    sprintf('spearman rho=%d, pval=%d',rho,rhopval)
-    };
-% annotation('textbox', [0.5 0.1 0.6 0.1], 'String',panel_I_stat_res_str,...
-%     'HorizontalAlignment','Left','Interpreter','none','FitBoxToText','on');
-
-%% panel J - field size ratio vs. speed ratio (more direct control!)
-% figure
-axes(panel_J);
-cla
-hold on
-text(-0.27,1.1, 'J', 'Units','normalized','FontWeight','bold');
 % arrange data
 cells_signif = cat(1,cells.signif);
 cells_signif = arrayfun(@(x)(x.TF), cells_signif);
@@ -623,19 +592,26 @@ stats_all = [stats.all];
 % plot 
 x = abs([stats_all.field_ratio_LS_vel]);
 y = [stats_all.field_ratio_LS];
+[r,pval] = corr(x',y','rows','pairwise');
 plot(x, y, '.k');
-xlabel('Speed ratio')
-ylabel('Field size ratio')
-% set(gca,'yscale','log')
-% set(gca,'ytick',[1 2 3 5 10 15 20])
-% xlim([0.8 1.2])
-ylim([0.9 max(y)+1])
+text(0.1,0.95, {sprintf('r=%.2f',r);sprintf('P=%.2f',pval)}, ...
+    'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+xlabel('Speed ratio', 'Units','normalized', 'Position',[0.5 -0.12]);
+ylabel('Field size ratio', 'units','normalized', 'Position',[-0.15 0.5]);
+set(gca,'yscale','log');
+set(gca,'ytick',[1 2 3 5 10 15 20]);
+ylim([0.9 max(y)+1]);
+ha = gca;
+ha.TickDir='out';
+ha.TickLength = [0.02 0.02];
+ha.XRuler.TickLabelGapMultiplier = -0.3;
+ha.YRuler.TickLabelGapMultiplier = 0.001;
 
 %% panel K - field diff(size) vs. distance
-axes(panel_K(1));
+axes(panel_J(1));
 cla
 hold on
-text(-0.28,1.1, 'K', 'Units','normalized','FontWeight','bold');
+text(-0.28,1.1, 'J', 'Units','normalized','FontWeight','bold');
 plot(distances_all, abs(field_size_diff_all), 'k.' , 'MarkerSize',4);
 ha = gca;
 ha.TickDir='out';
@@ -646,7 +622,7 @@ xlabel('Distance between fields (m)', 'Units','normalized', 'Position',[0.5 -0.1
 ylabel('{\Delta} Field size (m)', 'units','normalized', 'Position',[-0.15 0.5])
 
 % panel K inset
-axes(panel_K(2));
+axes(panel_J(2));
 cla
 hold on
 plot(distances_all, abs(field_size_diff_all), 'k.' , 'MarkerSize',3);
@@ -659,8 +635,6 @@ ha.TickDir='out';
 ha.TickLength = [0.02 0.02];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
-
-
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, fig_name_str);

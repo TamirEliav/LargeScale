@@ -52,11 +52,13 @@ panel_A(1) = axes('position', [ 2 22 panel_A_size]);
 panel_A(2) = axes('position', [ 2 18 panel_A_size]);
 panel_B(1) = axes('position', [11 22 panel_B_size]);
 panel_B(2) = axes('position', [11 18 panel_B_size]);
-panel_C(1) = axes('position', [ 2 13.5 panel_C_size]);
-panel_C(2) = axes('position', [ 2  9.5 panel_C_size]);
-panel_D(1) = axes('position', [11 13.5 panel_D_size]);
-panel_D(2) = axes('position', [11  9.5 panel_D_size]);
-panel_B_legend = axes('position', [14 23.3 2 1.3]);
+panel_C(1) = axes('position', [ 2 13 panel_C_size]);
+panel_C(2) = axes('position', [ 2  9 panel_C_size]);
+panel_D(1) = axes('position', [11 13 panel_D_size]);
+panel_D(2) = axes('position', [11  9 panel_D_size]);
+panel_B_legend(1) = axes('position', [13.4 23 2 1.3]);
+panel_B_legend(2) = axes('position', [13.4 19 2 1.3]);
+
 
 %% load population data
 % =========================================================================
@@ -123,7 +125,7 @@ for ii_dir = 1:2
     end
     
     % labels & graphics
-    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.17]);
+    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.14]);
     ylabel({'Cumulative';'fraction'}, 'Units','normalized','Position',[-0.025 0.5]);
     ha= gca;
     ha.TickDir='out';
@@ -266,36 +268,32 @@ for ii_dir = 1:2
 end
 
 axes(panel_B(1));
-text(-0.3,1.1, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.3,1.3, 'B', 'Units','normalized','FontWeight','bold');
 
 %% add panel B legend
-axes(panel_B_legend);
-cla
-hold on
-patch([1 1 2 2], 3*[1 1 1 1]+.3*[-1 1 1 -1], prm.graphics.colors.flight_directions{1},'EdgeColor','k');
-patch([1 1 2 2], 2*[1 1 1 1]+.3*[-1 1 1 -1], prm.graphics.colors.flight_directions{2},'EdgeColor','k');
-plot([1 2],      1*[1 1], 'k','LineWidth',2);
-text(2.3, 3, 'Data','FontSize',7,'HorizontalAlignment','left');
-text(2.3, 2, 'Data','FontSize',7,'HorizontalAlignment','left');
-text(2.3, 1, 'Shuffle','FontSize',7,'HorizontalAlignment','left');
-ha = annotation('arrow');  % store the arrow information in ha
-ha.Parent = gca;           % associate the arrow the the current axes
-ha.X = [5 7];          % the location in data units
-ha.Y = [3 3];   
-ha.LineWidth  = 1;          % make the arrow bolder for the picture
-ha.HeadWidth  = 4;
-ha.HeadLength = 4;
-ha = annotation('arrow');  % store the arrow information in ha
-ha.Parent = gca;           % associate the arrow the the current axes
-ha.X = [7 5];          % the location in data units
-ha.Y = [2 2];   
-ha.LineWidth  = 1;          % make the arrow bolder for the picture
-ha.HeadWidth  = 4;
-ha.HeadLength = 4;
-xlim([0 10]);
-ylim([0 4]);
-set(gca,'Visible','off');
-
+for ii_dir = 1:2
+    axes(panel_B_legend(ii_dir));
+    cla
+    hold on
+    patch([1 1 2 2], 2*[1 1 1 1]+.3*[-1 1 1 -1], prm.graphics.colors.flight_directions{ii_dir},'EdgeColor','k');
+    plot([1 2],      1*[1 1], 'k','LineWidth',2);
+    text(2.6, 2, 'Data','FontSize',7,'HorizontalAlignment','left');
+    text(2.6, 1, 'Shuffle','FontSize',7,'HorizontalAlignment','left');
+    ha = annotation('arrow');
+    ha.Parent = gca;
+    ha.X = [5 7]+1;
+    if ii_dir==2
+        ha.X = flip(ha.X);
+    end
+    ha.Y = [2 2];
+    ha.LineWidth  = 1;
+    ha.HeadWidth  = 4;
+    ha.HeadLength = 4;
+    xlim([0 10]);
+    ylim([0 4]);
+    set(gca,'Visible','off');
+end
+    
 %% panel C - field size vs. pos
 % =========================================================================
 % figure
@@ -335,7 +333,7 @@ for ii_dir = 1:2
     end
     
     % labels & graphics
-    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.17]);
+    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.14]);
     ylabel('Field size (m)', 'Units','normalized','Position',[-0.05 0.5]);
     ha= gca;
     ha.TickDir='out';
@@ -348,14 +346,14 @@ for ii_dir = 1:2
 end
 
 axes(panel_C(1));
-text(-0.13,1.1, 'C', 'Units','normalized','FontWeight','bold');
+text(-0.13,1.12, 'C', 'Units','normalized','FontWeight','bold');
 
 
 %% panel D - field size - near vs. far from LM
 % =========================================================================
 % figure
 axes(panel_D(1));
-text(-0.3,1.1, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.3,1.12, 'D', 'Units','normalized','FontWeight','bold');
 for ii_dir = 1:2
 %     subplot(1,2,ii_dir)
     axes(panel_D(ii_dir));
@@ -423,7 +421,7 @@ for ii_dir = 1:2
     h2.EdgeColor = c;
     h2.LineWidth = 2;
     [H,P,KSSTAT] = kstest2(y1,y2);
-    text(1,1,sprintf('P_{KS}=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',8);
+    text(1,0.96,sprintf('P_{KS}=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',8);
     
     % labels & graphics
     ha= gca;
@@ -449,8 +447,8 @@ for ii_dir = 1:2
     plot([1 2],[2 2], 'Color',c, 'LineWidth',2);
     xlim([0 3]);
     ylim([0 3]);
-    text(3,1, "Distance<"+thr+"m",'FontSize',7);
-    text(3,2, "Distance>"+thr+"m",'FontSize',7);
+    text(2.5,1, "Distance<"+thr+"m",'FontSize',7);
+    text(2.5,2, "Distance>"+thr+"m",'FontSize',7);
 %     text(3,1, "Distance$<$"   +thr+"m",'FontSize',7,'Interpreter','latex')
 %     text(3,2, "Distance$\geq$"+thr+"m",'FontSize',7,'Interpreter','latex')
     set(gca,'Visible','off');

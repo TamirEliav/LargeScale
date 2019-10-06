@@ -43,17 +43,12 @@ set(gcf, 'Renderer', 'painters');
 annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none');
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
-color_by_bat = 0;
-
 % create panels
 panels_size = [4 4];
 panel_A(1) = axes('position', [ 2 20 panels_size]);
-panel_A(2) = axes('position', [ 7 20 panels_size]);
-panel_B(1,1) = axes('position', [ 2 14 panels_size]);
-panel_B(1,2) = axes('position', [ 7 14 panels_size]);
-panel_B(2,1) = axes('position', [ 2  8 panels_size]);
-panel_B(2,2) = axes('position', [ 7  8 panels_size]);
-panel_legend = axes('position', [12 22 1 1]);;
+panel_A(2) = axes('position', [ 8 20 panels_size]);
+panel_A_legend(1) = axes('position', [ 4.5 22.5 0.5 0.3]);
+panel_A_legend(2) = axes('position', [10.5 22.5 0.5 0.3]);
 
 %% load population data
 % =========================================================================
@@ -84,19 +79,6 @@ exp = exp_load_data(exp_ID,'LM');
 LM = exp.LM;
 % LM( contains({LM.name},{'ball','enter'}) ) = [];
 turn_point_LM = LM( contains({LM.name},{'turn-point'}) );
-
-%% legend for long/short arms
-axes(panel_legend);
-cla
-hold on
-plot([1 2], [1 1], 'Color', prm.graphics.colors.flight_directions{1}, 'LineWidth', 1);
-plot([1 2], [2 2], 'Color', prm.graphics.colors.flight_directions{2}, 'LineWidth', 1);
-plot([1 2], [4 4], 'Color', prm.graphics.colors.flight_directions{1}, 'LineWidth', 2);
-plot([1 2], [5 5], 'Color', prm.graphics.colors.flight_directions{2}, 'LineWidth', 2);
-xlim([1 3])
-text(2.5,1.5,'Short arm','HorizontalAlignment','left','VerticalAlignment','middle');
-text(2.5,4.5,'Long arm');
-set(gca,'visible','off');
 
 %% panel A - compare fields size between short/long arms
 % arrange data
@@ -143,114 +125,45 @@ for ii_dir = 1:2
     h1.Normalization = 'pdf';
     h1.DisplayStyle = 'stairs';
     h1.EdgeColor = c;
-    h1.LineWidth = 2;
+    h1.LineWidth = 2; % long arm
     h2 = histogram( x2 );
     h2.NumBins = nBins;
     h2.Normalization = 'pdf';
     h2.DisplayStyle = 'stairs';
     h2.EdgeColor = c;
-    h2.LineWidth = 1;
-    [H,P,KSSTAT] = kstest2(x1,x2);
+    h2.LineWidth = 1; % short arm
+    [H,P_KS,KSSTAT] = kstest2(x1,x2);
+    text(1,1,sprintf('P_{KS}=%.2f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+    P_ranksum = ranksum(x1,x2);
+%     text(1,0.9,sprintf('P_{Wilc}=%.2f',P_ranksum),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     ha=gca;
     ha.YScale = 'log';
-    text(1,1,sprintf('P_{KS}=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
-    title("dir "+ii_dir);
-    xlabel('Field size (m)')
-    ylabel('PDF')
+%     title("dir "+ii_dir);
+    xlabel('Field size (m)');
+    ylabel('Probability');
 end
 
+%% add direction arrows
+arrow_vec = 0.025*[-1 1];
+arrow_y = 0.915*[1 1];
+clear h
+h(1)=annotation('arrow',      arrow_vec +0.18, arrow_y, 'Color', prm.graphics.colors.flight_directions{1});
+h(2)=annotation('arrow', flip(arrow_vec)+0.46, arrow_y, 'Color', prm.graphics.colors.flight_directions{2});
+[h.HeadWidth] = disperse([5 5]);
+[h.HeadLength] = disperse([5 5]);
 
-%% mean(Ipos)
-Ipos_all = arrayfun(@(cell)(cell.Ipos.data), cells, 'UniformOutput',0);
-Ipos_all = cat(1,Ipos_all{:});
-Ipos_bins_centers = Ipos_all(1).pos_bins_centers;
-sdf=arrayfun(@(x)(x.Ipos), Ipos_all, 'UniformOutput',0);
-sdf2=cat(1,sdf{:});
-sdf3 = reshape(sdf2,length(cells),2,[]);
-% whos Ipos_all sdf sdf2 sdf3
-
-%% plot Ipos comparison
-% figure
+%% legend for long/short arms
 for ii_dir = 1:2
-    Ipos_dir = squeeze(sdf3(:,ii_dir,:));
-    signif = arrayfun(@(x)(x.signif(ii_dir).TF), cells);
-    valid_pos = Ipos_bins_centers > prm.fields.valid_speed_pos(1) & Ipos_bins_centers < prm.fields.valid_speed_pos(end);
-    Ipos_dir(~signif,:) = nan;
-    Ipos_dir(:,~valid_pos) = nan;
-    
-    pos_thr = turn_point_LM.pos_proj;
-    IX1 = Ipos_bins_centers <  pos_thr;
-    IX2 = Ipos_bins_centers >= pos_thr;
-    x1 = Ipos_dir(:,IX1);
-    x2 = Ipos_dir(:,IX2);
-    
-    for Ipos_plot_type = 1:2
-        axes(panel_B(Ipos_plot_type,ii_dir));
-        cla
-        hold on
-        ha=gca;
-%         ha.Units = 'centimeters';
-%         ha.Position([3 4]) = [5 5];
-        axis equal
-        c = prm.graphics.colors.flight_directions{ii_dir};
-        switch Ipos_plot_type
-            case 1
-                nBins = 50;
-                h1 = histogram( x1 );
-                h1.NumBins = nBins;
-                h1.Normalization = 'pdf';
-                h1.DisplayStyle = 'stairs';
-                h1.EdgeColor = c;
-                h1.LineWidth = 2;
-                h2 = histogram( x2 );
-                h2.NumBins = nBins;
-                h2.Normalization = 'pdf';
-                h2.DisplayStyle = 'stairs';
-                h2.EdgeColor = c;
-                h2.LineWidth = 1;
-                ha.YScale = 'log';
-                [H,P,KSSTAT] = kstest2(x1(:),x2(:));
-                text(1,1,sprintf('P_{KS}=%.3f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
-                xlabel('Ipos')
-                ylabel('PDF')
-            case 2
-                x = nanmean(x1,2);
-                y = nanmean(x2,2);
-                plot(x,y,'.','Color',c);
-                xlim([0 max([x;y])]);
-                ylim([0 max([x;y])]);
-                h=refline(1,0);
-                h.Color = 'k';
-                signtest_pval = signtest(x,y);
-                signrank_pval = signrank(x,y);
-                text(0.5,-0.5,sprintf('P_{sign}=%f',signtest_pval),'Units','normalized','HorizontalAlignment','center','VerticalAlignment','top');
-                text(0.5,-0.7,sprintf('P_{signrank}=%f',signrank_pval),'Units','normalized','HorizontalAlignment','center','VerticalAlignment','top');
-                text(1,0.9, ""+sum(x>y),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
-                text(0.9,1, ""+sum(x<y),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
-                title('Averaged Ipos');
-                xlabel('long arm');
-                ylabel('short arm');
-        end
-    end
+    axes(panel_A_legend(ii_dir));
+    cla
+    hold on
+    plot([1 2], [2 2], 'Color', prm.graphics.colors.flight_directions{ii_dir}, 'LineWidth', 2); % long arm
+    plot([1 2], [1 1], 'Color', prm.graphics.colors.flight_directions{ii_dir}, 'LineWidth', 1); % shorty arm
+    xlim([0.5 2.5])
+    text(2.5, 1, 'Short arm', 'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
+    text(2.5, 2, 'Long arm',  'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
+    set(gca,'visible','off');
 end
-
-
-%% plot the sum of Ipos
-% figure
-% for ii_dir=1:2
-%     Ipos_dir = squeeze(sdf3(:,ii_dir,:));
-%     signif = arrayfun(@(x)(x.signif(ii_dir).TF), cells);
-%     valid_pos = Ipos_bins_centers > prm.fields.valid_speed_pos(1) & Ipos_bins_centers < prm.fields.valid_speed_pos(end);
-%     Ipos_dir(~signif,:) = nan;
-%     Ipos_dir(:,~valid_pos) = nan;
-%     subplot(2,1,ii_dir);
-%     c = prm.graphics.colors.flight_directions{ii_dir};
-%     plot(nansum(Ipos_dir),'Color',c);
-%     for ii_LM = 1:length(LM)
-%         xline(LM(ii_LM).pos_proj);
-%     end
-% end
-
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, fig_name_str);
