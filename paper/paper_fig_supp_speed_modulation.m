@@ -44,22 +44,17 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
 % create panels
-panel_AB_size = [3 4];
-panel_AB(1) = axes('position', [ 6 20 panel_AB_size]);
-panel_AB(2) = axes('position', [10 20 panel_AB_size]);
-panel_AB(3) = axes('position', [ 6 15 panel_AB_size]);
-panel_AB(4) = axes('position', [10 15 panel_AB_size]);
-panel_AB(5) = axes('position', [16 17.5 panel_AB_size]);
+panel_B_size = [2 3.5];
+panel_A       = axes('position', [ 2 18 12 4]);
+panel_A_ex(1) = axes('position', [ 3 13 4 2.5]);
+panel_A_ex(2) = axes('position', [ 9 13 4 2.5]);
+panel_B(1) = axes('position', [ 2 7 panel_B_size]);
+panel_B(2) = axes('position', [ 5 7 panel_B_size]);
+panel_B(3) = axes('position', [ 8 7 panel_B_size]);
+panel_B(4) = axes('position', [11 7 panel_B_size]);
+panel_B(5) = axes('position', [14 7 panel_B_size]);
 
-panel_stats_text = axes('position', [1 9 4 12]);
-
-panel_AB2_size = [3 3];
-panel_AB2(1) = axes('position', [ 6 20 panel_AB2_size]+[0 -12 0 0]);
-panel_AB2(2) = axes('position', [10 20 panel_AB2_size]+[0 -12 0 0]);
-panel_AB2(3) = axes('position', [ 6 15 panel_AB2_size]+[0 -12 0 0]);
-panel_AB2(4) = axes('position', [10 15 panel_AB2_size]+[0 -12 0 0]);
-panel_AB2(5) = axes('position', [16 17.5 panel_AB2_size]+[0 -12 0 0]);
-
+panel_stats_text = axes('position', [16 13 4 12]);
 
 %% load population data
 % =========================================================================
@@ -93,10 +88,142 @@ signif_both_dir = all(pop_signif_TF,2);
 pop_details = cat(1,cells.details);
 pop_bat_number = [pop_details.bat];
 
-%% panels A&B
+%% panel A - population speed comparison per bat
+% axes(panel_A); 
+% cla
+% hold on
+% text(-0.05,1.1, 'A', 'Units','normalized','FontWeight','bold');
+
+% arrange data
+signif = cat(1,cells.signif);
+signif = arrayfun(@(x)(x.TF), signif);
+signif = any(signif,2);
+signif_cells_details = [cells(signif).details];
+signif_cells_expIDs = {signif_cells_details.exp_ID};
+[signif_cells_expIDs_unique,IA,IC] = unique(signif_cells_expIDs, 'stable');
+
+% load exp data
+exps = cellfun(@(c)(exp_load_data(c,'details','flight')), signif_cells_expIDs_unique, 'UniformOutput',0);
+exps = [exps{:}];
+exps_details = [exps.details];
+
+%
+bins_centers = exps(1).flight.speed_traj(1).bins_centers;
+valid_IX = get_data_in_ti(bins_centers, prm.fields.valid_speed_pos);
+speed = nan(length(exps), 2, length(valid_IX));
+for ii_exp = 1:length(exps)
+    for ii_dir = 1:2
+        vel = exps(ii_exp).flight.speed_traj(ii_dir).vel_median;
+        speed(ii_exp,ii_dir,:) = abs(vel(valid_IX));
+    end
+end
+exps_bat_IX = interp1(bats,1:length(bats), [exps_details.batNum]);
+
+speed_mean = [];
+speed_sem = [];
+speed_pval = [];
+for ii_bat = 1:length(bats)
+    bat_IX = exps_bat_IX == ii_bat;
+    for ii_dir = 1:2
+        M = squeeze(speed(bat_IX, ii_dir, :));
+        M = mean(M,2);
+        bat_speed{ii_bat,ii_dir} = M;
+        speed_mean(ii_bat,ii_dir) = nanmean(M(:));
+        speed_sem(ii_bat,ii_dir) = nansem(M(:));
+    end
+    % calc stats
+    x = bat_speed{ii_bat,1}(:);
+    y = bat_speed{ii_bat,2}(:);
+    speed_pval(ii_bat) = ranksum(x,y);
+end
+speed_pval 
+
+%%
+axes(panel_A); 
+cla
+hold on
+text(-0.05,1.1, 'A', 'Units','normalized','FontWeight','bold');
+
+x = [1:length(bats)]' +0.15.*[-1 1];
+y = speed_mean;
+err = speed_sem;
+hbar = bar(x,y);
+[hbar.FaceColor] = disperse( prm.graphics.colors.flight_directions );
+[hbar.BarWidth] = disperse( repelem(3,2) );
+herr = errorbar(x,y,err);
+[herr.LineStyle] = disperse(repelem('none',2));
+[herr.Color] = disperse( prm.graphics.colors.flight_directions );
+
+% draw significance comparison lines
+for ii_bat = 1:length(bats)
+    plot(x(ii_bat,[1 1]), [y(ii_bat,1)+0.5 9.5],'k-','LineWidth',1.1)
+    plot(x(ii_bat,[2 2]), [y(ii_bat,2)+0.5 9.5],'k-','LineWidth',1.1)
+    plot(x(ii_bat,[1 2]), [9.5 9.5],'k-','LineWidth',1.1)
+end
+significant_strs = {'n.s';'n.s';'n.s';'n.s';'*'};
+ht = text( mean(x,2), repelem(9.5,length(bats)), significant_strs,...
+          'HorizontalAlignment','center', 'VerticalAlignment','bottom');
+[ht.FontSize] = disperse([10 10 10 10 20 ]);
+ht(end).Position(2) = 8.8;
+
+xlim([0.5 5.5])
+ylim([0 10])
+
+ha = gca;
+ha.XTick = 1:length(bats);
+ha.XTickLabel = {};
+ha.TickDir = 'out';
+ticklabels = arrayfun(@(bat)({"bat";num2str(bat)}),bats,'UniformOutput',0)
+text(1:length(bats), repelem(-0.3,length(bats)), ticklabels, ...
+    'HorizontalAlignment','center','VerticalAlignment','top','FontSize',8);
+
+%% panel A - speed trajectory exmaples
+example_opt = 4;
+example_list = {
+    'b2289_d180615', 'b0079_d160915';
+    'b2289_d180615', 'b0079_d160920';
+    'b2289_d180615', 'b0079_d160921';
+    'b2289_d180615', 'b0079_d160925';
+    'b2289_d180615', 'b0079_d160927';
+    'b2289_d180615', 'b0079_d160928';
+    'b2289_d180615', 'b0079_d160929';
+    'b2289_d180615', 'b0079_d160930';
+    'b2289_d180615', 'b0079_d161004';
+    'b2289_d180615', 'b0079_d161005';
+    };
+ylimits = [9 10];
+for ii_ex = 1:2
+    axes(panel_A_ex(ii_ex));
+    cla
+    hold on
+    exp = exp_load_data(example_list{example_opt,ii_ex},'flight');
+    FE=exp.flight.FE;
+    FE([exp.flight.FE.distance]<prm.flight.full_min_distance) = [];
+    directions = [1 -1];
+    for ii_dir = 1:2
+        dir_IX = [FE.direction]==directions(ii_dir);
+        FE_dir = [FE(dir_IX)];
+        x = [FE_dir.pos];
+        y = [FE_dir.vel];
+        y = abs(y);
+        plot(x,y,'.','Color', prm.graphics.colors.flight_directions{ii_dir},'MarkerSize',1);
+    end
+    set(gca,'xtick',0:50:200,'ytick',[-10 0 8],'xlim',[0 200])
+    set(gca,'tickdir','out','TickLength',repelem(0.01,2));
+    xlim([0 200]);
+    ylim([0 ylimits(ii_ex)]);
+    xlabel('Position (m)','Units','normalized','Position',[0.5 -0.25]);
+    ylabel('Speed (m/s)','Units','normalized','Position',[-0.05 0.45]);
+end
+
+% add lines going from bat to example
+annotation('line',[0.50 0.59], [0.6 0.64],'LineWidth',2);
+annotation('line',[0.23 0.15], [0.6 0.64],'LineWidth',2);
+
+%% panel B - compare field size (dir1 vs. dir 2)
 % =========================================================================
-averaging_method = 'mean';
-% averaging_method = 'median';
+% averaging_method = 'mean';
+averaging_method = 'median';
 % averaging_method = 'AC_width';
 stats_str = {};
 for ii_bat = 1:length(bats)
@@ -128,15 +255,32 @@ for ii_bat = 1:length(bats)
     stats_str{end+1} = sprintf('signrank, P=%.3f',signrank_pval);
     stats_str{end+1} = '';
     
-    %% plot (graphical option 1)
-    axes(panel_AB(ii_bat));
+    %% plot
+    axes(panel_B(ii_bat));
     cla
     hold on
-    plot([x1;x2],'.-', 'Color',c);
+    switch 2
+        case 1
+            plot([x1;x2],'.-', 'Color',c);
+        case 2
+            plot([x1;x2],'-', 'Color',.5*[1 1 1]);
+            plot(1,x1,'.','Color',prm.graphics.colors.flight_directions{1});
+            plot(2,x2,'.','Color',prm.graphics.colors.flight_directions{2});
+    end
     ha = gca;
     ha.XTick = [1 2];
-    ha.XTickLabel = "Direction "+[1 2];
+    ha.XTickLabel = {};
+    ha.TickDir = 'out';
+%     ha.XTickLabel = "Direction "+[1 2];
+%     ha.XTickLabel = {'{\rightarrow}';'{\leftarrow}'};
+%     ha.XTickLabelRotation = 0;
     ha.XLim = [0.5 2.5];
+    ha.YLim(1) = 0;
+    ht = text( [1 2], repelem(ha.YLim(1)-0.16*diff(ha.YLim),2), {'{\rightarrow}';'{\leftarrow}'},...
+          'HorizontalAlignment','center', 'VerticalAlignment','bottom');
+    [ht.FontSize] = disperse([10 10]);
+    [ht.Color] = disperse( prm.graphics.colors.flight_directions );
+    [ht.FontWeight] = disperse(repelem('bold',2));
     switch averaging_method
         case 'mean'
             ylabel('Averaged field size (m)');
@@ -147,29 +291,13 @@ for ii_bat = 1:length(bats)
     end
     xlabel('');
     title("bat "+bat)
-    
-    %% plot (graphical option 2)
-    axes(panel_AB2(ii_bat));
-    cla
-    hold on
-    axis equal
-    plot(x1,x2,'.', 'Color',c);
-    ha = gca;
-    ha.XLim = [0 max([x1,x2])+1];
-    ha.YLim = [0 max([x1,x2])+1];
-    xlabel('Direction 1');
-    ylabel('Direction 2');
-    title("bat "+bat)
-    h=refline(1,0);
-    h.Color = 'k';
+
 end
 
-axes(panel_AB(1));
-text(-0.2,1.1, 'A', 'Units','normalized','FontWeight','bold');
-axes(panel_AB(5));
-text(-0.2,1.1, 'B', 'Units','normalized','FontWeight','bold');
+axes(panel_B(1));
+text(-0.4,1.1, 'B', 'Units','normalized','FontWeight','bold');
 
-%%
+%% stats panel
 axes(panel_stats_text)
 cla
 set(gca,'Visible','off');
@@ -177,7 +305,8 @@ text(0,1, stats_str, 'Units','normalized','HorizontalAlignment','left','Vertical
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, fig_name_str);
-fig_name_out = [fig_name_out '_' averaging_method]
+fig_name_out = [fig_name_out '_' averaging_method];
+fig_name_out = [fig_name_out '_opt' num2str(example_opt)]
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
