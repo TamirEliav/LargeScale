@@ -40,7 +40,9 @@ set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 figure_size_cm]);
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]); % position on screen...
 set(gcf, 'Renderer', 'painters');
-annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none');
+set(groot, 'defaultAxesTickDir', 'out');
+set(groot,  'defaultAxesTickDirMode', 'manual');
+annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
 % create panels
@@ -56,8 +58,8 @@ panel_C(1) = axes('position', [ 2 13 panel_C_size]);
 panel_C(2) = axes('position', [ 2  9 panel_C_size]);
 panel_D(1) = axes('position', [11 13 panel_D_size]);
 panel_D(2) = axes('position', [11  9 panel_D_size]);
-panel_B_legend(1) = axes('position', [13.4 23 2 1.3]);
-panel_B_legend(2) = axes('position', [13.4 19 2 1.3]);
+panel_B_legend(1) = axes('position', [13.6 23 2 1.3]);
+panel_B_legend(2) = axes('position', [13.6 19 2 1.3]);
 
 
 %% load population data
@@ -421,7 +423,7 @@ for ii_dir = 1:2
     h2.EdgeColor = c;
     h2.LineWidth = 2;
     [H,P,KSSTAT] = kstest2(y1,y2);
-    text(1,0.96,sprintf('P_{KS}=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',8);
+    text(0.85,0.96,sprintf('P_{KS}=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',8);
     
     % labels & graphics
     ha= gca;
@@ -447,8 +449,8 @@ for ii_dir = 1:2
     plot([1 2],[2 2], 'Color',c, 'LineWidth',2);
     xlim([0 3]);
     ylim([0 3]);
-    text(2.5,1, "Distance<"+thr+"m",'FontSize',7);
-    text(2.5,2, "Distance>"+thr+"m",'FontSize',7);
+    text(2.5,1, "Distance < "+thr+"m",'FontSize',7);
+    text(2.5,2, "Distance > "+thr+"m",'FontSize',7);
 %     text(3,1, "Distance$<$"   +thr+"m",'FontSize',7,'Interpreter','latex')
 %     text(3,2, "Distance$\geq$"+thr+"m",'FontSize',7,'Interpreter','latex')
     set(gca,'Visible','off');

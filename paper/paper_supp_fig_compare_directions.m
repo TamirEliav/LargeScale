@@ -40,7 +40,9 @@ set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 figure_size_cm]);
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]); % position on screen...
 set(gcf, 'Renderer', 'painters');
-annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none');
+set(groot, 'defaultAxesTickDir', 'out');
+set(groot,  'defaultAxesTickDirMode', 'manual');
+annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
 color_by_bat = 0;

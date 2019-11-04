@@ -15,6 +15,7 @@ field_options = {
     'time_AC',
     'stats',
     'inclusion',
+    'cluster_control',
     };
 
 %% parse input

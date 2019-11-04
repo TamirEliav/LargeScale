@@ -46,7 +46,8 @@ set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]); % position on screen...
 set(gcf, 'Renderer', 'painters');
 set(groot, 'defaultAxesTickDir', 'out');
-annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none');
+set(groot,  'defaultAxesTickDirMode', 'manual');
+annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 
 % create panels
 panel_B_size = [9.5 1];
@@ -273,7 +274,7 @@ h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dm'
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
 text(-0.085,1.22, 'D', 'Units','normalized','FontWeight','bold');
 
-%% tunnel section behavior (ZY)
+%% panel I - tunnel section behavior (ZY)
 axes(panel_I)
 cla
 axis equal
@@ -729,7 +730,7 @@ set(gca,'xtick',0:50:200,'ytick',[-10 0 8],'xlim',[0 200])
 set(gca,'tickdir','out','TickLength',repelem(0.01,2));
 ylim(ylimits);
 xlabel('Position (m)','Units','normalized','Position',[0.5 -0.25]);
-ylabel('Speed (m/s)','Units','normalized','Position',[-0.05 0.45]);
+ylabel('Speed (m/s)','Units','normalized','Position',[-0.07 0.41]);
 
 
 %% panel K - speed trajectory very constant along the flight - population
@@ -809,7 +810,7 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors
 axes(panel_M);
 cla 
 hold on
-text(-0.4,1.1, 'M', 'Units','normalized','FontWeight','bold');
+text(-0.44,1.1, 'M', 'Units','normalized','FontWeight','bold');
 total_dist_by_dir = 0;
 if total_dist_by_dir
     %% (per direction)

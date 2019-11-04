@@ -3,6 +3,11 @@ function cell_calc_stats(cell_ID)
 %% load cell/exp data
 cell = cell_load_data(cell_ID);
 prm = PARAMS_GetAll();
+% load LM data
+exp_ID = 'b2289_d180615';
+exp = exp_load_data(exp_ID,'LM');
+LM = exp.LM;
+LM( contains({LM.name},{'ball','enter'}) ) = [];
 
 %% create struct
 FR_map = cell.FR_map;
@@ -86,6 +91,7 @@ for ii_dir = 1:2
             stats_per_dir(ii_dir).field_ratio_LS_vel  = nan;
             stats_per_dir(ii_dir).field_ratio_LS_vel2 = nan;
         otherwise % #fields>=2
+            [fields_valid_speed.LM_nearest_by_peak]  = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields_valid_speed.loc]  , 'nearest'));
             stats_per_dir(ii_dir).field_largest     = max([fields_valid_speed.width_prc]);
             stats_per_dir(ii_dir).field_smallest    = min([fields_valid_speed.width_prc]);
             stats_per_dir(ii_dir).field_ratio_LS    = max([fields_valid_speed.width_prc]) / min([fields_valid_speed.width_prc]);
@@ -96,8 +102,8 @@ for ii_dir = 1:2
             stats_per_dir(ii_dir).field_largest_vel2  = max([fields_valid_speed.vel2]);
             stats_per_dir(ii_dir).field_smallest_vel  = min([fields_valid_speed.vel]);
             stats_per_dir(ii_dir).field_smallest_vel2 = min([fields_valid_speed.vel2]);
-            stats_per_dir(ii_dir).field_ratio_LS_vel  = max([fields_valid_speed.vel]) / min([fields_valid_speed.vel]);
-            stats_per_dir(ii_dir).field_ratio_LS_vel2 = max([fields_valid_speed.vel2]) / min([fields_valid_speed.vel2]);
+            stats_per_dir(ii_dir).field_ratio_LS_vel  = stats_per_dir(ii_dir).field_largest_vel  / stats_per_dir(ii_dir).field_smallest_vel;
+            stats_per_dir(ii_dir).field_ratio_LS_vel2 = stats_per_dir(ii_dir).field_largest_vel2 / stats_per_dir(ii_dir).field_smallest_vel2;
     end
     stats_per_dir(ii_dir).spikes_prc_field = 100.* stats_per_dir(ii_dir).spikes_num_field / stats_per_dir(ii_dir).spikes_num_air;
 end
@@ -128,46 +134,42 @@ end
 % for scale stats, consider only fields outside the low speed area 
 fields_valid_speed = fields_all(valid_speed);
 stats_all.field_num = length(fields_valid_speed);
+stats_all.field_largest     = nan;
+stats_all.field_smallest    = nan;
+stats_all.field_ratio_LS    = nan;
+stats_all.field_CV          = nan;
+stats_all.field_size_mean   = nan;
+stats_all.field_size_median = nan;
+stats_all.field_largest_vel   = nan;
+stats_all.field_largest_vel2  = nan;
+stats_all.field_smallest_vel  = nan;
+stats_all.field_smallest_vel2 = nan;
+stats_all.field_ratio_LS_vel  = nan;
+stats_all.field_ratio_LS_vel2 = nan;
+stats_all.field_largest_dist2LM  = nan;
+stats_all.field_smallest_dist2LM = nan;
 switch length(fields_valid_speed)
     case 0
-        stats_all.field_largest     = nan;
-        stats_all.field_smallest    = nan;
-        stats_all.field_ratio_LS    = nan;
-        stats_all.field_CV          = nan;
-        stats_all.field_size_mean   = nan;
-        stats_all.field_size_median = nan;
-        stats_all.field_largest_vel   = nan;
-        stats_all.field_largest_vel2  = nan;
-        stats_all.field_smallest_vel  = nan;
-        stats_all.field_smallest_vel2 = nan;
-        stats_all.field_ratio_LS_vel  = nan;
-        stats_all.field_ratio_LS_vel2 = nan;
+        % do nothing
     case 1
-        stats_all.field_largest     = nan;
-        stats_all.field_smallest    = nan;
-        stats_all.field_ratio_LS    = nan;
-        stats_all.field_CV          = nan;
         stats_all.field_size_mean   = nanmean([fields_valid_speed.width_prc]);
         stats_all.field_size_median = nanmedian([fields_valid_speed.width_prc]);
-        stats_all.field_largest_vel   = nan;
-        stats_all.field_largest_vel2  = nan;
-        stats_all.field_smallest_vel  = nan;
-        stats_all.field_smallest_vel2 = nan;
-        stats_all.field_ratio_LS_vel  = nan;
-        stats_all.field_ratio_LS_vel2 = nan;
     otherwise % #fields>=2
-        stats_all.field_largest     = max([fields_valid_speed.width_prc]);
-        stats_all.field_smallest    = min([fields_valid_speed.width_prc]);
+        [fields_valid_speed.LM_nearest_by_peak]  = disperse(interp1( [LM.pos_proj], [LM.pos_proj], [fields_valid_speed.loc]  , 'nearest'));
+        [stats_all.field_largest,  L_IX] = max([fields_valid_speed.width_prc]);
+        [stats_all.field_smallest, S_IX] = min([fields_valid_speed.width_prc]);
         stats_all.field_ratio_LS    = max([fields_valid_speed.width_prc]) / min([fields_valid_speed.width_prc]);
         stats_all.field_CV          = nanstd([fields_valid_speed.width_prc]) / nanmean([fields_valid_speed.width_prc]);
         stats_all.field_size_mean   = nanmean([fields_valid_speed.width_prc]);
         stats_all.field_size_median = nanmedian([fields_valid_speed.width_prc]);
-        stats_all.field_largest_vel   = max([fields_valid_speed.vel]);
-        stats_all.field_largest_vel2  = max([fields_valid_speed.vel2]);
-        stats_all.field_smallest_vel  = min([fields_valid_speed.vel]);
-        stats_all.field_smallest_vel2 = min([fields_valid_speed.vel2]);
-        stats_all.field_ratio_LS_vel  = max([fields_valid_speed.vel]) / min([fields_valid_speed.vel]);
-        stats_all.field_ratio_LS_vel2 = max([fields_valid_speed.vel2]) / min([fields_valid_speed.vel2]);
+        stats_all.field_largest_vel   = fields_valid_speed(L_IX).vel;
+        stats_all.field_largest_vel2  = fields_valid_speed(L_IX).vel2;
+        stats_all.field_smallest_vel  = fields_valid_speed(S_IX).vel;
+        stats_all.field_smallest_vel2 = fields_valid_speed(S_IX).vel2;
+        stats_all.field_ratio_LS_vel  = stats_all.field_largest_vel  / stats_all.field_smallest_vel;
+        stats_all.field_ratio_LS_vel2 = stats_all.field_largest_vel2 / stats_all.field_smallest_vel2;
+        stats_all.field_largest_dist2LM  = abs(fields_valid_speed(L_IX).loc - fields_valid_speed(L_IX).LM_nearest_by_peak);
+        stats_all.field_smallest_dist2LM = abs(fields_valid_speed(S_IX).loc - fields_valid_speed(S_IX).LM_nearest_by_peak);
 end
 
 %% combine

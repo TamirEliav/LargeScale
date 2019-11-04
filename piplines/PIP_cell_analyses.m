@@ -39,12 +39,14 @@ cells(~ismember([cells.ClusterQuality], [2])) = [];
 cells_t = cells_t({cells.cell_ID},:);
 
 %% filter cells - mean FR
-% % % cells = cellfun(@(c)(cell_load_data(c,'stats')), cells_t.cell_ID, 'UniformOutput',0);
-% % % cells = [cells{:}];
-% % % cells = [cells.stats];
-% % % cells = [cells.all];
-% % % cells_t([cells.meanFR_all]>prm.inclusion.interneuron_FR_thr,:) = []; % take pyramidal
-% % % % cells_t([cells.meanFR_all]<prm.inclusion.interneuron_FR_thr,:) = []; % take interneurons
+if 0
+cells = cellfun(@(c)(cell_load_data(c,'stats')), cells_t.cell_ID, 'UniformOutput',0);
+cells = [cells{:}];
+cells = [cells.stats];
+cells = [cells.all];
+cells_t([cells.meanFR_all]>prm.inclusion.interneuron_FR_thr,:) = []; % take pyramidal
+% cells_t([cells.meanFR_all]<=prm.inclusion.interneuron_FR_thr,:) = []; % take interneurons
+end
 
 %% disp final cells table
 cells_t 
@@ -77,7 +79,9 @@ try
     cell_calc_stats(cell_ID);
 %     cell_calc_inclusion(cell_ID);
 %     cell_calc_time_AC(cell_ID);
-    
+
+%     cell_calc_cluster_control(cell_ID)
+
 %     cell_plot_map_fields(cell_ID);
 %     cell_plot_time_AC(cell_ID);
     toc

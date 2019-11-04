@@ -40,12 +40,14 @@ set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 figure_size_cm]);
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]); % position on screen...
 set(gcf, 'Renderer', 'painters');
-annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none');
+set(groot, 'defaultAxesTickDir', 'out');
+set(groot,  'defaultAxesTickDirMode', 'manual');
+annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
 % create panels
-panel_A_size = [10 5];
-panel_A(1) = axes('position', [ 4 17 panel_A_size]);
+panel_A_size = [7 3];
+panel_A(1) = axes('position', [ 4 14 panel_A_size]);
 panel_A(2) = axes('position', [ 4 10 panel_A_size]);
 
 
@@ -138,12 +140,17 @@ for ii_dir = 1:2
     text(0.75,0.9,{  sprintf('r=%.2g',r);...
                     sprintf('P=%.2g',p)},...
                     'Units','normalized', 'HorizontalAlignment','left','FontSize',7);
-    xlabel('Inter-Landmark distance (m)')
+    xlabel('Inter-Landmark distance (m)','Units','normalized','Position',[0.5 -0.13])
     ylabel('Field size (m)')
     xlim([0 25]);
     ylim([0 35]);
     set(gca,'xtick',[0:5:25])
     set(gca,'ytick',[0:5:35])
+    ha=gca;
+    ha.TickDir = 'out';
+    ha.TickLength = repelem(0.01,2);
+    ha.XRuler.TickLabelGapMultiplier = -.3;
+    ha.YRuler.TickLabelGapMultiplier = 0.1;
 
 end
 % axes(panel_A(1));
@@ -151,7 +158,7 @@ end
 
 %% add direction arrows
 arrow_x = 0.22 +[0 0.05];
-arrow_y = repelem(0.85,2);
+arrow_y = repelem(0.65,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.008,  'Color', prm.graphics.colors.flight_directions{1});
 h(2)=annotation('arrow',flip(arrow_x),arrow_y      ,  'Color', prm.graphics.colors.flight_directions{2});

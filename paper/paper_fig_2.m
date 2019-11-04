@@ -1,4 +1,4 @@
-%% Large Scale - fig 2 - Behavioral and neural recordings from bats fliying over large spatial scales.
+%% Large Scale - fig 2 - Multi-scale spatial coding with many fields in individual dorsla-CA1 neurons
 
 %%
 clear 
@@ -40,7 +40,9 @@ set(gcf,'PaperUnits','centimeters','PaperPosition',[0 0 figure_size_cm]);
 set(gcf,'PaperOrientation','portrait');
 set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]); % position on screen...
 set(gcf, 'Renderer', 'painters');
-annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none');
+set(groot, 'defaultAxesTickDir', 'out');
+set(groot,  'defaultAxesTickDirMode', 'manual');
+annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
@@ -70,12 +72,10 @@ panel_D = axes('position', [ 9.4  10.5 panel_BCDE_size]          );
 panel_E = axes('position', [13.0  10.5 panel_BCDE_size.*[1.2 1] ]);
 
 panel_FGH_size = [2 2];
-panel_F = axes('position', [2.0  7  panel_FGH_size          ]);
-panel_G = axes('position', [5.3  7  panel_FGH_size          ]);
-panel_H = axes('position', [8.6  7  panel_FGH_size.*[1.3 1] ]);
-panel_I = axes('position', [2 2.5 3 3]);
-panel_J(1) = axes('position', [6.5 2.5 3.0 3.0]);
-panel_J(2) = axes('position', [8.0 4.0 1.5 1.5]);
+panel_F = axes('position', [ 2.0  7  panel_FGH_size          ]);
+panel_G = axes('position', [ 5.3  7  panel_FGH_size          ]);
+panel_H = axes('position', [ 8.6  7  panel_FGH_size.*[1.3 1] ]);
+panel_I = axes('position', [13.0  6 3 3]);
 
 %%
 prm = PARAMS_GetAll();
@@ -223,7 +223,7 @@ IX = find( x>xlimits(1) & x<xlimits(end) );
 x=x(IX);
 y=y(IX);
 ylimits = [min(y) max(y)]+[-1 3];
-plot(x,y,'.','Color',c{ii_dir},'MarkerSize',2);
+plot(x,y,'.','Color',c{ii_dir},'MarkerSize',3);
 % plot field size bar
 x = cell.fields{ii_dir}(ii_field).edges_prc;
 y = ylimits([end end]);
@@ -312,6 +312,7 @@ ha.YLim = [0.7 100];
 ha.XLim = [0 33];
 ha.XTick = [0:10:30];
 ha.YTick = [1 10 100];
+ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
 % ha.XLim = [0 35];
 % ha.YLim = [0 40];
 % ha.XTick = [0:5:35];
@@ -346,12 +347,13 @@ h.BinWidth = 1;
 ha=gca;
 ha.YScale = 'log';
 xlabel('Field Size (m)')
-ylabel('Counts','Units','normalized','Position',[-0.2 0.5])
+ylabel('Counts','Units','normalized','Position',[-0.23 0.5])
 ha = gca;
 % ha.XLim = [0 35];
 % ha.YLim = [0 40];
 % ha.XTick = [0:5:35];
 ha.YTick = [1 10 100];
+ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
@@ -449,12 +451,13 @@ ha.YLim = [7e-1 260];
 % ha.XTick = [0:5:35];
 ha.YTick = [1 10 100];
 ha.XTick = [1 2 5 10 20];
+ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
-ylabel('No. of cells','Units','normalized','Position',[-0.21 0.5])
+ylabel('No. of cells','Units','normalized','Position',[-0.24 0.5])
 
 %% arragne population SI/sparsity
 signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
@@ -485,7 +488,7 @@ ha=gca;
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
-ha.YRuler.TickLabelGapMultiplier = 0.001;
+ha.YRuler.TickLabelGapMultiplier = 0.1;
 xlabel({'Spatial information';'(bits/spike)'}, 'Units','normalized','Position',[0.5 -0.17]);
 ylabel('No. of cells')
 
@@ -501,7 +504,7 @@ ha=gca;
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
-ha.YRuler.TickLabelGapMultiplier = 0.001;
+ha.YRuler.TickLabelGapMultiplier = 0.1;
 xlabel('Sparsity', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('No. of cells', 'Units','normalized','Position',[-0.2 0.5])
 
@@ -577,7 +580,7 @@ for ii_cell = 1:length(cells)
     end
 end
 
-%% panel J - field size ratio vs. speed ratio (direct control for speed!)
+%% panel I - field size ratio vs. speed ratio (direct control for speed!)
 % figure
 axes(panel_I);
 cla
@@ -594,47 +597,20 @@ x = abs([stats_all.field_ratio_LS_vel]);
 y = [stats_all.field_ratio_LS];
 [r,pval] = corr(x',y','rows','pairwise');
 plot(x, y, '.k');
-text(0.1,0.95, {sprintf('r=%.2f',r);sprintf('P=%.2f',pval)}, ...
+text(0.1,1, {sprintf('r=%.2f',r);sprintf('P=%.2f',pval)}, ...
     'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
 xlabel('Speed ratio', 'Units','normalized', 'Position',[0.5 -0.12]);
 ylabel('Field size ratio', 'units','normalized', 'Position',[-0.15 0.5]);
 set(gca,'yscale','log');
 set(gca,'ytick',[1 2 3 5 10 15 20]);
 ylim([0.9 max(y)+1]);
+xlim([0.7 1.3])
 ha = gca;
 ha.TickDir='out';
 ha.TickLength = [0.02 0.02];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
-ha.YRuler.TickLabelGapMultiplier = 0.001;
+ha.YRuler.TickLabelGapMultiplier = 0.1;
 
-%% panel K - field diff(size) vs. distance
-axes(panel_J(1));
-cla
-hold on
-text(-0.28,1.1, 'J', 'Units','normalized','FontWeight','bold');
-plot(distances_all, abs(field_size_diff_all), 'k.' , 'MarkerSize',4);
-ha = gca;
-ha.TickDir='out';
-ha.TickLength = [0.02 0.02];
-ha.XRuler.TickLabelGapMultiplier = -0.3;
-ha.YRuler.TickLabelGapMultiplier = 0.001;
-xlabel('Distance between fields (m)', 'Units','normalized', 'Position',[0.5 -0.12]) 
-ylabel('{\Delta} Field size (m)', 'units','normalized', 'Position',[-0.15 0.5])
-
-% panel K inset
-axes(panel_J(2));
-cla
-hold on
-plot(distances_all, abs(field_size_diff_all), 'k.' , 'MarkerSize',3);
-ha = gca;
-ha.XLim = [0 40];
-ha.YLim = [0 15];
-ha.XTick = ha.XLim;
-ha.YTick = ha.YLim;
-ha.TickDir='out';
-ha.TickLength = [0.02 0.02];
-ha.XRuler.TickLabelGapMultiplier = -0.3;
-ha.YRuler.TickLabelGapMultiplier = 0.001;
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, fig_name_str);

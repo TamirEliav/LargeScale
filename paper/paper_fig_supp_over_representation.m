@@ -56,7 +56,24 @@ panel_C(1) = axes('position', [ 2 13.5 panel_C_size]);
 panel_C(2) = axes('position', [ 2  9.5 panel_C_size]);
 % panel_D(1) = axes('position', [11 13.5 panel_D_size]);
 % panel_D(2) = axes('position', [11  9.5 panel_D_size]);
+panel_legend = axes('position', [9.5 23.5 0.5 0.5]);
 
+%%
+axes(panel_legend);
+% figure
+cla
+hold on
+t = linspace(0,1,100);
+% x = cos(3*2*pi*linspace(0,1,100));
+x = pulstran(t,linspace(0,1,3),'rectpuls',1/6);
+x(x>0) = nan;x(~isnan(x)) = 1;
+plot(  t  ,   x  , '-' , 'color', 0.7.*[1 1 1], 'LineWidth',0.5);
+plot([0 1], [2 2], '-', 'color', 0.7.*[1 1 1], 'LineWidth',0.5);
+text(1.3, 2, 'Landmarks','FontSize',7,'HorizontalAlignment','left');
+text(1.3, 1, 'Landing balls','FontSize',7,'HorizontalAlignment','left');
+xlim([0 1]);
+ylim([1 2]);
+set(gca,'Visible','off');
 
 %% load population data
 % =========================================================================
@@ -85,7 +102,7 @@ whos cells
 exp_ID = 'b2289_d180615';
 exp = exp_load_data(exp_ID,'LM');
 LM = exp.LM;
-LM( contains({LM.name},{'ball','enter'}) ) = [];
+LM( contains({LM.name},{'enter'}) ) = [];
 
 %% panel A - field pos CDF
 % =========================================================================
@@ -106,7 +123,7 @@ for ii_dir = 1:2
     % plot cdf
     h = cdfplot([fields.loc]);
     h.Color = prm.graphics.colors.flight_directions{ii_dir};
-    h.LineWidth = 0.5;
+    h.LineWidth = 0.9;
     title('')
     ha=gca;
     ha.GridLineStyle = 'none';
@@ -118,13 +135,17 @@ for ii_dir = 1:2
     for ii_LM=1:length(LM)
         x = LM(ii_LM).pos_proj;
         name = LM(ii_LM).name;
-        h=xline(x, '-', 'color', 0.5.*[1 1 1], 'LineWidth',1);
+        LM_line_type = '-';
+        if ismember(ii_LM,[1 length(LM)])
+            LM_line_type = '--';
+        end
+        h=xline(x, LM_line_type, 'color', 0.7.*[1 1 1], 'LineWidth',0.5);
 %         text(x, ylimits(2)+ypos*diff(ylimits), LM(ii_LM).name, 'Rotation', 45, 'FontSize',8);
     end
     
     % labels & graphics
-    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.17]);
-    ylabel('CDF', 'Units','normalized','Position',[-0.05 0.5]);
+    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.14]);
+    ylabel({'Cumulative';'fraction'}, 'Units','normalized','Position',[-0.025 0.5]);
     ha= gca;
     ha.TickDir='out';
     ha.TickLength = [0.015 0.015];
@@ -303,7 +324,7 @@ for ii_dir = 1:2
     y(y>y_clipping) = y_clipping;
 %     plot(x,y,'.','MarkerSize',4, 'Color',c);
     plot(x(y< y_clipping), y(y< y_clipping),'.','MarkerSize',4, 'Color',c);
-    plot(x(y>=y_clipping), y(y>=y_clipping),'o','MarkerSize',4, 'Color',c);
+    plot(x(y>=y_clipping), y(y>=y_clipping),'o','MarkerSize',2, 'Color',c);
 %     yline(20)
     
     % plot LM
@@ -313,12 +334,16 @@ for ii_dir = 1:2
     for ii_LM=1:length(LM)
         x = LM(ii_LM).pos_proj;
         name = LM(ii_LM).name;
-        h=xline(x, '-', 'color', 0.9.*[1 1 1], 'LineWidth',0.5);
+        LM_line_type = '-';
+        if ismember(ii_LM,[1 length(LM)])
+            LM_line_type = '--';
+        end
+        h=xline(x, LM_line_type, 'color', 0.7.*[1 1 1], 'LineWidth',0.5);
 %         text(x, ylimits(2)+ypos*diff(ylimits), LM(ii_LM).name, 'Rotation', 45, 'FontSize',8);
     end
     
     % labels & graphics
-    xlabel('position (m)', 'Units','normalized','Position',[0.5 -0.17]);
+    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.14]);
     ylabel('Field size (m)', 'Units','normalized','Position',[-0.05 0.5]);
     ha= gca;
     ha.TickDir='out';
@@ -327,7 +352,7 @@ for ii_dir = 1:2
     ha.YLim = [0 y_clipping];
     ha.YTick = ha.YLim;
     ha.XRuler.TickLabelGapMultiplier = -0.3;
-    ha.YRuler.TickLabelGapMultiplier = 0.001;
+    ha.YRuler.TickLabelGapMultiplier = 0.1;
 end
 
 axes(panel_C(1));
@@ -446,9 +471,6 @@ h(1)=annotation('arrow',arrow_x,      arrow_y+0.008,  'Color', prm.graphics.colo
 h(2)=annotation('arrow',flip(arrow_x),arrow_y      ,  'Color', prm.graphics.colors.flight_directions{2});
 [h.HeadWidth] = disperse([5 5]);
 [h.HeadLength] = disperse([5 5]);
-
-
-
 
 
 
