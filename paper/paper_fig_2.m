@@ -49,7 +49,7 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 % create panels
 panel_A_size_raster = [5 1];
 panel_A_size_FR_map = [5 1];
-panel_A_pos = [2 14];
+panel_A_pos = [2 12];
 panel_A = [];
 for ii=1:3
     for jj=1:3
@@ -65,17 +65,20 @@ end
 panel_A = panel_A(:,3:-1:1,:);
 panel_A = reshape(panel_A,[9 3]);
 
-panel_BCDE_size = [2 2];
-panel_B = axes('position', [ 2.0  10.5 panel_BCDE_size]          );
-panel_C = axes('position', [ 5.3  10.5 panel_BCDE_size.*[1.4 1] ]);
-panel_D = axes('position', [ 9.4  10.5 panel_BCDE_size]          );
-panel_E = axes('position', [13.0  10.5 panel_BCDE_size.*[1.2 1] ]);
+panel_BCD_size = [2 2];
+panel_B = axes('position', [ 2.0  8.5  panel_BCD_size          ]);
+panel_C = axes('position', [ 5.3  8.5  panel_BCD_size          ]);
+panel_D = axes('position', [ 8.6  8.5  panel_BCD_size.*[1.3 1] ]);
 
-panel_FGH_size = [2 2];
-panel_F = axes('position', [ 2.0  7  panel_FGH_size          ]);
-panel_G = axes('position', [ 5.3  7  panel_FGH_size          ]);
-panel_H = axes('position', [ 8.6  7  panel_FGH_size.*[1.3 1] ]);
-panel_I = axes('position', [13.0  6 3 3]);
+panel_EFG_size = [2 2];
+panel_E = axes('position', [ 2.0  5 panel_EFG_size]          );
+panel_F = axes('position', [ 5.3  5 panel_EFG_size.*[1.4 1] ]);
+panel_G = axes('position', [ 9.4  5 panel_EFG_size]          );
+
+panel_H = axes('position', [13.0  8.5 panel_EFG_size.*[1.2 1] ]);
+
+
+panel_I = axes('position', [13.0  4 3 3]);
 
 %%
 prm = PARAMS_GetAll();
@@ -237,7 +240,7 @@ h.YLim = ylimits;
 
 %% add direction arrows
 arrow_x = 0.1 +[0 0.05];
-arrow_y = repelem(0.965,2);
+arrow_y = repelem(0.8933,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.008,  'Color', prm.graphics.colors.flight_directions{1});
 h(2)=annotation('arrow',flip(arrow_x),arrow_y      ,  'Color', prm.graphics.colors.flight_directions{2});
@@ -283,12 +286,12 @@ clear cells stats cells_details cells_t
 cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
 
-%% panel B - field count histogram
+%% panel E - field count histogram
 % figure
-axes(panel_B);
+axes(panel_E);
 cla
 hold on
-text(-0.45,1.15, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'E', 'Units','normalized','FontWeight','bold');
 nFields = nan(2,length(cells));
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -322,12 +325,12 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 
-%% panel C - field size histogram
+%% panel F - field size histogram
 % figure
-axes(panel_C);
+axes(panel_F);
 cla
 hold on
-text(-0.35,1.15, 'C', 'Units','normalized','FontWeight','bold');
+text(-0.35,1.15, 'F', 'Units','normalized','FontWeight','bold');
 fields_size = [];
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -359,12 +362,12 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 
-%% panel D - smallest / largest field size
+%% panel G - smallest / largest field size
 % figure
-axes(panel_D);
+axes(panel_G);
 cla
 hold on
-text(-0.45,1.15, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'G', 'Units','normalized','FontWeight','bold');
 LS_field_size = nan(2,length(cells));
 for ii_cell = 1:length(cells)
     cell = cells(ii_cell);
@@ -402,12 +405,12 @@ ylabel('Field size (m)','Units','normalized','Position',[-0.21 0.5])
 
 
 
-%% panel E - field ratio (largest/smallest)
+%% panel H - field ratio (largest/smallest)
 % figure
-axes(panel_E);
+axes(panel_H);
 cla
 hold on
-text(-0.4,1.15, 'E', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.15, 'H', 'Units','normalized','FontWeight','bold');
 LS_field_ratio_all = nan(1,length(cells));
 LS_field_ratio_dir = nan(2,length(cells));
 for ii_cell = 1:length(cells)
@@ -473,14 +476,11 @@ sparsity(~signif) = nan;
 sparsity = sparsity(:);
 sparsity(isnan(sparsity)) = [];
 
-%% panel F - spatial info histogram
-% TODO: check why I used to have cells with higher spatial info, maybe
-% because I used different inclusion/signif criteria, or because some how
-% now I have nans in my SI/FR_map calculation...?
-axes(panel_F);
+%% panel B - spatial info histogram
+axes(panel_B);
 cla
 hold on
-text(-0.45,1.15, 'F', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'B', 'Units','normalized','FontWeight','bold');
 h = histogram(SI);
 h.NumBins = 12;
 h.FaceColor = 0.5*[1 1 1];
@@ -492,11 +492,11 @@ ha.YRuler.TickLabelGapMultiplier = 0.1;
 xlabel({'Spatial information';'(bits/spike)'}, 'Units','normalized','Position',[0.5 -0.17]);
 ylabel('No. of cells')
 
-%% panel G - sparsity histogram
-axes(panel_G);
+%% panel C - sparsity histogram
+axes(panel_C);
 cla
 hold on
-text(-0.45,1.15, 'G', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'C', 'Units','normalized','FontWeight','bold');
 h = histogram(sparsity);
 h.NumBins = 15;
 h.FaceColor = 0.5*[1 1 1];
@@ -508,12 +508,12 @@ ha.YRuler.TickLabelGapMultiplier = 0.1;
 xlabel('Sparsity', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('No. of cells', 'Units','normalized','Position',[-0.2 0.5])
 
-%% panel H - map correlations histogram
+%% panel D - map correlations histogram
 % figure
-axes(panel_H);
+axes(panel_D);
 cla
 hold on
-text(-0.45,1.15, 'H', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'D', 'Units','normalized','FontWeight','bold');
 
 % arrange data
 signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
@@ -543,7 +543,7 @@ histogram(data,    'Normalization','pdf','BinEdges',edges,'FaceColor', 0.5*[1 1 
 histogram(shuffle, 'Normalization','pdf','BinEdges',edges,'DisplayStyle','stairs','EdgeColor','k','LineWidth',1.5);
 [~,P_KS] = kstest2(data, shuffle);
 P_RankSum = ranksum(data, shuffle);
-text(1.2,0.9, sprintf('P_{KS}=%.02f',P_KS),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
+text(1,0.9, sprintf('P_{KS}=%.02f',P_KS),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
 % text(1,0.9, sprintf('P=%.02f',P_RankSum),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
 
 ha= gca;

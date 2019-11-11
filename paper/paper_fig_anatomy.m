@@ -48,15 +48,16 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 % create panels
 panel_A_size = [4 5];
 panel_BCD_size = [6 4];
-panel_A(1) = axes('position', [ 3 20.5 panel_A_size]);
-panel_A(2) = axes('position', [ 8 21.5 4 3]);
+panel_A(1) = axes('position', [ 8.5 20.5 panel_A_size]);
+panel_A(2) = axes('position', [ 3 21.5 4 3]);
+panel_A(3) = axes('position', [13 21.5 4 3]);
 panel_B(1) = axes('position', [ 3 15 panel_BCD_size]);
 panel_B(2) = axes('position', [11 15 panel_BCD_size]);
 panel_C(1) = axes('position', [ 3 10 panel_BCD_size]);
 panel_C(2) = axes('position', [11 10 panel_BCD_size]);
 panel_D(1) = axes('position', [ 3  5 panel_BCD_size]);
 panel_D(2) = axes('position', [11  5 panel_BCD_size]);
-panel_legend = axes('position', [16 21.5 1 3]);
+panel_legend = axes('position', [18 16 1 3]);
 
 %% load population data
 % =========================================================================
@@ -120,7 +121,7 @@ set(gca,'Visible','off');
 axes(panel_A(1));
 cla
 hold on
-text(-0.3,1.1, 'A', 'Units','normalized','FontWeight','bold');
+text(-1.68,1.1, 'A', 'Units','normalized','FontWeight','bold');
 
 axis ij
 plot(Prox2dist_curve(1,:),Prox2dist_curve(2,:), 'k');
@@ -142,7 +143,13 @@ ylabel('Longitudinal axis (\mum)');
 %% histology slice example
 axes(panel_A(2));
 cla
-histology_slice_example_file = 'L:\resources\Histology_bat_148_TT1.jpg';
+histology_slice_example_file = 'L:\resources\Histology\Tamir_bat148_Sec16a_X4_after_WB.tif';
+image = imread(histology_slice_example_file);
+imshow(image);
+
+axes(panel_A(3));
+cla
+histology_slice_example_file = 'L:\resources\Histology\Tamir_bat9861_Sec15a_X4_after_WB.tif';
 image = imread(histology_slice_example_file);
 imshow(image);
 
@@ -171,8 +178,8 @@ for ii_pos_TT_opt = 1:2
     [rho,pval_rho] = corr(x(:,ii_pos_TT_opt),y','rows','pairwise','type','Spearman');
     text(1,1, {sprintf('r=%.2f',r);sprintf('P=%.2f',pval_r)}, ...
         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
-    text(1,0.8, {sprintf('%s=%.2f','\rho',rho);sprintf('P=%.2f',pval_rho)}, ...
-        'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+%     text(1,0.8, {sprintf('%s=%.2f','\rho',rho);sprintf('P=%.2f',pval_rho)}, ...
+%         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     
     xlim(TT_pos_limits(ii_pos_TT_opt,:))
     ylim([0 15]);
@@ -203,8 +210,8 @@ for ii_pos_TT_opt = 1:2
     [rho,pval_rho] = corr(x(:,ii_pos_TT_opt),y','rows','pairwise','type','Spearman');
     text(1,1, {sprintf('r=%.2f',r);sprintf('P=%.2f',pval_r)}, ...
         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
-    text(1,0.8, {sprintf('%s=%.2f','\rho',rho);sprintf('P=%.2f',pval_rho)}, ...
-        'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+%     text(1,0.8, {sprintf('%s=%.2f','\rho',rho);sprintf('P=%.2f',pval_rho)}, ...
+%         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     
     xlim(TT_pos_limits(ii_pos_TT_opt,:))
     ylim([0 20]);
@@ -236,8 +243,8 @@ for ii_pos_TT_opt = 1:2
     [rho,pval_rho] = corr(x(:,ii_pos_TT_opt),y','rows','pairwise','type','Spearman');
     text(1,1, {sprintf('r=%.2f',r);sprintf('P=%.2f',pval_r)}, ...
         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
-    text(1,0.8, {sprintf('%s=%.2f','\rho',rho);sprintf('P=%.2f',pval_rho)}, ...
-        'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+%     text(1,0.8, {sprintf('%s=%.2f','\rho',rho);sprintf('P=%.2f',pval_rho)}, ...
+%         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     
     xlim(TT_pos_limits(ii_pos_TT_opt,:))
     ylim([0 40]);

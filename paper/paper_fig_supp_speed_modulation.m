@@ -48,21 +48,22 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 % create panels
 panel_B_size = [2 3.5];
 panel_A       = axes('position', [ 2 18 12 4]);
-panel_A_ex(1) = axes('position', [ 3 13 4 2.5]);
-panel_A_ex(2) = axes('position', [ 9 13 4 2.5]);
+panel_A_ex(1) = axes('position', [ 2 13 4 2.5]);
+panel_A_ex(2) = axes('position', [ 7 13 4 2.5]);
+panel_A_ex(3) = axes('position', [12 13 4 2.5]);
 panel_B(1) = axes('position', [ 2 7 panel_B_size]);
 panel_B(2) = axes('position', [ 5 7 panel_B_size]);
 panel_B(3) = axes('position', [ 8 7 panel_B_size]);
 panel_B(4) = axes('position', [11 7 panel_B_size]);
 panel_B(5) = axes('position', [14 7 panel_B_size]);
 
-panel_stats_text = axes('position', [16 13 4 12]);
+% panel_stats_text = axes('position', [16 13 4 12]);
 
 %% load population data
 % =========================================================================
 prm = PARAMS_GetAll();
 cells_t = DS_get_cells_summary();
-bats = [148,34,9861,2289,79];
+bats = [2289 9861 148 34 79];
 cells_t(~ismember(cells_t.bat, bats ),:) = [];
 cells = cellfun(@(c)(cell_load_data(c,'details')), cells_t.cell_ID, 'UniformOutput',0);
 cells = [cells{:}];
@@ -91,10 +92,6 @@ pop_details = cat(1,cells.details);
 pop_bat_number = [pop_details.bat];
 
 %% panel A - population speed comparison per bat
-% axes(panel_A); 
-% cla
-% hold on
-% text(-0.05,1.1, 'A', 'Units','normalized','FontWeight','bold');
 
 % arrange data
 signif = cat(1,cells.signif);
@@ -120,6 +117,7 @@ for ii_exp = 1:length(exps)
     end
 end
 exps_bat_IX = interp1(bats,1:length(bats), [exps_details.batNum]);
+n_sessions_per_bat = accumarray(exps_bat_IX',ones(size(exps_bat_IX))');
 
 speed_mean = [];
 speed_sem = [];
@@ -136,15 +134,15 @@ for ii_bat = 1:length(bats)
     % calc stats
     x = bat_speed{ii_bat,1}(:);
     y = bat_speed{ii_bat,2}(:);
-    speed_pval(ii_bat) = ranksum(x,y);
+    speed_pval(ii_bat) = ranksum(x,y,'tail','right');
 end
-speed_pval 
+speed_pval
 
 %%
 axes(panel_A); 
 cla
 hold on
-text(-0.05,1.1, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.1,1.2, 'A', 'Units','normalized','FontWeight','bold');
 
 x = [1:length(bats)]' +0.15.*[-1 1];
 y = speed_mean;
@@ -162,11 +160,16 @@ for ii_bat = 1:length(bats)
     plot(x(ii_bat,[2 2]), [y(ii_bat,2)+0.5 9.5],'k-','LineWidth',1.1)
     plot(x(ii_bat,[1 2]), [9.5 9.5],'k-','LineWidth',1.1)
 end
-significant_strs = {'n.s';'n.s';'n.s';'n.s';'*'};
-ht = text( mean(x,2), repelem(9.5,length(bats)), significant_strs,...
-          'HorizontalAlignment','center', 'VerticalAlignment','bottom');
-[ht.FontSize] = disperse([10 10 10 10 20 ]);
-ht(end).Position(2) = 8.8;
+significant_strs = {'n.s';'n.s';'n.s';'n.s';'**'};
+n_sessions_per_bat
+ht = text( mean(x,2), repelem(11.5,length(bats)), "n="+n_sessions_per_bat,...
+    'HorizontalAlignment','center', 'VerticalAlignment','bottom','FontSize',8);
+ht = text( mean(x,2), repelem(10.5,length(bats)), "sessions",...
+    'HorizontalAlignment','center', 'VerticalAlignment','bottom','FontSize',8);
+ht = text( mean(x,2), repelem(9.6,length(bats)), significant_strs,...
+    'HorizontalAlignment','center', 'VerticalAlignment','bottom');
+[ht.FontSize] = disperse([8 8 8 8 15 ]);
+ht(end).Position(2) = 9;
 
 xlim([0.5 5.5])
 ylim([0 10])
@@ -175,30 +178,42 @@ ha = gca;
 ha.XTick = 1:length(bats);
 ha.XTickLabel = {};
 ha.TickDir = 'out';
-ticklabels = arrayfun(@(bat)({"bat";num2str(bat)}),bats,'UniformOutput',0)
+ticklabels = arrayfun(@(bat)({"Bat";num2str(bat)}),bats,'UniformOutput',0)
 text(1:length(bats), repelem(-0.3,length(bats)), ticklabels, ...
     'HorizontalAlignment','center','VerticalAlignment','top','FontSize',8);
+ylabel('Speed (m/s)','Units','normalized','Position',[-0.05 0.45]);
 
 %% panel A - speed trajectory exmaples
-example_opt = 1;
+example_opt = [20 19 4];
 example_list = {
-    'b2289_d180615', 'b0079_d160915';
-    'b2289_d180615', 'b0079_d160920';
-    'b2289_d180615', 'b0079_d160921';
-    'b2289_d180615', 'b0079_d160925';
-    'b2289_d180615', 'b0079_d160927';
-    'b2289_d180615', 'b0079_d160928';
-    'b2289_d180615', 'b0079_d160929';
-    'b2289_d180615', 'b0079_d160930';
-    'b2289_d180615', 'b0079_d161004';
-    'b2289_d180615', 'b0079_d161005';
-    };
-ylimits = [9 10];
-for ii_ex = 1:2
+    'b0079_d160915'; % 1
+    'b0079_d160920';
+    'b0079_d160921';
+    'b0079_d160925';
+    'b0079_d160927'; % 5
+    'b0079_d160928';
+    'b0079_d160929';
+    'b0079_d160930';
+    'b0079_d161004';
+    'b0079_d161005'; % 10
+    
+    'b0034_d180313'; % 11
+    'b0034_d180315';
+    'b0079_d161003';
+    'b0148_d170613';
+    'b0148_d170615'; % 15
+    'b0148_d170626';
+    'b0148_d170802';
+    'b0148_d170807';
+    'b2289_d180520';
+    'b2289_d180615'; % 20
+};
+% ylimits = [9 10];
+for ii_ex = 1:3
     axes(panel_A_ex(ii_ex));
     cla
     hold on
-    exp = exp_load_data(example_list{example_opt,ii_ex},'flight');
+    exp = exp_load_data(example_list{example_opt(ii_ex)},'flight');
     FE=exp.flight.FE;
     FE([exp.flight.FE.distance]<prm.flight.full_min_distance) = [];
     directions = [1 -1];
@@ -213,14 +228,16 @@ for ii_ex = 1:2
     set(gca,'xtick',0:50:200,'ytick',[-10 0 8],'xlim',[0 200])
     set(gca,'tickdir','out','TickLength',repelem(0.01,2));
     xlim([0 200]);
-    ylim([0 ylimits(ii_ex)]);
+%     ylim([0 ylimits(ii_ex)]);
+    ylim([0 10]);
     xlabel('Position (m)','Units','normalized','Position',[0.5 -0.25]);
     ylabel('Speed (m/s)','Units','normalized','Position',[-0.05 0.45]);
 end
 
 % add lines going from bat to example
-annotation('line',[0.50 0.59], [0.6 0.64],'LineWidth',2);
-annotation('line',[0.23 0.15], [0.6 0.64],'LineWidth',2);
+annotation('line',[0.18 0.15], [0.6 0.64],'LineWidth',1);
+annotation('line',[0.64 0.59], [0.6 0.64],'LineWidth',1);
+
 
 %% panel B - compare field size (dir1 vs. dir 2)
 % =========================================================================
@@ -292,23 +309,23 @@ for ii_bat = 1:length(bats)
             ylabel('AC width (m)');
     end
     xlabel('');
-    title("bat "+bat)
+    title("Bat "+bat)
 
 end
 
 axes(panel_B(1));
-text(-0.4,1.1, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.6,1.1, 'B', 'Units','normalized','FontWeight','bold');
 
 %% stats panel
-axes(panel_stats_text)
-cla
-set(gca,'Visible','off');
-text(0,1, stats_str, 'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top');
+% axes(panel_stats_text)
+% cla
+% set(gca,'Visible','off');
+% text(0,1, stats_str, 'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top');
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, fig_name_str);
 fig_name_out = [fig_name_out '_' averaging_method];
-fig_name_out = [fig_name_out '_opt' num2str(example_opt)]
+fig_name_out = [fig_name_out '_opt_' char(join(""+example_opt,"_"))]
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');

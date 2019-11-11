@@ -16,6 +16,7 @@ field_options = {
     'stats',
     'inclusion',
     'cluster_control',
+    'cluster_quality',
     };
 
 %% parse input

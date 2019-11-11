@@ -5,6 +5,7 @@ clear
 clc
 
 %% choose data options
+panel_C_opt = 6;
 panel_G_opt = 1;
 panel_I_opt = 6;
 panel_J_opt = 10;
@@ -51,13 +52,13 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 
 % create panels
 panel_B_size = [9.5 1];
-panel_A    = axes('position', [ 0.95 23.2  2 2]);
+panel_A    = axes('position', [ 0.75 23.2  2 2]);
 panel_B(1) = axes('position', [ 4 24.5  panel_B_size]);
 panel_B(2) = axes('position', [ 4 23.5  panel_B_size]);
 panel_B(3) = axes('position', [ 4 22.5  panel_B_size]);
 panel_B(4) = axes('position', [ 4 21.5  panel_B_size]);
 panel_C    = axes('position', [15 21.4  4 4]);
-panel_D    = axes('position', [ 1 18 8 2.3]);
+panel_D    = axes('position', [ 0.8 18 8 2.3]);
 panel_E    = axes('position', [ -0.5 12.5 9 5]);
 panel_F    = axes('position', [10 18 2 2]);
 panel_G    = axes('position', [13.6 18 6 2]);
@@ -159,6 +160,9 @@ clusters_colors = clusters_colors ./255;
 % clusters_colors([1 2 8 9],:) = clusters_colors([7 11 9 8],:);
 % clusters_colors = clusters_colors(randperm(size(clusters_colors,1)),:);
 
+%% identify the single-units
+clusters_single_unit = [1 1 1 1 1 1 1 0 1 0 0 0];
+
 %% ---------------------- spikes clusters ---------------------------------
 % the spikes trace is during flight
 % the clusters are from sleep session before behavior
@@ -168,14 +172,60 @@ clusters_colors = clusters_colors ./255;
 % 3. 1st half session during flight
 % 4. 2nd half session during flight
 
-if 1
 NTT_file = 'L:\Analysis\pre_proc\0148\20170625\spikes_sorting\spikes_b0148_d170625_TT4.NTT';
-limits_ts = [70019176845 70816687098]; % sleep session
-% limits_ts = [];
-if isempty(limits_ts)
-    [Timestamps, CellNumbers, Samples, Header] = Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 1, [] );
-else
-    [Timestamps, CellNumbers, Samples, Header] = Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 4, limits_ts);
+exp_ID = 'b0148_d170625';
+exp=exp_load_data(exp_ID,'details','flight');
+prm = PARAMS_GetAll();
+FE=exp.flight.FE;
+FE([FE.distance] < prm.flight.full_min_distance) = [];
+behave_session_ts = exp_get_sessions_ti(exp_ID, 'Behave');
+switch panel_C_opt
+    case 1 
+        % sleep session
+        panel_C_opt_str = 'sleep_session';
+        limits_ts = [70019176845 70816687098];
+        [Timestamps, CellNumbers, Samples, Header] = Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 4, limits_ts);
+    case 2 
+        % all spikes
+        panel_C_opt_str = 'all_spikes';
+        limits_ts = [];
+        [Timestamps, CellNumbers, Samples, Header] = Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 1, [] );
+    case 3
+        % all spikes during flight (in-air)
+        panel_C_opt_str = 'flight_all';
+        limits_ts = behave_session_ts;
+        [Timestamps, CellNumbers, Samples, Header] = Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 4, limits_ts);
+        IX = get_data_in_ti(Timestamps, flight_ts);
+        Timestamps = Timestamps(IX);
+        Samples = Samples(:,:,IX);
+        CellNumbers = CellNumbers(IX);
+    case 4
+        % spikes during flight (in-air) - 1st half
+        panel_C_opt_str = 'flight_1st_half';
+        limits_ts = behave_session_ts;
+        [Timestamps, CellNumbers, Samples, Header] = Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 4, limits_ts);
+        FE(length(FE)/2:end) = [];
+        flight_ts = [FE.start_ts; FE.end_ts]';
+        IX = get_data_in_ti(Timestamps, flight_ts);
+        Timestamps = Timestamps(IX);
+        Samples = Samples(:,:,IX);
+        CellNumbers = CellNumbers(IX);
+    case 5
+        % spikes during flight (in-air) - 2nd half
+        panel_C_opt_str = 'flight_2nd_half';
+        limits_ts = behave_session_ts;
+        [Timestamps, CellNumbers, Samples, Header] = Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 4, limits_ts);
+        FE(1:length(FE)/2) = [];
+        flight_ts = [FE.start_ts; FE.end_ts]';
+        IX = get_data_in_ti(Timestamps, flight_ts);
+        Timestamps = Timestamps(IX);
+        Samples = Samples(:,:,IX);
+        CellNumbers = CellNumbers(IX);
+    case 6
+        % all spikes during behave session (in-air+on balls)
+        panel_C_opt_str = 'behave_session';
+        limits_ts = behave_session_ts;
+        [Timestamps, CellNumbers, Samples, Header] = Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 4, limits_ts);
 end
 ADBitVolts = sscanf(Header{contains(Header,'ADBitVolts')},'-ADBitVolts %f %f %f %f');
 Samples = Samples .* ADBitVolts' .* 1e6; % convert bits to uVolts
@@ -205,6 +255,11 @@ for ii_cell = 1:length(cells)
     y = Y(cell_spikes_IX);
     z = Z(cell_spikes_IX);
     plot3(x,y,z,'.','Color',color_list(ii_cell,:),'MarkerSize',1);
+    cluCntr = prctile([x;y;z]',95);
+    text(cluCntr(1),cluCntr(2),cluCntr(3), num2str(cellNum));
+    if clusters_single_unit(cellNum)
+        plot3(cluCntr(1),cluCntr(2),cluCntr(3),'*','Color','r','MarkerSize',10);
+    end
 end
 ha = gca;
 ha.XLim = [0 max(X(CellNumbers ~= 0))];
@@ -223,7 +278,7 @@ AZ_EL(3,:) = [511 -8];
 AZ_EL(4,:) = [876 -12];
 viewing_option = 4;
 view(AZ_EL(viewing_option,:));
-end
+
 text(-0.2,0.95, 'C', 'Units','normalized','FontWeight','bold');
 
 %% show images
@@ -236,7 +291,7 @@ tunnel_view_image_file = 'L:\Videos_Photos\TAZOT_HAMAMA\taza4.jpg';
 axes(panel_A);
 image = imread(logger_image_filename);
 imshow(image);
-text(-0.3,1.22, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.29,1.22, 'A', 'Units','normalized','FontWeight','bold');
 % add scale bar
 scale_mm = 10;
 pixel_mm_ratio = 720/11; % 720 pixels is measured manually using ginput amd sd card width is 11mm
@@ -272,7 +327,7 @@ yaf = yaf + 0.008;
 annotation('line', xaf,yaf, 'Linewidth',scale_line_width);
 h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dm',scale_m),...
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
-text(-0.085,1.22, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.075,1.22, 'D', 'Units','normalized','FontWeight','bold');
 
 %% panel I - tunnel section behavior (ZY)
 axes(panel_I)
@@ -281,12 +336,11 @@ axis equal
 hold on
 text(-0.15,1, 'I', 'Units','normalized','FontWeight','bold');
 % plot tunnel section lines
-% TODO: measure REAL dimensions in the tunnel
-plot([-1.25 -1.25],[0 1.7],'k','LineWidth',1.5);
-plot([ 1.25  1.25],[0 1.7],'k','LineWidth',1.5);
-plot([ 1.25 0],[1.7 2.35],'k','LineWidth',1.5);
-plot([-1.25 0],[1.7 2.35],'k','LineWidth',1.5);
-plot([-1.25 1.25],[0 0],'k','LineWidth',1.5);
+plot([-1.15 -1.15],[0 1.7],'k','LineWidth',1.5);
+plot([ 1.15  1.15],[0 1.7],'k','LineWidth',1.5);
+plot([ 1.15 0],[1.7 2.35],'k','LineWidth',1.5);
+plot([-1.15 0],[1.7 2.35],'k','LineWidth',1.5);
+plot([-1.15 1.15],[0 0],'k','LineWidth',1.5);
 % add Y/Z arrows
 xlimits = get(gca,'xlim');
 ylimits = get(gca,'ylim');
@@ -380,7 +434,7 @@ ha.YRuler.TickLabelGapMultiplier = 0;
 %% bespoon localization (anchors+tag+tunnel)
 axes(panel_E);
 cla
-text(-0.08, 1, 'E', 'Units','normalized','FontWeight','bold');
+text(-0.11, 1, 'E', 'Units','normalized','FontWeight','bold');
 axis equal
 % axis normal
 pause(eps)
@@ -496,7 +550,7 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.25;
-text(-0.4,1.15, 'F', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'F', 'Units','normalized','FontWeight','bold');
 
 %% behavioral trajectory is 1D (small y deviations) - example
 axes(panel_G);
@@ -594,7 +648,7 @@ ystd_median_all = arrayfun(@(x)(x.ystd_median), pos_y_dev_all);
 %% behavioral trajectory is 1D (small y deviations) - population
 axes(panel_H);
 cla
-text(-0.32,1.1, 'H', 'Units','normalized','FontWeight','bold');
+text(-0.34,1.1, 'H', 'Units','normalized','FontWeight','bold');
 hold on
 % arrange data
 data = {};
@@ -698,7 +752,7 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors
 axes(panel_J); 
 cla
 hold on
-text(-0.1,1.1, 'J', 'Units','normalized','FontWeight','bold');
+text(-0.13,1.1, 'J', 'Units','normalized','FontWeight','bold');
 % panel_J_opt = 4;
 panel_J_data_options = {
     'b0034_d180313';
@@ -721,8 +775,8 @@ y = [FE.vel];
 y = abs(y);
 ylimits = [0 9];
 baseval = 0.1;
-area([1 prm.fields.valid_speed_pos(1)]    , ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
-area([  prm.fields.valid_speed_pos(2) 199], ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
+area([4 prm.fields.valid_speed_pos(1)]    , ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
+area([  prm.fields.valid_speed_pos(2) 194], ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
 plot(x,y,'.','Color', 'k','MarkerSize',1);
 % plot(prm.fields.valid_speed_pos([1 1]), ylimits,'--m','LineWidth',2)
 % plot(prm.fields.valid_speed_pos([2 2]), ylimits,'--m','LineWidth',2)
@@ -753,6 +807,7 @@ for ii_dir = 1:2
     h.LineWidth = 1;
 end
 ha=gca;
+ha.XTick = [0 0.04 0.08];
 ha.TickLength = [0.04 0.04];
 ha.XRuler.TickLabelGapMultiplier = -0.1;
 ha.YRuler.TickLabelGapMultiplier = 0.2;
@@ -794,7 +849,7 @@ ha.XLim(2) = 65;
 ha.TickLength = [0.04 0.04];
 ha.XRuler.TickLabelGapMultiplier = -0.1;
 ha.YRuler.TickLabelGapMultiplier = 0.2;
-xlabel('No. of laps','Units','normalized','Position',[0.5 -0.25]);
+xlabel('No. of flights','Units','normalized','Position',[0.5 -0.25]);
 ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
 % add direction arrows
@@ -857,6 +912,7 @@ ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 %%
 data_opt_str = {
     'data options:'
+    sprintf('panel C - option %d: %s               ',panel_C_opt,panel_C_opt_str);
     sprintf('panel G - option %d: %s               ',panel_G_opt,panel_G_data_options{panel_G_opt});
     sprintf('panel I - option %d: %s, dir=%d, x0=%d',panel_I_opt,panel_I_data_options{panel_I_opt,:});
     sprintf('panel J - option %d: %s               ',panel_J_opt,panel_J_data_options{panel_J_opt});
@@ -865,6 +921,7 @@ data_opt_str = {
 annotation('textbox', [0.2 0.2 0.6 0.1], 'String',data_opt_str, 'HorizontalAlignment','Left','Interpreter','none','FitBoxToText','on');
 
 %% print/save the figure
+fig_name_str = fig_name_str+"_C_opt"+panel_C_opt+panel_C_opt_str;
 % fig_name_str = fig_name_str+"_G_opt"+panel_G_opt;
 % fig_name_str = fig_name_str+"_I_opt"+panel_I_opt;
 % fig_name_str = fig_name_str+"_J_opt"+panel_J_opt;

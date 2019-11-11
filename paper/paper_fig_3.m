@@ -255,7 +255,7 @@ for ii_dir = 1:2
     h2.EdgeColor = 'k';
     h2.LineWidth = 2;
     [H,P,KSSTAT] = kstest2(x1,x2);
-    text(1,1,sprintf('P_{KS}=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',8);
+    text(1,1.03,sprintf('P_{KS}=%.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',8);
     xline(0,'-','LineWidth',2);
     
     % labels & graphics
