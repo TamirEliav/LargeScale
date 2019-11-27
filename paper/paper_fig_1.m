@@ -5,7 +5,7 @@ clear
 clc
 
 %% choose data options
-panel_C_opt = 6;
+panel_C_opt = 2;
 panel_G_opt = 1;
 panel_I_opt = 6;
 panel_J_opt = 10;
@@ -57,8 +57,8 @@ panel_B(1) = axes('position', [ 4 24.5  panel_B_size]);
 panel_B(2) = axes('position', [ 4 23.5  panel_B_size]);
 panel_B(3) = axes('position', [ 4 22.5  panel_B_size]);
 panel_B(4) = axes('position', [ 4 21.5  panel_B_size]);
-panel_C    = axes('position', [15 21.4  4 4]);
-panel_D    = axes('position', [ 0.8 18 8 2.3]);
+panel_C    = axes('position', [14.7 21.0  5 5]);
+panel_D    = axes('position', [ 0.6 18 8 2.3]);
 panel_E    = axes('position', [ -0.5 12.5 9 5]);
 panel_F    = axes('position', [10 18 2 2]);
 panel_G    = axes('position', [13.6 18 6 2]);
@@ -162,16 +162,9 @@ clusters_colors = clusters_colors ./255;
 
 %% identify the single-units
 clusters_single_unit = [1 1 1 1 1 1 1 0 1 0 0 0];
+% clusters_single_unit = [1 0 0 0 0 0 0 0 0 0 0 0];
 
 %% ---------------------- spikes clusters ---------------------------------
-% the spikes trace is during flight
-% the clusters are from sleep session before behavior
-% TODO: show nachum different examples...
-% 1. all spikes
-% 2. all spikes during flight (in-air)
-% 3. 1st half session during flight
-% 4. 2nd half session during flight
-
 NTT_file = 'L:\Analysis\pre_proc\0148\20170625\spikes_sorting\spikes_b0148_d170625_TT4.NTT';
 exp_ID = 'b0148_d170625';
 exp=exp_load_data(exp_ID,'details','flight');
@@ -254,12 +247,14 @@ for ii_cell = 1:length(cells)
     x = X(cell_spikes_IX);
     y = Y(cell_spikes_IX);
     z = Z(cell_spikes_IX);
-    plot3(x,y,z,'.','Color',color_list(ii_cell,:),'MarkerSize',1);
-    cluCntr = prctile([x;y;z]',95);
-    text(cluCntr(1),cluCntr(2),cluCntr(3), num2str(cellNum));
     if clusters_single_unit(cellNum)
-        plot3(cluCntr(1),cluCntr(2),cluCntr(3),'*','Color','r','MarkerSize',10);
+        plot3(x,y,z,'.','Color',color_list(ii_cell,:),'MarkerSize',1);
     end
+%     cluCntr = prctile([x;y;z]',95);
+%     text(cluCntr(1),cluCntr(2),cluCntr(3), num2str(cellNum));
+%     if clusters_single_unit(cellNum)
+%         plot3(cluCntr(1),cluCntr(2),cluCntr(3),'*','Color','r','MarkerSize',10);
+%     end
 end
 ha = gca;
 ha.XLim = [0 max(X(CellNumbers ~= 0))];
@@ -268,18 +263,43 @@ ha.ZLim = [0 max(Z(CellNumbers ~= 0))];
 ha.XTick = floor(ha.XLim/100)*100;
 ha.YTick = floor(ha.YLim/100)*100;
 ha.ZTick = floor(ha.ZLim/100)*100;
-ha.YRuler.TickLabelGapMultiplier = -0.15;
-xlabel(['ch' num2str(ch2plot(1)) ' ( {\mu}V )'],'Position',[835  250  -152]);
-ylabel(['ch' num2str(ch2plot(2)) ' ( {\mu}V )'],'Position',[100  300  -100]);
-zlabel(['ch' num2str(ch2plot(3)) ' ( {\mu}V )'],'Position',[1400  -44  480]);
+
+h1=text([230 1610],[650 680],  [0 0], ""+ha.XRuler.TickValues,'FontSize',7);
+h2=text([1560 1793],[140 683], [-15 15], ""+ha.YRuler.TickValues,'FontSize',7);
+h3=text([1650 1740],[140 120], [70 960], ""+ha.ZRuler.TickValues,'FontSize',7);
+ha.XRuler.TickLabels = {};
+ha.YRuler.TickLabels = {};
+ha.ZRuler.TickLabels = {};
+
+% ha.XRuler.TickLabelGapMultiplier = -0.5;
+% ha.YRuler.TickLabelGapMultiplier = -0.5;
+% ha.ZRuler.TickLabelGapMultiplier = -0.5;
+%%
 AZ_EL(1,:) = [140 39];
 AZ_EL(2,:) = [488 20];
 AZ_EL(3,:) = [511 -8];
 AZ_EL(4,:) = [876 -12];
-viewing_option = 4;
+AZ_EL(5,:) = [156 8];
+AZ_EL(6,:) = [-41 -14];
+AZ_EL(7,:) = [138 12];
+AZ_EL(8,:) = [146 16];
+viewing_option = 5;
 view(AZ_EL(viewing_option,:));
 
-text(-0.2,0.95, 'C', 'Units','normalized','FontWeight','bold');
+hx=xlabel(['Ch' num2str(ch2plot(1)) ' ( {\mu}V )']);%,'Position',[835  250  -152]);
+hy=ylabel(['Ch' num2str(ch2plot(2)) ' ( {\mu}V )']);%,'Position',[100  300  -100]);
+hz=zlabel(['Ch' num2str(ch2plot(3)) ' ( {\mu}V )']);%,'Position',[1400  -44  480]);
+hx.Units = 'normalized';
+hy.Units = 'normalized';
+hz.Units = 'normalized';
+hx.Position = [0.58 -0.005 0];
+hy.Position = [0.20 -0.050 0];
+hz.Position = [-0.050  0.5300 0];
+hx.Rotation = 2;
+hy.Rotation = -24;
+hz.Rotation = 90;
+
+text(-0.215,0.95, 'C', 'Units','normalized','FontWeight','bold');
 
 %% show images
 % logger_image_filename = 'D:\Tamir\PROJECTS\Neurologger\miniBat\pics\minibat_good_pic.jpg';
@@ -327,7 +347,7 @@ yaf = yaf + 0.008;
 annotation('line', xaf,yaf, 'Linewidth',scale_line_width);
 h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dm',scale_m),...
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
-text(-0.075,1.22, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.05,1.22, 'D', 'Units','normalized','FontWeight','bold');
 
 %% panel I - tunnel section behavior (ZY)
 axes(panel_I)
@@ -891,6 +911,8 @@ else
     total_distance = cellfun(@(FE)(sum([FE.distance])),{exps_flight.FE});
     total_distance = total_distance .*1e-3; % to km
     h=histogram(total_distance);
+    fprintf('Total distance (mean) = %.1f\n', mean(total_distance));
+    fprintf('Total distance (max) = %.1f\n', max(total_distance));
     
     nBinEdges = 12;
     h.BinEdges = linspace(0,25,nBinEdges);
@@ -918,7 +940,7 @@ data_opt_str = {
     sprintf('panel J - option %d: %s               ',panel_J_opt,panel_J_data_options{panel_J_opt});
     
     };
-annotation('textbox', [0.2 0.2 0.6 0.1], 'String',data_opt_str, 'HorizontalAlignment','Left','Interpreter','none','FitBoxToText','on');
+% annotation('textbox', [0.2 0.2 0.6 0.1], 'String',data_opt_str, 'HorizontalAlignment','Left','Interpreter','none','FitBoxToText','on');
 
 %% print/save the figure
 fig_name_str = fig_name_str+"_C_opt"+panel_C_opt+panel_C_opt_str;

@@ -21,7 +21,7 @@ diary on
 disp('Log file');
 disp(['created: ', datestr(clock)]);
 disp('======================================================');
-disp([fig_name_str ':' fig_caption_str]);
+disp([fig_name_str ':' fig_caption_str]);   
 disp('======================================================');
 disp('');
 
@@ -54,7 +54,7 @@ panel_A = [];
 for ii=1:3
     for jj=1:3
         offset_x = (ii-1)*6;
-        offset_y = (jj-1)*4;
+        offset_y = (jj-1)*4.3;
         offset = panel_A_pos + [offset_x offset_y];
         panel_A(ii,jj,1) = axes('position', [offset+[0 2.25] panel_A_size_FR_map]);
         panel_A(ii,jj,2) = axes('position', [offset+[0 1   ] panel_A_size_raster]);
@@ -65,30 +65,31 @@ end
 panel_A = panel_A(:,3:-1:1,:);
 panel_A = reshape(panel_A,[9 3]);
 
-panel_BCD_size = [2 2];
-panel_B = axes('position', [ 2.0  8.5  panel_BCD_size          ]);
-panel_C = axes('position', [ 5.3  8.5  panel_BCD_size          ]);
-panel_D = axes('position', [ 8.6  8.5  panel_BCD_size.*[1.3 1] ]);
+panel_BCDE_size = [2 2];
+panel_B    = axes('position', [ 2.0  8.5  panel_BCDE_size           ]);
+panel_C    = axes('position', [ 5.3  8.5  panel_BCDE_size           ]);
+panel_D(1) = axes('position', [ 8.6  8.5  panel_BCDE_size.*[1 0.9]  ]);
+panel_D(2) = axes('position', [ 8.6  8.5  panel_BCDE_size.*[1 0.9]  ]);
+panel_E =    axes('position', [12.2  8.5  panel_BCDE_size.*[1.3 1]  ]);
 
-panel_EFG_size = [2 2];
-panel_E = axes('position', [ 2.0  5 panel_EFG_size]          );
-panel_F = axes('position', [ 5.3  5 panel_EFG_size.*[1.4 1] ]);
-panel_G = axes('position', [ 9.4  5 panel_EFG_size]          );
-
-panel_H = axes('position', [13.0  8.5 panel_EFG_size.*[1.2 1] ]);
-
-
-panel_I = axes('position', [13.0  4 3 3]);
+panel_FGH_size = [2 2];
+panel_F = axes('position', [ 2.0  5 panel_FGH_size]          );
+panel_G = axes('position', [ 5.3  5 panel_FGH_size.*[1.4 1] ]);
+panel_H = axes('position', [ 9.1  5 panel_FGH_size]          );
+panel_I = axes('position', [12.3  5 panel_FGH_size.*[1.2 1] ]);
+panel_J = axes('position', [16.0  4.4 3 3]);
 
 %%
 prm = PARAMS_GetAll();
 
+if 1
 %% FR map + rasters - 9 examples
 cell_examples = {
-433; 56; 51;
-609; 67; 477;
-419; 628; 337;
+433;  56;  51;
+609; 419; 477;
+ 57; 628; 337;
 };
+% other options: 57 474 658
 for ii_cell = 1:length(cell_examples)
     cell_ID = cell_examples{ii_cell};
     cell = cell_load_data(cell_ID,'details','FR_map','fields','stats','FE');
@@ -127,8 +128,8 @@ for ii_cell = 1:length(cell_examples)
     % cell details
     cell_num_str_pos_x   = [0.50 0.50 0.50 0.50 0.50 0.45 0.50 0.50 0.50];
     cell_num_str_pos_y   = [1.05 1.05 1.05 0.85 0.90 0.90 0.90 0.90 0.90];
-    cell_stats_str_pos_x = [0.80 0.95 0.80 0.80 0.20 0.80 0.80 0.50 0.85];
-    cell_stats_str_pos_y = [1.20 1.05 1.15 0.90 0.95 1.10 1.10 0.90 0.90]+0.05;
+    cell_stats_str_pos_x = [0.80 0.95 0.80 0.80 0.80 0.80 0.12 0.50 0.85];
+    cell_stats_str_pos_y = [1.20 1.05 1.15 0.90 1.10 1.10 1.10 0.90 0.90]+0.05;
     text(cell_num_str_pos_x(ii_cell), cell_num_str_pos_y(ii_cell), "cell "+ ii_cell,...
         'Units','normalized','HorizontalAlignment','center','VerticalAlignment','bottom','FontSize',8);
     switch ii_cell
@@ -180,7 +181,22 @@ for ii_cell = 1:length(cell_examples)
     end
 end
 
-%% add zoom in panel
+%% add x/y labels for specific panels
+for ii = [7 8 9]
+    axes(panel_A(ii, 3));
+    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.35]);
+end
+for ii = [1 4 7]
+    axes(panel_A(ii, 3));
+%     ylabel('Time (min)',   'Units','normalized','Position',[-0.1 1]);
+    ylabel('Flight no.',   'Units','normalized','Position',[-0.1 1]);
+    axes(panel_A(ii, 1));
+    ylabel({'Firing rate';'(Hz)'},   'Units','normalized','Position',[-0.07 0.42]);
+end
+axes(panel_A(1, 1));
+text(-0.25,1.6, 'A', 'Units','normalized','FontWeight','bold');
+
+%% add zoom in panel (cell 3)
 % choose cell/dir/field to zoom
 ii_cell = 3;
 ii_dir = 1;
@@ -237,6 +253,63 @@ h=gca;
 h.XLim = xlimits;
 h.YLim = ylimits;
 
+%% add zoom in panel (cell 7)
+% choose cell/dir/field to zoom
+ii_cell = 7;
+ii_dir = 2;
+ii_field = 4;
+cell_ID = cell_examples{ii_cell};
+cell = cell_load_data(cell_ID,'details','FR_map','fields','stats','FE');
+c = prm.graphics.colors.flight_directions;
+% add zoom ("out") lines
+axes(panel_A(ii_cell,1));
+x=[];
+y=[];
+x(1,:) = cell.fields{ii_dir}(ii_field).edges_href;
+x(2,:) = cell.fields{ii_dir}(ii_field).edges_href;
+% x(3,:) = [15;50];
+x(3,:) = cell.fields{ii_dir}(ii_field).edges_href + 10*[-1 1];
+y(1,:) = 2*[1;1];
+y(2,:) = 3*[1;1];
+y(3,:) = 6*[1;1];
+[xf, yf] = ds2nfu(x,y);
+for jj = 1:2
+    for ii = 1:2
+        hl = annotation('line');
+%         hl.Parent = gca;
+        hl.X = xf(ii+[0 1],jj);
+        hl.Y = yf(ii+[0 1],jj);
+        hl.LineWidth = 0.5;
+        hl.Color = 0.5*[1 1 1];
+    end
+end
+% create zoom panel
+POSf = ds2nfu([x(end,1) 4 diff(x(end,:)) 8]);
+panel_A_zoom = axes('Units','normalized', 'position', POSf);
+cla
+hold on
+set(gca,'visible','off');
+FE = cell.FE{ii_dir};
+x = [FE.spikes_pos];
+[FE.number2] = disperse(1:length(FE));
+y = arrayfun(@(FE)(FE.number2*ones(1,FE.num_spikes)),FE,'UniformOutput',0);
+y = [y{:}];
+xlimits = cell.fields{ii_dir}(ii_field).edges_href;
+IX = find( x>xlimits(1) & x<xlimits(end) );
+x=x(IX);
+y=y(IX);
+ylimits = [min(y) max(y)]+[-1 3];
+plot(x,y,'.','Color',c{ii_dir},'MarkerSize',3);
+% plot field size bar
+x = cell.fields{ii_dir}(ii_field).edges_prc;
+y = ylimits([end end]);
+plot(x,y,'-','Color',c{ii_dir},'LineWidth',1);
+text(mean(x),mean(y)+1, sprintf('%.1fm',diff(x)), 'HorizontalAlignment','center','VerticalAlignment','bottom','FontSize',6);
+box off
+h=gca;
+h.XLim = xlimits;
+h.YLim = ylimits;
+
 
 %% add direction arrows
 arrow_x = 0.1 +[0 0.05];
@@ -247,22 +320,7 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y      ,  'Color', prm.graphics.colo
 [h.HeadWidth] = disperse([5 5]);
 [h.HeadLength] = disperse([5 5]);
 
-%% add x/y labels for specific panels
-for ii = [7 8 9]
-    axes(panel_A(ii, 3));
-    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.35]);
 end
-for ii = [1 4 7]
-    axes(panel_A(ii, 3));
-%     ylabel('Time (min)',   'Units','normalized','Position',[-0.1 1]);
-    ylabel('Flight no.',   'Units','normalized','Position',[-0.1 1]);
-    axes(panel_A(ii, 1));
-    ylabel({'Firing rate';'(Hz)'},   'Units','normalized','Position',[-0.07 0.42]);
-end
-axes(panel_A(1, 1));
-text(-0.25,1.6, 'A', 'Units','normalized','FontWeight','bold');
-
-
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 %% load population data
@@ -288,10 +346,10 @@ cells = [cells{:}];
 
 %% panel E - field count histogram
 % figure
-axes(panel_E);
+axes(panel_F);
 cla
 hold on
-text(-0.45,1.15, 'E', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'F', 'Units','normalized','FontWeight','bold');
 nFields = nan(2,length(cells));
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -302,16 +360,21 @@ for ii_dir = 1:2
         end
         nFields(ii_dir,ii_cell) = cell.stats.dir(ii_dir).field_num;
     end
-    h = histogram(nFields(ii_dir,:));
-    h.FaceColor = prm.graphics.colors.flight_directions{ii_dir};
-    nBinEdges = 17;
-    h.BinEdges = linspace(0,35,nBinEdges);
+%     h = histogram(nFields(ii_dir,:));
+%     h.FaceColor = prm.graphics.colors.flight_directions{ii_dir};
+%     nBinEdges = 17;
+%     h.BinEdges = linspace(0,35,nBinEdges);
 end
+h = histogram(nFields(:));
+h.FaceColor = 0.5*[1 1 1];
+nBinEdges = 14;
+h.BinEdges = linspace(0,35,nBinEdges);
 xlabel({'No. of fields';'per direction'},'Units','normalized','Position',[0.5 -0.18]);
 ylabel('No. of cells')
 ha = gca;
 ha.YScale = 'log';
-ha.YLim = [0.7 100];
+% ha.YLim = [0.7 130];
+ha.YLim = [0.7 max(h.Values)*1.05];
 ha.XLim = [0 33];
 ha.XTick = [0:10:30];
 ha.YTick = [1 10 100];
@@ -327,10 +390,10 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 
 %% panel F - field size histogram
 % figure
-axes(panel_F);
+axes(panel_G);
 cla
 hold on
-text(-0.35,1.15, 'F', 'Units','normalized','FontWeight','bold');
+text(-0.35,1.15, 'G', 'Units','normalized','FontWeight','bold');
 fields_size = [];
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -364,10 +427,10 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 
 %% panel G - smallest / largest field size
 % figure
-axes(panel_G);
+axes(panel_H);
 cla
 hold on
-text(-0.45,1.15, 'G', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'H', 'Units','normalized','FontWeight','bold');
 LS_field_size = nan(2,length(cells));
 for ii_cell = 1:length(cells)
     cell = cells(ii_cell);
@@ -407,10 +470,10 @@ ylabel('Field size (m)','Units','normalized','Position',[-0.21 0.5])
 
 %% panel H - field ratio (largest/smallest)
 % figure
-axes(panel_H);
+axes(panel_I);
 cla
 hold on
-text(-0.4,1.15, 'H', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.15, 'I', 'Units','normalized','FontWeight','bold');
 LS_field_ratio_all = nan(1,length(cells));
 LS_field_ratio_dir = nan(2,length(cells));
 for ii_cell = 1:length(cells)
@@ -476,6 +539,26 @@ sparsity(~signif) = nan;
 sparsity = sparsity(:);
 sparsity(isnan(sparsity)) = [];
 
+%% count total area per cell per direction
+total_area = nan(length(cells),2);
+for ii_cell = 1:length(cells)
+    cell = cells(ii_cell);
+    for ii_dir = 1:2
+        if ~cell.signif(ii_dir).TF
+            continue;
+        end
+        fields = cell.fields{ii_dir};
+%         fields([fields.in_low_speed_area]) = []; % we decided we don't want to remove those fields, because in SI/sparsity those field also go in the calculation
+        total_area(ii_cell, ii_dir) = sum([fields.width_prc]);
+    end
+end
+
+% figure
+% hold on
+% histogram(total_area(:,1))
+% histogram(total_area(:,2))
+% histogram(total_area(:))
+
 %% panel B - spatial info histogram
 axes(panel_B);
 cla
@@ -508,12 +591,46 @@ ha.YRuler.TickLabelGapMultiplier = 0.1;
 xlabel('Sparsity', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('No. of cells', 'Units','normalized','Position',[-0.2 0.5])
 
-%% panel D - map correlations histogram
-% figure
-axes(panel_D);
+%% panel D - Total area histogram
+axes(panel_D(1));
 cla
 hold on
-text(-0.45,1.15, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.275, 'D', 'Units','normalized','FontWeight','bold');
+h = histogram(total_area(:));
+h.NumBins = 17;
+h.FaceColor = 0.5*[1 1 1];
+ha=gca;
+ha.XTick = [0:30:150];
+ha.TickDir='out';
+ha.TickLength = [0.03 0.03];
+ha.XRuler.TickLabelGapMultiplier = -0.35;
+ha.YRuler.TickLabelGapMultiplier = 0.1;
+xlabel('Total area (m)', 'Units','normalized','Position',[0.5 -0.17])
+ylabel('No. of cells', 'Units','normalized','Position',[-0.2 0.5])
+ha.XLim(1) = 0;
+
+axes(panel_D(2));
+cla
+hold on
+exp=exp_load_data(cell.details.exp_ID);
+hax = gca;
+hax.XLim = 100 * panel_D(1).XLim / exp.pos.calib_tunnel.tunnel_length;
+hax.XAxisLocation = 'top';
+hax.YAxisLocation = 'right';
+hax.Color = 'none';
+hax.XColor = 'k';
+hax.YColor = 'none';
+box off
+hax.XRuler.TickLabelGapMultiplier = -0.35;
+hax.TickLength = panel_D(1).TickLength;
+xlabel('Total area (%)', 'Units','normalized','Position',[0.45 1.2]);
+
+%% panel E - map correlations histogram
+% figure
+axes(panel_E);
+cla
+hold on
+text(-0.4,1.15, 'E', 'Units','normalized','FontWeight','bold');
 
 % arrange data
 signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
@@ -557,7 +674,7 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel('Map correlation', 'Units','normalized','Position',[0.5 -0.17])
-ylabel('Probability', 'Units','normalized','Position',[-0.2 0.5])
+ylabel('Probability', 'Units','normalized','Position',[-0.17 0.5])
 
 %% panels I&J - prepare data
 distances_all = [];
@@ -580,12 +697,12 @@ for ii_cell = 1:length(cells)
     end
 end
 
-%% panel I - field size ratio vs. speed ratio (direct control for speed!)
+%% panel J - field size ratio vs. speed ratio (direct control for speed!)
 % figure
-axes(panel_I);
+axes(panel_J);
 cla
 hold on
-text(-0.27,1.1, 'I', 'Units','normalized','FontWeight','bold');
+text(-0.27,0.9667, 'J', 'Units','normalized','FontWeight','bold');
 % arrange data
 cells_signif = cat(1,cells.signif);
 cells_signif = arrayfun(@(x)(x.TF), cells_signif);

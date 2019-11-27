@@ -3,15 +3,16 @@ clear
 clc
 
 %%
-feature = 'SI';
+% feature = 'SI';
 % feature = 'fields_ratio';
 % feature = 'fields_smallest';
 % feature = 'fields_largest';
-% feature = 'fields_number';
+feature = 'fields_number';
 
-dir_IN = 'L:\Analysis\Results\cells\figures\';
+% dir_IN = 'L:\Analysis\Results\cells\figures\';
+dir_IN = 'L:\Analysis\Results\cells\choose_examples';
 dir_OUT = fullfile( dir_IN , feature );
-pattern = '*_map_fields.tif';
+pattern = '*.tif';
 % dir_OUT = 'L:\Analysis\Results\cells\figures\good_cluster_CA1\by_SI';
 % dir_OUT = 'L:\Analysis\Results\cells\figures\good_cluster_CA1\by_field_ratio';
 % dir_OUT = 'L:\Analysis\Results\cells\figures\good_cluster_CA1\by_nSpikesAir';

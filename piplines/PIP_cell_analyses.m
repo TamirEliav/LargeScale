@@ -30,6 +30,7 @@ cells_t(~ismember(cells_t.bat, [79,148,34,9861,2289] ),:) = [];
 % cells_t(~contains(cells_t.cell_ID, cell_list),:) = [];
 
 %% filter cells - brain region / sorting quality
+if 1
 cells = cellfun(@(c)(cell_load_data(c,'details')), cells_t.cell_ID, 'UniformOutput',0);
 cells = [cells{:}];
 cells = [cells.details];
@@ -37,15 +38,26 @@ cells(~contains({cells.brain_area}, 'CA1')) = [];
 cells(~ismember([cells.ClusterQuality], [2])) = [];
 % cells(cellfun(@isempty, {cells.stable_ts})) = [];
 cells_t = cells_t({cells.cell_ID},:);
+end
 
 %% filter cells - mean FR
-if 0
+if 1
 cells = cellfun(@(c)(cell_load_data(c,'stats')), cells_t.cell_ID, 'UniformOutput',0);
 cells = [cells{:}];
 cells = [cells.stats];
 cells = [cells.all];
 cells_t([cells.meanFR_all]>prm.inclusion.interneuron_FR_thr,:) = []; % take pyramidal
 % cells_t([cells.meanFR_all]<=prm.inclusion.interneuron_FR_thr,:) = []; % take interneurons
+end
+
+%% only signif place cells
+if 1
+cells = cellfun(@(c)(cell_load_data(c,'signif')), cells_t.cell_ID, 'UniformOutput',0);
+cells = [cells{:}];
+signif = cat(1,cells.signif);
+signif = arrayfun(@(x)(x.TF), signif);
+signif = any(signif,2);
+cells_t(~signif,:) = []; % take only signif
 end
 
 %% disp final cells table
@@ -81,10 +93,12 @@ try
 %     cell_calc_time_AC(cell_ID);
 
 %     cell_calc_cluster_control(cell_ID);
-    cell_calc_cluster_quality2(cell_ID);
+%     cell_calc_cluster_quality2(cell_ID);
 
 %     cell_plot_map_fields(cell_ID);
 %     cell_plot_time_AC(cell_ID);
+
+    cell_plot_figure_choose_examples(cell_ID)
     toc
     
 catch err

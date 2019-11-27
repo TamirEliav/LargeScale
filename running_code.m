@@ -1626,8 +1626,81 @@ setappdata(gcf, 'brush_data_link', hlink);
 
 
 
+%% 14/11/2019
+fields_size = [];
+fields_peak_FR = [];
+for ii_dir = 1:2
+    for ii_cell = 1:length(cells)
+        cell = cells(ii_cell);
+        if ~cell.signif(ii_dir).TF % check signif per direction
+            continue;
+        end
+        fields = cell.fields{ii_dir};
+        fields([fields.in_low_speed_area]) = []; % remove fields in low speed area
+        fields_size = [fields_size fields.width_prc];
+        fields_peak_FR = [fields_peak_FR fields.peak];
+    end
+end
+% fields_peak_FR = fields_size .* 2 + randn(size(fields_peak_FR));
+N = length(fields_size);
+
+figure
+
+subplot(221)
+plot(fields_size, fields_peak_FR, '.')
+[r,p] = corr(fields_size', fields_peak_FR','type','Pearson');
+text(0.98,0.95,sprintf('r=%.2f',r),'Units','normalized','HorizontalAlignment','right')
+text(0.98,0.90,sprintf('p=%.2g',p),'Units','normalized','HorizontalAlignment','right')
+xlabel('fields size (m)')
+ylabel('fields peak FR (Hz)')
+title('linear-linear')
+
+subplot(222)
+plot(fields_size, fields_peak_FR, '.')
+ha=gca;
+ha.YScale = 'log';
+xlabel('fields size (m)')
+ylabel('fields peak FR (Hz)')
+title('log-linear')
+[r,p] = corr(fields_size', log(fields_peak_FR'),'type','Pearson');
+text(0.98,0.95,sprintf('r=%.2f',r),'Units','normalized','HorizontalAlignment','right')
+text(0.98,0.90,sprintf('p=%.2g',p),'Units','normalized','HorizontalAlignment','right')
+
+subplot(223)
+plot(fields_size, fields_peak_FR, '.')
+ha=gca;
+ha.YScale = 'log';
+ha.XScale = 'log';
+xlabel('fields size (m)')
+ylabel('fields peak FR (Hz)')
+title('log-log')
+[r,p] = corr(log(fields_size'), log(fields_peak_FR'),'type','Pearson');
+text(0.98,0.95,sprintf('r=%.2f',r),'Units','normalized','HorizontalAlignment','right')
+text(0.98,0.90,sprintf('p=%.2g',p),'Units','normalized','HorizontalAlignment','right')
+
+subplot(224)
+hold on
+[~,IX1] = sort(fields_size);
+[~,IX2] = sort(fields_peak_FR);
+rank1 = 1:N;
+rank1(IX1) = rank1;
+rank2 = 1:N;
+rank2(IX2) = rank2;
+plot(rank1, rank2, '.', 'MarkerSize',4)
+ksdensity([rank1;rank2]','PlotFcn','contour')
+[r,p] = corr(rank1', rank2','type','Pearson');
+text(0.98,0.95,sprintf('r=%.2f',r),'Units','normalized','HorizontalAlignment','right')
+text(0.98,0.90,sprintf('p=%.2g',p),'Units','normalized','HorizontalAlignment','right')
+xlabel('fields size (rank)')
+ylabel('fields peak FR (rank)')
+title('by rank')
+
+h=suptitle('Field peak FR vs. size correlations');
+h.FontSize = 16;
+
+
+
+
+
+
 %%
-
-
-
-

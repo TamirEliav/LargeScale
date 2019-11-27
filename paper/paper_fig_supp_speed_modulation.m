@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_supp_speed_effects';
+fig_name_str = 'fig_S4_speed_effects';
 fig_caption_str = 'speed effects on AVERAGED field size';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -134,7 +134,7 @@ for ii_bat = 1:length(bats)
     % calc stats
     x = bat_speed{ii_bat,1}(:);
     y = bat_speed{ii_bat,2}(:);
-    speed_pval(ii_bat) = ranksum(x,y,'tail','right');
+    speed_pval(ii_bat) = ranksum(x,y,'tail','both');
 end
 speed_pval
 
@@ -153,6 +153,8 @@ hbar = bar(x,y);
 herr = errorbar(x,y,err);
 [herr.LineStyle] = disperse(repelem('none',2));
 [herr.Color] = disperse( prm.graphics.colors.flight_directions );
+herr(1).XData = herr(1).XData-0.04; % workaround...
+herr(2).XData = herr(2).XData+0.04; % workaround...
 
 % draw significance comparison lines
 for ii_bat = 1:length(bats)
@@ -160,8 +162,7 @@ for ii_bat = 1:length(bats)
     plot(x(ii_bat,[2 2]), [y(ii_bat,2)+0.5 9.5],'k-','LineWidth',1.1)
     plot(x(ii_bat,[1 2]), [9.5 9.5],'k-','LineWidth',1.1)
 end
-significant_strs = {'n.s';'n.s';'n.s';'n.s';'**'};
-n_sessions_per_bat
+significant_strs = {'n.s';'n.s';'n.s';'n.s';'*'};
 ht = text( mean(x,2), repelem(11.5,length(bats)), "n="+n_sessions_per_bat,...
     'HorizontalAlignment','center', 'VerticalAlignment','bottom','FontSize',8);
 ht = text( mean(x,2), repelem(10.5,length(bats)), "sessions",...
@@ -184,7 +185,7 @@ text(1:length(bats), repelem(-0.3,length(bats)), ticklabels, ...
 ylabel('Speed (m/s)','Units','normalized','Position',[-0.05 0.45]);
 
 %% panel A - speed trajectory exmaples
-example_opt = [20 19 4];
+example_opt = [20 15 4];
 example_list = {
     'b0079_d160915'; % 1
     'b0079_d160920';
@@ -230,14 +231,14 @@ for ii_ex = 1:3
     xlim([0 200]);
 %     ylim([0 ylimits(ii_ex)]);
     ylim([0 10]);
-    xlabel('Position (m)','Units','normalized','Position',[0.5 -0.25]);
-    ylabel('Speed (m/s)','Units','normalized','Position',[-0.05 0.45]);
+    xlabel('Position (m)','Units','normalized','Position',[0.5 -0.2]);
+    ylabel('Speed (m/s)','Units','normalized','Position',[-0.05 0.4]);
 end
 
-% add lines going from bat to example
-annotation('line',[0.18 0.15], [0.6 0.64],'LineWidth',1);
-annotation('line',[0.64 0.59], [0.6 0.64],'LineWidth',1);
-
+%% add lines going from bat to example
+annotation('arrow',[0.150 0.18], [0.64 0.6],'LineWidth',1);
+annotation('arrow',[0.375 0.41], [0.64 0.6],'LineWidth',1);
+annotation('arrow',[0.595 0.64], [0.64 0.6],'LineWidth',1);
 
 %% panel B - compare field size (dir1 vs. dir 2)
 % =========================================================================
