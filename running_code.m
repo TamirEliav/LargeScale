@@ -1698,7 +1698,22 @@ title('by rank')
 h=suptitle('Field peak FR vs. size correlations');
 h.FontSize = 16;
 
-
+%%
+L = 50000;
+[f] = MultiscalePlace_GenerateTuning_AllModels(L);
+%%
+figure
+sdf=f.fI;
+[~,IX] = sort(sum(sdf));
+ds = 20;
+pos = 1:ds:L;
+pos = pos / 100; % back to meter
+subplot(121)
+imagesc(pos, 1:1000, 1-sdf(:,IX)');
+colormap bone
+subplot(122)
+mean(sum(sdf)./5)
+histogram(sum(sdf)./5)
 
 
 

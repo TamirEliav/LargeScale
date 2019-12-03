@@ -22,20 +22,29 @@
 
 
 %% load data
-load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_2_Summary_1.mat')
+switch dt
+    case 0.5
+        load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_2_Summary_1.mat');
+        load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_2IJ_Summary_1.mat')
+    case 0.2
+        load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_4_Summary_1.mat');
+        load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_4IJ_Summary_1.mat')
+end
 nL = length(L);
 ds = 20 ;
 Nint = 10:1:250 ;
  
 %% arrange data
-clr  = [1.0 0.0 0.5   ; ...
-        0.0 1.0 0.5   ; ...
-        1.0 0.5 0.0   ; ...
-        0.25 0.75 1.0 ; ...
-        0.5 0.0 1.0   ; ...
-        0.5 0.9 1.0   ; ...
-        0.85 0.4 1.0  ; ...
-        1.0 0.75 0.25] ;
+clr  = [1.0 0.0 0.5   ; ... % 1
+        0.0 1.0 0.5   ; ... % 2
+        1.0 0.5 0.0   ; ... % 3
+        0.25 0.75 1.0 ; ... % 4
+        0.5 0.0 1.0   ; ... % 5
+        0.5 0.9 1.0   ; ... % 6
+        0.85 0.4 1.0  ; ... % 7
+        1.0 0.75 0.25 ; ... % 8
+        0   0    0    ; ... % 9
+        0.7 0.7 0.7 ] ;     % 10
     
 errs  = [1 2 5] ;
 perrs = [0.01 0.02 0.05] ;
@@ -51,6 +60,8 @@ NerrPVE = zeros(nL,nerrs) ;
 NerrPVF = zeros(nL,nerrs) ;
 NerrPVG = zeros(nL,nerrs) ;
 NerrPVH = zeros(nL,nerrs) ;
+NerrPVI = zeros(nL,nerrs) ;
+NerrPVJ = zeros(nL,nerrs) ;
 
 NerrMLA = zeros(nL,nerrs) ;
 NerrMLB = zeros(nL,nerrs) ;
@@ -60,6 +71,8 @@ NerrMLE = zeros(nL,nerrs) ;
 NerrMLF = zeros(nL,nerrs) ;
 NerrMLG = zeros(nL,nerrs) ;
 NerrMLH = zeros(nL,nerrs) ;
+NerrMLI = zeros(nL,nerrs) ;
+NerrMLJ = zeros(nL,nerrs) ;
 
 NperrPVA = zeros(nL,nerrs) ;
 NperrPVB = zeros(nL,nerrs) ;
@@ -69,6 +82,8 @@ NperrPVE = zeros(nL,nerrs) ;
 NperrPVF = zeros(nL,nerrs) ;
 NperrPVG = zeros(nL,nerrs) ;
 NperrPVH = zeros(nL,nerrs) ;
+NperrPVI = zeros(nL,nerrs) ;
+NperrPVJ = zeros(nL,nerrs) ;
 
 NperrMLA = zeros(nL,nerrs) ;
 NperrMLB = zeros(nL,nerrs) ;
@@ -78,6 +93,8 @@ NperrMLE = zeros(nL,nerrs) ;
 NperrMLF = zeros(nL,nerrs) ;
 NperrMLG = zeros(nL,nerrs) ;
 NperrMLH = zeros(nL,nerrs) ;
+NperrMLI = zeros(nL,nerrs) ;
+NperrMLJ = zeros(nL,nerrs) ;
 
 NerrPVBfit  = cell(1,nerrs) ;
 NerrPVDfit  = cell(1,nerrs) ;
@@ -89,38 +106,6 @@ NerrMLEfit  = cell(1,nerrs) ;
 
 for jerr = 1:nerrs
     for jL = 1:nL
-%         jjNPVA = find(mePVA(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         jjNPVB = find(mePVB(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         jjNPVC = find(mePVC(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         jjNPVD = find(mePVD(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         jjNPVE = find(mePVE(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         jjNPVF = find(mePVF(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         jjNPVG = find(mePVG(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         
-%         jjNMLA = find(meMLA(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         jjNMLB = find(meMLB(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         jjNMLC = find(meMLC(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         jjNMLD = find(meMLD(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         jjNMLE = find(meMLE(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         jjNMLF = find(meMLF(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         jjNMLG = find(meMLG(:,jL)*ds/100<errs(jerr),1,'first') ; 
-%         
-%         if isempty(jjNPVA) NerrPVA(jL,jerr) = N(end)+1 ; else NerrPVA(jL,jerr) = N(jjNPVA) ; end ;
-%         if isempty(jjNPVB) NerrPVB(jL,jerr) = N(end)+1 ; else NerrPVB(jL,jerr) = N(jjNPVB) ; end ;
-%         if isempty(jjNPVC) NerrPVC(jL,jerr) = N(end)+1 ; else NerrPVC(jL,jerr) = N(jjNPVC) ; end ;
-%         if isempty(jjNPVD) NerrPVD(jL,jerr) = N(end)+1 ; else NerrPVD(jL,jerr) = N(jjNPVD) ; end ;
-%         if isempty(jjNPVE) NerrPVE(jL,jerr) = N(end)+1 ; else NerrPVE(jL,jerr) = N(jjNPVE) ; end ;
-%         if isempty(jjNPVF) NerrPVF(jL,jerr) = N(end)+1 ; else NerrPVF(jL,jerr) = N(jjNPVF) ; end ;
-%         if isempty(jjNPVG) NerrPVG(jL,jerr) = N(end)+1 ; else NerrPVG(jL,jerr) = N(jjNPVG) ; end ;
-%         
-%         if isempty(jjNMLA) NerrMLA(jL,jerr) = N(end)+1 ; else NerrMLA(jL,jerr) = N(jjNMLA) ; end ;
-%         if isempty(jjNMLB) NerrMLB(jL,jerr) = N(end)+1 ; else NerrMLB(jL,jerr) = N(jjNMLB) ; end ;
-%         if isempty(jjNMLC) NerrMLC(jL,jerr) = N(end)+1 ; else NerrMLC(jL,jerr) = N(jjNMLC) ; end ;
-%         if isempty(jjNMLD) NerrMLD(jL,jerr) = N(end)+1 ; else NerrMLD(jL,jerr) = N(jjNMLD) ; end ;
-%         if isempty(jjNMLE) NerrMLE(jL,jerr) = N(end)+1 ; else NerrMLE(jL,jerr) = N(jjNMLE) ; end ;
-%         if isempty(jjNMLF) NerrMLF(jL,jerr) = N(end)+1 ; else NerrMLF(jL,jerr) = N(jjNMLF) ; end ;
-%         if isempty(jjNMLG) NerrMLG(jL,jerr) = N(end)+1 ; else NerrMLG(jL,jerr) = N(jjNMLG) ; end ;
-
         jjNPVA = find(interp1(N,mePVA(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
         jjNPVB = find(interp1(N,mePVB(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
         jjNPVC = find(interp1(N,mePVC(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
@@ -129,6 +114,8 @@ for jerr = 1:nerrs
         jjNPVF = find(interp1(N,mePVF(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
         jjNPVG = find(interp1(N,mePVG(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
         jjNPVH = find(interp1(N,mePVH(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
+        jjNPVI = find(interp1(N,mePVI(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
+        jjNPVJ = find(interp1(N,mePVJ(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
         
         jjNMLA = find(interp1(N,meMLA(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
         jjNMLB = find(interp1(N,meMLB(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
@@ -138,24 +125,32 @@ for jerr = 1:nerrs
         jjNMLF = find(interp1(N,meMLF(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
         jjNMLG = find(interp1(N,meMLG(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
         jjNMLH = find(interp1(N,meMLH(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
+        jjNMLI = find(interp1(N,meMLI(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
+        jjNMLJ = find(interp1(N,meMLJ(:,jL)*ds/100,Nint,'spline')<errs(jerr),1,'first') ; 
         
-        if isempty(jjNPVA) NerrPVA(jL,jerr) = N(end)+1 ; else NerrPVA(jL,jerr) = Nint(jjNPVA) ; end ;
-        if isempty(jjNPVB) NerrPVB(jL,jerr) = N(end)+1 ; else NerrPVB(jL,jerr) = Nint(jjNPVB) ; end ;
+        if isempty(jjNPVA) && jL>1 NerrPVA(jL,jerr) = NerrPVA(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrPVA(jL-1,jerr)-NerrPVA(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrPVA(jL,jerr) = Nint(jjNPVA) ; end ;
+        if isempty(jjNPVB) && jL>1 NerrPVB(jL,jerr) = NerrPVB(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrPVB(jL-1,jerr)-NerrPVB(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrPVB(jL,jerr) = Nint(jjNPVB) ; end ;
+        if isempty(jjNPVD) && jL>1 NerrPVD(jL,jerr) = NerrPVD(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrPVD(jL-1,jerr)-NerrPVD(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrPVD(jL,jerr) = Nint(jjNPVD) ; end ;
+        if isempty(jjNPVE) && jL>1 NerrPVE(jL,jerr) = NerrPVE(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrPVE(jL-1,jerr)-NerrPVE(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrPVE(jL,jerr) = Nint(jjNPVE) ; end ;
+        if isempty(jjNPVF) && jL>1 NerrPVF(jL,jerr) = NerrPVF(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrPVF(jL-1,jerr)-NerrPVF(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrPVF(jL,jerr) = Nint(jjNPVF) ; end ;
+        if isempty(jjNPVG) && jL>1 NerrPVG(jL,jerr) = NerrPVG(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrPVG(jL-1,jerr)-NerrPVG(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrPVG(jL,jerr) = Nint(jjNPVG) ; end ;
+        if isempty(jjNPVI) && jL>1 NerrPVI(jL,jerr) = NerrPVI(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrPVI(jL-1,jerr)-NerrPVI(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrPVI(jL,jerr) = Nint(jjNPVI) ; end ;
+        
         if isempty(jjNPVC) NerrPVC(jL,jerr) = N(end)+1 ; else NerrPVC(jL,jerr) = Nint(jjNPVC) ; end ;
-        if isempty(jjNPVD) NerrPVD(jL,jerr) = N(end)+1 ; else NerrPVD(jL,jerr) = Nint(jjNPVD) ; end ;
-        if isempty(jjNPVE) NerrPVE(jL,jerr) = N(end)+1 ; else NerrPVE(jL,jerr) = Nint(jjNPVE) ; end ;
-        if isempty(jjNPVF) NerrPVF(jL,jerr) = N(end)+1 ; else NerrPVF(jL,jerr) = Nint(jjNPVF) ; end ;
-        if isempty(jjNPVG) NerrPVG(jL,jerr) = N(end)+1 ; else NerrPVG(jL,jerr) = Nint(jjNPVG) ; end ;
         if isempty(jjNPVH) NerrPVH(jL,jerr) = N(end)+1 ; else NerrPVH(jL,jerr) = Nint(jjNPVH) ; end ;
+        if isempty(jjNPVJ) NerrPVJ(jL,jerr) = N(end)+1 ; else NerrPVJ(jL,jerr) = Nint(jjNPVJ) ; end ;
         
-        if isempty(jjNMLA) NerrMLA(jL,jerr) = N(end)+1 ; else NerrMLA(jL,jerr) = Nint(jjNMLA) ; end ;
-        if isempty(jjNMLB) NerrMLB(jL,jerr) = N(end)+1 ; else NerrMLB(jL,jerr) = Nint(jjNMLB) ; end ;
+        if isempty(jjNMLA) && jL>1 NerrMLA(jL,jerr) = NerrMLA(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrMLA(jL-1,jerr)-NerrMLA(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrMLA(jL,jerr) = Nint(jjNMLA) ; end ;
+        if isempty(jjNMLB) && jL>1 NerrMLB(jL,jerr) = NerrMLB(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrMLB(jL-1,jerr)-NerrMLB(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrMLB(jL,jerr) = Nint(jjNMLB) ; end ;
+        if isempty(jjNMLD) && jL>1 NerrMLD(jL,jerr) = NerrMLD(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrMLD(jL-1,jerr)-NerrMLD(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrMLD(jL,jerr) = Nint(jjNMLD) ; end ;
+        if isempty(jjNMLE) && jL>1 NerrMLE(jL,jerr) = NerrMLE(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrMLE(jL-1,jerr)-NerrMLE(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrMLE(jL,jerr) = Nint(jjNMLE) ; end ;
+        if isempty(jjNMLF) && jL>1 NerrMLF(jL,jerr) = NerrMLF(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrMLF(jL-1,jerr)-NerrMLF(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrMLF(jL,jerr) = Nint(jjNMLF) ; end ;
+        if isempty(jjNMLG) && jL>1 NerrMLG(jL,jerr) = NerrMLG(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrMLG(jL-1,jerr)-NerrMLG(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrMLG(jL,jerr) = Nint(jjNMLG) ; end ;
+        if isempty(jjNMLI) && jL>1 NerrMLI(jL,jerr) = NerrMLI(jL-1,jerr) + (L(jL)-L(jL-1))*(NerrMLI(jL-1,jerr)-NerrMLI(jL-2,jerr))/(L(jL-1)-L(jL-2)) ; else NerrMLI(jL,jerr) = Nint(jjNMLI) ; end ;
+    
         if isempty(jjNMLC) NerrMLC(jL,jerr) = N(end)+1 ; else NerrMLC(jL,jerr) = Nint(jjNMLC) ; end ;
-        if isempty(jjNMLD) NerrMLD(jL,jerr) = N(end)+1 ; else NerrMLD(jL,jerr) = Nint(jjNMLD) ; end ;
-        if isempty(jjNMLE) NerrMLE(jL,jerr) = N(end)+1 ; else NerrMLE(jL,jerr) = Nint(jjNMLE) ; end ;
-        if isempty(jjNMLF) NerrMLF(jL,jerr) = N(end)+1 ; else NerrMLF(jL,jerr) = Nint(jjNMLF) ; end ;
-        if isempty(jjNMLG) NerrMLG(jL,jerr) = N(end)+1 ; else NerrMLG(jL,jerr) = Nint(jjNMLG) ; end ;
         if isempty(jjNMLH) NerrMLH(jL,jerr) = N(end)+1 ; else NerrMLH(jL,jerr) = Nint(jjNMLH) ; end ;
+        if isempty(jjNMLJ) NerrMLJ(jL,jerr) = N(end)+1 ; else NerrMLJ(jL,jerr) = Nint(jjNMLJ) ; end ;
     end
     jLfiti = intersect(jLfit,find(NerrPVB(:,jerr)<=N(end))) ; NerrPVBfit{jerr} = fit(L(jLfiti)'/100,NerrPVB(jLfiti,jerr),'poly1') ;
     jLfiti = intersect(jLfit,find(NerrPVD(:,jerr)<=N(end))) ; NerrPVDfit{jerr} = fit(L(jLfiti)'/100,NerrPVD(jLfiti,jerr),'poly1') ;
@@ -178,6 +173,8 @@ for jerr = 1:nerrs
         jjNPVF = find(interp1(N,mePVF(:,jL)*ds/100,Nint,'spline')<L(jL)/100*perrs(jerr),1,'first') ; 
         jjNPVG = find(interp1(N,mePVG(:,jL)*ds/100,Nint,'spline')<L(jL)/100*perrs(jerr),1,'first') ; 
         jjNPVH = find(interp1(N,mePVH(:,jL)*ds/100,Nint,'spline')<L(jL)/100*perrs(jerr),1,'first') ; 
+        jjNPVI = find(interp1(N,mePVI(:,jL)*ds/100,Nint,'spline')<L(jL)/100*perrs(jerr),1,'first') ; 
+        jjNPVJ = find(interp1(N,mePVJ(:,jL)*ds/100,Nint,'spline')<L(jL)/100*perrs(jerr),1,'first') ; 
         
         jjNMLA = find(interp1(N,meMLA(:,jL)*ds/100,Nint,'spline')<L(jL)/100*perrs(jerr),1,'first') ; 
         jjNMLB = find(interp1(N,meMLB(:,jL)*ds/100,Nint,'spline')<L(jL)/100*perrs(jerr),1,'first') ; 
@@ -187,6 +184,8 @@ for jerr = 1:nerrs
         jjNMLF = find(interp1(N,meMLF(:,jL)*ds/100,Nint,'spline')<L(jL)/100*perrs(jerr),1,'first') ; 
         jjNMLG = find(interp1(N,meMLG(:,jL)*ds/100,Nint,'spline')<L(jL)/100*perrs(jerr),1,'first') ; 
         jjNMLH = find(interp1(N,meMLH(:,jL)*ds/100,Nint,'spline')<L(jL)/100*perrs(jerr),1,'first') ; 
+        jjNMLI = find(interp1(N,meMLI(:,jL)*ds/100,Nint,'spline')<L(jL)/100*perrs(jerr),1,'first') ; 
+        jjNMLJ = find(interp1(N,meMLJ(:,jL)*ds/100,Nint,'spline')<L(jL)/100*perrs(jerr),1,'first') ; 
         
         if isempty(jjNPVA) NperrPVA(jL,jerr) = N(end)+1 ; else NperrPVA(jL,jerr) = Nint(jjNPVA) ; end ;
         if isempty(jjNPVB) NperrPVB(jL,jerr) = N(end)+1 ; else NperrPVB(jL,jerr) = Nint(jjNPVB) ; end ;
@@ -196,6 +195,8 @@ for jerr = 1:nerrs
         if isempty(jjNPVF) NperrPVF(jL,jerr) = N(end)+1 ; else NperrPVF(jL,jerr) = Nint(jjNPVF) ; end ;
         if isempty(jjNPVG) NperrPVG(jL,jerr) = N(end)+1 ; else NperrPVG(jL,jerr) = Nint(jjNPVG) ; end ;
         if isempty(jjNPVH) NperrPVH(jL,jerr) = N(end)+1 ; else NperrPVH(jL,jerr) = Nint(jjNPVH) ; end ;
+        if isempty(jjNPVI) NperrPVI(jL,jerr) = N(end)+1 ; else NperrPVI(jL,jerr) = Nint(jjNPVI) ; end ;
+        if isempty(jjNPVJ) NperrPVJ(jL,jerr) = N(end)+1 ; else NperrPVJ(jL,jerr) = Nint(jjNPVJ) ; end ;
         
         if isempty(jjNMLA) NperrMLA(jL,jerr) = N(end)+1 ; else NperrMLA(jL,jerr) = Nint(jjNMLA) ; end ;
         if isempty(jjNMLB) NperrMLB(jL,jerr) = N(end)+1 ; else NperrMLB(jL,jerr) = Nint(jjNMLB) ; end ;
@@ -205,5 +206,7 @@ for jerr = 1:nerrs
         if isempty(jjNMLF) NperrMLF(jL,jerr) = N(end)+1 ; else NperrMLF(jL,jerr) = Nint(jjNMLF) ; end ;
         if isempty(jjNMLG) NperrMLG(jL,jerr) = N(end)+1 ; else NperrMLG(jL,jerr) = Nint(jjNMLG) ; end ;
         if isempty(jjNMLH) NperrMLH(jL,jerr) = N(end)+1 ; else NperrMLH(jL,jerr) = Nint(jjNMLH) ; end ;
+        if isempty(jjNMLI) NperrMLI(jL,jerr) = N(end)+1 ; else NperrMLI(jL,jerr) = Nint(jjNMLI) ; end ;
+        if isempty(jjNMLJ) NperrMLJ(jL,jerr) = N(end)+1 ; else NperrMLJ(jL,jerr) = Nint(jjNMLJ) ; end ;
     end
 end

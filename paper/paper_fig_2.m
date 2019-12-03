@@ -609,12 +609,21 @@ xlabel('Total area (m)', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('No. of cells', 'Units','normalized','Position',[-0.2 0.5])
 ha.XLim(1) = 0;
 
+exp=exp_load_data(cell.details.exp_ID);
+IX=find(contains({exp.LM.name},'ball'));
+LM_locs = [exp.LM.pos_proj];
+ball2ball_dist = diff(LM_locs(IX));
+fprintf( 'Average total area in meters : %.4g\n\r',nanmean(total_area(:)) )
+fprintf( 'Average total area in prc (%%): %.4g\n\r',100*nanmean(total_area(:)) / ball2ball_dist )
+fprintf( 'Median total area in meters : %.4g\n\r',nanmedian(total_area(:)) )
+fprintf( 'Median total area in prc (%%): %.4g\n\r',100*nanmedian(total_area(:)) / ball2ball_dist )
+
+% add normalized x-axis
 axes(panel_D(2));
 cla
 hold on
-exp=exp_load_data(cell.details.exp_ID);
 hax = gca;
-hax.XLim = 100 * panel_D(1).XLim / exp.pos.calib_tunnel.tunnel_length;
+hax.XLim = 100 * panel_D(1).XLim / ball2ball_dist ;
 hax.XAxisLocation = 'top';
 hax.YAxisLocation = 'right';
 hax.Color = 'none';
