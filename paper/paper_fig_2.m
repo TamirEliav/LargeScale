@@ -412,11 +412,11 @@ h.FaceColor = 0.5*[1 1 1];
 h.BinWidth = 1;
 ha=gca;
 ha.YScale = 'log';
-xlabel('Field Size (m)')
+xlabel('Field size (m)')
 ylabel('Counts','Units','normalized','Position',[-0.23 0.5])
 ha = gca;
 % ha.XLim = [0 35];
-% ha.YLim = [0 40];
+ha.YLim = [0.8 300];
 % ha.XTick = [0:5:35];
 ha.YTick = [1 10 100];
 ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
@@ -424,6 +424,8 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
+
+save( fullfile(res_dir,'pop_dist_fields_size'), 'fields_size');
 
 %% panel G - smallest / largest field size
 % figure
@@ -548,7 +550,7 @@ for ii_cell = 1:length(cells)
             continue;
         end
         fields = cell.fields{ii_dir};
-%         fields([fields.in_low_speed_area]) = []; % we decided we don't want to remove those fields, because in SI/sparsity those field also go in the calculation
+        fields([fields.in_low_speed_area]) = [];
         total_area(ii_cell, ii_dir) = sum([fields.width_prc]);
     end
 end
@@ -613,17 +615,19 @@ exp=exp_load_data(cell.details.exp_ID);
 IX=find(contains({exp.LM.name},'ball'));
 LM_locs = [exp.LM.pos_proj];
 ball2ball_dist = diff(LM_locs(IX));
+% total_area_L = ball2ball_dist;
+total_area_L = diff(prm.fields.valid_speed_pos);
 fprintf( 'Average total area in meters : %.4g\n\r',nanmean(total_area(:)) )
-fprintf( 'Average total area in prc (%%): %.4g\n\r',100*nanmean(total_area(:)) / ball2ball_dist )
+fprintf( 'Average total area in prc (%%): %.4g\n\r',100*nanmean(total_area(:)) / total_area_L )
 fprintf( 'Median total area in meters : %.4g\n\r',nanmedian(total_area(:)) )
-fprintf( 'Median total area in prc (%%): %.4g\n\r',100*nanmedian(total_area(:)) / ball2ball_dist )
+fprintf( 'Median total area in prc (%%): %.4g\n\r',100*nanmedian(total_area(:)) / total_area_L )
 
 % add normalized x-axis
 axes(panel_D(2));
 cla
 hold on
 hax = gca;
-hax.XLim = 100 * panel_D(1).XLim / ball2ball_dist ;
+hax.XLim = 100 * panel_D(1).XLim / total_area_L;
 hax.XAxisLocation = 'top';
 hax.YAxisLocation = 'right';
 hax.Color = 'none';
@@ -649,6 +653,9 @@ M = cat(1,FR_maps_all.PSTH);
 M = reshape(M,size(FR_maps_all,1),size(FR_maps_all,2),[]);
 signif = repmat(signif,1,1,size(M,3));
 M(~signif) = nan;
+pos_bins = cells(1).FR_map(1).all.bin_centers;
+invalid_pos_IX = pos_bins<=prm.fields.valid_speed_pos(1) | pos_bins>=prm.fields.valid_speed_pos(2);
+M(:,:,invalid_pos_IX) = nan;
 ccc = corr(squeeze(M(:,1,:))', squeeze(M(:,2,:))' ,'rows', 'pairwise');
 data = diag(ccc);
 switch 2

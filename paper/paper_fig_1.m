@@ -507,9 +507,24 @@ plot(xy(1),xy(2),'.b','MarkerSize',15)
 xlim([1280 1515])
 ylim([2360 2541])
 pause(eps)
-view(9,90); % rotate this axis to match the TAZA rotation
+TAZA_rotation = 9;
+north_rotation = -3;
+view(TAZA_rotation,90); % rotate this axis to match the TAZA rotation
 % view(0,90);
 pause(eps)
+
+% add north arrow
+h=annotation('arrow',[0 0],[0 0]);
+h.Units = 'centimeters';
+center = [7 15.8];
+l = 1;
+width  = l*cos(deg2rad(90-(TAZA_rotation+north_rotation)));
+height = l*sin(deg2rad(90-(TAZA_rotation+north_rotation)));
+h.Position = [center width height];
+h.HeadLength = 8;
+h.HeadWidth = 8;
+h=text(1517,2570,'North','FontSize',10,'HorizontalAlignment','center');
+h.Rotation = -(TAZA_rotation+north_rotation);
 
 % add scale bar
 scale_m = 20;

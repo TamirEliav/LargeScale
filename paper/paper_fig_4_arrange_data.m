@@ -210,3 +210,58 @@ for jerr = 1:nerrs
         if isempty(jjNMLJ) NperrMLJ(jL,jerr) = N(end)+1 ; else NperrMLJ(jL,jerr) = Nint(jjNMLJ) ; end ;
     end
 end
+
+%% calc slopes of minN required for error vs. L
+lmNerrMLA = {};
+lmNerrMLB = {};
+lmNerrMLC = {};
+lmNerrMLD = {};
+lmNerrMLE = {};
+lmNerrMLF = {};
+lmNerrMLG = {};
+lmNerrMLH = {};
+lmNerrMLI = {};
+lmNerrPVA = {};
+lmNerrPVB = {};
+lmNerrPVC = {};
+lmNerrPVD = {};
+lmNerrPVE = {};
+lmNerrPVF = {};
+lmNerrPVG = {};
+lmNerrPVH = {};
+lmNerrPVI = {};
+L_thr = 50;
+L_IX = L./100 >= L_thr;
+L_IX = true(size(L));
+for jerr = 1:nerrs
+	IX = L_IX' & NerrMLA(:,jerr)<max(N); lmNerrMLA{jerr} = fitlm(L(IX)./100, NerrMLA(IX,jerr));
+	IX = L_IX' & NerrMLB(:,jerr)<max(N); lmNerrMLB{jerr} = fitlm(L(IX)./100, NerrMLB(IX,jerr));
+% 	IX = L_IX' & NerrMLC(:,jerr)<max(N); lmNerrMLC{jerr} = fitlm(L(IX)./100, NerrMLC(IX,jerr));
+% 	IX = L_IX' & NerrMLD(:,jerr)<max(N); lmNerrMLD{jerr} = fitlm(L(IX)./100, NerrMLD(IX,jerr));
+% 	IX = L_IX' & NerrMLE(:,jerr)<max(N); lmNerrMLE{jerr} = fitlm(L(IX)./100, NerrMLE(IX,jerr));
+	IX = L_IX' & NerrMLF(:,jerr)<max(N); lmNerrMLF{jerr} = fitlm(L(IX)./100, NerrMLF(IX,jerr));
+	IX = L_IX' & NerrMLG(:,jerr)<max(N); lmNerrMLG{jerr} = fitlm(L(IX)./100, NerrMLG(IX,jerr));
+% 	IX = L_IX' & NerrMLH(:,jerr)<max(N); lmNerrMLH{jerr} = fitlm(L(IX)./100, NerrMLH(IX,jerr));
+	IX = L_IX' & NerrMLI(:,jerr)<max(N); lmNerrMLI{jerr} = fitlm(L(IX)./100, NerrMLI(IX,jerr));
+
+	IX = L_IX' & NerrPVA(:,jerr)<max(N); lmNerrPVA{jerr} = fitlm(L(IX)./100, NerrPVA(IX,jerr));
+	IX = L_IX' & NerrPVB(:,jerr)<max(N); lmNerrPVB{jerr} = fitlm(L(IX)./100, NerrPVB(IX,jerr));
+% 	IX = L_IX' & NerrPVC(:,jerr)<max(N); lmNerrPVC{jerr} = fitlm(L(IX)./100, NerrPVC(IX,jerr));
+% 	IX = L_IX' & NerrPVD(:,jerr)<max(N); lmNerrPVD{jerr} = fitlm(L(IX)./100, NerrPVD(IX,jerr));
+% 	IX = L_IX' & NerrPVE(:,jerr)<max(N); lmNerrPVE{jerr} = fitlm(L(IX)./100, NerrPVE(IX,jerr));
+	IX = L_IX' & NerrPVF(:,jerr)<max(N); lmNerrPVF{jerr} = fitlm(L(IX)./100, NerrPVF(IX,jerr));
+	IX = L_IX' & NerrPVG(:,jerr)<max(N); lmNerrPVG{jerr} = fitlm(L(IX)./100, NerrPVG(IX,jerr));
+% 	IX = L_IX' & NerrPVH(:,jerr)<max(N); lmNerrPVH{jerr} = fitlm(L(IX)./100, NerrPVH(IX,jerr));
+	IX = L_IX' & NerrPVI(:,jerr)<max(N); lmNerrPVI{jerr} = fitlm(L(IX)./100, NerrPVI(IX,jerr));
+end
+
+
+
+
+
+
+
+
+
+
+

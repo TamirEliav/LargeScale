@@ -52,12 +52,12 @@ panel_A(1) = axes('position', [ 1 13 8 16]);
 panel_B(1) = axes('position', [ 9 19 4 5]);
 panel_B(2) = axes('position', [14 21 6 5]);
 panel_B(3) = axes('position', [14 16.5 6 5]);
-panel_C(1) = axes('position', [ 3  12 panel_CDE_size]);
-panel_C(2) = axes('position', [8.5 12 panel_CDE_size]);
-panel_D(1) = axes('position', [3    7.5 panel_CDE_size]);
-panel_D(2) = axes('position', [8.5  7.5 panel_CDE_size]);
-panel_E(1) = axes('position', [3    3 panel_CDE_size]);
-panel_E(2) = axes('position', [8.5  3 panel_CDE_size]);
+panel_C(1) = axes('position', [3 12   panel_CDE_size]);
+panel_C(2) = axes('position', [9 12   panel_CDE_size]);
+panel_D(1) = axes('position', [3  7.5 panel_CDE_size]);
+panel_D(2) = axes('position', [9  7.5 panel_CDE_size]);
+panel_E(1) = axes('position', [3  3   panel_CDE_size]);
+panel_E(2) = axes('position', [9  3   panel_CDE_size]);
 panel_legend = axes('position', [8.5 23.5 1 1]);
 
 
@@ -116,13 +116,16 @@ ha.ZLim = [-11 -3];
 % add x/y/z scale bar
 scale_bar_center = [2,3,-7];
 scale_bar_length = [-1 1];
-APMLDV_pos_offset = scale_bar_length.*1.2;
+APMLDV_pos_offset = scale_bar_length.*1.3;
 line(scale_bar_center(1)+scale_bar_length,scale_bar_center(2)+[0 0],scale_bar_center(3)+[0 0],'Color','k','LineWidth',1.5);
 line(scale_bar_center(1)+[0 0],scale_bar_center(2)+scale_bar_length,scale_bar_center(3)+[0 0],'Color','k','LineWidth',1.5);
 line(scale_bar_center(1)+[0 0],scale_bar_center(2)+[0 0],scale_bar_center(3)+scale_bar_length,'Color','k','LineWidth',1.5);
 text(scale_bar_center(1)+APMLDV_pos_offset,scale_bar_center(2)+[0 0],scale_bar_center(3)+[0 0], {'A';'P'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
 text(scale_bar_center(1)+[0 0],scale_bar_center(2)+APMLDV_pos_offset,scale_bar_center(3)+[0 0], {'M';'L'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
 text(scale_bar_center(1)+[0 0],scale_bar_center(2)+[0 0],scale_bar_center(3)+APMLDV_pos_offset, {'V';'D'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
+
+text(1,1.5,-5,    {'Septal';'pole'}, 'FontSize',8,'HorizontalAlignment','left');
+text(1,2.3,-10.3, {'Temporal';'pole'}, 'FontSize',8,'HorizontalAlignment','left');
 
 % add colorbar
 POSf = ds2nfu(panel_A(1), [0 0 0 0]);
@@ -132,7 +135,7 @@ POSf([3 4]) = [0.01 0.10];
 c=colorbar('location','EastOutside', 'position', POSf);
 c.Ticks = [0,100];
 c.TickLabels = {'100','0'};
-c.Label.String = 'Septo-Temporal (%)';
+c.Label.String = 'Longitudinal axis (%)';
 c.Label.FontSize = 8;
 
 colormap cool

@@ -1,4 +1,4 @@
-%% Large Scale - Fig. 4 - Theoretical analysis
+%% Large Scale - Fig. S9 - decoder with shorter dt (200ms)
 
 %%
 clear 
@@ -7,8 +7,8 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_4';
-fig_caption_str = 'Theoretical analysis';
+fig_name_str = 'Fig_S9_decoder_short_dt';
+fig_caption_str = 'Theoretical analysis with shorter integration window (dt)';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
 log_name_str = strrep(log_name_str , ' ', '_');
@@ -62,7 +62,7 @@ panel_E(1)   = axes('position', [14    9.5  5 4]);
 panel_legend = axes('position', [9.5 17 0.5 2]);
 
 %% arrange data
-dt = 0.5;
+dt = 0.2;
 paper_fig_4_arrange_data;
 rng(0);
 exampleL = 200*100; % 200*cm

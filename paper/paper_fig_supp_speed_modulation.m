@@ -236,9 +236,9 @@ for ii_ex = 1:3
 end
 
 %% add lines going from bat to example
-annotation('arrow',[0.150 0.18], [0.64 0.6],'LineWidth',1);
-annotation('arrow',[0.375 0.41], [0.64 0.6],'LineWidth',1);
-annotation('arrow',[0.595 0.64], [0.64 0.6],'LineWidth',1);
+annotation('arrow',[0.150 0.18], [0.64 0.6],'LineWidth',0.8,'HeadWidth',6,'HeadLength',6);
+annotation('arrow',[0.375 0.41], [0.64 0.6],'LineWidth',0.8,'HeadWidth',6,'HeadLength',6);
+annotation('arrow',[0.595 0.64], [0.64 0.6],'LineWidth',0.8,'HeadWidth',6,'HeadLength',6);
 
 %% panel B - compare field size (dir1 vs. dir 2)
 % =========================================================================

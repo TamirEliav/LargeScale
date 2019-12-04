@@ -125,7 +125,7 @@ text(1,1,   {sprintf('r = %.2f',r);sprintf('P = %.2f',pval_r)}, ...
 % text(1,0.8, {sprintf('rho=%.2f',rho);sprintf('P=%.2f',pval_rho)}, ...
 %         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     
-xlabel('Isolation index','Units','normalized','Position',[0.5 -0.15]);
+xlabel('Isolation distance','Units','normalized','Position',[0.5 -0.13]);
 ylabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[-0.15 0.5]);
 
 %% panel B - No. of fields vs. Isolation index
@@ -153,7 +153,7 @@ text(1,1,   {sprintf('r = %.2f',r);sprintf('P = %.2f',pval_r)}, ...
 % text(1,0.8, {sprintf('rho=%.2f',rho);sprintf('P=%.2f',pval_rho)}, ...
 %         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     
-xlabel('Isolation index','Units','normalized','Position',[0.5 -0.15]);
+xlabel('Isolation distance','Units','normalized','Position',[0.5 -0.13]);
 ylabel({'No. of fields per direction'},'Units','normalized','Position',[-0.15 0.5]);
 
 
@@ -229,8 +229,8 @@ for ii_cell = 1:length(cell_examples)
     end
     plot([0 1]*scale_ms,[0 0], 'k-', 'LineWidth', 1.5);
     plot([1 1]*scale_ms,[0 scale_uV], 'k-', 'LineWidth', 1.5);
-    text(0.5*scale_ms,  -0.15*range(ylimits),  sprintf('%dms',scale_ms),      'HorizontalAlignment','center', 'VerticalAlignment','middle', 'FontSize', 8);
-    text(1.12*scale_ms,  0.5*scale_uV,         sprintf('%d  {\\mu}V',scale_uV), 'HorizontalAlignment','left', 'VerticalAlignment','middle', 'FontSize', 8);
+    text(0.5*scale_ms,  -0.18*range(ylimits),  sprintf('%dms',scale_ms),      'HorizontalAlignment','center', 'VerticalAlignment','middle', 'FontSize', 8);
+    text(1.1*scale_ms,  0.5*scale_uV,         sprintf('%d  {\\mu}V',scale_uV), 'HorizontalAlignment','left', 'VerticalAlignment','middle', 'FontSize', 8);
     set(gca,'Visible','off');
     xlim(xlimits)
     ylim(ylimits)
@@ -238,7 +238,7 @@ for ii_cell = 1:length(cell_examples)
     axes(panel_C(ii_cell,1));
     text(0.1,1.8, sprintf('Cell %d',ii_cell),...
             'Units','normalized','HorizontalAlignment','left','FontSize',8);
-    text(0.1,1.5, sprintf('Isolation Distance = %.3g', cell.cluster_quality.Isolation_dis_mean),...
+    text(0.1,1.5, sprintf('Isolation distance = %.3g', cell.cluster_quality.Isolation_dis_mean),...
         'Units','normalized','HorizontalAlignment','left','FontSize',8);
 	text(0.1,1.2, sprintf('N fields = %d', size(wvfs,3) ),...
             'Units','normalized','HorizontalAlignment','left','FontSize',8);
