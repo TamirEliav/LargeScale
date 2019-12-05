@@ -120,7 +120,11 @@ ylabel('PDF','Units','normalized','Position',[-0.15 0.5])
 ha.XScale = 'log';
 ha.YScale = 'linear';
 
-%% decoder schemes colors
+%% load decoding data
+load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_5_Summary_1.mat');
+nL = length(L);
+ds = 20 ;
+% decoder schemes colors
 clr  = [1.0 0.0 0.5   ; ... % 1
         0.0 1.0 0.5   ; ... % 2
         1.0 0.5 0.0   ; ... % 3
@@ -138,29 +142,28 @@ cla
 hold on
 text(-0.2,1.1, 'B', 'Units','normalized','FontWeight','bold');
 
-% place holder
-dts = linspace(0.2, 0.5, 20) .* 1e3;
-err = rand(5, length(dts));
-plot(dts, err(1,:), 'Color', clr(1,:), 'LineWidth', 2)
-plot(dts, err(2,:), 'Color', clr(3,:), 'LineWidth', 2)
-plot(dts, err(3,:), 'Color', clr(2,:), 'LineWidth', 2)
-plot(dts, err(4,:), 'Color', clr(6,:), 'LineWidth', 2)
-plot(dts, err(5,:), 'Color', clr(7,:), 'LineWidth', 2)
+jN = find(ismember(N, [50]));
+jL = find(ismember(L, [20000]));
+plot(dt.*1e3, squeeze(meMLA(jN,:,jL)), 'Color', clr(1,:), 'LineWidth', 2);
+plot(dt.*1e3, squeeze(meMLB(jN,:,jL)), 'Color', clr(3,:), 'LineWidth', 2);
+plot(dt.*1e3, squeeze(meMLI(jN,:,jL)), 'Color', clr(2,:), 'LineWidth', 2);
+plot(dt.*1e3, squeeze(meMLF(jN,:,jL)), 'Color', clr(6,:), 'LineWidth', 2);
+plot(dt.*1e3, squeeze(meMLG(jN,:,jL)), 'Color', clr(7,:), 'LineWidth', 2);
 
 ha= gca;
-ha.XLim = [0.2 0.5].*1e3;
+ha.XLim = [20 500];
 % ha.YLim = [0.8 310];
-% ha.XTick = [0:5:35];
+ha.XTick = [20 100:100:500];
 % ha.YTick = [1 10 100];
 % ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
 ha.TickDir='out';
-ha.TickLength = [0.03 0.03];
+ha.TickLength = [0.02 0.02];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel('Integration window (ms)')
 ylabel('Mean decoding error (m)','Units','normalized','Position',[-0.12 0.5]);
 ha.XScale = 'linear';
-ha.YScale = 'linear';
+ha.YScale = 'log';
 
 %% legend panel
 axes(panel_legend);
