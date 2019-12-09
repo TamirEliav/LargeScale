@@ -1,4 +1,4 @@
-function [f] = MultiscalePlace_GenerateTuning_AllModels(L)
+function [f] = MultiscalePlace_GenerateTuning_AllModels(L,coverage)
 
 ds = 20 ;
 L = L/ds ;
@@ -16,13 +16,13 @@ gmaAL_th0 = 100/7.75/ds ;
 gmaAL_k   = 0.57 ;
 
 l0A    = 100/ds ;
-l0B    = round(0.2*L0*sqrt(L/L0)) ;
+l0B    = round(coverage*L0*sqrt(L/L0)) ;
 l0C    = 100/ds ;
 l0H    = 100/ds ;
 l0I = 100/ds ;
 liD    = sort(repmat(round(gaminv(((Ninvgma-0.5):-1:0.5)/Ninvgma,gma_k,gma_th0)),[1 Nmax/Ninvgma]),'Descend') ;
 liF    = sort(repmat(round(gaminv(((Ninvgma-0.5):-1:0.5)/Ninvgma,gma_k,gma_th0)*sqrt(L/L0)),[1 Nmax/Ninvgma]),'Descend') ; liF(liF==0) = 1 ;
-phi    = 0.2*sqrt(L0./L)  ;
+phi    = coverage*sqrt(L0./L)  ;
 KC     = round(phi./(l0C./L)) ;
 liH    = l0H * sqrt(L/L0H) ;
 KH     = round(phi./(liH/L)) ;

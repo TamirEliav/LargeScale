@@ -25,10 +25,16 @@
 switch dt
     case 0.5
         load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_2_Summary_1.mat');
-        load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_2IJ_Summary_1.mat')
+        load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_2IJ_Summary_1.mat');
+        if coverage==0.15
+            load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_6_dt_0.5_Summary_1.mat');
+        end
     case 0.2
         load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_4_Summary_1.mat');
         load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_4IJ_Summary_1.mat')
+        if coverage==0.15
+            load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_6_dt_0.2_Summary_1.mat');
+        end
 end
 nL = length(L);
 ds = 20 ;

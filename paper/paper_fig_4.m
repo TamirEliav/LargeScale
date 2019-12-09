@@ -63,10 +63,12 @@ panel_legend = axes('position', [9.5 17 0.5 2]);
 
 %% arrange data
 dt = 0.5;
+coverage = 0.20; % 20%
+% coverage = 0.15; % 15%
 paper_fig_4_arrange_data;
 rng(0);
 exampleL = 200*100; % 200*cm
-[f] = MultiscalePlace_GenerateTuning_AllModels(exampleL);
+[f] = MultiscalePlace_GenerateTuning_AllModels(exampleL,coverage);
 pos = 1:ds:exampleL;
 pos = pos / 100; % back to meter
 
@@ -170,11 +172,13 @@ he=errorbar(x,y,err(1,:));
 he.CapSize = 2;
 he.LineStyle = 'none';
 he.Color = 'k';
+m = 1.1 * max(y+err(1,:));
+m = round(m,1);
 xlim([0 6]);
-ylim([0 1.7]);
+ylim([0 m]);
 h=gca;
 h.XTick = [];
-h.YTick = [0 1.7];
+h.YTick = [0 m];
 ylabel('Slope (N per meter)', 'Units','normalized','Position',[-0.11 0.5]);
 
 %% panel C - mean decoding error
@@ -319,7 +323,7 @@ end
 
 
 %% print/save the figure
-fig_name_out = fullfile(res_dir, [fig_name_str '_dt_' strrep(num2str(dt),'.','_')]);
+fig_name_out = fullfile(res_dir, [fig_name_str '_dt_' strrep(num2str(dt),'.','_') '_coverage=' num2str(100*coverage)]);
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');

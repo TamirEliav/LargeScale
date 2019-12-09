@@ -1,4 +1,4 @@
-%% Large Scale - Fig. S9 - PV decoder
+%% Large Scale - Fig. S10 - decoder with shorter dt (200ms) + error vs. dt
 
 %%
 clear 
@@ -7,8 +7,8 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_S9_PV_decoder';
-fig_caption_str = 'Theoretical analysis with PV decoder';
+fig_name_str = 'Fig_S10_decoder_changing_dt';
+fig_caption_str = 'Theoretical analysis - error vs. integration time (dt)';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
 log_name_str = strrep(log_name_str , ' ', '_');
@@ -59,18 +59,20 @@ panel_C(1,2) = axes('position', [ 2   11.5  3 2]);
 panel_D(1,1) = axes('position', [ 7.7    9.5  5 4]);
 panel_D(1,2) = axes('position', [ 8.2 11.5  3 2]);
 panel_E(1)   = axes('position', [14    9.5  5 4]);
+panel_F      = axes('position', [ 7.4 3.3 6 4]);
 panel_legend = axes('position', [9.5 17 0.5 2]);
 
 %% arrange data
-dt = 0.5;
-% coverage = 0.20; % 20%
-coverage = 0.15; % 15%
+dt = 0.2;
+coverage = 0.20; % 20%
+% coverage = 0.15; % 15%
 paper_fig_4_arrange_data;
 rng(0);
 exampleL = 200*100; % 200*cm
 [f] = MultiscalePlace_GenerateTuning_AllModels(exampleL,coverage);
 pos = 1:ds:exampleL;
 pos = pos / 100; % back to meter
+panels_AE_dt = dt;
 
 %% legend panel
 axes(panel_legend);
@@ -129,11 +131,11 @@ text(-0.2,1.1, 'B', 'Units','normalized','FontWeight','bold');
 text(0.5,1.1, {'Minimal no. of neurons';'required for decoding'}, 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
 
 jerr = find(ismember(errs, [2]));
-plot(L/100,NerrPVA(:,jerr),'Color',clr(1,:),'LineWidth',2) ; hold on ; 
-plot(L/100,NerrPVB(:,jerr),'Color',clr(3,:),'LineWidth',2) ; hold on ; 
-plot(L/100,NerrPVI(:,jerr),'Color',clr(2,:),'LineWidth',2) ; hold on ;
-plot(L/100,NerrPVF(:,jerr),'Color',clr(6,:),'LineWidth',2) ; hold on ; 
-plot(L/100,NerrPVG(:,jerr),'Color',clr(7,:),'LineWidth',2) ; hold on ;
+plot(L/100,NerrMLA(:,jerr),'Color',clr(1,:),'LineWidth',2) ; hold on ; 
+plot(L/100,NerrMLB(:,jerr),'Color',clr(3,:),'LineWidth',2) ; hold on ; 
+plot(L/100,NerrMLI(:,jerr),'Color',clr(2,:),'LineWidth',2) ; hold on ;
+plot(L/100,NerrMLF(:,jerr),'Color',clr(6,:),'LineWidth',2) ; hold on ; 
+plot(L/100,NerrMLG(:,jerr),'Color',clr(7,:),'LineWidth',2) ; hold on ;
 xlim([20 1000]) ;
 ylim([10 250]) ;
 xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
@@ -148,17 +150,17 @@ h.XTick = [20 200 400 600 800 1000];
 %% panel B - bar plot of slopes
 x = 1:5;
 y = [
-    lmNerrPVA{jerr}.Coefficients.Estimate(2)
-    lmNerrPVB{jerr}.Coefficients.Estimate(2)
-    lmNerrPVI{jerr}.Coefficients.Estimate(2)
-    lmNerrPVF{jerr}.Coefficients.Estimate(2)
-    lmNerrPVG{jerr}.Coefficients.Estimate(2)]';
+    lmNerrMLA{jerr}.Coefficients.Estimate(2)
+    lmNerrMLB{jerr}.Coefficients.Estimate(2)
+    lmNerrMLI{jerr}.Coefficients.Estimate(2)
+    lmNerrMLF{jerr}.Coefficients.Estimate(2)
+    lmNerrMLG{jerr}.Coefficients.Estimate(2)]';
 err = [
-    lmNerrPVA{jerr}.coefCI
-    lmNerrPVB{jerr}.coefCI
-    lmNerrPVI{jerr}.coefCI
-    lmNerrPVF{jerr}.coefCI
-    lmNerrPVG{jerr}.coefCI];
+    lmNerrMLA{jerr}.coefCI
+    lmNerrMLB{jerr}.coefCI
+    lmNerrMLI{jerr}.coefCI
+    lmNerrMLF{jerr}.coefCI
+    lmNerrMLG{jerr}.coefCI];
 err  = err(2:2:end,:)';
 err = err - y;
 
@@ -190,11 +192,11 @@ for ii_N = 1:length(jN_options)
     axes(panel_C(ii_N,1));
     cla
     hold on
-    plot(L/100,mePVA(jN,:)*ds/100,'Color',clr(1,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,mePVB(jN,:)*ds/100,'Color',clr(3,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,mePVI(jN,:)*ds/100,'Color',clr(2,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,mePVF(jN,:)*ds/100,'Color',clr(6,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,mePVG(jN,:)*ds/100,'Color',clr(7,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,meMLA(jN,:)*ds/100,'Color',clr(1,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,meMLB(jN,:)*ds/100,'Color',clr(3,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,meMLI(jN,:)*ds/100,'Color',clr(2,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,meMLF(jN,:)*ds/100,'Color',clr(6,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,meMLG(jN,:)*ds/100,'Color',clr(7,:),'LineWidth',2) ; hold on ; 
     xlim([20 1000]) ;
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
     ylabel('Mean decoding error (m)', 'Units','normalized','Position',[ -0.15 0.5]);
@@ -215,11 +217,11 @@ for ii_N = 1:length(jN_options)
     axes(panel_C(ii_N,2));
     cla
     hold on
-    plot(L/100,mePVA(jN,:)*ds/100,'Color',clr(1,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,mePVB(jN,:)*ds/100,'Color',clr(3,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,mePVI(jN,:)*ds/100,'Color',clr(2,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,mePVF(jN,:)*ds/100,'Color',clr(6,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,mePVG(jN,:)*ds/100,'Color',clr(7,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,meMLA(jN,:)*ds/100,'Color',clr(1,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,meMLB(jN,:)*ds/100,'Color',clr(3,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,meMLI(jN,:)*ds/100,'Color',clr(2,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,meMLF(jN,:)*ds/100,'Color',clr(6,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,meMLG(jN,:)*ds/100,'Color',clr(7,:),'LineWidth',2) ; hold on ; 
     xlim([20 1000]) ;
     ylim(ylimits_options(ii_N,:))
     h = gca;
@@ -241,11 +243,11 @@ for ii_N = 1:length(jN_options)
     axes(panel_D(ii_N,1));
     cla
     hold on
-    plot(L/100,pePVA(jN,:,jprc)*ds/100,'Color',clr(1,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,pePVB(jN,:,jprc)*ds/100,'Color',clr(3,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,pePVI(jN,:,jprc)*ds/100,'Color',clr(2,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,pePVF(jN,:,jprc)*ds/100,'Color',clr(6,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,pePVG(jN,:,jprc)*ds/100,'Color',clr(7,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,peMLA(jN,:,jprc)*ds/100,'Color',clr(1,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,peMLB(jN,:,jprc)*ds/100,'Color',clr(3,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,peMLI(jN,:,jprc)*ds/100,'Color',clr(2,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,peMLF(jN,:,jprc)*ds/100,'Color',clr(6,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,peMLG(jN,:,jprc)*ds/100,'Color',clr(7,:),'LineWidth',2) ; hold on ; 
 %     ylim([0.1 2000]) ;
     xlim([20 1000]) ;
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
@@ -268,11 +270,11 @@ for ii_N = 1:length(jN_options)
     axes(panel_D(ii_N,2));
     cla
     hold on
-    plot(L/100,pePVA(jN,:,jprc)*ds/100,'Color',clr(1,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,pePVB(jN,:,jprc)*ds/100,'Color',clr(3,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,pePVI(jN,:,jprc)*ds/100,'Color',clr(2,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,pePVF(jN,:,jprc)*ds/100,'Color',clr(6,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,pePVG(jN,:,jprc)*ds/100,'Color',clr(7,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,peMLA(jN,:,jprc)*ds/100,'Color',clr(1,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,peMLB(jN,:,jprc)*ds/100,'Color',clr(3,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,peMLI(jN,:,jprc)*ds/100,'Color',clr(2,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,peMLF(jN,:,jprc)*ds/100,'Color',clr(6,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,peMLG(jN,:,jprc)*ds/100,'Color',clr(7,:),'LineWidth',2) ; hold on ; 
 %     ylim([0.1 2000]) ;
     xlim([100 1000]) ;
     h = gca;
@@ -298,11 +300,11 @@ for ii_N = 1:length(jN_options)
     cla
     hold on
 
-    plot(L/100,plePVA(jN,:)+(2e6)^(-1),'Color',clr(1,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,plePVB(jN,:)+(2e6)^(-1),'Color',clr(3,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,plePVI(jN,:)+(2e6)^(-1),'Color',clr(2,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,plePVF(jN,:)+(2e6)^(-1),'Color',clr(6,:),'LineWidth',2) ; hold on ; 
-    plot(L/100,plePVG(jN,:)+(2e6)^(-1),'Color',clr(7,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,pleMLA(jN,:)+(2e6)^(-1),'Color',clr(1,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,pleMLB(jN,:)+(2e6)^(-1),'Color',clr(3,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,pleMLI(jN,:)+(2e6)^(-1),'Color',clr(2,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,pleMLF(jN,:)+(2e6)^(-1),'Color',clr(6,:),'LineWidth',2) ; hold on ; 
+    plot(L/100,pleMLG(jN,:)+(2e6)^(-1),'Color',clr(7,:),'LineWidth',2) ; hold on ; 
     xlim([20 1000]) ;
     ylim(ylimits_options(ii_N,:))
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
@@ -321,9 +323,48 @@ for ii_N = 1:length(jN_options)
     end
 end
 
+%% panel F - decoding error vs. dt
+axes(panel_F);
+cla
+hold on
+text(-0.2,1.1, 'F', 'Units','normalized','FontWeight','bold');
+
+% load data
+switch coverage
+    case 0.20
+        load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_5_Summary_1.mat');
+    case 0.15
+        load('L:\Theory\Yonatan_code_data\Multiscale_PV_ML_decoder_7_Summary_1.mat');
+end
+nL = length(L);
+ds = 20 ;
+
+jN = find(ismember(N, [50]));
+jL = find(ismember(L, [20000]));
+plot(dt.*1e3, squeeze(meMLA(jN,:,jL)), 'Color', clr(1,:), 'LineWidth', 2);
+plot(dt.*1e3, squeeze(meMLB(jN,:,jL)), 'Color', clr(3,:), 'LineWidth', 2);
+plot(dt.*1e3, squeeze(meMLI(jN,:,jL)), 'Color', clr(2,:), 'LineWidth', 2);
+plot(dt.*1e3, squeeze(meMLF(jN,:,jL)), 'Color', clr(6,:), 'LineWidth', 2);
+plot(dt.*1e3, squeeze(meMLG(jN,:,jL)), 'Color', clr(7,:), 'LineWidth', 2);
+
+ha= gca;
+ha.XLim = [20 500];
+% ha.YLim = [0.8 310];
+ha.XTick = [20 100:100:500];
+% ha.YTick = [1 10 100];
+% ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
+ha.TickDir='out';
+ha.TickLength = [0.02 0.02];
+ha.XRuler.TickLabelGapMultiplier = -0.3;
+ha.YRuler.TickLabelGapMultiplier = 0.001;
+xlabel('Integration window (ms)')
+ylabel('Mean decoding error (m)','Units','normalized','Position',[-0.12 0.5]);
+ha.XScale = 'linear';
+ha.YScale = 'log';
 
 %% print/save the figure
-fig_name_out = fullfile(res_dir, [fig_name_str '_dt_' strrep(num2str(dt),'.','_') '_coverage=' num2str(100*coverage)]);
+% fig_name_out = fullfile(res_dir, fig_name_str);
+fig_name_out = fullfile(res_dir, [fig_name_str '_dt_' strrep(num2str(panels_AE_dt),'.','_') '_coverage=' num2str(100*coverage)]);
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
