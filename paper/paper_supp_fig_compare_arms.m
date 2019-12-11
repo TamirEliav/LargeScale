@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S3_compare_arms';
+fig_name_str = 'fig_S3';
 fig_caption_str = 'compare firing patterns between the two arms (long vs. short)';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');

@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_S10_decoder_changing_dt';
+fig_name_str = 'Fig_S10';
 fig_caption_str = 'Theoretical analysis - error vs. integration time (dt)';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');

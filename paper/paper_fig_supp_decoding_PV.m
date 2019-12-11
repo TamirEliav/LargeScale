@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_S9_PV_decoder';
+fig_name_str = 'Fig_S9';
 fig_caption_str = 'Theoretical analysis with PV decoder';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -63,8 +63,8 @@ panel_legend = axes('position', [9.5 17 0.5 2]);
 
 %% arrange data
 dt = 0.5;
-% coverage = 0.20; % 20%
-coverage = 0.15; % 15%
+coverage = 0.20; % 20%
+% coverage = 0.15; % 15%
 paper_fig_4_arrange_data;
 rng(0);
 exampleL = 200*100; % 200*cm

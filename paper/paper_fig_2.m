@@ -313,7 +313,7 @@ h.YLim = ylimits;
 
 %% add direction arrows
 arrow_x = 0.1 +[0 0.05];
-arrow_y = repelem(0.8933,2);
+arrow_y = repelem(0.9111,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.008,  'Color', prm.graphics.colors.flight_directions{1});
 h(2)=annotation('arrow',flip(arrow_x),arrow_y      ,  'Color', prm.graphics.colors.flight_directions{2});

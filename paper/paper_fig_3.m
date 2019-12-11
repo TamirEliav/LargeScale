@@ -106,6 +106,7 @@ for ii_dir = 1:2
     fields = cellfun(@(x)(x{ii_dir}), {cells_dir.fields},'UniformOutput',0);
     fields =[fields{:}];
     fields( [fields.in_low_speed_area] ) = [];
+    length(fields)
     
     % plot cdf
     h = cdfplot([fields.loc]);

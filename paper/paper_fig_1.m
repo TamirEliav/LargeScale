@@ -832,6 +832,8 @@ for ii_dir = 1:2
     cv = [speed_traj_all(:,ii_dir).speed_cv];
 %     cv = [cv.raw_high_speed];
     cv = [cv.across_pos_high_speed];
+    mean(cv)
+    length(cv)
     h=histogram(cv);
     h.BinEdges = linspace(0,0.1,13);
     h.BinEdges = h.BinEdges + (ii_dir-1)*0.3*h.BinWidth;
@@ -928,6 +930,7 @@ else
     h=histogram(total_distance);
     fprintf('Total distance (mean) = %.1f\n', mean(total_distance));
     fprintf('Total distance (max) = %.1f\n', max(total_distance));
+    length(total_distance)
     
     nBinEdges = 12;
     h.BinEdges = linspace(0,25,nBinEdges);
