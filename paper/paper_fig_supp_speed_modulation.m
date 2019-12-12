@@ -322,6 +322,7 @@ text(-0.6,1.1, 'B', 'Units','normalized','FontWeight','bold');
 % cla
 % set(gca,'Visible','off');
 % text(0,1, stats_str, 'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top');
+fprintf('%s\n',stats_str{:})
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, fig_name_str);

@@ -47,11 +47,10 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 
 % create panels
 panel_CDE_size = [4.5 3];
-panel_A(1) = axes('position', [ 1 13 8 16]);
-% panel_A(2) = axes('position', [ 7 20 0.7 3]);
-panel_B(1) = axes('position', [ 9 19 4 5]);
-panel_B(2) = axes('position', [14 21 6 5]);
-panel_B(3) = axes('position', [14 16.5 6 5]);
+panel_A(1) = axes('position', [ 0.6 13 8 16]);
+panel_B(1) = axes('position', [ 8.6 19 4 5]);
+panel_B(2) = axes('position', [13.6 21 6 5]);
+panel_B(3) = axes('position', [13.6 16.5 6 5]);
 panel_C(1) = axes('position', [3 12   panel_CDE_size]);
 panel_C(2) = axes('position', [9 12   panel_CDE_size]);
 panel_D(1) = axes('position', [3  7.5 panel_CDE_size]);
@@ -241,7 +240,7 @@ for ii_bat = 1:length(bats)
     bat_num = bats(ii_bat);
     c = bats_colors(bat_num);
     scatter(1,ii_bat,9,c);
-    text(1+0.25, ii_bat, sprintf('bat %d',bat_num), 'FontSize',7,'HorizontalAlignment','Left');
+    text(1+0.25, ii_bat, sprintf('Bat %d',bat_num), 'FontSize',7,'HorizontalAlignment','Left');
 end
 xlim([0 1]);
 ylim([1 length(bats)]);
@@ -394,7 +393,7 @@ for ii_pos_TT_opt = 1:2
     xlim(TT_pos_limits(ii_pos_TT_opt,:))
     ylim([0 20]);
     xlabel(TT_pos_labels{ii_pos_TT_opt});
-    ylabel('Averaged field size (m)','Units','normalized','Position',[-0.1 0.5]);
+    ylabel('Average field size (m)','Units','normalized','Position',[-0.1 0.5]);
 end
 axes(panel_D(1));
 text(-0.25,1.1, 'D', 'Units','normalized','FontWeight','bold');

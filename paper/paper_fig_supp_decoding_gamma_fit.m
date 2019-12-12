@@ -46,8 +46,8 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
 % create panels
-panel_A(1) = axes('position', [ 3 21 4 3]);
-panel_A(2) = axes('position', [ 9 21 4 3]);
+panel_A(1) = axes('position', [ 3.0 21 4 3]);
+panel_A(2) = axes('position', [ 9.5 21 4 3]);
 
 %% load data
 load('L:\paper_figures\pop_dist_fields_size.mat');
@@ -68,9 +68,9 @@ h.BinWidth = 1;
 h.Normalization = 'pdf';
 
 X = linspace(1,50,100);
-Y = gampdf(X, gamma_phat(1), gamma_phat(2));
-plot(X,Y,'-r', 'LineWidth', 1.5);
 Y = lognpdf(X, logn_phat(1), logn_phat(2));
+plot(X,Y,'-r', 'LineWidth', 1.5);
+Y = gampdf(X, gamma_phat(1), gamma_phat(2));
 plot(X,Y,'-g', 'LineWidth', 1.5);
 
 ha= gca;
@@ -84,18 +84,19 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.2;
 xlabel('Field size (m)')
-ylabel('PDF','Units','normalized','Position',[-0.15 0.5])
+ylabel('Probability density function','Units','normalized','Position',[-0.18 0.5])
 ha.XScale = 'linear';
 ha.YScale = 'linear';
 
 plot([12 16],[0.20 0.20], 'r', 'LineWidth', 2)
 plot([12 16],[0.12 0.12], 'g', 'LineWidth', 2)
-text(0.5,1.0, 'Gamma distribution',                   'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
-text(0.55,0.9, ['\alpha = ' num2str(gamma_phat(1),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
-text(0.55,0.8, ['\beta= '   num2str(gamma_phat(2),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
-text(0.5,0.6, 'Log-Normal distribution',              'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
-text(0.55,0.5, ['\mu= ' num2str(logn_phat(1),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
-text(0.55,0.4, ['\sigma= '   num2str(logn_phat(2),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+text(0.5,1.0, 'Log-Normal distribution',              'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+text(0.55,0.9, ['\mu= ' num2str(logn_phat(1),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+text(0.55,0.8, ['\sigma= '   num2str(logn_phat(2),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+text(0.5,0.6, 'Gamma distribution',                   'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+text(0.55,0.5, ['\alpha = ' num2str(gamma_phat(1),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+text(0.55,0.4, ['\beta= '   num2str(gamma_phat(2),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+
 
 %% panel A - field size distribution gamma fit (log scale)
 axes(panel_A(2));
@@ -108,9 +109,9 @@ h.BinWidth = 1;
 h.Normalization = 'pdf';
 
 X = linspace(1,50,100);
-Y = gampdf(X, gamma_phat(1), gamma_phat(2));
-plot(X,Y,'-r', 'LineWidth', 1.5);
 Y = lognpdf(X, logn_phat(1), logn_phat(2));
+plot(X,Y,'-r', 'LineWidth', 1.5);
+Y = gampdf(X, gamma_phat(1), gamma_phat(2));
 plot(X,Y,'-g', 'LineWidth', 1.5);
 
 ha= gca;
@@ -124,7 +125,7 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.2;
 xlabel('Field size (m)')
-ylabel('PDF','Units','normalized','Position',[-0.15 0.5])
+ylabel('Probability density function','Units','normalized','Position',[-0.18 0.5])
 ha.XScale = 'log';
 ha.YScale = 'linear';
 

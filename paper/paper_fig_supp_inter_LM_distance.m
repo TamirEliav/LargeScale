@@ -47,8 +47,8 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 
 % create panels
 panel_A_size = [7 3];
-panel_A(1) = axes('position', [ 4 14 panel_A_size]);
-panel_A(2) = axes('position', [ 4 10 panel_A_size]);
+panel_A(1) = axes('position', [ 4 14.3 panel_A_size]);
+panel_A(2) = axes('position', [ 4 10   panel_A_size]);
 
 
 %% load population data
@@ -137,11 +137,11 @@ for ii_dir = 1:2
 %     h=plot(lm);
 %     h(1).Color = c;
 %     h(1).Marker = '.';
-    text(0.75,0.9,{  sprintf('r=%.2g',r);...
-                    sprintf('P=%.2g',p)},...
+    text(0.75,0.9,{  sprintf('r = %.2g',r);...
+                    sprintf('P = %.2g',p)},...
                     'Units','normalized', 'HorizontalAlignment','left','FontSize',7);
     xlabel('Inter-Landmark distance (m)','Units','normalized','Position',[0.5 -0.13])
-    ylabel('Field size (m)')
+    ylabel('Field size (m)','Units','normalized','Position',[-0.09 0.5]);
     xlim([0 25]);
     ylim([0 35]);
     set(gca,'xtick',[0:5:25])

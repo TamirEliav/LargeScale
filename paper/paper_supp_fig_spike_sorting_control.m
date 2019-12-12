@@ -108,31 +108,12 @@ stats = [cells.stats];
 stats_all = [stats.all];
 stats_dir = cat(1,stats.dir);
 
-%% panel A - field size ratio vs. Isolation index
+
+%% panel A - No. of fields vs. Isolation index
 axes(panel_A);
 cla
 hold on
 text(-0.27,1.1, 'A', 'Units','normalized','FontWeight','bold');
-
-x = [CQ.Isolation_dis_mean];
-y = [stats_all.field_ratio_LS];
-plot(x, y, '.k');
-xlim([0 100])
-[r,pval_r]     = corr(x',y','rows','pairwise','type','Pearson');
-[rho,pval_rho] = corr(x',y','rows','pairwise','type','Spearman');
-text(1,1,   {sprintf('r = %.2f',r);sprintf('P = %.2f',pval_r)}, ...
-        'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
-% text(1,0.8, {sprintf('rho=%.2f',rho);sprintf('P=%.2f',pval_rho)}, ...
-%         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
-    
-xlabel('Isolation distance','Units','normalized','Position',[0.5 -0.13]);
-ylabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[-0.15 0.5]);
-
-%% panel B - No. of fields vs. Isolation index
-axes(panel_B);
-cla
-hold on
-text(-0.27,1.1, 'B', 'Units','normalized','FontWeight','bold');
 
 x = [CQ.Isolation_dis_mean];
 x = [x;x]';
@@ -148,7 +129,7 @@ plot(x, y, '.k');
 xlim([0 100])
 [r,pval_r]     = corr(x',y','rows','pairwise','type','Pearson');
 [rho,pval_rho] = corr(x',y','rows','pairwise','type','Spearman');
-text(1,1,   {sprintf('r = %.2f',r);sprintf('P = %.2f',pval_r)}, ...
+text(1,1,   {sprintf('r = %.3f',r);sprintf('P = %.2f',pval_r)}, ...
         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 % text(1,0.8, {sprintf('rho=%.2f',rho);sprintf('P=%.2f',pval_rho)}, ...
 %         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
@@ -156,6 +137,29 @@ text(1,1,   {sprintf('r = %.2f',r);sprintf('P = %.2f',pval_r)}, ...
 xlabel('Isolation distance','Units','normalized','Position',[0.5 -0.13]);
 ylabel({'No. of fields per direction'},'Units','normalized','Position',[-0.15 0.5]);
 
+fprintf('panel A number of cells=%d\n',sum(~isnan(y)))
+
+%% panel B - field size ratio vs. Isolation index
+axes(panel_B);
+cla
+hold on
+text(-0.27,1.1, 'B', 'Units','normalized','FontWeight','bold');
+
+x = [CQ.Isolation_dis_mean];
+y = [stats_all.field_ratio_LS];
+plot(x, y, '.k');
+xlim([0 100])
+[r,pval_r]     = corr(x',y','rows','pairwise','type','Pearson');
+[rho,pval_rho] = corr(x',y','rows','pairwise','type','Spearman');
+text(1,1,   {sprintf('r = %.3f',r);sprintf('P = %.2f',pval_r)}, ...
+        'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+% text(1,0.8, {sprintf('rho=%.2f',rho);sprintf('P=%.2f',pval_rho)}, ...
+%         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+    
+xlabel('Isolation distance','Units','normalized','Position',[0.5 -0.13]);
+ylabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[-0.15 0.5]);
+
+fprintf('panel A number of cells=%d\n',sum(~isnan(y)))
 
 %% panel C - examples: waveforms of spikes from different fields
 cell_examples = {
@@ -244,7 +248,7 @@ for ii_cell = 1:length(cell_examples)
             'Units','normalized','HorizontalAlignment','left','FontSize',8);
 end
 axes(panel_C(1,2));
-text(-2.5,1.5, 'C', 'Units','normalized','FontWeight','bold');
+text(-2.5,2, 'C', 'Units','normalized','FontWeight','bold');
 
 
 %% print/save the figure

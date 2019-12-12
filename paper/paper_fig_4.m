@@ -47,19 +47,20 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 
 % create panels
 panel_A_size = [3 3].*[0.95 0.85];
-panel_A(1) = axes('position', [ 1.5 21 panel_A_size]);
-panel_A(2) = axes('position', [ 5.0 21 panel_A_size]);
-panel_A(3) = axes('position', [ 8.5 21 panel_A_size]);
-panel_A(4) = axes('position', [12.0 21 panel_A_size]);
-panel_A(5) = axes('position', [15.5 21 panel_A_size]);
-panel_B(1)   = axes('position', [ 1.5 15 5 4]);
-panel_B(2)   = axes('position', [ 7.5 15 1.5 4]);
-panel_C(1,1) = axes('position', [ 1.5  9.5  5 4]);
-panel_C(1,2) = axes('position', [ 2   11.5  3 2]);
-panel_D(1,1) = axes('position', [ 7.7    9.5  5 4]);
-panel_D(1,2) = axes('position', [ 8.2 11.5  3 2]);
-panel_E(1)   = axes('position', [14    9.5  5 4]);
-panel_legend = axes('position', [9.5 17 0.5 2]);
+panel_BCDE_size = [4.6 4];
+panel_A(1) = axes('position', [ 2.0 21 panel_A_size]);
+panel_A(2) = axes('position', [ 5.5 21 panel_A_size]);
+panel_A(3) = axes('position', [ 9.0 21 panel_A_size]);
+panel_A(4) = axes('position', [12.5 21 panel_A_size]);
+panel_A(5) = axes('position', [16.0 21 panel_A_size]);
+panel_B(1)   = axes('position', [ 2.0 14.6 panel_BCDE_size]);
+panel_B(2)   = axes('position', [ 7.6 14.6 2 4]);
+panel_C(1,1) = axes('position', [ 2.0  8.7  panel_BCDE_size]);
+panel_C(1,2) = axes('position', [ 2.5   10.7  2.8 2]);
+panel_D(1,1) = axes('position', [ 8.1  8.7  panel_BCDE_size]);
+panel_D(1,2) = axes('position', [ 8.7 10.7  2.5 2]);
+panel_E(1)   = axes('position', [14.4    8.7  panel_BCDE_size]);
+panel_legend = axes('position', [9.8 16.6 0.4 2]);
 
 %% arrange data
 dt = 0.5;
@@ -81,11 +82,11 @@ plot([0 1], 4*[1 1], 'Color',clr(3,:),'LineWidth',2) ; hold on ;
 plot([0 1], 3*[1 1], 'Color',clr(2,:),'LineWidth',2) ; hold on ; 
 plot([0 1], 2*[1 1], 'Color',clr(6,:),'LineWidth',2) ; hold on ; 
 plot([0 1], 1*[1 1], 'Color',clr(7,:),'LineWidth',2) ; hold on ; 
-text(1.2,5,'1: Single small fields', 'FontSize', 10);
-text(1.2,4,'2: Single large fields', 'FontSize', 10);
-text(1.2,3,'3: multiple small fields (Rich et al. 2014)', 'FontSize', 10);
-text(1.2,2,'4: multi-scale (population)', 'FontSize', 10);
-text(1.2,1,'5: multi-scale (single-cell)', 'FontSize', 10);
+text(1.2,5,'1: Single small field', 'FontSize', 9);
+text(1.2,4,'2: Single large field', 'FontSize', 9);
+text(1.2,3,'3: multiple small fields (Rich et al. 2014)', 'FontSize', 9);
+text(1.2,2,'4: multi-scale (population)', 'FontSize', 9);
+text(1.2,1,'5: multi-scale (single-cell)', 'FontSize', 9);
 axis off
 xlim([0 1])
 ylim([1 5])
@@ -95,9 +96,12 @@ maps=[];
 maps(1,:,:) = f.fA(:,1:10);
 maps(1,:,[7 4 9 10]) = f.fA(:,[4 7 11 12]);
 maps(2,:,:) = f.fB(:,1:10);
-maps(2,:,[3 9]) = f.fB(:,[14 12]);
+maps(2,:,[3 9 5]) = f.fB(:,[14 12 15]);
 [~,IX] = sort(sum(f.fI,1));
 maps(3,:,:) = f.fI(:,IX(50:100:950));
+maps(3,:,10) = f.fI(:,IX(951));
+rng(0);
+maps(3,:,:) = maps(3,:,randperm(10));
 maps(4,:,:) = f.fF(:,950:-100:50);
 maps(5,:,:) = f.fG(:,1:10);
 for ii_scnr = 1:5
@@ -115,18 +119,18 @@ for ii_scnr = 1:5
     h.YTick = [1 5 10];
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
-    title("Scheme "+ii_scnr);
+    title("Scheme "+ii_scnr,'Units','normalized','Position',[0.5 1.06]);
 end
 axes(panel_A(1));
-text(-0.3,1.1, 'A', 'Units','normalized','FontWeight','bold');
-ylabel('Example neuron #','Units','normalized','Position',[-0.2 0.5]);
+text(-0.4,1.1, 'A', 'Units','normalized','FontWeight','bold');
+ylabel('Example neuron no.','Units','normalized','Position',[-0.2 0.5]);
 
 %% panel B - minimum N required for error < 1 m
 axes(panel_B(1));
 cla
 hold on
-text(-0.2,1.1, 'B', 'Units','normalized','FontWeight','bold');
-text(0.5,1.1, {'Minimal no. of neurons';'required for decoding'}, 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
+text(-0.24,1.13, 'B', 'Units','normalized','FontWeight','bold');
+text(0.5,1.13, {'Minimal no. of neurons';'required for decoding'}, 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
 
 jerr = find(ismember(errs, [2]));
 plot(L/100,NerrMLA(:,jerr),'Color',clr(1,:),'LineWidth',2) ; hold on ; 
@@ -153,14 +157,14 @@ y = [
     lmNerrMLI{jerr}.Coefficients.Estimate(2)
     lmNerrMLF{jerr}.Coefficients.Estimate(2)
     lmNerrMLG{jerr}.Coefficients.Estimate(2)]';
-err = [
+CI = [
     lmNerrMLA{jerr}.coefCI
     lmNerrMLB{jerr}.coefCI
     lmNerrMLI{jerr}.coefCI
     lmNerrMLF{jerr}.coefCI
     lmNerrMLG{jerr}.coefCI];
-err  = err(2:2:end,:)';
-err = err - y;
+CI = CI(2:2:end,:)';
+err = CI - y;
 
 axes(panel_B(2));
 cla
@@ -180,6 +184,47 @@ h=gca;
 h.XTick = [];
 h.YTick = [0 m];
 ylabel('Slope (N per meter)', 'Units','normalized','Position',[-0.11 0.5]);
+
+% add significance test
+slopes_fit = {
+    lmNerrMLA{jerr}
+    lmNerrMLB{jerr}
+    lmNerrMLI{jerr}
+    lmNerrMLF{jerr}
+    lmNerrMLG{jerr}};
+signif_lines_y = [1.72 1.62 1.52 1.42];
+for ii_scheme = 1:4
+    % signif test
+    mu1 = slopes_fit{ii_scheme}.Coefficients.Estimate(2);
+    mu2 = slopes_fit{5}.Coefficients.Estimate(2);
+    alpha = (1-normcdf(1,0,1));
+    ci1 = coefCI(slopes_fit{ii_scheme}, alpha);
+    ci2 = coefCI(slopes_fit{5}, alpha);
+    sigma1 = ci1(2,2)-mu1;
+    sigma2 = ci2(2,2)-mu2;
+    sigma1 = sqrt(slopes_fit{ii_scheme}.CoefficientCovariance(2,2));
+    sigma2 = sqrt(slopes_fit{5}.CoefficientCovariance(2,2));
+    z = (mu1-mu2) / sqrt(sigma1^2+sigma2^2);
+    pval = 1-normcdf(z,0,1);
+    fprintf('scheme %d vs %d: pval=%g\n',ii_scheme,5,pval);
+    % line + asterisks
+    m = signif_lines_y(ii_scheme);
+    X = [ii_scheme 5];
+    Y = [1 1].*m;
+    [Xf, Yf] = ds2nfu(X,Y);
+    annotation('line',Xf,Yf,'LineWidth',1.1);
+    if pval < 0.05
+        signif_str = '*';
+        signif_str_font_size = 12;
+        signif_str_offset = 0;
+    else
+        signif_str = 'n.s.';
+        signif_str_font_size = 6;
+        signif_str_offset = 0.05;
+    end
+    text(mean(X),m+0.02+signif_str_offset, signif_str, 'HorizontalAlignment','center','FontSize',signif_str_font_size);
+end
+
 
 %% panel C - mean decoding error
 jN_options = find(ismember(N, [50]));
@@ -207,7 +252,7 @@ for ii_N = 1:length(jN_options)
     h.XRuler.TickLength = [0.03 0.03];
 %     text(0.95,1, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
     if ii_N == 1
-        text(-0.2,1.1, 'C', 'Units','normalized','FontWeight','bold');
+        text(-0.24,1.1, 'C', 'Units','normalized','FontWeight','bold');
         text(0.5,1.1, 'Mean decoding errors', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
 
@@ -249,7 +294,7 @@ for ii_N = 1:length(jN_options)
 %     ylim([0.1 2000]) ;
     xlim([20 1000]) ;
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel([num2str(prc(jprc)) '% decoder error (m)'], 'Units','normalized','Position',[ -0.12 0.5]);
+    ylabel([num2str(prc(jprc)) '% decoding error (m)'], 'Units','normalized','Position',[ -0.12 0.5]);
     h = gca;
     h.XScale = 'log';
 %     h.YScale = 'log';
@@ -261,7 +306,7 @@ for ii_N = 1:length(jN_options)
 %     text(0.95,1, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
     if ii_N == 1
         text(-0.19,1.1, 'D', 'Units','normalized','FontWeight','bold');
-        text(1.12,1.22, 'Catastrophic errors', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
+        text(0.5,1.1, 'Catastrophic errors', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
     
     % zoom-in inset
@@ -282,7 +327,7 @@ for ii_N = 1:length(jN_options)
     h.XTickLabel = {'100';'1000'};
     h.YTick = [1 100];
     h.YTickLabel = {'1';'100'};
-    h.YRuler.TickLabelGapOffset = -0.1;
+    h.YRuler.TickLabelGapOffset = 2;
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
 end
@@ -306,7 +351,7 @@ for ii_N = 1:length(jN_options)
     xlim([20 1000]) ;
     ylim(ylimits_options(ii_N,:))
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel('P(err>5% of environment size)', 'Units','normalized','Position',[ -0.12 0.5]);
+    ylabel('Prob.(error>5% of environment size)', 'Units','normalized','Position',[ -0.12 0.44]);
 %     text(0.95,1.03, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
     h = gca;
     h.XScale = 'log';
@@ -318,6 +363,7 @@ for ii_N = 1:length(jN_options)
     h.XRuler.TickLength = [0.03 0.03];
     if ii_N == 1
         text(-0.19,1.1, 'E', 'Units','normalized','FontWeight','bold');
+        text(0.5,1.1, 'Catastrophic errors', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
 end
 

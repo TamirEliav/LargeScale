@@ -52,22 +52,22 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 
 % create panels
 panel_B_size = [9.5 1];
-panel_A    = axes('position', [ 0.75 23.2  2 2]);
-panel_B(1) = axes('position', [ 4 24.5  panel_B_size]);
-panel_B(2) = axes('position', [ 4 23.5  panel_B_size]);
-panel_B(3) = axes('position', [ 4 22.5  panel_B_size]);
-panel_B(4) = axes('position', [ 4 21.5  panel_B_size]);
-panel_C    = axes('position', [14.7 21.0  5 5]);
-panel_D    = axes('position', [ 0.6 18 8 2.3]);
-panel_E    = axes('position', [ -0.5 12.5 9 5]);
-panel_F    = axes('position', [10 18 2 2]);
-panel_G    = axes('position', [13.6 18 6 2]);
-panel_H    = axes('position', [10 14 2.5 2.5]);
-panel_I    = axes('position', [13.5 14.25 3 2.5]);
-panel_J    = axes('position', [ 1 10.25 6 2]);
-panel_K    = axes('position', [ 8.5 10.25 2.5 2]);
-panel_L    = axes('position', [12.5 10.25 2.5 2]);
-panel_M    = axes('position', [16.5 10.25 2.5 2]);
+panel_A    = axes('position', [ 1.25 23.2  2 2]);
+panel_B(1) = axes('position', [ 4.5 24.5  panel_B_size]);
+panel_B(2) = axes('position', [ 4.5 23.5  panel_B_size]);
+panel_B(3) = axes('position', [ 4.5 22.5  panel_B_size]);
+panel_B(4) = axes('position', [ 4.5 21.5  panel_B_size]);
+panel_C    = axes('position', [15.2 21.0  5 5]);
+panel_D    = axes('position', [ 1.1 18 8 2.3]);
+panel_E    = axes('position', [ 0   12.5 9 5]);
+panel_F    = axes('position', [10.5 18 2 2]);
+panel_G    = axes('position', [14.1 18 6 2]);
+panel_H    = axes('position', [10.5 14 2.5 2.5]);
+panel_I    = axes('position', [14.0 14.25 3 2.5]);
+panel_J    = axes('position', [ 1.5 10.25 6 2]);
+panel_K    = axes('position', [ 9.0 10.25 2.5 2]);
+panel_L    = axes('position', [13.0 10.25 2.5 2]);
+panel_M    = axes('position', [17.0 10.25 2.5 2]);
 
 %
 prm = PARAMS_GetAll();
@@ -256,6 +256,7 @@ for ii_cell = 1:length(cells)
 %         plot3(cluCntr(1),cluCntr(2),cluCntr(3),'*','Color','r','MarkerSize',10);
 %     end
 end
+%%
 ha = gca;
 ha.XLim = [0 max(X(CellNumbers ~= 0))];
 ha.YLim = [0 max(Y(CellNumbers ~= 0))];
@@ -265,8 +266,8 @@ ha.YTick = floor(ha.YLim/100)*100;
 ha.ZTick = floor(ha.ZLim/100)*100;
 
 h1=text([230 1610],[650 680],  [0 0], ""+ha.XRuler.TickValues,'FontSize',7);
-h2=text([1560 1793],[140 683], [-15 15], ""+ha.YRuler.TickValues,'FontSize',7);
-h3=text([1650 1740],[140 120], [70 960], ""+ha.ZRuler.TickValues,'FontSize',7);
+h2=text([1560 1810],[140 683], [-20 15], ""+ha.YRuler.TickValues,'FontSize',7);
+h3=text([1645 1740],[140 120], [70 960], ""+ha.ZRuler.TickValues,'FontSize',7);
 ha.XRuler.TickLabels = {};
 ha.YRuler.TickLabels = {};
 ha.ZRuler.TickLabels = {};
@@ -286,9 +287,9 @@ AZ_EL(8,:) = [146 16];
 viewing_option = 5;
 view(AZ_EL(viewing_option,:));
 
-hx=xlabel(['Ch' num2str(ch2plot(1)) ' ( {\mu}V )']);%,'Position',[835  250  -152]);
-hy=ylabel(['Ch' num2str(ch2plot(2)) ' ( {\mu}V )']);%,'Position',[100  300  -100]);
-hz=zlabel(['Ch' num2str(ch2plot(3)) ' ( {\mu}V )']);%,'Position',[1400  -44  480]);
+hx=xlabel(['Ch' num2str(ch2plot(1)) ' ( {\mu}V)']);%,'Position',[835  250  -152]);
+hy=ylabel(['Ch' num2str(ch2plot(2)) ' ( {\mu}V)']);%,'Position',[100  300  -100]);
+hz=zlabel(['Ch' num2str(ch2plot(3)) ' ( {\mu}V)']);%,'Position',[1400  -44  480]);
 hx.Units = 'normalized';
 hy.Units = 'normalized';
 hz.Units = 'normalized';
@@ -315,7 +316,7 @@ text(-0.29,1.22, 'A', 'Units','normalized','FontWeight','bold');
 % add scale bar
 scale_mm = 10;
 pixel_mm_ratio = 720/11; % 720 pixels is measured manually using ginput amd sd card width is 11mm
-scale_line_width = 1;
+scale_line_width = 1.5;
 scale_pixels = scale_mm * pixel_mm_ratio;
 xlimits = get(gca,'xlim');
 ylimits = get(gca,'ylim');
@@ -325,7 +326,7 @@ ya = ylimits(1) + [0 0];
 xaf = xaf + 0.04;
 yaf = yaf + 0.008;
 annotation('line', xaf,yaf, 'Linewidth',scale_line_width);
-h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dmm',scale_mm),...
+h=annotation('textbox', [mean(xaf)-0.0005 mean(yaf)-0.008 0 0], 'String', sprintf('%dmm',scale_mm),...
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
 
 axes(panel_D);
@@ -516,14 +517,14 @@ pause(eps)
 % add north arrow
 h=annotation('arrow',[0 0],[0 0]);
 h.Units = 'centimeters';
-center = [7 15.8];
+center = [7.8 15.8];
 l = 1;
 width  = l*cos(deg2rad(90-(TAZA_rotation+north_rotation)));
 height = l*sin(deg2rad(90-(TAZA_rotation+north_rotation)));
 h.Position = [center width height];
 h.HeadLength = 8;
 h.HeadWidth = 8;
-h=text(1517,2570,'North','FontSize',10,'HorizontalAlignment','center');
+h=text(1525,2570,'North','FontSize',9,'HorizontalAlignment','center');
 h.Rotation = -(TAZA_rotation+north_rotation);
 
 % add scale bar
@@ -549,8 +550,8 @@ hold on
 plot(0,1,'.b','MarkerSize',10)
 plot(0,2,'.r','MarkerSize',10);
 % plot(0,2,'or','MarkerSize',10,'MarkerFaceColor',[1 0 0]);
-text(0.25,1,'Bat','FontSize',7);
-text(0.25,2,'Antenna','FontSize',7);
+text(0.18,1,'Bat','FontSize',7);
+text(0.18,2,'Antenna','FontSize',7);
 xlim([0 1])
 ylim([0.5 2.5])
 box off
@@ -575,7 +576,7 @@ x = linspace(-50,50,100);
 y = normpdf(x,muHat,sigmaHat);
 plot(x,y,'k','LineWidth',1.5);
 text(0.65,0.85, sprintf('\x03C3=%.1fcm', sigmaHat), 'Units','normalized','FontSize',8);
-xlabel({'Positioning error (cm)'},'Units','normalized','Position',[0.5 -0.2]);
+xlabel({'Localization error (cm)'},'Units','normalized','Position',[0.5 -0.2]);
 ylabel('Probability','Units','normalized','Position',[-0.07 0.5]);
 ha = gca;
 ha.XLim = [-40 40];
@@ -626,7 +627,7 @@ ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 
 % add direction arrows
-arrow_x = [0.80 0.85];
+arrow_x = [0.80 0.85]+0.0231;
 arrow_y = repelem(0.74,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
@@ -774,7 +775,7 @@ switch yvar_pop_plot
 end
 
 % add direction arrows
-arrow_x = 0.53 + [0 0.03];
+arrow_x = 0.53 + [0 0.03] + 0.0231;
 arrow_y = repelem(0.60,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
@@ -819,7 +820,7 @@ set(gca,'xtick',0:50:200,'ytick',[-10 0 8],'xlim',[0 200])
 set(gca,'tickdir','out','TickLength',repelem(0.01,2));
 ylim(ylimits);
 xlabel('Position (m)','Units','normalized','Position',[0.5 -0.25]);
-ylabel('Speed (m/s)','Units','normalized','Position',[-0.07 0.41]);
+ylabel('Flight speed (m/s)','Units','normalized','Position',[-0.07 0.41]);
 
 
 %% panel K - speed trajectory very constant along the flight - population
@@ -852,7 +853,7 @@ xlabel('CV of speed','Units','normalized','Position',[0.5 -0.25]);
 ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
 % add direction arrows
-arrow_x = [0.48 0.50];
+arrow_x = [0.48 0.50] + 0.0231;
 arrow_y = repelem(0.45,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
@@ -890,7 +891,7 @@ xlabel('No. of flights','Units','normalized','Position',[0.5 -0.25]);
 ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
 % add direction arrows
-arrow_x = 0.67 + [0 0.02];
+arrow_x = 0.67 + [0 0.02] + 0.0231;
 arrow_y = repelem(0.45,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});

@@ -110,7 +110,7 @@ nFields(nFields==0) = nan;
 axes(panel_A(1));
 cla
 hold on
-text(-0.1,1.1, 'A', 'Units','normalized','FontWeight','bold');
+% text(-0.1,1.1, 'A', 'Units','normalized','FontWeight','bold');
 for ii_dir = 1:2
     axes(panel_A(ii_dir));
 %     subplot(1,2,ii_dir)
@@ -139,9 +139,12 @@ for ii_dir = 1:2
     P_ranksum = ranksum(x1,x2);
 %     text(1,0.9,sprintf('P_{Wilc}=%.2f',P_ranksum),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     ha=gca;
+    ha.YLim(1) = 6e-4;
     ha.YScale = 'log';
+    ha.XRuler.TickLabelGapOffset = -1;
+    ha.TickLength = [0.03 0.03];
 %     title("dir "+ii_dir);
-    xlabel('Field size (m)');
+    xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.12]);
     ylabel('Probability');
 end
 
