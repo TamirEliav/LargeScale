@@ -109,3 +109,15 @@ end
 
 
 
+%% different param sets
+% % % % prm.fields.width_href = 0.1;
+% % % % prm.fields.width_href = 0.3;
+% % % % 
+% % % % prm.fields.width_prc = [0  100];
+% % % % prm.fields.width_prc = [10  90];
+% % % % prm.fields.width_prc = [25  75];
+% % % % 
+% % % % prm.fields.min_flights_with_spikes_prc = 0.25;
+% % % % prm.fields.min_flights_with_spikes_prc = 0.30;
+% % % % 
+% % % % % plot F,G,I in this new supp figure

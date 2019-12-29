@@ -230,7 +230,7 @@ setappdata(gcf, 'NTT_file', NTT_file);
 
 % set brush callback
 bO = brush(gcf);
-set(bO, 'ActionPostCallback', @MyBrushFunc);
+% set(bO, 'ActionPostCallback', @MyBrushFunc);
 
 % save figure
 file_out = fullfile(dir_out, 'maps_all_units');

@@ -133,6 +133,7 @@ for ii_dir = 1:2
     ha= gca;
     ha.TickDir='out';
     ha.TickLength = [0.015 0.015];
+    ha.XTick = [0:50:200];
     ha.YTick = ha.YLim;
     ha.XRuler.TickLabelGapMultiplier = -0.3;
     ha.YRuler.TickLabelGapMultiplier = 0.001;

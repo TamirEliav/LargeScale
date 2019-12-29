@@ -1715,6 +1715,224 @@ subplot(122)
 mean(sum(sdf)./5)
 histogram(sum(sdf)./5)
 
+%%
+clear
+clc
+file_in = 'L:\DATA\9861_Somo\20180704\nlx\CSC5.ncs';
+limits_ts = [28121638315 28985664907];
+[signal, ts, fs, params] = Nlx_csc_read(file_in, []);
+limits_ts = ts(1) + round([0 0.5*60*1e6]);
+[signal, ts, fs, params] = Nlx_csc_read(file_in, limits_ts);
+
+% set up the parameters of the filter
+ops.fshigh = 600;
+ops.fs = fs;
+[b1, a1] = butter(3, ops.fshigh/ops.fs*2, 'high');
+nCh = 16;
+signal = repmat(signal, nCh, 1);
+
+dataRAW = gpuArray(signal); % move int16 data to GPU
+dataRAW = dataRAW';
+dataRAW = single(dataRAW); % convert to float32 so GPU operations are fast
+% dataRAW = dataRAW(:, chanMap); % subsample only good channels
+
+% subtract the mean from each channel
+dataRAW = dataRAW - mean(dataRAW, 1); % subtract mean of each channel
+
+% next four lines should be equivalent to filtfilt (which cannot be used because it requires float64)
+tic
+datr = filter(b1, a1, dataRAW); % causal forward filter
+datr = flipud(datr); % reverse time
+datr = filter(b1, a1, datr); % causal forward filter again
+datr = flipud(datr); % reverse time back
+toc
+
+%%
+clear
+clc
+switch 2
+    case 1
+        % file_in = 'L:\DATA\9861_Somo\20180704\nlx\CSC5.ncs';
+        % [signal, ts, fs, params] = Nlx_csc_read(file_in, []);
+        nCh = 16;
+        signal = repmat(signal, nCh, 1);
+    case 2
+        fs = 32000;
+        dt = 1/fs;
+        T = 1*60*60;    % 1 hours
+%         T = 10*60;      % 10 minutes
+        t = 0:dt:T;
+        L = length(t);
+        nCh = 1;
+%         signal = randn(nCh,L);
+        f1=10;
+        f2=1000;
+        signal = sin(2*pi*f1.*t) + sin(2*pi*f2.*t);
+        signal = repmat(signal, nCh, 1);
+end
+
+% set up the parameters of the filter
+ops.fshigh = 600;
+ops.fs = fs;
+[b1, a1] = butter(3, ops.fshigh/ops.fs*2, 'high');
+
+end_loop = 0;
+chunk_size = round(2*60*fs);
+nDataChunks = ceil(L/chunk_size)
+chunk_start_IX = 1;
+% ch_chunks = num2cell(1:nCh);  % channel by channel
+ch_chunks = {1:nCh};            % all channels together
+signal_filtered = zeros(size(signal));
+timing_all = tic;
+for ii_ch_chunk = 1:length(ch_chunks)
+    ch_chunk_IX = ch_chunks{ii_ch_chunk};
+    ii_data_chunk = 1;
+    while ~end_loop
+        fprintf('data chunk %d: %d/n', ii_data_chunk);
+        chunk_end_IX = chunk_start_IX + chunk_size-1;
+        if chunk_end_IX > L
+            chunk_end_IX = L;
+            end_loop = 1;
+        end
+        data_chunk_IX = chunk_start_IX:chunk_end_IX;
+
+        dataRAW = gpuArray(signal(ch_chunk_IX,data_chunk_IX)); % move int16 data to GPU
+        dataRAW = dataRAW';
+        dataRAW = single(dataRAW); % convert to float32 so GPU operations are fast
+        % dataRAW = dataRAW(:, chanMap); % subsample only good channels
+
+        % subtract the mean from each channel
+    %     dataRAW = dataRAW - mean(dataRAW, 1); % subtract mean of each channel
+
+        % next four lines should be equivalent to filtfilt (which cannot be used because it requires float64)
+
+        tic
+        datr = filter(b1, a1, dataRAW); % causal forward filter
+        datr = flipud(datr); % reverse time
+        datr = filter(b1, a1, datr); % causal forward filter again
+        datr = flipud(datr); % reverse time back
+        signal_filtered(ch_chunk_IX,data_chunk_IX) = gather(datr)';
+        toc
+        
+        chunk_start_IX = chunk_start_IX + chunk_size;
+        ii_data_chunk = ii_data_chunk + 1;
+        disp('...')
+    end
+end
+toc(timing_all)
+
+%%
+figure
+hold on
+plot(signal(1,:));
+plot(signal_filtered(1,:));
+
+%%
+% 64ch 0.5min 1.7322sec
+% 16ch 0.5min 0.9354sec
+
+%% 26/12/2019 - all kind of correlations
+figure
+hold on
+h=[];
+h(1)=plot(LS_field_ratio_all, LS_field_size(1,:),'*');
+h(2)=plot(LS_field_ratio_all, LS_field_size(2,:),'+');
+linkprop(h, 'BrushData');
+xlabel('LS field ratio')
+ylabel('LS field size (m)')
+[r1,p1]=corr(LS_field_ratio_all', LS_field_size(1,:)', 'rows','pairwise');
+[r2,p2]=corr(LS_field_ratio_all', LS_field_size(2,:)', 'rows','pairwise');
+% text(0.7,0.9, sprintf('S: r=%.2f, p=%.2g',r1,p1), 'Units','normalized');
+% text(0.7,0.8, sprintf('L: r=%.2f, p=%.2g',r2,p2), 'Units','normalized');
+legend({sprintf('S: r=%.2f, p=%.2g',r1,p1);...
+        sprintf('L: r=%.2f, p=%.2g',r2,p2)}, 'Location','northwest')
+h=gca;
+h.XScale = 'log';
+h.YScale = 'log';
+
+%%
+figure
+plot(LS_field_size(1,:), LS_field_size(2,:),'.')
+lsline
+axis equal
+
+%%
+smallest_field_peak_FR = nan(1,length(cells));
+for ii_cell = 1:length(cells)
+    cell = cells(ii_cell);
+    % pooled stats - check at least one direction is signif
+    if any([cell.signif.TF])
+        LS_field_ratio_all(ii_cell) = cell.stats.all.field_ratio_LS;
+    end
+    % per dir stats - check signif per direction
+    for ii_dir = 1:2
+        if cell.signif(ii_dir).TF 
+            LS_field_ratio_dir(ii_dir,ii_cell) = cell.stats.dir(ii_dir).field_ratio_LS;
+        end
+    end
+end
+
+%%
+figure
+subplot(2,2,1)
+plot(in_field_spikes_prc(:),total_area(:),'.')
+subplot(2,2,3)
+sdf = repelem(LS_field_ratio_all,2,1)';
+plot(in_field_spikes_prc(:),sdf(:),'.')
+subplot(2,2,4)
+plot(in_field_spikes_prc(:),LS_field_ratio_dir(:),'.')
+
+%% 29/12/2019 - simulate perfect gaussian field 
+% and see how many spikes are counted as in-field (with the same detections
+% process and params)
+clear
+clc
+T = 60*60; % in sec
+dt=0.01;
+v = 8;
+dx = v*dt
+x = 0:dx:200;
+field_pos = 100;
+field_size_std = 5;
+FR_map = gaussmf(x,[field_size_std field_pos]);
+FR_map_peak = 20;
+FR_map = FR_map .* FR_map_peak;
+field_href = 0.2;
+n = round(T/dt)
+pos_IX = randi([1 length(x)], 1,n);
+pos = x(pos_IX);
+flight = randi([1 40], 1,n);
+spikes_rate = poissrnd(FR_map(pos_IX).*dt);
+unique(spikes_rate) % dt is so small -> binary case (spike/no spike)
+spikes_pos = pos;
+spikes_flight = flight;
+spikes_pos(spikes_rate==0) = [];
+spikes_flight(spikes_rate==0) = [];
+left_border_IX = find( FR_map < field_href*FR_map_peak & x < field_pos, 1,'last');
+right_border_IX = find( FR_map < field_href*FR_map_peak & x > field_pos, 1,'first');
+field_border_IX = [left_border_IX right_border_IX];
+field_border_pos = x(field_border_IX);
+in_field_spikes = spikes_pos > field_border_pos(1) & spikes_pos < field_border_pos(2);
+in_field_spikes_prc = sum(in_field_spikes) / length(in_field_spikes)
+out_of_field_spikes_prc = 1-in_field_spikes_prc
+% 
+h=[];
+figure
+h(1)=subplot(2,1,1);
+hold on
+plot(x,FR_map,'k');
+xline(x(field_border_IX(1)));
+xline(x(field_border_IX(2)));
+yline(field_href*FR_map_peak);
+plot(x(field_border_IX), FR_map(field_border_IX), 'ob');
+h(2)=subplot(2,1,2);
+hold on
+% plot(pos,flight,'.k')
+plot(spikes_pos,spikes_flight,'.r')
+plot(spikes_pos(~in_field_spikes),spikes_flight(~in_field_spikes),'.b')
+linkaxes(h,'x')
+
+text(1,0.8,sprintf('in field spikes=%.1f%%',100*in_field_spikes_prc),'Units','normalized','HorizontalAlignment','right')
 
 
 

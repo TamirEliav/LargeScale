@@ -51,12 +51,12 @@ panel_A(1) = axes('position', [ 0.6 13 8 16]);
 panel_B(1) = axes('position', [ 8.6 19 4 5]);
 panel_B(2) = axes('position', [13.6 21 6 5]);
 panel_B(3) = axes('position', [13.6 16.5 6 5]);
-panel_C(1) = axes('position', [3 12   panel_CDE_size]);
-panel_C(2) = axes('position', [9 12   panel_CDE_size]);
-panel_D(1) = axes('position', [3  7.5 panel_CDE_size]);
-panel_D(2) = axes('position', [9  7.5 panel_CDE_size]);
-panel_E(1) = axes('position', [3  3   panel_CDE_size]);
-panel_E(2) = axes('position', [9  3   panel_CDE_size]);
+% panel_C(1) = axes('position', [3 12   panel_CDE_size]);
+% panel_C(2) = axes('position', [9 12   panel_CDE_size]);
+% panel_D(1) = axes('position', [3  7.5 panel_CDE_size]);
+% panel_D(2) = axes('position', [9  7.5 panel_CDE_size]);
+% panel_E(1) = axes('position', [3  3   panel_CDE_size]);
+% panel_E(2) = axes('position', [9  3   panel_CDE_size]);
 panel_legend = axes('position', [8.5 23.5 1 1]);
 
 
@@ -128,7 +128,7 @@ text(1,2.3,-10.3, {'Temporal';'pole'}, 'FontSize',8,'HorizontalAlignment','left'
 
 % add colorbar
 POSf = ds2nfu(panel_A(1), [0 0 0 0]);
-POSf([1 2]) = POSf([1 2]) + [0.05 0.225];
+POSf([1 2]) = POSf([1 2]) + [0.05 0.1];
 POSf([3 4]) = [0.01 0.10];
 % colorbar_ax_pos = [panel_A(1).Position(1:2)+[panel_A(1).Position(3) 1] 0.7 3];
 c=colorbar('location','EastOutside', 'position', POSf);
@@ -144,7 +144,7 @@ colormap cool
 % =========================================================================
 prm = PARAMS_GetAll();
 cells_t = DS_get_cells_summary();
-bats = [79,148,34,9861,2289];
+bats = [79,148,9861,2289];
 cells_t(~ismember(cells_t.bat, bats ),:) = [];
 cells = cellfun(@(c)(cell_load_data(c,'details')), cells_t.cell_ID, 'UniformOutput',0);
 cells = [cells{:}];
@@ -279,7 +279,7 @@ scale_bar_pixels = scale_bar_mm / pixel2mm ;
 xa = hax.XLim(1) + [0 scale_bar_pixels];
 ya = hax.YLim([1 1]);
 [xaf,yaf] = ds2nfu(xa,ya);
-yaf = yaf + 0.016;
+% yaf = yaf + 0.016;
 hl=annotation('line',xaf,yaf);
 hl.LineWidth = 2;
 hl.Color = 'k';
@@ -319,7 +319,7 @@ scale_bar_pixels = scale_bar_mm / pixel2mm ;
 xa = hax.XLim(1) + [0 scale_bar_pixels];
 ya = hax.YLim([1 1]);
 [xaf,yaf] = ds2nfu(xa,ya);
-yaf = yaf + 0.025;
+% yaf = yaf + 0.025;
 hl=annotation('line',xaf,yaf);
 hl.LineWidth = 2;
 hl.Color = 'k';
@@ -327,8 +327,8 @@ hl.Color = 'k';
 text(300, 1270, sprintf('%dmm',scale_bar_mm), 'HorizontalAlignment','center', 'VerticalAlignment','middle','FontSize',8);
 
 %%
-
-
+if 0
+    
 %% panels BCD labels
 TT_pos_labels = {'Proximo-distal (%)';'Longitudinal (%)'};
 TT_pos_limits = [0 100; 10 20];
@@ -431,7 +431,7 @@ end
 axes(panel_E(1));
 text(-0.25,1.1, 'E', 'Units','normalized','FontWeight','bold');
 
-
+end
 %%
 
 

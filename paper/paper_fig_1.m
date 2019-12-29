@@ -75,7 +75,7 @@ prm = PARAMS_GetAll();
 %% ---------------------- spikes trace ------------------------------------
 % define option for data
 exp_ID = 'b0148_d170625';
-exp = exp_load_data(exp_ID,'details','path');
+exp = exp_load_data(exp_ID,'details','path','pos');
 TT = 4;
 trace_duration = 0.33;
 trace_ts_opt = 6;
@@ -87,13 +87,14 @@ trace_ts_list = [
     72188230643,...
     71432461878 % in flight!
     ];
-traces_ts = trace_ts_list(trace_ts_opt) + [0 trace_duration]*1e6;
+trace_ts = trace_ts_list(trace_ts_opt) + [0 trace_duration]*1e6;
+trace_pos = interp1(exp.pos.proc_1D.ts, exp.pos.proc_1D.pos, trace_ts);
 % load channels data
 signal = [];
 for ii_ch = 1:4
     
     file_in = fullfile(exp.path.spikes_raw, sprintf('spikes_%s_TT%d_ch%d.ncs',exp_ID,TT,ii_ch) );
-    [signal(ii_ch,:), ts, fs] = Nlx_csc_read(file_in, traces_ts);
+    [signal(ii_ch,:), ts, fs] = Nlx_csc_read(file_in, trace_ts);
 end
 
 % plot the data
@@ -141,6 +142,7 @@ h.LineStyle='none';
 % add panel letter
 axes(panel_B(1));
 text(-0.05,0.7, 'B', 'Units','normalized','FontWeight','bold');
+text(0.06,0.7, 'Spikes recorded in-flight', 'Units','normalized','FontWeight','bold', 'FontSize',9);
 
 %%
 clusters_colors = [
@@ -324,7 +326,7 @@ xa = xlimits(1) + [0 scale_pixels];
 ya = ylimits(1) + [0 0];
 [xaf,yaf] = ds2nfu(xa,ya);
 xaf = xaf + 0.04;
-yaf = yaf + 0.008;
+yaf = yaf - 0.004;
 annotation('line', xaf,yaf, 'Linewidth',scale_line_width);
 h=annotation('textbox', [mean(xaf)-0.0005 mean(yaf)-0.008 0 0], 'String', sprintf('%dmm',scale_mm),...
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
@@ -344,11 +346,27 @@ xa = xlimits(2) - [0 scale_pixels];
 ya = ylimits(1) + [0 0];
 [xaf,yaf] = ds2nfu(xa,ya);
 xaf = xaf - 0.01;
-yaf = yaf + 0.008;
+yaf = yaf - 0.008;
 annotation('line', xaf,yaf, 'Linewidth',scale_line_width);
 h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dm',scale_m),...
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
 text(-0.05,1.22, 'D', 'Units','normalized','FontWeight','bold');
+
+% add zoom-out lines from the position the trace in panel B was taken
+tunnel_start_pos_pixels = [830 150];
+tunnel_tunrpoint_pos_pixels = [225 25];
+tunnel_dir_unit_vec = normalize(tunnel_tunrpoint_pos_pixels-tunnel_start_pos_pixels, 'norm');
+trace_pos_pixel = tunnel_start_pos_pixels + pixel_m_ratio.*tunnel_dir_unit_vec.*trace_pos';
+% hold on
+% plot(trace_pos_pixel(:,1),trace_pos_pixel(:,2),'or')
+xa = trace_pos_pixel(:,1);
+ya = trace_pos_pixel(:,2);
+ya = ylimits(2) - ya;
+[xaf,yaf] = ds2nfu(xa,ya);
+annotation('line', xaf(1)+[0 0], [yaf(1) 0.767], 'Linewidth',1);
+annotation('line', xaf(2)+[0 0], [yaf(2) 0.767], 'Linewidth',1);
+annotation('line', xaf(1)+[0 0.265], 0.767+[0 0.04], 'Linewidth',1);
+annotation('line', xaf(2)+[0 -0.17], 0.767+[0 0.04], 'Linewidth',1);
 
 %% panel I - tunnel section behavior (ZY)
 axes(panel_I)
@@ -535,7 +553,7 @@ ylimits = get(gca,'ylim');
 xa = xlimits(1) + [0 scale_m];
 ya = ylimits(1) + [0 0];
 [xaf,yaf] = ds2nfu(xa,ya);
-xaf = xaf + 0.06;
+xaf = xaf + 0.02;
 yaf = yaf + 0.1;
 annotation('line', xaf,yaf, 'Linewidth',scale_line_width);
 h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dm',scale_m),...
@@ -610,7 +628,8 @@ for ii_dir = [1 2]
     y = ydev.xy(:,2);
     ymean = interp1(ydev.bin_centers, ydev.ymean, x);
     y = y-ymean;
-    plot(x, y, '.', 'Color',c, 'MarkerSize',.0001);
+%     plot(x, y, '.', 'Color',c, 'MarkerSize',.0001);
+    plot(x, y, '-', 'Color',c, 'LineWidth',0.0001);
 %     h=shadedErrorBar(ydev.bin_centers, ydev.ymean, ydev.ystd, 'lineprops',{'Color',c});
 %     h.patch.FaceAlpha = 0;
 end
@@ -680,6 +699,17 @@ exps_flight = [exps.flight];
 pos_y_dev_all = cat(1,exps_flight.pos_y_std);
 speed_traj_all = cat(1,exps_flight.speed_traj);
 ystd_median_all = arrayfun(@(x)(x.ystd_median), pos_y_dev_all);
+
+%% calculate fraction of missing position data 
+if 0
+% missing_data_frac = cellfun(@(x)(exp_calc_position_holes_stats(x)), exp_list);
+fprintf('Raw data percentage: mean=%.4f, std=%.4f\n',...
+    100*mean([missing_data_frac.rawdata_fraction]),...
+    100*std([missing_data_frac.rawdata_fraction]));
+fprintf('missing data percentage: mean=%.4f, std=%.4f\n',...
+    100*mean(1-[missing_data_frac.rawdata_fraction]),...
+    100*std(1-[missing_data_frac.rawdata_fraction]));
+end
 
 %% behavioral trajectory is 1D (small y deviations) - population
 axes(panel_H);

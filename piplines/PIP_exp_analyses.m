@@ -44,7 +44,7 @@ try
 %     exp_create_details(exp_ID);
 %     exp=exp_load_data(exp_ID,'details','path');
 %     Nlg2Nlx(exp.path.raw,forcecalc);
-%     PRE_filter_CSCs(exp_ID, forcecalc);
+    PRE_filter_CSCs(exp_ID, forcecalc);
 %     exp_calc_CSC_RAW_stats(exp_ID);
 %     PRE_detect_spikes(exp_ID,forcecalc);
 %     PRE_calc_write_artifacts(exp_ID);

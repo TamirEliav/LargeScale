@@ -82,7 +82,8 @@ end
 %% Get limits
 axun = get(hAx,'Units');
 set(hAx,'Units','normalized');
-axpos = get(hAx,'Position');
+% axpos = get(hAx,'Position');
+axpos = plotboxpos(hAx); % see comments from 4 Dec 2015, in https://www.mathworks.com/matlabcentral/fileexchange/10656-data-space-to-figure-units-conversion
 axlim = axis(hAx);
 axwidth = diff(axlim(1:2));
 axheight = diff(axlim(3:4));

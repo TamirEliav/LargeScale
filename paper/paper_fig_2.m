@@ -71,6 +71,7 @@ panel_C    = axes('position', [ 5.3  8.5  panel_BCDE_size           ]);
 panel_D(1) = axes('position', [ 8.6  8.5  panel_BCDE_size.*[1 0.9]  ]);
 panel_D(2) = axes('position', [ 8.6  8.5  panel_BCDE_size.*[1 0.9]  ]);
 panel_E =    axes('position', [12.2  8.5  panel_BCDE_size.*[1.3 1]  ]);
+panel_Fnew = axes('position', [16.0  8.5  panel_BCDE_size           ]);
 
 panel_FGH_size = [2 2];
 panel_F = axes('position', [ 2.0  5 panel_FGH_size]          );
@@ -91,6 +92,7 @@ cell_examples = {
 };
 % other options: 57 474 658
 for ii_cell = 1:length(cell_examples)
+    %%
     cell_ID = cell_examples{ii_cell};
     cell = cell_load_data(cell_ID,'details','FR_map','fields','stats','FE');
     c = prm.graphics.colors.flight_directions;
@@ -98,18 +100,24 @@ for ii_cell = 1:length(cell_examples)
     % map+fields
     axes(panel_A(ii_cell, 1));
     cla
+    hold on
     maps=[cell.FR_map.all];
     x = maps(1).bin_centers;
     y = cat(1,maps.PSTH);
+    m = round(max(y(:)));
+    ylimits = [0 m+1];
+    % low-speed area
+    baseval = 0.1;
+    area([4 prm.fields.valid_speed_pos(1)]    , ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
+    area([  prm.fields.valid_speed_pos(2) 194], ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
     h=plot(x,y);
     [h.Color] = disperse(c);
     box off
     h=gca;
     h.TickDir = 'out';
     h.XTick = [];
-    m = round(max(y(:)));
     h.YTick = [0 m];
-    h.YLim = [0 m+1];
+    h.YLim = ylimits;
     h.XLim = [0 200];
     
     % fields
@@ -177,7 +185,16 @@ for ii_cell = 1:length(cell_examples)
                 h.YTickLabel = {'1',num2str(m)};
                 h.TickDir = 'out';
         end
-        
+    end
+    % fields num (here to be above the 
+    for ii_dir=1:2
+        fields = cell.fields{ii_dir};
+        if isfield(fields,'in_low_speed_area')
+            fields([fields.in_low_speed_area])=[];
+        end
+        dir_offsets =2.05+[0.18 0];
+        text(1.05, dir_offsets(ii_dir), num2str(length(fields)), 'Units','normalized', 'Color', c{ii_dir},...
+            'HorizontalAlignment','right', 'VerticalAlignment','middle','FontSize',6);
     end
 end
 
@@ -341,7 +358,7 @@ stats = [cells.stats];
 stats = [stats.all];
 cells_ID([stats.meanFR_all]>prm.inclusion.interneuron_FR_thr)=[];
 clear cells stats cells_details cells_t
-cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map')), cells_ID, 'UniformOutput',0);
+cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map','FE')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
 
 %% panel E - field count histogram
@@ -349,7 +366,7 @@ cells = [cells{:}];
 axes(panel_F);
 cla
 hold on
-text(-0.45,1.15, 'F', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'G', 'Units','normalized','FontWeight','bold');
 nFields = nan(2,length(cells));
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -393,7 +410,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 axes(panel_G);
 cla
 hold on
-text(-0.35,1.15, 'G', 'Units','normalized','FontWeight','bold');
+text(-0.35,1.15, 'H', 'Units','normalized','FontWeight','bold');
 fields_size = [];
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -432,7 +449,7 @@ save( fullfile(res_dir,'pop_dist_fields_size'), 'fields_size');
 axes(panel_H);
 cla
 hold on
-text(-0.45,1.15, 'H', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'I', 'Units','normalized','FontWeight','bold');
 LS_field_size = nan(2,length(cells));
 for ii_cell = 1:length(cells)
     cell = cells(ii_cell);
@@ -470,12 +487,12 @@ ylabel('Field size (m)','Units','normalized','Position',[-0.21 0.5])
 
 
 
-%% panel H - field ratio (largest/smallest)
+%% panel I - field ratio (largest/smallest)
 % figure
 axes(panel_I);
 cla
 hold on
-text(-0.4,1.15, 'I', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.15, 'J', 'Units','normalized','FontWeight','bold');
 LS_field_ratio_all = nan(1,length(cells));
 LS_field_ratio_dir = nan(2,length(cells));
 for ii_cell = 1:length(cells)
@@ -491,7 +508,7 @@ for ii_cell = 1:length(cells)
         end
     end
 end
-LS_field_ratio_dir = LS_field_ratio_dir(:);
+% LS_field_ratio_dir = LS_field_ratio_dir(:);
 % LS_field_ratio_dir(isnan(LS_field_ratio_dir)) = [];
 % LS_field_ratio_all(isnan(LS_field_ratio_all)) = [];
 % edges = linspace(1,ceil(max(max(LS_field_ratio_all))),9);
@@ -541,7 +558,7 @@ sparsity(~signif) = nan;
 sparsity = sparsity(:);
 sparsity(isnan(sparsity)) = [];
 
-%% count total area per cell per direction
+%% count total fields coverage per cell per direction
 total_area = nan(length(cells),2);
 for ii_cell = 1:length(cells)
     cell = cells(ii_cell);
@@ -607,7 +624,7 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.1;
-xlabel('Total area (m)', 'Units','normalized','Position',[0.5 -0.17])
+xlabel('Coverage (m)', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('No. of cells', 'Units','normalized','Position',[-0.2 0.5])
 ha.XLim(1) = 0;
 
@@ -636,7 +653,7 @@ hax.YColor = 'none';
 box off
 hax.XRuler.TickLabelGapMultiplier = -0.35;
 hax.TickLength = panel_D(1).TickLength;
-xlabel('Total area (%)', 'Units','normalized','Position',[0.45 1.2]);
+xlabel('Coverage (%)', 'Units','normalized','Position',[0.45 1.2]);
 
 %% panel E - map correlations histogram
 % figure
@@ -692,6 +709,69 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel('Map correlation', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('Probability', 'Units','normalized','Position',[-0.17 0.5])
 
+%% Panel F - percentage of out-of-field spikes
+axes(panel_Fnew);
+cla
+hold on
+text(-0.4,1.15, 'F', 'Units','normalized','FontWeight','bold');
+
+in_field_spikes_prc = nan(length(cells),2);
+for ii_cell = 1:length(cells)
+    cell = cells(ii_cell);
+    for ii_dir = 1:2
+        if ~cell.signif(ii_dir).TF
+            continue;
+        end
+        fields = cell.fields{ii_dir};
+        fields([fields.in_low_speed_area])=[];
+        fields_spikes_ts = [fields.spikes_ts];
+        FE_spikes_ts = [cell.FE{ii_dir}.spikes_ts];
+        FE_spikes_pos = [cell.FE{ii_dir}.spikes_pos];
+        invalid_IX =( FE_spikes_pos < prm.fields.valid_speed_pos(1) | ...
+                      FE_spikes_pos > prm.fields.valid_speed_pos(2) );
+        FE_spikes_ts(invalid_IX)=[];
+        FE_spikes_pos(invalid_IX)=[];
+        in_field_spikes = ismember(FE_spikes_ts, fields_spikes_ts);
+        in_field_spikes_prc(ii_cell,ii_dir) = sum(in_field_spikes) / length(in_field_spikes);
+    end
+end
+
+h = histogram(in_field_spikes_prc(:));
+h.NumBins = 12;
+h.FaceColor = 0.5*[1 1 1];
+ha=gca;
+ha.XLim=[0 1];
+ha.XTick = 0:0.5:1;
+ha.TickDir='out';
+ha.TickLength = [0.03 0.03];
+ha.XRuler.TickLabelGapMultiplier = -0.35;
+ha.YRuler.TickLabelGapMultiplier = 0.1;
+xlabel('In-field spikes (%)', 'Units','normalized','Position',[0.5 -0.17]);
+ylabel('No. of cells')
+
+%%
+if 0
+figure
+subplot(2,2,1)
+hold on
+histogram(in_field_spikes_prc(:,1),'Normalization','pdf','FaceColor',prm.graphics.colors.flight_directions{1})
+histogram(in_field_spikes_prc(:,2),'Normalization','pdf','FaceColor',prm.graphics.colors.flight_directions{2})
+subplot(2,2,2)
+axis equal
+plot(in_field_spikes_prc(:,1),in_field_spikes_prc(:,2),'.')
+h=refline(1,0);
+h.Color='k';
+subplot(2,2,3)
+h=violinplot(in_field_spikes_prc);
+h(1).ViolinColor = prm.graphics.colors.flight_directions{1};
+h(2).ViolinColor = prm.graphics.colors.flight_directions{2};
+% h(1).ScatterPlot.MarkerFaceColor = prm.graphics.colors.flight_directions{1};
+% h(2).ScatterPlot.MarkerFaceColor = prm.graphics.colors.flight_directions{2};
+subplot(2,2,4)
+boxplot(in_field_spikes_prc)
+suptitle('Percentage of in-field-spikes is different between directions')
+end
+
 %% panels I&J - prepare data
 distances_all = [];
 field_size_diff_all = [];
@@ -718,7 +798,7 @@ end
 axes(panel_J);
 cla
 hold on
-text(-0.27,0.9667, 'J', 'Units','normalized','FontWeight','bold');
+text(-0.27,0.9667, 'K', 'Units','normalized','FontWeight','bold');
 % arrange data
 cells_signif = cat(1,cells.signif);
 cells_signif = arrayfun(@(x)(x.TF), cells_signif);
@@ -757,25 +837,52 @@ disp('figure was successfully saved to pdf/tiff/fig formats');
 
 
 
-%%
+%% figure for Liora
+cells_details=[cells.details];
+cells_anatomy_PD_prc = [cells_details.TT_pos_proximodistal_prc];
 
+figure('Units','centimeters', 'position', [2 2 20 20])
+subplot(2,2,1)
+hold on
+nBinEdges = 9;
+edges = logspace(0,log10(25),nBinEdges);
+h=histogram(LS_field_ratio_all,edges); h.FaceColor = 0.5*[1 1 1];
+h=histogram(LS_field_ratio_dir,edges); h.FaceColor = 'g';
+ha=gca;
+ha.XScale = 'log';
+ha.YScale = 'log';
+ha.XLim = [0 27];
+ha.YLim(1) = 7e-1;
+ha.YTick = [1 10 100];
+ha.XTick = [1 2 5 10 20];
+ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
+ha.TickDir='out';
+xlabel('Largest/Smallest ratio')
+ylabel('No. cells')
+legend({'dir pooled';'per dir'})
+subplot(2,2,2)
+hold on
+plot(LS_field_ratio_dir(1,:), nFields(1,:),'.', 'Color',prm.graphics.colors.flight_directions{1});
+plot(LS_field_ratio_dir(2,:), nFields(2,:),'.', 'Color',prm.graphics.colors.flight_directions{2});
+xlabel('Largest/Smallest ratio')
+ylabel('No. fields')
+legend({'dir1';'dir2'},'Location','northwest')
+subplot(2,2,3)
+plot(LS_field_ratio_all, sum(nFields,1), '.k');
+legend('dir pooled')
+xlabel('Largest/Smallest ratio')
+ylabel('No. fields')
+subplot(2,2,4)
+plot(total_area, cells_anatomy_PD_prc+0.01*randn(size(cells_anatomy_PD_prc)), '.')
+xlabel('Total area (m)')
+ylabel('Proximo-distal axis (%)');
+legend({'dir1';'dir2'},'Location','southeast')
 
-
-
-
-
-
-
-
-
-
-%%
-
-
-
-
-
-
+fig_name_out = fullfile(res_dir, 'Fig_2__for_Liora');
+saveas(gcf, fig_name_out, 'fig');
+saveas(gcf, fig_name_out, 'pdf');
+saveas(gcf, fig_name_out, 'tif');
+close(gcf)
 
 
 
