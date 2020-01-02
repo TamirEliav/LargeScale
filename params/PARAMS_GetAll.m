@@ -1,5 +1,12 @@
 function prm = PARAMS_GetAll()
 
+%% global param set definition
+global paramset_global_var;
+if isempty(paramset_global_var)
+    paramset_global_var = 0;
+end
+
+%% units
 % units are in (unless otherwise indicated):
 % - meters for position
 % - meters/second for velocity
@@ -9,9 +16,7 @@ function prm = PARAMS_GetAll()
 % - radians for phase
 % - percentage in 0-100
 
-% prm.arena.balls_detect_area = [6 7; 191 192];
-% prm.arena.balls_detect_vel_thr = 0.1;
-
+%% params
 % prm.pos.pos_smooth
 % prm.pos.pos_max_interp
 % prm.pos.vel_min
@@ -99,7 +104,32 @@ bats_colors_mapping = {
 M = containers.Map([bats_colors_mapping{:,1}],...
                     bats_colors_mapping(:,2));
 prm.graphics.colors.bats = M; % this is a colormap
-                
+
+%% different param sets
+prm.parmaset = paramset_global_var;
+switch paramset_global_var
+    case 1
+        prm.fields.width_href = 0.1;
+    case 2
+        prm.fields.width_href = 0.3;
+    case 3
+        prm.fields.width_prc = [0  100];
+    case 4
+        prm.fields.width_prc = [10  90];
+    case 5
+        prm.fields.width_prc = [25  75];
+    case 6
+        prm.fields.min_flights_with_spikes_prc = 0.25;
+    case 7
+        prm.fields.min_flights_with_spikes_prc = 0.30;
+    case 8
+        prm.fields.width_prc = [20 80];
+end
+% % % % % plot F,G,I in this new supp figure
+
+
+%%
+
                 
 end
 
@@ -109,15 +139,8 @@ end
 
 
 
-%% different param sets
-% % % % prm.fields.width_href = 0.1;
-% % % % prm.fields.width_href = 0.3;
-% % % % 
-% % % % prm.fields.width_prc = [0  100];
-% % % % prm.fields.width_prc = [10  90];
-% % % % prm.fields.width_prc = [25  75];
-% % % % 
-% % % % prm.fields.min_flights_with_spikes_prc = 0.25;
-% % % % prm.fields.min_flights_with_spikes_prc = 0.30;
-% % % % 
-% % % % % plot F,G,I in this new supp figure
+
+
+
+
+

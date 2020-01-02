@@ -42,16 +42,15 @@ end
 
 %% filter cells - mean FR
 if 1
-cells = cellfun(@(c)(cell_load_data(c,'stats')), cells_t.cell_ID, 'UniformOutput',0);
+cells = cellfun(@(c)(cell_load_data(c,'meanFR')), cells_t.cell_ID, 'UniformOutput',0);
 cells = [cells{:}];
-cells = [cells.stats];
-cells = [cells.all];
-cells_t([cells.meanFR_all]>prm.inclusion.interneuron_FR_thr,:) = []; % take pyramidal
+meanFR = [cells.meanFR];
+cells_t([meanFR.all]>prm.inclusion.interneuron_FR_thr,:) = []; % take pyramidal
 % cells_t([cells.meanFR_all]<=prm.inclusion.interneuron_FR_thr,:) = []; % take interneurons
 end
 
 %% only signif place cells
-if 1
+if 0
 cells = cellfun(@(c)(cell_load_data(c,'signif')), cells_t.cell_ID, 'UniformOutput',0);
 cells = [cells{:}];
 signif = cat(1,cells.signif);
@@ -84,11 +83,11 @@ try
 %     cell_calc_FR_map(cell_ID);
 %     cell_calc_FR_map_shuffles(cell_ID);
 %     cell_calc_Ipos(cell_ID);
-%     cell_calc_fields(cell_ID);
-%     cell_calc_fields_properties(cell_ID);
-%     cell_calc_significant(cell_ID);
+    cell_calc_fields(cell_ID);
+    cell_calc_fields_properties(cell_ID);
+    cell_calc_significant(cell_ID);
 %     cell_calc_mean_FR(cell_ID);
-%     cell_calc_stats(cell_ID);
+    cell_calc_stats(cell_ID);
 %     cell_calc_inclusion(cell_ID);
 %     cell_calc_time_AC(cell_ID);
 
@@ -98,7 +97,7 @@ try
 %     cell_plot_map_fields(cell_ID);
 %     cell_plot_time_AC(cell_ID);
 
-    cell_plot_figure_choose_examples(cell_ID)
+%     cell_plot_figure_choose_examples(cell_ID)
     toc
     
 catch err

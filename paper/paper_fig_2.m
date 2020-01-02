@@ -350,13 +350,12 @@ cells = [cells{:}];
 cells = [cells.details];
 cells(~contains({cells.brain_area}, 'CA1')) = [];
 cells(~ismember([cells.ClusterQuality], [2])) = [];
-cells = cellfun(@(c)(cell_load_data(c,'details','stats')), {cells.cell_ID}, 'UniformOutput',0);
+cells = cellfun(@(c)(cell_load_data(c,'details','meanFR')), {cells.cell_ID}, 'UniformOutput',0);
 cells = [cells{:}];
 cells_details = [cells.details];
 cells_ID = {cells_details.cell_ID};
-stats = [cells.stats];
-stats = [stats.all];
-cells_ID([stats.meanFR_all]>prm.inclusion.interneuron_FR_thr)=[];
+meanFR = [cells.meanFR];
+cells_ID([meanFR.all]>prm.inclusion.interneuron_FR_thr)=[];
 clear cells stats cells_details cells_t
 cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map','FE')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
@@ -882,7 +881,7 @@ fig_name_out = fullfile(res_dir, 'Fig_2__for_Liora');
 saveas(gcf, fig_name_out, 'fig');
 saveas(gcf, fig_name_out, 'pdf');
 saveas(gcf, fig_name_out, 'tif');
-close(gcf)
+% close(gcf)
 
 
 

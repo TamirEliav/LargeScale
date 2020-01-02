@@ -1934,6 +1934,41 @@ linkaxes(h,'x')
 
 text(1,0.8,sprintf('in field spikes=%.1f%%',100*in_field_spikes_prc),'Units','normalized','HorizontalAlignment','right')
 
+%% 30/12/2019 - test symlink (for the different paramsets)
+clear
+clc
+dir_link     = 'D:\__TEMP\symlink_test\cells\fields';
+dir_original = 'D:\__TEMP\symlink_test\cells_paramset_1\fields';
+command = sprintf('mklink /D "%s" "%s"', dir_link, dir_original);
+delete(dir_link)
+[status,cmdout] = system(command,'-echo')
+
+%% 30/12/2019 - Run different paramsets
+clear
+for paramset = 1:7
+    PARAMS_SetParamset(paramset);
+    PIP_cell_analyses;
+end
+
+%%
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 %%
+
+
+
+
+%%
+

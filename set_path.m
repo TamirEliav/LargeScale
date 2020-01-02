@@ -7,3 +7,7 @@ addpath(genpath('L:\Analysis\Code'))
 
 %% plexon
 % addpath(genpath('D:\Tamir\CODE\Matlab\plexon\Matlab Offline Files SDK'))
+
+
+%% set default paramset
+PARAMS_SetParamset(0)
