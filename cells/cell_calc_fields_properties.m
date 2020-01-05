@@ -17,7 +17,7 @@ for ii_dir = 1:2
                       field.loc);
         vel2 = median(field.spikes_vel);
         % mark fields that are entirely in the low speed area
-        IX = get_data_in_ti(field.edges_href, prm.fields.valid_speed_pos);
+        IX = get_data_in_ti(field.edges_prc, prm.fields.valid_speed_pos);
         in_low_speed_area = isempty(IX);
         % update struct
         cell.fields{ii_dir}(ii_field).direction = direction;

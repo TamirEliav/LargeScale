@@ -5,7 +5,8 @@ clc
 log_name_str = ['cell_analysis ' datestr(clock, 'yyyy-mm-dd HH-MM-SS') '.txt'];
 log_name_out = fullfile('L:\Analysis\Results\pipelines', log_name_str );
 diary off; diary(log_name_out); diary on
-% log script code
+
+%% log script code
 disp('-------------------------------------------------------------------')
 p = mfilename('fullpath')
 code_txt = fileread([p '.m'])
@@ -78,15 +79,15 @@ try
 %     cell_create_details(cell_ID);
 %     cell_create_spikes_data(cell_ID);
 %     
+%     cell_calc_mean_FR(cell_ID);
 %     cell_calc_time_stability(cell_ID);
 %     cell_create_flight_data(cell_ID);
 %     cell_calc_FR_map(cell_ID);
 %     cell_calc_FR_map_shuffles(cell_ID);
 %     cell_calc_Ipos(cell_ID);
-    cell_calc_fields(cell_ID);
+%     cell_calc_fields(cell_ID);
     cell_calc_fields_properties(cell_ID);
     cell_calc_significant(cell_ID);
-%     cell_calc_mean_FR(cell_ID);
     cell_calc_stats(cell_ID);
 %     cell_calc_inclusion(cell_ID);
 %     cell_calc_time_AC(cell_ID);

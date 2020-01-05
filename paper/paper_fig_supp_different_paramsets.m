@@ -48,7 +48,7 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 % create panels
 panels_size = [3.5 2];
 paramsets = 0:7;
-% paramsets(6) = 8;
+paramsets(6) = 8;
 x_positions =      linspace(2,16,4);
 y_positions = flip(linspace(3,23,length(paramsets)));
 % y_positions(1) = y_positions(1) + 1;

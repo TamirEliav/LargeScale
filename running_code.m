@@ -1945,7 +1945,8 @@ delete(dir_link)
 
 %% 30/12/2019 - Run different paramsets
 clear
-for paramset = 1:7
+clc
+for paramset = 0:8
     PARAMS_SetParamset(paramset);
     PIP_cell_analyses;
 end

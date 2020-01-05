@@ -125,8 +125,6 @@ switch paramset_global_var
     case 8
         prm.fields.width_prc = [20 80];
 end
-% % % % % plot F,G,I in this new supp figure
-
 
 %%
 
