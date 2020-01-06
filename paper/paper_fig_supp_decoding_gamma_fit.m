@@ -56,6 +56,9 @@ load('L:\paper_figures\pop_dist_fields_size.mat');
 gamma_phat = gamfit(fields_size);
 logn_phat = lognfit(fields_size);
 
+fprintf('Log-normal fit: mu=%.5f, sigma=%.5f\n', logn_phat(:) );
+fprintf('Gamma fit: alpha=%.5f, beta=%.5f\n', gamma_phat(:) )
+
 %% panel A - field size distribution gamma fit
 axes(panel_A(1));
 cla

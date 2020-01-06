@@ -50,8 +50,7 @@ panels_size = [4 4];
 panel_A(1) = axes('position', [ 2 20 panels_size]);
 panel_A(2) = axes('position', [ 8 20 panels_size]);
 panel_B(1) = axes('position', [ 2 14 panels_size]);
-panel_B(2) = axes('position', [ 8 14 panels_size]);
-panel_B(3) = axes('position', [14 14 panels_size]);
+panel_B(2) = axes('position', [ 5 17 0.35 0.2]);
 panel_A_legend(1) = axes('position', [ 4.5 22.5 0.5 0.3]);
 panel_A_legend(2) = axes('position', [10.5 22.5 0.5 0.3]);
 
@@ -144,10 +143,10 @@ for ii_dir = 1:2
     ha.TickLength = [0.03 0.03];
 %     title("dir "+ii_dir);
     xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.12]);
-    ylabel('Probability');
+    ylabel('Probability', 'Units','normalized','Position',[-0.20 0.5]);
 end
 axes(panel_A(1));
-text(-0.1,1.1, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.3,1.15, 'A', 'Units','normalized','FontWeight','bold');
 
 %% add direction arrows
 arrow_vec = 0.025*[-1 1];
@@ -219,35 +218,13 @@ for ii_cell = 1:length(cells)
 end
 
 %% now plot
-nBinEdges = 9;
-edges = logspace(0,log10(25),nBinEdges);
-for ii_dir = 1:2
-    axes(panel_B(ii_dir));
-    cla
-    hold on
-    h=histogram(LS_field_ratio_dir(ii_dir,:));
-    h.BinEdges = edges;
-%     h.FaceColor = 0.5*[1 1 1];
-    h.FaceColor = prm.graphics.colors.flight_directions{ii_dir};
-    ha=gca;
-    ha.YScale = 'log';
-    ha.XScale = 'log';
-    ha.XLim = [0 27];
-    ha.YLim = [7e-1 260];
-    ha.YTick = [1 10 100];
-    ha.XTick = [1 2 5 10 20];
-    ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
-    ha.TickDir='out';
-    ha.TickLength = [0.03 0.03];
-    ha.XRuler.TickLabelGapMultiplier = -0.35;
-    ha.YRuler.TickLabelGapMultiplier = 0.001;
-    xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
-    ylabel('No. of cells','Units','normalized','Position',[-0.24 0.5])
-end
-
-axes(panel_B(3));
+axes(panel_B(1));
 cla
 hold on
+text(-0.3,1.15, 'B', 'Units','normalized','FontWeight','bold');
+
+nBinEdges = 9;
+edges = logspace(0,log10(25),nBinEdges);
 h=histogram(LS_field_ratio_all(:));
 h.BinEdges = edges;
 h.FaceColor = 0.5*[1 1 1];
@@ -255,7 +232,8 @@ ha=gca;
 ha.YScale = 'log';
 ha.XScale = 'log';
 ha.XLim = [0 27];
-ha.YLim = [7e-1 260];
+ha.YLim = [7e-1 1.2*max(h.Values)];
+ha.YLim = [7e-1 100];
 ha.YTick = [1 10 100];
 ha.XTick = [1 2 5 10 20];
 ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
@@ -264,10 +242,18 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
-ylabel('No. of cells','Units','normalized','Position',[-0.24 0.5])
+ylabel('No. of cells','Units','normalized','Position',[-0.20 0.5])
 
-axes(panel_B(1));
-text(-0.1,1.1, 'B', 'Units','normalized','FontWeight','bold');
+% add legend
+axes(panel_B(2));
+cla
+hold on
+area([0 1],[1 1], 'FaceColor',0.5*[1 1 1])
+text(1.2, 0.5, 'Long arm', 'VerticalAlignment','middle', 'HorizontalAlignment','left');
+xlim([0 1])
+ylim([0 1])
+box off
+set(gca,'Visible','off')
 
 
 %% print/save the figure

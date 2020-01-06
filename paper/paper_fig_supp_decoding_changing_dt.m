@@ -60,7 +60,7 @@ panel_C(1,2) = axes('position', [ 2.5   10.7  2.8 2]);
 panel_D(1,1) = axes('position', [ 8.1  8.7  panel_BCDE_size]);
 panel_D(1,2) = axes('position', [ 8.7 10.7  2.5 2]);
 panel_E(1)   = axes('position', [14.4    8.7  panel_BCDE_size]);
-panel_F      = axes('position', [ 7.4 3.3 6 4]);
+panel_F      = axes('position', [ 7.4 2.5 6 4]);
 panel_legend = axes('position', [9.8 16.6 0.4 2]);
 
 %% arrange data
@@ -309,7 +309,7 @@ for ii_N = 1:length(jN_options)
 %     text(0.95,1, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
     if ii_N == 1
         text(-0.19,1.1, 'D', 'Units','normalized','FontWeight','bold');
-        text(0.5,1.1, 'Catastrophic errors', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
+        text(0.5,1.1, 'Catastrophic errors (size)', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
     
     % zoom-in inset
@@ -367,7 +367,7 @@ for ii_N = 1:length(jN_options)
     h.YLim(1) = 1e-4;
     if ii_N == 1
         text(-0.19,1.1, 'E', 'Units','normalized','FontWeight','bold');
-        text(0.5,1.1, 'Catastrophic errors', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
+        text(0.5,1.1, 'Catastrophic errors (probability)', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
 end
 
@@ -376,6 +376,7 @@ axes(panel_F);
 cla
 hold on
 text(-0.2,1.1, 'F', 'Units','normalized','FontWeight','bold');
+text(0.5,1.15, 'Various integration time windows', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
 
 % load data
 switch coverage

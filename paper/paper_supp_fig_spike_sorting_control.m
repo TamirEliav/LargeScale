@@ -4,6 +4,10 @@
 clear 
 clc
 
+%% options
+% corr_type = 'pearson';
+corr_type = 'spearman';
+
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
@@ -129,11 +133,17 @@ plot(x, y, '.k');
 xlim([0 100])
 [r,pval_r]     = corr(x',y','rows','pairwise','type','Pearson');
 [rho,pval_rho] = corr(x',y','rows','pairwise','type','Spearman');
-text(1,1,   {sprintf('r = %.3f',r);sprintf('P = %.2f',pval_r)}, ...
-        'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
-% text(1,0.8, {sprintf('rho=%.2f',rho);sprintf('P=%.2f',pval_rho)}, ...
-%         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
-    
+fprintf('num_field vs. IsoDist corr: r=%.2f, P=%.2f\n',r,pval_r);
+fprintf('num_field vs. IsoDist corr: rho=%.2f, P=%.2f\n',rho,pval_rho);
+switch corr_type
+    case 'pearson'
+        text(1,1,   {sprintf('r = %.3f',r);sprintf('P = %.2f',pval_r)}, ...
+            'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+    case 'spearman'
+        text(1,1, {['{\rho}' sprintf(' = %.2f',rho)];sprintf('P = %.2f',pval_rho)}, ...
+            'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+end
+
 xlabel('Isolation distance','Units','normalized','Position',[0.5 -0.13]);
 ylabel({'No. of fields per direction'},'Units','normalized','Position',[-0.15 0.5]);
 
@@ -151,15 +161,20 @@ plot(x, y, '.k');
 xlim([0 100])
 [r,pval_r]     = corr(x',y','rows','pairwise','type','Pearson');
 [rho,pval_rho] = corr(x',y','rows','pairwise','type','Spearman');
-text(1,1,   {sprintf('r = %.3f',r);sprintf('P = %.2f',pval_r)}, ...
-        'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
-% text(1,0.8, {sprintf('rho=%.2f',rho);sprintf('P=%.2f',pval_rho)}, ...
-%         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
-    
+fprintf('field size ratio vs. IsoDist corr: r=%.2f, P=%.2f\n',r,pval_r);
+fprintf('field size ratio vs. IsoDist corr: rho=%.2f, P=%.2f\n',rho,pval_rho);
+switch corr_type
+    case 'pearson'
+        text(1,1,   {sprintf('r = %.3f',r);sprintf('P = %.2f',pval_r)}, ...
+            'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+    case 'spearman'
+        text(1,1, {['{\rho}' sprintf(' = %.2f',rho)];sprintf('P = %.2f',pval_rho)}, ...
+            'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+end
 xlabel('Isolation distance','Units','normalized','Position',[0.5 -0.13]);
 ylabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[-0.15 0.5]);
 
-fprintf('panel A number of cells=%d\n',sum(~isnan(y)))
+fprintf('panel B number of cells=%d\n',sum(~isnan(y)))
 
 %% panel C - examples: waveforms of spikes from different fields
 cell_examples = {
@@ -252,7 +267,7 @@ text(-2.5,2, 'C', 'Units','normalized','FontWeight','bold');
 
 
 %% print/save the figure
-fig_name_out = fullfile(res_dir, fig_name_str);
+fig_name_out = fullfile(res_dir, sprintf('%s__corr_type_%s',fig_name_str,corr_type));
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');

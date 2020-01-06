@@ -50,8 +50,8 @@ panels_size = [3.5 2];
 paramsets = 0:7;
 paramsets(6) = 8;
 x_positions =      linspace(2,16,4);
+x_positions(end)=[];
 y_positions = flip(linspace(3,23,length(paramsets)));
-% y_positions(1) = y_positions(1) + 1;
 for ii_paramset = 1:length(paramsets)
     y = y_positions(ii_paramset);
     for ii_x = 1:length(x_positions)
@@ -236,6 +236,7 @@ end
 
 
 %% 4) panels A+B - LS ratio correlation to paramset 0
+if 0
 for ii_paramset = 1:length(paramsets)
     %% choose axis
     axes(panel_AB(ii_paramset,4));
@@ -264,6 +265,7 @@ for ii_paramset = 1:length(paramsets)
         otherwise
             xlabel('')
     end
+end
 end
 
 %% Add Paramsets labels (letters A-H)

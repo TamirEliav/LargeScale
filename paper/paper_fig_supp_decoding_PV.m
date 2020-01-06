@@ -123,7 +123,7 @@ for ii_scnr = 1:5
 end
 axes(panel_A(1));
 text(-0.4,1.1, 'A', 'Units','normalized','FontWeight','bold');
-text(3,1.4, 'PV decoder instead of ML decoder', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
+text(3,1.4, 'Population Vector decoder instead of Maximum Likelihood decoder', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
 ylabel('Example neuron no.','Units','normalized','Position',[-0.2 0.5]);
 
 %% panel B - minimum N required for error < 1 m
@@ -307,7 +307,7 @@ for ii_N = 1:length(jN_options)
 %     text(0.95,1, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
     if ii_N == 1
         text(-0.19,1.1, 'D', 'Units','normalized','FontWeight','bold');
-        text(0.5,1.1, 'Catastrophic errors', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
+        text(0.5,1.1, 'Catastrophic errors (size)', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
     
     % zoom-in inset
@@ -364,7 +364,7 @@ for ii_N = 1:length(jN_options)
     h.XRuler.TickLength = [0.03 0.03];
     if ii_N == 1
         text(-0.19,1.1, 'E', 'Units','normalized','FontWeight','bold');
-        text(0.5,1.1, 'Catastrophic errors', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
+        text(0.5,1.1, 'Catastrophic errors (probability)', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
 end
 

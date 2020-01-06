@@ -102,7 +102,10 @@ light(gca,'position',[-0.5,-0.05,0.8],'style','infinite');
 xlabel('AP (\mum)'); ylabel('ML (\mum)'); zlabel('DV (\mum)');
 hold on;
 axis equal
-scatter3(TT_x, TT_y, TT_z_new, 10, 'k', 'filled');
+% TT tracks
+% scatter3(TT_x, TT_y, TT_z_new, 10, 'k', 'filled');
+plot3(repmat(TT_x,2,1), repmat(TT_y,2,1), [TT_z_new'; TT_z_new'+5], '-k', 'LineWidth',1);
+
 grid on
 grid off
 axis off
@@ -110,7 +113,7 @@ view([-60 16])
 ha = gca;
 ha.XLim = [-0.5 4.5];
 ha.YLim = [0.5 7.25];
-ha.ZLim = [-11 -3];
+ha.ZLim = [-11 -2];
 
 % add x/y/z scale bar
 scale_bar_center = [2,3,-7];
@@ -188,7 +191,7 @@ end
 axes(panel_B(1));
 cla
 hold on
-text(-0.25,1.1, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.25,1.17, 'B', 'Units','normalized','FontWeight','bold');
 
 axis ij
 axis xy

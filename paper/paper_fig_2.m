@@ -83,7 +83,7 @@ panel_J = axes('position', [16.0  4.4 3 3]);
 %%
 prm = PARAMS_GetAll();
 
-if 1
+
 %% FR map + rasters - 9 examples
 cell_examples = {
 433;  56;  51;
@@ -91,6 +91,7 @@ cell_examples = {
  57; 628; 337;
 };
 % other options: 57 474 658
+if 1
 for ii_cell = 1:length(cell_examples)
     %%
     cell_ID = cell_examples{ii_cell};
@@ -106,10 +107,10 @@ for ii_cell = 1:length(cell_examples)
     y = cat(1,maps.PSTH);
     m = round(max(y(:)));
     ylimits = [0 m+1];
-    % low-speed area
-    baseval = 0.1;
-    area([4 prm.fields.valid_speed_pos(1)]    , ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
-    area([  prm.fields.valid_speed_pos(2) 194], ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
+%     % low-speed area
+%     baseval = 0.1;
+%     area([4 prm.fields.valid_speed_pos(1)]    , ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
+%     area([  prm.fields.valid_speed_pos(2) 194], ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
     h=plot(x,y);
     [h.Color] = disperse(c);
     box off
@@ -121,17 +122,25 @@ for ii_cell = 1:length(cell_examples)
     h.XLim = [0 200];
     
     % fields
+    dir_offsets = [-0.1 -0.17]+0.015;
+    % first, low-speed area (in the background)
+    [xaf1,yaf1] = ds2nfu([4 prm.fields.valid_speed_pos(1)],     repelem(mean(dir_offsets)*range(h.YLim),2));
+    [xaf2,yaf2] = ds2nfu([  prm.fields.valid_speed_pos(2) 194], repelem(mean(dir_offsets)*range(h.YLim),2));
+    annotation('line',xaf1,yaf1,'Linewidth', 5, 'Color', 0.5*[1 1 1]);
+    annotation('line',xaf2,yaf2,'Linewidth', 5, 'Color', 0.5*[1 1 1]);
+    % now, the field
     for ii_dir=1:2
         fields = cell.fields{ii_dir};
         if isfield(fields,'in_low_speed_area')
             fields([fields.in_low_speed_area])=[];
         end
         for ii_field = 1:length(fields)
-            dir_offsets = [-0.1 -0.17]+0.015;
+            
             [xaf,yaf] = ds2nfu(fields(ii_field).edges_prc, repelem(dir_offsets(ii_dir)*range(h.YLim),2));
             annotation('line',xaf,yaf,'Linewidth', 2, 'Color', c{ii_dir});
         end
     end
+    
     
     % cell details
     cell_num_str_pos_x   = [0.50 0.50 0.50 0.50 0.50 0.45 0.50 0.50 0.50];
