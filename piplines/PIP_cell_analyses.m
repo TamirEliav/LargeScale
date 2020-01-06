@@ -87,7 +87,7 @@ try
 %     cell_calc_Ipos(cell_ID);
 %     cell_calc_fields(cell_ID);
     cell_calc_fields_properties(cell_ID);
-    cell_calc_significant(cell_ID);
+%     cell_calc_significant(cell_ID);
     cell_calc_stats(cell_ID);
 %     cell_calc_inclusion(cell_ID);
 %     cell_calc_time_AC(cell_ID);

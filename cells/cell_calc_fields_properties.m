@@ -16,6 +16,7 @@ for ii_dir = 1:2
                       exp.flight.speed_traj(ii_dir).vel_median,   ...
                       field.loc);
         vel2 = median(field.spikes_vel);
+        vel3 = mean(field.spikes_vel);
         % mark fields that are entirely in the low speed area
         IX = get_data_in_ti(field.edges_prc, prm.fields.valid_speed_pos);
         in_low_speed_area = isempty(IX);
@@ -23,6 +24,7 @@ for ii_dir = 1:2
         cell.fields{ii_dir}(ii_field).direction = direction;
         cell.fields{ii_dir}(ii_field).vel = vel;
         cell.fields{ii_dir}(ii_field).vel2 = vel2;
+        cell.fields{ii_dir}(ii_field).vel3 = vel3;
         cell.fields{ii_dir}(ii_field).in_low_speed_area = in_low_speed_area;
     end
 end

@@ -1951,22 +1951,195 @@ for paramset = 0:8
     PIP_cell_analyses;
 end
 
+%% 06/01/2020 - check how many cells have PF ONLY near balls, and thus is not considered to be signif
+flags = zeros(length(cells),2);
+for ii_cell = 1:length(cells)
+    cell = cells(ii_cell);
+    for ii_dir = 1:2
+        if ~cell.signif(ii_dir).TF
+            fields = cell.fields{ii_dir};
+            if ~isempty(fields)
+                if all([fields.in_low_speed_area])
+                    flags(ii_cell,ii_dir) = 1;
+                end
+            end
+        end
+    end
+end
+sum(flags)
+[rows,cols]=find(flags);
+arrayfun(@(x)(x.cell_ID),[cells(rows).details], 'UniformOutput',0)'
+cols    
+
+signif_TF = arrayfun(@(x)(x.TF), signif);
+cells_excluded = ~any(signif_TF,2) & any(flags,2);
+sum(cells_excluded)
+arrayfun(@(x)(x.cell_ID),[cells(cells_excluded).details], 'UniformOutput',0)'
+
 %%
+nFE1 = nan(length(cells1),2);
+nFE2 = nan(length(cells2),2);
+for ii_cell = 1:length(cell1)
+    cell1 = cell_load_data(cells1(ii_cell).details.cell_ID, 'FE');
+    cell2 = cell_load_data(cells2(ii_cell).details.cell_ID, 'FE');
+    nFE1(ii_cell,:) = cellfun(@length, cell1.FE);
+    nFE2(ii_cell,:) = cellfun(@length, cell2.FE);
+end
+plot(nFE1, nFE2, '.')
 
+%% 06/10/2020 - check what happened to Fig. 2K after introducing paramsets
+clc
+cells1 = pop_data(1).cells; % paramset 0
+cells2 = pop_data(2).cells; % paramset 100
+signif1 = any(arrayfun(@(x)(x.TF), cat(1,cells1.signif)),2);
+signif2 = any(arrayfun(@(x)(x.TF), cat(1,cells2.signif)),2);
+if any(signif1 ~= signif2)
+    error('different signif cells between paramsets')
+end
+cells1(~signif1)=[];
+cells2(~signif2)=[];
+stats1 = [cells1.stats];
+stats2 = [cells2.stats];
+stats1 = [stats1.all];
+stats2 = [stats2.all];
+nFEs1 = cellfun(@length, cat(1,cells1.FE));
+nFEs2 = cellfun(@length, cat(1,cells2.FE));
 
+figure
+subplot(2,3,1)
+x1 = [stats1.field_num];
+x2 = [stats2.field_num];
+stem(x2-x1);
+ndiff = length(find(x2~=x1));
+xlabel('cells');
+ylabel('{\Delta} no. of fields');
+title(sprintf('#changes=%d',ndiff))
 
+subplot(2,3,2); hold on
+axis equal
+x1 = [stats1.field_ratio_LS];
+x2 = [stats2.field_ratio_LS];
+plot(x1,x2, 'ok')
+plot(x1(x1~=x2),x2(x1~=x2), '*r')
+ndiff = length(find(x2~=x1 & ~isnan(x1) & ~isnan(x2)));
+xlabel('field LS ratio NEW');
+ylabel('field LS ratio OLD');
+title(sprintf('#changes=%d',ndiff))
+xlim([min([x1,x2]) max([x1,x2])])
+ylim([min([x1,x2]) max([x1,x2])])
+refline(1,0)
 
+subplot(2,3,3); hold on
+axis equal
+x1 = abs([stats1.field_ratio_LS_vel]);
+x2 = abs([stats2.field_ratio_LS_vel]);
+plot(x1,x2, '.k')
+plot(x1(x1~=x2),x2(x1~=x2), '.r')
+ndiff = length(find(x2~=x1 & ~isnan(x1) & ~isnan(x2)));
+xlabel('field LS speed ratio NEW');
+ylabel('field LS speed ratio OLD');
+title(sprintf('#changes=%d',ndiff))
+xlim([min([x1,x2]) max([x1,x2])])
+ylim([min([x1,x2]) max([x1,x2])])
+refline(1,0)
 
+subplot(2,3,4); hold on
+axis equal
+refline(1,0)
+x1 = abs(speed_ratio_max_min1);
+x2 = abs([stats2.field_ratio_LS_vel]);
+plot(x1,x2, '.k')
+plot(x1(x1~=x2),x2(x1~=x2), '.r')
+ndiff = length(find(x2~=x1 & ~isnan(x1) & ~isnan(x2)));
+xlabel('field LS speed ratio NEW (calced with OLD bug)');
+ylabel('field LS speed ratio OLD');
+title(sprintf('#changes=%d',ndiff))
+xlim([min([x1,x2]) max([x1,x2])])
+ylim([min([x1,x2]) max([x1,x2])])
+refline(1,0)
 
+subplot(2,3,5); hold on
+axis equal
+refline(1,0)
+x1 = abs(speed_ratio_max_min1);
+x2 = abs(speed_ratio_max_min2);
+plot(x1,x2, '.k')
+plot(x1(x1~=x2),x2(x1~=x2), '.r')
+ndiff = length(find(x2~=x1 & ~isnan(x1) & ~isnan(x2)));
+xlabel('field LS speed ratio NEW (calced with OLD bug)');
+ylabel('field LS speed ratio OLD (calced with OLD bug)');
+title(sprintf('#changes=%d',ndiff))
+xlim([min([x1,x2]) max([x1,x2])])
+ylim([min([x1,x2]) max([x1,x2])])
+refline(1,0)
 
+subplot(2,3,6); hold on
+axis equal
+x1 = nFEs1;
+x2 = nFEs2;
+plot(x1(:),x2(:), '.k')
+plot(x1(x1~=x2),x2(x1~=x2), '.r')
+ndiff = length(find(any(x2~=x1 & ~isnan(x1) & ~isnan(x2))));
+xlabel('no. of flights NEW');
+ylabel('no. of flights OLD');
+title(sprintf('#changes=%d',ndiff))
+xlim([min([x1(:);x2(:)]) max([x1(:);x2(:)])])
+ylim([min([x1(:);x2(:)]) max([x1(:);x2(:)])])
+refline(1,0)
 
-
-
-
-
-
+saveas(gcf, 'L:\paper_figures\20200106_compare_BEFORE_AFTER_field_in_low_speed_correction\backwards_comparison', 'fig')
+saveas(gcf, 'L:\paper_figures\20200106_compare_BEFORE_AFTER_field_in_low_speed_correction\backwards_comparison', 'tif')
 
 %%
+clc
+ii_cell = 10
+cells1(ii_cell).stats.all.field_ratio_LS_vel
+cells2(ii_cell).stats.all.field_ratio_LS_vel
+
+[cells1(ii_cell).fields{1}.vel]
+[cells2(ii_cell).fields{1}.vel]
+
+%%
+cells = cells2;
+speed_ratio_max_min = nan(size(cells));
+for ii_cell = 1:length(cells)
+    cell = cells(ii_cell);
+    fields = cell.fields;
+    fields_all = [];
+    for ii_dir = 1:2
+        if isempty(fields{ii_dir})
+            continue
+        end
+        fields_to_add = fields{ii_dir};
+        % workaround to solve the problem that sometimes I don't have the
+        % field 'overlap_edges'... maybe change that in 'cell_calc_fields'...
+        if isfield(fields_to_add,'overlap_edges')
+            fields_to_add = rmfield(fields_to_add,'overlap_edges');
+        end
+        fields_all = [fields_all fields_to_add];
+    end
+    fields_all([fields_all.in_low_speed_area])=[];
+    speed_ratio_max_min(ii_cell) = max([fields_all.vel]) / min([fields_all.vel]);
+end
+
+%% Yohai code example
+% spikes_ts; % spikes time in ms
+% FR_bin_size = 1; % in ms
+% ker_SD = 15; % in ms
+% sleep_ts; % start/end time of single sleep session in ms
+% FR_bin_edges = sleep_ts(1) : FR_bin_size : sleep_ts(2);
+% N=histcounts(spikes_ts, FR_bin_edges);
+% FR_sleep = N * (1e3/FR_bin_size); % in Hz (Actually it is not really neccessary to convert to Hz because we use z-score)
+% % smooth
+% hsize = 1 + (5*ker_SD/FR_bin_size);
+% hsize = round(hsize);
+% alpha = hsize*FR_bin_size/(2*ker_SD); %the equation is:
+% % alpha = hsize/2*sigma  where sigma is in number of samples - so the sigma_PF_smoothing
+% % (m) is devided by bin size (m) in order to get the sigma in number of bins unit.
+% ker = gausswin(hsize,alpha)'./(sqrt(2*pi)*ker_SD);
+% FR_sleep_smoothed = imfilter(FR_sleep,ker,'same','conv','symmetric');
+% FR_sleep_zscored = zscore(FR_sleep_smoothed);
+% findpeaks(FR_sleep_zscored, 'MinPeakHeight', 3);
 
 
 

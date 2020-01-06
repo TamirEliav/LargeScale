@@ -4,6 +4,11 @@
 clear 
 clc
 
+%% plotting options
+field_speed_opt = 2;
+% corr_type = 'pearson';
+corr_type = 'spearman';
+
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
@@ -814,18 +819,34 @@ signif_IX = any(cells_signif,2);
 stats = [cells(signif_IX).stats];
 stats_all = [stats.all];
 % plot 
-x = abs([stats_all.field_ratio_LS_vel]);
+switch field_speed_opt 
+    case 1 % median speed @ field peak
+        x = abs([stats_all.field_ratio_LS_vel]);
+    case 2 % median of spikes speed
+        x = abs([stats_all.field_ratio_LS_vel2]);
+    case 3 % mean of spikes speed
+        x = abs([stats_all.field_ratio_LS_vel3]);
+end
 y = [stats_all.field_ratio_LS];
-[r,pval] = corr(x',y','rows','pairwise');
+[r,r_pval] = corr(x',y','rows','pairwise','type','Pearson')
+[rho,rho_pval] = corr(x',y','rows','pairwise','type','Spearman')
 plot(x, y, '.k');
-text(0.1,1, {sprintf('r=%.2f',r);sprintf('P=%.2f',pval)}, ...
-    'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+switch corr_type
+    case 'pearson'
+        text(0.1,1, {sprintf('r = %.2f',r);sprintf('P = %.2f',r_pval)}, ...
+            'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+    case 'spearman'
+        text(0.1,1, {['{\rho}' sprintf(' = %.2f',rho)];sprintf('P = %.2f',rho_pval)}, ...
+            'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+end
 xlabel('Speed ratio', 'Units','normalized', 'Position',[0.5 -0.12]);
 ylabel('Field size ratio', 'units','normalized', 'Position',[-0.15 0.5]);
 set(gca,'yscale','log');
 set(gca,'ytick',[1 2 3 5 10 15 20]);
 ylim([0.9 max(y)+1]);
 xlim([0.7 1.3])
+% xlim([min(x) max(x)])
+% xlim([0 2])
 ha = gca;
 ha.TickDir='out';
 ha.TickLength = [0.02 0.02];
@@ -834,7 +855,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.1;
 
 
 %% print/save the figure
-fig_name_out = fullfile(res_dir, fig_name_str);
+fig_name_out = fullfile(res_dir, sprintf('%s__corr_%s_%d',fig_name_str,corr_type,field_speed_opt));
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
@@ -846,6 +867,7 @@ disp('figure was successfully saved to pdf/tiff/fig formats');
 
 
 %% figure for Liora
+if 0
 cells_details=[cells.details];
 cells_anatomy_PD_prc = [cells_details.TT_pos_proximodistal_prc];
 
@@ -891,7 +913,7 @@ saveas(gcf, fig_name_out, 'fig');
 saveas(gcf, fig_name_out, 'pdf');
 saveas(gcf, fig_name_out, 'tif');
 % close(gcf)
-
+end
 
 
 

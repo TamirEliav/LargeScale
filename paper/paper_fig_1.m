@@ -628,10 +628,11 @@ for ii_dir = [1 2]
     y = ydev.xy(:,2);
     ymean = interp1(ydev.bin_centers, ydev.ymean, x);
     y = y-ymean;
+    % the data is not in FE structure, so using a line plot creates jumps.
+    % WORKAROUND: add nans in the big jumps
+    x(find(abs(diff(x)) > 10)) = nan;
 %     plot(x, y, '.', 'Color',c, 'MarkerSize',.0001);
     plot(x, y, '-', 'Color',c, 'LineWidth',0.0001);
-%     h=shadedErrorBar(ydev.bin_centers, ydev.ymean, ydev.ystd, 'lineprops',{'Color',c});
-%     h.patch.FaceAlpha = 0;
 end
 xlabel('Position (m)','Units','normalized','Position',[0.5 -0.15]);
 ylabel('Y (m)','Units','normalized','Position',[-0.055 0.5]);
