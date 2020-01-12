@@ -89,11 +89,10 @@ cells = [cells.details];
 cells(~contains({cells.brain_area}, 'CA1')) = [];
 cells(~ismember([cells.ClusterQuality], [2])) = [];
 % choose pyramidal cells only
-cells = cellfun(@(c)(cell_load_data(c,'details','stats')), {cells.cell_ID}, 'UniformOutput',0);
+cells = cellfun(@(c)(cell_load_data(c,'details','meanFR')), {cells.cell_ID}, 'UniformOutput',0);
 cells = [cells{:}];
-stats = [cells.stats];
-stats = [stats.all];
-cells([stats.meanFR_all]>prm.inclusion.interneuron_FR_thr)=[];
+meanFR = [cells.meanFR];
+cells([meanFR.all]>prm.inclusion.interneuron_FR_thr)=[];
 % choose only signif cells (in any direction)
 cells_details = [cells.details];
 cells = cellfun(@(c)(cell_load_data(c,'details','signif')), {cells_details.cell_ID}, 'UniformOutput',0);
@@ -140,7 +139,7 @@ switch corr_type
         text(1,1,   {sprintf('r = %.3f',r);sprintf('P = %.2f',pval_r)}, ...
             'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     case 'spearman'
-        text(1,1, {['{\rho}' sprintf(' = %.2f',rho)];sprintf('P = %.2f',pval_rho)}, ...
+        text(1,1, {['{\rho}' sprintf(' = %.3f',rho)];sprintf('P = %.3f',pval_rho)}, ...
             'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 end
 
@@ -168,7 +167,7 @@ switch corr_type
         text(1,1,   {sprintf('r = %.3f',r);sprintf('P = %.2f',pval_r)}, ...
             'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     case 'spearman'
-        text(1,1, {['{\rho}' sprintf(' = %.2f',rho)];sprintf('P = %.2f',pval_rho)}, ...
+        text(1,1, {['{\rho}' sprintf(' = %.3f',rho)];sprintf('P = %.3f',pval_rho)}, ...
             'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 end
 xlabel('Isolation distance','Units','normalized','Position',[0.5 -0.13]);

@@ -89,7 +89,7 @@ TT_z_new = ALL_fitted_points(ind,3)+0.050;%so the points will be above the surfa
 axes(panel_A);
 cla
 hold on
-text(0.15,0.89, 'A', 'Units','normalized','FontWeight','bold');
+text(0.15,0.91, 'A', 'Units','normalized','FontWeight','bold');
 
 long_axis = linspace(100,0,size(X,1))';
 s = surf(X,Y,Z, repmat(long_axis,1,size(X,2)));
@@ -128,6 +128,7 @@ text(scale_bar_center(1)+[0 0],scale_bar_center(2)+[0 0],scale_bar_center(3)+APM
 
 text(1,1.5,-5,    {'Septal';'pole'}, 'FontSize',8,'HorizontalAlignment','left');
 text(1,2.3,-10.3, {'Temporal';'pole'}, 'FontSize',8,'HorizontalAlignment','left');
+text(1,4,-1.4,       {'Recording';'locations'}, 'FontSize',8,'HorizontalAlignment','left');
 
 % add colorbar
 POSf = ds2nfu(panel_A(1), [0 0 0 0]);
@@ -154,13 +155,12 @@ cells = [cells{:}];
 cells = [cells.details];
 cells(~contains({cells.brain_area}, 'CA1')) = [];
 cells(~ismember([cells.ClusterQuality], [2])) = [];
-cells = cellfun(@(c)(cell_load_data(c,'details','stats')), {cells.cell_ID}, 'UniformOutput',0);
+cells = cellfun(@(c)(cell_load_data(c,'details','meanFR')), {cells.cell_ID}, 'UniformOutput',0);
 cells = [cells{:}];
 cells_details = [cells.details];
 cells_ID = {cells_details.cell_ID};
-stats = [cells.stats];
-stats = [stats.all];
-cells_ID([stats.meanFR_all]>prm.inclusion.interneuron_FR_thr)=[];
+meanFR = [cells.meanFR];
+cells_ID([meanFR.all]>prm.inclusion.interneuron_FR_thr)=[];
 clear cells stats cells_details cells_t
 cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
@@ -191,7 +191,7 @@ end
 axes(panel_B(1));
 cla
 hold on
-text(-0.25,1.17, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.25,1.24, 'B', 'Units','normalized','FontWeight','bold');
 
 axis ij
 axis xy
@@ -287,7 +287,7 @@ hl=annotation('line',xaf,yaf);
 hl.LineWidth = 2;
 hl.Color = 'k';
 % h=annotation('textbox',[xaf(2)+0.001 yaf(1) 0 0], 'String',sprintf('%dmm',scale_bar_mm), 'FitBoxToText','on', 'LineStyle','none');
-text(550, 1180, sprintf('%dmm',scale_bar_mm), 'HorizontalAlignment','center', 'VerticalAlignment','middle','FontSize',8);
+text(550, 1193, sprintf('%dmm',scale_bar_mm), 'HorizontalAlignment','center', 'VerticalAlignment','middle','FontSize',8);
 
 axes(panel_B(3));
 cla

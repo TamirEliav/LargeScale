@@ -1,4 +1,4 @@
-%% Large Scale - Fig. SXXX - 1-D behavior
+%% Large Scale - Fig. S3 - 1-D behavior
 
 %%
 clear 
@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_SXXX_1D_behavior';
+fig_name_str = 'Fig_S3';
 fig_caption_str = '1-Dim behavior';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -46,8 +46,8 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
 % create panels
-panel_A = axes('position', [ 3 20 10 3]);
-panel_B = axes('position', [15 20  3 3]);
+panel_A = axes('position', [ 3 20 6 2]);
+panel_B = axes('position', [10.5 20 2 2]);
 
 %% load population data
 % load params
@@ -65,11 +65,10 @@ cells = [cells.details];
 cells(~contains({cells.brain_area}, 'CA1')) = [];
 cells(~ismember([cells.ClusterQuality], [2])) = [];
 % choose pyramidal cells only
-cells = cellfun(@(c)(cell_load_data(c,'details','stats')), {cells.cell_ID}, 'UniformOutput',0);
+cells = cellfun(@(c)(cell_load_data(c,'details','meanFR')), {cells.cell_ID}, 'UniformOutput',0);
 cells = [cells{:}];
-stats = [cells.stats];
-stats = [stats.all];
-cells([stats.meanFR_all]>prm.inclusion.interneuron_FR_thr)=[];
+meanFR = [cells.meanFR];
+cells([meanFR.all]>prm.inclusion.interneuron_FR_thr)=[];
 % choose only signif cells (in any direction)
 cells_details = [cells.details];
 cells = cellfun(@(c)(cell_load_data(c,'details','signif')), {cells_details.cell_ID}, 'UniformOutput',0);
@@ -110,11 +109,13 @@ for ii_dir = 1:2
     y = ydev.xy(:,2);
     ymean = interp1(ydev.bin_centers, ydev.ymean, x);
     y = y-ymean;
-    % the data is not in FE structure, so using a line plot creates jumps.
-    % WORKAROUND: add nans in the big jumps
-    x(find(abs(diff(x)) > 10)) = nan;
-    plot(x, y, '-', 'Color',c, 'LineWidth',0.0001);
-%     plot(x, y, '.', 'Color',c, 'MarkerSize',.0001);
+    
+%     % the data is not in FE structure, so using a line plot creates jumps.
+%     % WORKAROUND: add nans in the big jumps
+%     x(find(abs(diff(x)) > 10)) = nan;
+%     plot(x, y, '-', 'Color',c, 'LineWidth',0.0001);
+
+    plot(x, y, '.', 'Color',c, 'MarkerSize',.0001);
 end
 xlabel('Position (m)','Units','normalized','Position',[0.5 -0.15]);
 ylabel('Y (m)','Units','normalized','Position',[-0.055 0.5]);
@@ -129,8 +130,8 @@ ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 
 % add direction arrows
-arrow_x = [0 0.05] + 0.53;
-arrow_y = repelem(0.85,2);
+arrow_x = [0 0.05] + 0.35;
+arrow_y = repelem(0.82,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
 h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
@@ -231,8 +232,8 @@ switch yvar_pop_plot
 end
 
 % add direction arrows
-arrow_x = [0 0.03] + 0.8;
-arrow_y = repelem(0.85,2);
+arrow_x = [0 0.03] + 0.542;
+arrow_y = repelem(0.82,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
 h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});

@@ -73,13 +73,12 @@ cells = [cells{:}];
 cells = [cells.details];
 cells(~contains({cells.brain_area}, 'CA1')) = [];
 cells(~ismember([cells.ClusterQuality], [2])) = [];
-cells = cellfun(@(c)(cell_load_data(c,'details','stats')), {cells.cell_ID}, 'UniformOutput',0);
+cells = cellfun(@(c)(cell_load_data(c,'details','meanFR')), {cells.cell_ID}, 'UniformOutput',0);
 cells = [cells{:}];
 cells_details = [cells.details];
 cells_ID = {cells_details.cell_ID};
-stats = [cells.stats];
-stats = [stats.all];
-cells_ID([stats.meanFR_all]>prm.inclusion.interneuron_FR_thr)=[];
+meanFR = [cells.meanFR];
+cells_ID([meanFR.all]>prm.inclusion.interneuron_FR_thr)=[];
 clear cells stats cells_details cells_t
 cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
@@ -108,6 +107,13 @@ for ii_dir = 1:2
     fields( [fields.in_low_speed_area] ) = [];
     length(fields)
     
+    % plot LM
+    for ii_LM=1:length(LM)
+        x = LM(ii_LM).pos_proj;
+        name = LM(ii_LM).name;
+        plot(repelem(x,2), [0 1], '-', 'color', 0.7.*[1 1 1], 'LineWidth',0.5);
+    end
+    
     % plot cdf
     h = cdfplot([fields.loc]);
     h.Color = prm.graphics.colors.flight_directions{ii_dir};
@@ -115,17 +121,6 @@ for ii_dir = 1:2
     title('')
     ha=gca;
     ha.GridLineStyle = 'none';
-    
-    % plot LM
-    ypos = 0.02;
-    angle = 45;
-    ylimits = get(gca,'ylim');
-    for ii_LM=1:length(LM)
-        x = LM(ii_LM).pos_proj;
-        name = LM(ii_LM).name;
-        h=xline(x, '-', 'color', 0.7.*[1 1 1], 'LineWidth',0.5);
-%         text(x, ylimits(2)+ypos*diff(ylimits), LM(ii_LM).name, 'Rotation', 45, 'FontSize',8);
-    end
     
     % labels & graphics
     xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.14]);
@@ -314,27 +309,25 @@ for ii_dir = 1:2
     fields =[fields{:}];
     fields( [fields.in_low_speed_area] ) = [];
     
-    % plot cdf
+    % graphical options
+    y_clipping = 20;
+    
+    % plot LM
+    for ii_LM=1:length(LM)
+        x = LM(ii_LM).pos_proj;
+        name = LM(ii_LM).name;
+        plot(repelem(x,2), [0 y_clipping], '-', 'color', 0.7.*[1 1 1], 'LineWidth',0.5);
+    end
+    
+    % plot scatter - field size vs. position
     c = prm.graphics.colors.flight_directions{ii_dir};
     x = [fields.loc];
     y = [fields.width_prc];
-    y_clipping = 20;
     y(y>y_clipping) = y_clipping;
 %     plot(x,y,'.','MarkerSize',4, 'Color',c);
     plot(x(y< y_clipping), y(y< y_clipping),'.','MarkerSize',4, 'Color',c);
     plot(x(y>=y_clipping), y(y>=y_clipping),'o','MarkerSize',2, 'Color',c);
 %     yline(20)
-    
-    % plot LM
-    ypos = 0.02;
-    angle = 45;
-    ylimits = get(gca,'ylim');
-    for ii_LM=1:length(LM)
-        x = LM(ii_LM).pos_proj;
-        name = LM(ii_LM).name;
-        h=xline(x, '-', 'color', 0.7.*[1 1 1], 'LineWidth',0.5);
-%         text(x, ylimits(2)+ypos*diff(ylimits), LM(ii_LM).name, 'Rotation', 45, 'FontSize',8);
-    end
     
     % labels & graphics
     xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.14]);

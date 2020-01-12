@@ -5,7 +5,7 @@ clear
 clc
 
 %% plotting options
-field_speed_opt = 2;
+field_speed_opt = 1;
 % corr_type = 'pearson';
 corr_type = 'spearman';
 
@@ -76,14 +76,14 @@ panel_C    = axes('position', [ 5.3  8.5  panel_BCDE_size           ]);
 panel_D(1) = axes('position', [ 8.6  8.5  panel_BCDE_size.*[1 0.9]  ]);
 panel_D(2) = axes('position', [ 8.6  8.5  panel_BCDE_size.*[1 0.9]  ]);
 panel_E =    axes('position', [12.2  8.5  panel_BCDE_size.*[1.3 1]  ]);
-panel_Fnew = axes('position', [16.0  8.5  panel_BCDE_size           ]);
+panel_F = axes('position', [16.0  8.5  panel_BCDE_size           ]);
 
-panel_FGH_size = [2 2];
-panel_F = axes('position', [ 2.0  5 panel_FGH_size]          );
-panel_G = axes('position', [ 5.3  5 panel_FGH_size.*[1.4 1] ]);
-panel_H = axes('position', [ 9.1  5 panel_FGH_size]          );
-panel_I = axes('position', [12.3  5 panel_FGH_size.*[1.2 1] ]);
-panel_J = axes('position', [16.0  4.4 3 3]);
+panel_GHIJ_size = [2 2];
+panel_G = axes('position', [ 2.0  5 panel_GHIJ_size]          );
+panel_H = axes('position', [ 5.3  5 panel_GHIJ_size.*[1.4 1] ]);
+panel_I = axes('position', [ 9.1  5 panel_GHIJ_size]          );
+panel_J = axes('position', [12.3  5 panel_GHIJ_size.*[1.2 1] ]);
+panel_K = axes('position', [16.0  4.4 3 3]);
 
 %%
 prm = PARAMS_GetAll();
@@ -112,10 +112,11 @@ for ii_cell = 1:length(cell_examples)
     y = cat(1,maps.PSTH);
     m = round(max(y(:)));
     ylimits = [0 m+1];
-%     % low-speed area
-%     baseval = 0.1;
-%     area([4 prm.fields.valid_speed_pos(1)]    , ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
-%     area([  prm.fields.valid_speed_pos(2) 194], ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
+    % low-speed area
+    area_lowerval = ylimits(1) - 0.23*range(ylimits);
+    area_upperval = ylimits(1) - 1e-2*range(ylimits);
+    area([4 prm.fields.valid_speed_pos(1)]    , repelem(area_upperval,2), area_lowerval, 'FaceColor',0.7*[1 1 1],'EdgeColor','none','ShowBaseLine','off','Clipping','off');
+    area([  prm.fields.valid_speed_pos(2) 194], repelem(area_upperval,2), area_lowerval, 'FaceColor',0.7*[1 1 1],'EdgeColor','none','ShowBaseLine','off','Clipping','off');
     h=plot(x,y);
     [h.Color] = disperse(c);
     box off
@@ -128,12 +129,6 @@ for ii_cell = 1:length(cell_examples)
     
     % fields
     dir_offsets = [-0.1 -0.17]+0.015;
-    % first, low-speed area (in the background)
-    [xaf1,yaf1] = ds2nfu([4 prm.fields.valid_speed_pos(1)],     repelem(mean(dir_offsets)*range(h.YLim),2));
-    [xaf2,yaf2] = ds2nfu([  prm.fields.valid_speed_pos(2) 194], repelem(mean(dir_offsets)*range(h.YLim),2));
-    annotation('line',xaf1,yaf1,'Linewidth', 5, 'Color', 0.5*[1 1 1]);
-    annotation('line',xaf2,yaf2,'Linewidth', 5, 'Color', 0.5*[1 1 1]);
-    % now, the field
     for ii_dir=1:2
         fields = cell.fields{ii_dir};
         if isfield(fields,'in_low_speed_area')
@@ -374,9 +369,9 @@ clear cells stats cells_details cells_t
 cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map','FE')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
 
-%% panel E - field count histogram
+%% panel G - field count histogram
 % figure
-axes(panel_F);
+axes(panel_G);
 cla
 hold on
 text(-0.45,1.15, 'G', 'Units','normalized','FontWeight','bold');
@@ -397,7 +392,7 @@ for ii_dir = 1:2
 end
 h = histogram(nFields(:));
 h.FaceColor = 0.5*[1 1 1];
-nBinEdges = 14;
+nBinEdges = 19; % 9 or 19 are good options
 h.BinEdges = linspace(0,35,nBinEdges);
 xlabel({'No. of fields';'per direction'},'Units','normalized','Position',[0.5 -0.18]);
 ylabel('No. of cells')
@@ -418,9 +413,9 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 
-%% panel F - field size histogram
+%% panel H - field size histogram
 % figure
-axes(panel_G);
+axes(panel_H);
 cla
 hold on
 text(-0.35,1.15, 'H', 'Units','normalized','FontWeight','bold');
@@ -457,9 +452,9 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 
 save( fullfile(res_dir,'pop_dist_fields_size'), 'fields_size');
 
-%% panel G - smallest / largest field size
+%% panel I - smallest / largest field size
 % figure
-axes(panel_H);
+axes(panel_I);
 cla
 hold on
 text(-0.45,1.15, 'I', 'Units','normalized','FontWeight','bold');
@@ -500,9 +495,9 @@ ylabel('Field size (m)','Units','normalized','Position',[-0.21 0.5])
 
 
 
-%% panel I - field ratio (largest/smallest)
+%% panel J - field ratio (largest/smallest)
 % figure
-axes(panel_I);
+axes(panel_J);
 cla
 hold on
 text(-0.4,1.15, 'J', 'Units','normalized','FontWeight','bold');
@@ -541,11 +536,11 @@ h(2).FaceColor = 0.5*[1 1 1];
 % legend({'per cell';'per direction'})
 ha=gca;
 ha.YScale = 'log';
-% ha.YScale = 'linear';
 ha.XScale = 'log';
 ha.XLim = [0 27];
 % ha.YLim = [0 10];
-ha.YLim = [7e-1 260];
+% ha.YLim = [7e-1 260];
+ha.YLim = [0.7 max(h(2).Values)*1.05];
 % ha.XTick = [0:5:35];
 ha.YTick = [1 10 100];
 ha.XTick = [1 2 5 10 20];
@@ -604,6 +599,7 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.1;
+ha.YScale = 'linear';
 xlabel({'Spatial information';'(bits/spike)'}, 'Units','normalized','Position',[0.5 -0.17]);
 ylabel('No. of cells')
 
@@ -620,6 +616,7 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.1;
+ha.YScale = 'linear';
 xlabel('Sparsity', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('No. of cells', 'Units','normalized','Position',[-0.2 0.5])
 
@@ -637,6 +634,7 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.1;
+ha.YScale = 'linear';
 xlabel('Coverage (m)', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('No. of cells', 'Units','normalized','Position',[-0.2 0.5])
 ha.XLim(1) = 0;
@@ -723,7 +721,7 @@ xlabel('Map correlation', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('Probability', 'Units','normalized','Position',[-0.17 0.5])
 
 %% Panel F - percentage of out-of-field spikes
-axes(panel_Fnew);
+axes(panel_F);
 cla
 hold on
 text(-0.4,1.15, 'F', 'Units','normalized','FontWeight','bold');
@@ -745,7 +743,7 @@ for ii_cell = 1:length(cells)
         FE_spikes_ts(invalid_IX)=[];
         FE_spikes_pos(invalid_IX)=[];
         in_field_spikes = ismember(FE_spikes_ts, fields_spikes_ts);
-        in_field_spikes_prc(ii_cell,ii_dir) = sum(in_field_spikes) / length(in_field_spikes);
+        in_field_spikes_prc(ii_cell,ii_dir) = 100 * sum(in_field_spikes) / length(in_field_spikes);
     end
 end
 
@@ -753,12 +751,13 @@ h = histogram(in_field_spikes_prc(:));
 h.NumBins = 12;
 h.FaceColor = 0.5*[1 1 1];
 ha=gca;
-ha.XLim=[0 1];
-ha.XTick = 0:0.5:1;
+ha.XLim = [0 100];
+ha.XTick = [0 50 100];
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.1;
+ha.YScale = 'linear';
 xlabel('In-field spikes (%)', 'Units','normalized','Position',[0.5 -0.17]);
 ylabel('No. of cells')
 
@@ -806,9 +805,9 @@ for ii_cell = 1:length(cells)
     end
 end
 
-%% panel J - field size ratio vs. speed ratio (direct control for speed!)
+%% panel K - field size ratio vs. speed ratio (direct control for speed!)
 % figure
-axes(panel_J);
+axes(panel_K);
 cla
 hold on
 text(-0.27,0.9667, 'K', 'Units','normalized','FontWeight','bold');
@@ -836,7 +835,7 @@ switch corr_type
         text(0.1,1, {sprintf('r = %.2f',r);sprintf('P = %.2f',r_pval)}, ...
             'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
     case 'spearman'
-        text(0.1,1, {['{\rho}' sprintf(' = %.2f',rho)];sprintf('P = %.2f',rho_pval)}, ...
+        text(0.54,1.05, {['{\rho}' sprintf(' = %.3f',rho)];sprintf('P = %.3f',rho_pval)}, ...
             'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
 end
 xlabel('Speed ratio', 'Units','normalized', 'Position',[0.5 -0.12]);
@@ -863,8 +862,26 @@ disp('figure was successfully saved to pdf/tiff/fig formats');
 
 
 
+%% calc some more stats...
+single_PF_cells_IX = find(nansum(nFields)==1);
+single_PF_cells = cells(single_PF_cells_IX);
 
+fields=cat(1,single_PF_cells.fields);
+fields=fields(~isnan(nFields(:,single_PF_cells_IX)'));
+fields=[fields{:}];
+fields([fields.in_low_speed_area])=[];
 
+single_PF_field_size_mean = mean([fields.width_prc]);
+single_PF_field_size_std  = std([fields.width_prc]);
+
+% print stats
+disp(' ')
+fprintf('no. of single field cells = %d/%d (%.2f%%),\n with mean field size = %.1fm std=%.1fm\n',...
+    length(single_PF_cells), ...
+    length(cells), ...
+    100 * length(single_PF_cells) / length(cells),...
+    single_PF_field_size_mean,...
+    single_PF_field_size_std);
 
 %% figure for Liora
 if 0

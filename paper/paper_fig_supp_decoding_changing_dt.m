@@ -1,4 +1,4 @@
-%% Large Scale - Fig. S10 - decoder with shorter dt (200ms) + error vs. dt
+%% Large Scale - Fig. S11 - decoder with shorter dt (200ms) + error vs. dt
 
 %%
 clear 
@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_S10';
+fig_name_str = 'Fig_S11';
 fig_caption_str = 'Theoretical analysis - error vs. integration time (dt)';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -60,7 +60,7 @@ panel_C(1,2) = axes('position', [ 2.5   10.7  2.8 2]);
 panel_D(1,1) = axes('position', [ 8.1  8.7  panel_BCDE_size]);
 panel_D(1,2) = axes('position', [ 8.7 10.7  2.5 2]);
 panel_E(1)   = axes('position', [14.4    8.7  panel_BCDE_size]);
-panel_F      = axes('position', [ 7.4 2.5 6 4]);
+panel_F      = axes('position', [ 7.4 2.0 6 4]);
 panel_legend = axes('position', [9.8 16.6 0.4 2]);
 
 %% arrange data
@@ -125,7 +125,7 @@ for ii_scnr = 1:5
 end
 axes(panel_A(1));
 text(-0.4,1.1, 'A', 'Units','normalized','FontWeight','bold');
-text(3,1.4, 'Integration time window of 200 ms instead of 500 ms', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
+text(3,1.5, 'Integration time window of 200 ms instead of 500 ms', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
 ylabel('Example neuron no.','Units','normalized','Position',[-0.2 0.5]);
 
 %% panel B - minimum N required for error < 1 m
@@ -375,7 +375,7 @@ end
 axes(panel_F);
 cla
 hold on
-text(-0.2,1.1, 'F', 'Units','normalized','FontWeight','bold');
+text(-0.2,1.15, 'F', 'Units','normalized','FontWeight','bold');
 text(0.5,1.15, 'Various integration time windows', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
 
 % load data

@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S8';
+fig_name_str = 'fig_S9';
 fig_caption_str = 'field properties vs. distance between landmrks';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -47,8 +47,11 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 
 % create panels
 panel_A_size = [7 3];
-panel_A(1) = axes('position', [ 4 20.3 panel_A_size]);
-panel_A(2) = axes('position', [ 4 16   panel_A_size]);
+panel_B_size = [3 3];
+panel_A(1) = axes('position', [ 4   20.3 panel_A_size]);
+panel_A(2) = axes('position', [ 4   16   panel_A_size]);
+panel_B(1) = axes('position', [12.5 20.3 panel_B_size]);
+panel_B(2) = axes('position', [12.5 16   panel_B_size]);
 
 
 %% load population data
@@ -62,13 +65,12 @@ cells = [cells{:}];
 cells = [cells.details];
 cells(~contains({cells.brain_area}, 'CA1')) = [];
 cells(~ismember([cells.ClusterQuality], [2])) = [];
-cells = cellfun(@(c)(cell_load_data(c,'details','stats')), {cells.cell_ID}, 'UniformOutput',0);
+cells = cellfun(@(c)(cell_load_data(c,'details','meanFR')), {cells.cell_ID}, 'UniformOutput',0);
 cells = [cells{:}];
 cells_details = [cells.details];
 cells_ID = {cells_details.cell_ID};
-stats = [cells.stats];
-stats = [stats.all];
-cells_ID([stats.meanFR_all]>prm.inclusion.interneuron_FR_thr)=[];
+meanFR = [cells.meanFR];
+cells_ID([meanFR.all]>prm.inclusion.interneuron_FR_thr)=[];
 clear cells stats cells_details cells_t
 cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
@@ -84,11 +86,7 @@ LM( contains({LM.name},{'ball','enter'}) ) = [];
 % =========================================================================
 % figure
 for ii_dir = 1:2
-%     subplot(1,2,ii_dir)
-    axes(panel_A(ii_dir));
-    cla
-    hold on
-    
+
     %% arrange data
     signif = cat(1,cells.signif);
     cells_dir = cells([signif(:,ii_dir).TF]);
@@ -124,7 +122,10 @@ for ii_dir = 1:2
     fields([fields.in_low_speed_area])=[];
     fields(isnan([fields.LM_nearest_by_peak])) = [];
     
-    %% scatter plot with linear fit
+    %% scatter plot - field size vs. inter-LM-dist
+    axes(panel_A(ii_dir));
+    cla
+    hold on
     c = prm.graphics.colors.flight_directions{ii_dir};
     x = abs([fields.LM_prev_by_peak]-[fields.LM_next_by_peak]);
     y = [fields.width_prc];
@@ -133,12 +134,10 @@ for ii_dir = 1:2
 %     plot(x+0.5*(rand(size(x))-.5), y, '.', 'Color',c); % uniform jitter
     plot(x+0.1*randn(size(x)), y, '.', 'Color',c); % gaussian jitter
     lm = fitlm(x,y);
-    [r,p] = corr(x',y');
-%     h=plot(lm);
-%     h(1).Color = c;
-%     h(1).Marker = '.';
-    text(0.75,0.9,{  sprintf('r = %.2g',r);...
-                    sprintf('P = %.2g',p)},...
+    [r,r_pal] = corr(x',y','type','Pearson');
+    [rho,rho_pal] = corr(x',y','type','Spearman');
+    text(0.75,0.9,{ ['{\rho} = ' sprintf('%.2g',rho)    ];...
+                    ['P = '      sprintf('%.2g',rho_pal)]},...
                     'Units','normalized', 'HorizontalAlignment','left','FontSize',7);
     xlabel('Inter-Landmark distance (m)','Units','normalized','Position',[0.5 -0.13])
     ylabel('Field size (m)','Units','normalized','Position',[-0.09 0.5]);
@@ -152,9 +151,34 @@ for ii_dir = 1:2
     ha.XRuler.TickLabelGapMultiplier = -.3;
     ha.YRuler.TickLabelGapMultiplier = 0.1;
 
+    %% scatter plot - field size vs. distance to nearest LM
+    axes(panel_B(ii_dir));
+    cla
+    hold on
+    x = abs([fields.loc] - [fields.LM_nearest_by_peak]);
+    y = [fields.width_prc];
+    plot(x,y,'.', 'Color', prm.graphics.colors.flight_directions{ii_dir})
+    [r,r_pal] = corr(x',y','type','Pearson');
+    [rho,rho_pal] = corr(x',y','type','Spearman');
+    text(0.7,0.9,{ ['{\rho} = ' sprintf('%.2g',rho)    ];...
+                    ['P = '      sprintf('%.2g',rho_pal)]},...
+                    'Units','normalized', 'HorizontalAlignment','left','FontSize',7);
+
+    % set axis properties
+    ha = gca;
+    ha.TickDir='out';
+    ha.TickLength = [0.025 0.025];
+    ha.XRuler.TickLabelGapMultiplier = -0.2;
+    ha.YRuler.TickLabelGapMultiplier = 0.001;
+    xlabel({'Distance of fields';'to nearest landmark (m)'}, 'Units','normalized','Position',[0.5 -0.11]);
+    ylabel('Field size (m)', 'Units','normalized','Position',[-0.15 0.5]);
+    
 end
-% axes(panel_A(1));
-% text(-0.13,1.1, 'A', 'Units','normalized','FontWeight','bold');
+axes(panel_A(1));
+text(-0.13,1.1, 'A', 'Units','normalized','FontWeight','bold');
+axes(panel_B(1));
+text(-0.2,1.1, 'B', 'Units','normalized','FontWeight','bold');
+
 
 %% add direction arrows
 arrow_x = 0.22 +[0 0.05];

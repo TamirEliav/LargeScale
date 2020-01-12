@@ -4,10 +4,14 @@
 clear 
 clc
 
+%% plotting options
+% yscale_opt = 'linear';
+yscale_opt = 'log';
+
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S3';
+fig_name_str = 'fig_S4';
 fig_caption_str = 'compare firing patterns between the two arms (long vs. short)';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -47,10 +51,10 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 
 % create panels
 panels_size = [4 4];
-panel_A(1) = axes('position', [ 2 20 panels_size]);
-panel_A(2) = axes('position', [ 8 20 panels_size]);
-panel_B(1) = axes('position', [ 2 14 panels_size]);
-panel_B(2) = axes('position', [ 5 17 0.35 0.2]);
+panel_A(1) = axes('position', [ 2   20 panels_size]);
+panel_A(2) = axes('position', [ 8   20 panels_size]);
+panel_B(1) = axes('position', [ 2   14 panels_size]);
+panel_B(2) = axes('position', [ 5.3 17 0.35 0.2]);
 panel_A_legend(1) = axes('position', [ 4.5 22.5 0.5 0.3]);
 panel_A_legend(2) = axes('position', [10.5 22.5 0.5 0.3]);
 
@@ -65,13 +69,12 @@ cells = [cells{:}];
 cells = [cells.details];
 cells(~contains({cells.brain_area}, 'CA1')) = [];
 cells(~ismember([cells.ClusterQuality], [2])) = [];
-cells = cellfun(@(c)(cell_load_data(c,'details','stats')), {cells.cell_ID}, 'UniformOutput',0);
+cells = cellfun(@(c)(cell_load_data(c,'details','meanFR')), {cells.cell_ID}, 'UniformOutput',0);
 cells = [cells{:}];
 cells_details = [cells.details];
 cells_ID = {cells_details.cell_ID};
-stats = [cells.stats];
-stats = [stats.all];
-cells_ID([stats.meanFR_all]>prm.inclusion.interneuron_FR_thr)=[];
+meanFR = [cells.meanFR];
+cells_ID([meanFR.all]>prm.inclusion.interneuron_FR_thr)=[];
 clear cells stats cells_details cells_t
 cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map','Ipos')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
@@ -138,7 +141,7 @@ for ii_dir = 1:2
 %     text(1,0.9,sprintf('P_{Wilc}=%.2f',P_ranksum),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     ha=gca;
     ha.YLim(1) = 6e-4;
-    ha.YScale = 'log';
+    ha.YScale = yscale_opt;
     ha.XRuler.TickLabelGapOffset = -1;
     ha.TickLength = [0.03 0.03];
 %     title("dir "+ii_dir);
@@ -221,7 +224,7 @@ end
 axes(panel_B(1));
 cla
 hold on
-text(-0.3,1.15, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.3,1.1, 'B', 'Units','normalized','FontWeight','bold');
 
 nBinEdges = 9;
 edges = logspace(0,log10(25),nBinEdges);
@@ -229,11 +232,11 @@ h=histogram(LS_field_ratio_all(:));
 h.BinEdges = edges;
 h.FaceColor = 0.5*[1 1 1];
 ha=gca;
-ha.YScale = 'log';
+ha.YScale = yscale_opt;
 ha.XScale = 'log';
 ha.XLim = [0 27];
 ha.YLim = [7e-1 1.2*max(h.Values)];
-ha.YLim = [7e-1 100];
+% ha.YLim = [7e-1 100];
 ha.YTick = [1 10 100];
 ha.XTick = [1 2 5 10 20];
 ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
@@ -248,8 +251,8 @@ ylabel('No. of cells','Units','normalized','Position',[-0.20 0.5])
 axes(panel_B(2));
 cla
 hold on
-area([0 1],[1 1], 'FaceColor',0.5*[1 1 1])
-text(1.2, 0.5, 'Long arm', 'VerticalAlignment','middle', 'HorizontalAlignment','left');
+area([0 1],[1 1], 'FaceColor',0.5*[1 1 1],'Clipping','off');
+text(1.2, 0.5, 'Long arm', 'VerticalAlignment','middle', 'HorizontalAlignment','left','FontSize',7);
 xlim([0 1])
 ylim([0 1])
 box off
@@ -257,7 +260,7 @@ set(gca,'Visible','off')
 
 
 %% print/save the figure
-fig_name_out = fullfile(res_dir, fig_name_str);
+fig_name_out = fullfile(res_dir, sprintf('%s_yscale_%s',fig_name_str,yscale_opt));
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');

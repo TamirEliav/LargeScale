@@ -1,4 +1,4 @@
-%% Large Scale - Fig. S9 - PV decoder
+%% Large Scale - Fig. S10 - PV decoder
 
 %%
 clear 
@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_S9';
+fig_name_str = 'Fig_S10';
 fig_caption_str = 'Theoretical analysis with PV decoder';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -123,7 +123,7 @@ for ii_scnr = 1:5
 end
 axes(panel_A(1));
 text(-0.4,1.1, 'A', 'Units','normalized','FontWeight','bold');
-text(3,1.4, 'Population Vector decoder instead of Maximum Likelihood decoder', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
+text(3,1.5, 'Population Vector decoder instead of Maximum Likelihood decoder', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
 ylabel('Example neuron no.','Units','normalized','Position',[-0.2 0.5]);
 
 %% panel B - minimum N required for error < 1 m

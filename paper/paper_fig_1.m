@@ -52,22 +52,21 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 
 % create panels
 panel_B_size = [9.5 1];
-panel_A    = axes('position', [ 1.25 23.2  2 2]);
+panel_A    = axes('position', [ 1.25 23.6  2 2]);
 panel_B(1) = axes('position', [ 4.5 24.5  panel_B_size]);
 panel_B(2) = axes('position', [ 4.5 23.5  panel_B_size]);
 panel_B(3) = axes('position', [ 4.5 22.5  panel_B_size]);
 panel_B(4) = axes('position', [ 4.5 21.5  panel_B_size]);
 panel_C    = axes('position', [15.2 21.0  5 5]);
-panel_D    = axes('position', [ 1.1 18 8 2.3]);
-panel_E    = axes('position', [ 0   12.5 9 5]);
-panel_F    = axes('position', [10.5 18 2 2]);
-panel_G    = axes('position', [14.1 18 6 2]);
-panel_H    = axes('position', [10.5 14 2.5 2.5]);
-panel_I    = axes('position', [14.0 14.25 3 2.5]);
-panel_J    = axes('position', [ 1.5 10.25 6 2]);
-panel_K    = axes('position', [ 9.0 10.25 2.5 2]);
-panel_L    = axes('position', [13.0 10.25 2.5 2]);
-panel_M    = axes('position', [17.0 10.25 2.5 2]);
+panel_D    = axes('position', [ 1.15 20.75 3.0 2.4]);
+panel_E    = axes('position', [ 1.1 18 8 2.3]);
+panel_F    = axes('position', [ 0   12.5 9 5]);
+panel_G    = axes('position', [10.0 18 2 2]);
+panel_H    = axes('position', [9.2 14.25 3 2.5]);
+panel_I    = axes('position', [14.0 18    6 2]);
+panel_J    = axes('position', [13.0 14.5 1.8 2]);
+panel_K    = axes('position', [15.7 14.5 1.8 2]);
+panel_L    = axes('position', [18.4 14.5 1.8 2]);
 
 %
 prm = PARAMS_GetAll();
@@ -107,6 +106,11 @@ for ch = 1:4
 end
 linkaxes(panel_B,'xy')
 
+% add panel letter
+axes(panel_B(1));
+text(-0.05,1.05, 'B', 'Units','normalized','FontWeight','bold');
+text(0.06,0.85, 'Spikes recorded in-flight', 'Units','normalized','FontWeight','bold', 'FontSize',9);
+
 %% add time/voltage scales
 axes(panel_B(4));
 xlimits = get(gca,'xlim');
@@ -117,10 +121,8 @@ scale_line_width = 1;
 xa = xlimits(1) + [0 scale_ms*1e3];
 ya = ylimits(1) + [0 scale_uVolt ];
 [xaf,yaf] = ds2nfu(xa,ya);
-% xaf = xaf + 0.01;
-% yaf = yaf - 0.02;
-xaf = xaf - 0.035;
-yaf = yaf + 0.02;
+xaf = xaf + 0.17;
+yaf = yaf - 0.02;
 annotation('line',    xaf([1 2]),yaf([1 1]),'Linewidth',scale_line_width); % time
 annotation('line',    xaf([1 1]),yaf([1 2]),'Linewidth',scale_line_width)  % voltage
 h=annotation('textbox',[mean(xaf) mean(yaf)-0.003 0 0],'String',sprintf('%dms',scale_ms));
@@ -138,11 +140,6 @@ h.Text.VerticalAlignment = 'bottom';
 h.Text.FontSize = 7;
 h.FitBoxToText='on';
 h.LineStyle='none';
-
-% add panel letter
-axes(panel_B(1));
-text(-0.05,0.7, 'B', 'Units','normalized','FontWeight','bold');
-text(0.06,0.7, 'Spikes recorded in-flight', 'Units','normalized','FontWeight','bold', 'FontSize',9);
 
 %%
 clusters_colors = [
@@ -267,7 +264,7 @@ ha.XTick = floor(ha.XLim/100)*100;
 ha.YTick = floor(ha.YLim/100)*100;
 ha.ZTick = floor(ha.ZLim/100)*100;
 
-h1=text([230 1610],[650 680],  [0 0], ""+ha.XRuler.TickValues,'FontSize',7);
+h1=text([236 1610],[650 680],  [0 0],    ""+ha.XRuler.TickValues,'FontSize',7);
 h2=text([1560 1810],[140 683], [-20 15], ""+ha.YRuler.TickValues,'FontSize',7);
 h3=text([1645 1740],[140 120], [70 960], ""+ha.ZRuler.TickValues,'FontSize',7);
 ha.XRuler.TickLabels = {};
@@ -310,11 +307,13 @@ logger_image_filename = 'L:\resources\minibat\minibat3.jpg';
 % tunnel_view_image_file = 'L:\Videos_Photos\tunnel_area_various\20170111_170850_downsampled.jpg';
 % tunnel_view_image_file = 'L:\Videos_Photos\TAZOT_HAMAMA\taza3.jpg';
 tunnel_view_image_file = 'L:\Videos_Photos\TAZOT_HAMAMA\taza4.jpg';
+histology_slice_example_file = 'L:\resources\Histology\processed\Tamir_bat148_Sec16a_X4_after_WB.tif';
 
+%% Logger image
 axes(panel_A);
 image = imread(logger_image_filename);
 imshow(image);
-text(-0.29,1.22, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.29,1.16, 'A', 'Units','normalized','FontWeight','bold');
 % add scale bar
 scale_mm = 10;
 pixel_mm_ratio = 720/11; % 720 pixels is measured manually using ginput amd sd card width is 11mm
@@ -331,7 +330,48 @@ annotation('line', xaf,yaf, 'Linewidth',scale_line_width);
 h=annotation('textbox', [mean(xaf)-0.0005 mean(yaf)-0.008 0 0], 'String', sprintf('%dmm',scale_mm),...
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
 
+%% panel D - Histology
 axes(panel_D);
+cla
+hold on
+text(-0.16,1.1, 'D', 'Units','normalized','FontWeight','bold');
+image = imread(histology_slice_example_file);
+imshow(image);
+% add arrow to indicate the track/lesion
+harr = annotation('arrow', [0 1],[0 1]);
+hax = gca;
+harr.Parent = hax;
+harr.X = 870 + [0 6];
+harr.Y = 350 + [9 0];
+harr.LineStyle = 'none';
+harr.HeadLength = 7;
+harr.HeadWidth = 7;
+harr.Color = [1 0 0];
+xlim([324 1795]);
+ylim([ 67 1116]);
+hax.DataAspectRatio(:) = 1;
+% add CA1 border lines
+plot([1588 1484],[347 539], 'k-', 'LineWidth',0.7); % border correction by nachum
+% plot([686 763],[480 550], 'k-', 'LineWidth',0.7);
+plot([590 760],[525 570], 'k-', 'LineWidth',0.7); % border correction by nachum
+text(1000,222,'CA1','FontSize',8,'FontWeight','bold')
+% add scale bar
+scale_bar_mm = 1;
+pixel2mm = 2.325e-3;
+scale_bar_pixels = scale_bar_mm / pixel2mm ;
+xa = hax.XLim(1) + 0.7*range(hax.XLim) + [0 scale_bar_pixels];
+ya = hax.YLim([1 1]);
+[xaf,yaf] = ds2nfu(xa,ya);
+yaf = yaf - 0.003;
+hl=annotation('line',xaf,yaf);
+hl.LineWidth = 2;
+hl.Color = 'k';
+% h=annotation('textbox',[xaf(2)+0.001 yaf(1) 0 0], 'String',sprintf('%dmm',scale_bar_mm), 'FitBoxToText','on', 'LineStyle','none');
+text(1550, 1280, sprintf('%dmm',scale_bar_mm), 'HorizontalAlignment','center', 'VerticalAlignment','middle','FontSize',8);
+
+%% panel E - tunnel TAZA
+axes(panel_E);
+cla
 image = imread(tunnel_view_image_file);
 imshow(image);
 axis image
@@ -350,7 +390,6 @@ yaf = yaf - 0.008;
 annotation('line', xaf,yaf, 'Linewidth',scale_line_width);
 h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dm',scale_m),...
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
-text(-0.05,1.22, 'D', 'Units','normalized','FontWeight','bold');
 
 % add zoom-out lines from the position the trace in panel B was taken
 tunnel_start_pos_pixels = [830 150];
@@ -367,13 +406,14 @@ annotation('line', xaf(1)+[0 0], [yaf(1) 0.767], 'Linewidth',1);
 annotation('line', xaf(2)+[0 0], [yaf(2) 0.767], 'Linewidth',1);
 annotation('line', xaf(1)+[0 0.265], 0.767+[0 0.04], 'Linewidth',1);
 annotation('line', xaf(2)+[0 -0.17], 0.767+[0 0.04], 'Linewidth',1);
+text(-0.05,1.22, 'E', 'Units','normalized','FontWeight','bold');
 
-%% panel I - tunnel section behavior (ZY)
-axes(panel_I)
+%% panel H - tunnel section behavior (ZY)
+axes(panel_H)
 cla
 axis equal
 hold on
-text(-0.15,1, 'I', 'Units','normalized','FontWeight','bold');
+text(-0.05,1, 'H', 'Units','normalized','FontWeight','bold');
 % plot tunnel section lines
 plot([-1.15 -1.15],[0 1.7],'k','LineWidth',1.5);
 plot([ 1.15  1.15],[0 1.7],'k','LineWidth',1.5);
@@ -471,9 +511,9 @@ ha.XRuler.TickLabelGapMultiplier = -0.5;
 ha.YRuler.TickLabelGapMultiplier = 0;
 
 %% bespoon localization (anchors+tag+tunnel)
-axes(panel_E);
+axes(panel_F);
 cla
-text(-0.11, 1, 'E', 'Units','normalized','FontWeight','bold');
+text(-0.11, 1, 'F', 'Units','normalized','FontWeight','bold');
 axis equal
 % axis normal
 pause(eps)
@@ -560,7 +600,7 @@ h=annotation('textbox', [mean(xaf) mean(yaf)-0.008 0 0], 'String', sprintf('%dm'
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
 
 % add legend
-leg_pos = get(panel_E,'position');
+leg_pos = get(panel_F,'position');
 leg_pos(1:2) = leg_pos(1:2) + [0.65 0.88].*leg_pos(3:4);
 leg_pos(3:4) = [1 0.6];
 leg_ax = axes('position',leg_pos);
@@ -577,9 +617,10 @@ set(gca,'Visible','off');
 set(gca,'XTick',[],'YTick',[]);
 
 %% bespoon localization precision
-axes(panel_F);
+axes(panel_G);
 cla
 hold on
+text(-0.45,1.15, 'G', 'Units','normalized','FontWeight','bold');
 bespoon_loc_precision = load('L:\BeSpoon\testing\test_20180530__YOM_KEF_200m_static+dynamic+discretization\30-05-2018__calib_test_dynamic+non-jitter_jitter_with_kalman\data\outside_perpendicular_error.mat');
 err = bespoon_loc_precision.perpendicular_error;
 err = err.*100; % convert to cm
@@ -604,57 +645,6 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.25;
-text(-0.45,1.15, 'F', 'Units','normalized','FontWeight','bold');
-
-%% behavioral trajectory is 1D (small y deviations) - example
-axes(panel_G);
-cla
-hold on
-text(-0.115,1.15, 'G', 'Units','normalized','FontWeight','bold');
-% panel_G_opt = 1;
-panel_G_data_options = {
-'b0034_d180413'; % TODO: verify this option is from a CA1 day!!!!
-'b2289_d180514';
-'b2289_d180515';
-'b2289_d180518';
-'b9861_d180705';
-'b9861_d180709';
-};
-exp = exp_load_data(panel_G_data_options{panel_G_opt},'flight');
-for ii_dir = [1 2] 
-    c = prm.graphics.colors.flight_directions{ii_dir};
-    ydev = exp.flight.pos_y_std(ii_dir);
-    x = ydev.xy(:,1);
-    y = ydev.xy(:,2);
-    ymean = interp1(ydev.bin_centers, ydev.ymean, x);
-    y = y-ymean;
-    % the data is not in FE structure, so using a line plot creates jumps.
-    % WORKAROUND: add nans in the big jumps
-    x(find(abs(diff(x)) > 10)) = nan;
-%     plot(x, y, '.', 'Color',c, 'MarkerSize',.0001);
-    plot(x, y, '-', 'Color',c, 'LineWidth',0.0001);
-end
-xlabel('Position (m)','Units','normalized','Position',[0.5 -0.15]);
-ylabel('Y (m)','Units','normalized','Position',[-0.055 0.5]);
-ha = gca;
-ha.XLim = [0 200];
-ha.YLim = [-1.5 1.5];
-ha.XTick = [0:50:200];
-ha.YTick = [-2:1:2];
-ha.TickDir='out';
-ha.TickLength = [0.01 0.01];
-ha.XRuler.TickLabelGapMultiplier = -0.3;
-ha.YRuler.TickLabelGapMultiplier = 0.001;
-
-% add direction arrows
-arrow_x = [0.80 0.85]+0.0231;
-arrow_y = repelem(0.74,2);
-clear h
-h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
-h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
-[h.HeadWidth] = disperse([5 5]);
-[h.HeadLength] = disperse([5 5]);
-
 
 %% load population data
 % get list of significant cells (at least in one direction)
@@ -670,11 +660,10 @@ cells = [cells.details];
 cells(~contains({cells.brain_area}, 'CA1')) = [];
 cells(~ismember([cells.ClusterQuality], [2])) = [];
 % choose pyramidal cells only
-cells = cellfun(@(c)(cell_load_data(c,'details','stats')), {cells.cell_ID}, 'UniformOutput',0);
+cells = cellfun(@(c)(cell_load_data(c,'details','meanFR')), {cells.cell_ID}, 'UniformOutput',0);
 cells = [cells{:}];
-stats = [cells.stats];
-stats = [stats.all];
-cells([stats.meanFR_all]>prm.inclusion.interneuron_FR_thr)=[];
+meanFR = [cells.meanFR];
+cells([meanFR.all]>prm.inclusion.interneuron_FR_thr)=[];
 % choose only signif cells (in any direction)
 cells_details = [cells.details];
 cells = cellfun(@(c)(cell_load_data(c,'details','signif')), {cells_details.cell_ID}, 'UniformOutput',0);
@@ -712,114 +701,11 @@ fprintf('missing data percentage: mean=%.4f, std=%.4f\n',...
     100*std(1-[missing_data_frac.rawdata_fraction]));
 end
 
-%% behavioral trajectory is 1D (small y deviations) - population
-axes(panel_H);
-cla
-text(-0.34,1.1, 'H', 'Units','normalized','FontWeight','bold');
-hold on
-% arrange data
-data = {};
-for ii_bat = 1:length(bats)
-    bat = bats(ii_bat);
-    c = prm.graphics.colors.bats(bat);
-    bat_exp_IX = ismember([exps_details.batNum],bat);
-    bat_exp_ydev = pos_y_dev_all(bat_exp_IX,:);
-    valid_pos_IX = get_data_in_ti(bat_exp_ydev(1).bin_centers, prm.fields.valid_speed_pos);
-    ystd_bat_all = cat(1,bat_exp_ydev.ystd); % pooling directions together!
-    ystd_bat_all = ystd_bat_all(:,valid_pos_IX); % take only valid positions
-    ystd_bat_all = ystd_bat_all(:)';% pooling over all positions!
-    ystd_bat_all = ystd_bat_all.*100; % convert to cm
-    data{ii_bat} = ystd_bat_all;
-end
-% t2 = table2cell(t);
-x = [data{:}];
-grps = repelem(1:length(bats), cellfun(@length,data));
-
-% plot!
-cmap = prm.graphics.colors.bats;
-c = arrayfun(@(x)(cmap(x)), bats,'UniformOutput',0);
-yvar_pop_plot = 'ksdensity_pooled_bats';
-% yvar_pop_plot = 'violin';
-% yvar_pop_plot = 'boxplot';
-% yvar_pop_plot = 'median_std';
-% yvar_pop_plot = 'none';
-switch yvar_pop_plot 
-    case 'ksdensity_pooled_bats'
-        for ii_dir = 1:2
-            ystd_by_dir = cat(1,pos_y_dev_all(:,ii_dir).ystd); % pool over sessions
-            ystd_by_dir = ystd_by_dir(:,valid_pos_IX); % take only valid position (high-speed)
-            ystd_by_dir = ystd_by_dir(:); % pool over positions
-            ystd_by_dir = ystd_by_dir .* 100; % convert to cm
-            xi = linspace(0,50,100);
-            ystd_density = ksdensity(ystd_by_dir,xi);
-            plot(xi,ystd_density,'Color',prm.graphics.colors.flight_directions{ii_dir},'LineWidth',1.5);
-        end
-        xlabel('Y s.d. (cm)');
-        ylabel('Probability','Units','normalized','Position',[-0.1 0.5]);
-        ha=gca;
-        ha.XLim = [0 40];
-        ha.XTick = 0:10:40;
-        ha.YLim = [0 0.1];
-        ha.YTick = [0 0.1];
-        ha.TickLength = [0.03 0.03];
-        ha.XRuler.TickLabelGapMultiplier = -0.3;
-        ha.YRuler.TickLabelGapMultiplier = 0.001;
-    case 'violin'
-        hv=violinplot(x,grps);
-        [hv.BoxWidth] = disperse(repelem(0.02,length(hv)));
-        [hv.EdgeColor ] = disperse(repelem({'none'},length(hv)));
-        hs = [hv.ScatterPlot];
-        [hs.SizeData] = disperse(repelem(5,length(hs)));
-        hm = [hv.MedianPlot];
-        [hm.SizeData] = disperse(repelem(10,length(hm)));
-        ha=gca;
-        ha.YLim = [0 90];
-        ha.YTick = [0:30:90];
-    case 'boxplot'
-        boxplot(x,grps)
-        box off
-        ha=gca;
-        ha.YLim = [0 90];
-        ha.YTick = [0:30:90];
-    case 'median_std'
-        medians = cellfun(@median,data);
-        stds    = cellfun(@std,data);
-        errorbar(medians,stds,'-o','MarkerSize',3);
-        ha=gca;
-        ha.YLim = [0 40];
-        ha.YTick = [0:20:40];
-    case 'none'
-        ha=gca;
-end
-switch yvar_pop_plot
-    case {'ksdensity_pooled_bats'}
-    otherwise
-        ha.XTick = 1:length(bats);
-        ha.XTickLabel = bats;
-        ha.XLim = [0.5 length(bats)+.5];
-        ha.TickDir='out';
-        ha.TickLength = [0.01 0.01];
-        ha.XRuler.TickLabelGapMultiplier = -0.3;
-        ha.YRuler.TickLabelGapMultiplier = 0.001;
-        xlabel('Bats');
-        ylabel('Y s.d. (cm)');
-end
-
-% add direction arrows
-arrow_x = 0.53 + [0 0.03] + 0.0231;
-arrow_y = repelem(0.60,2);
-clear h
-h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
-h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
-[h.HeadWidth] = disperse([5 5]);
-[h.HeadLength] = disperse([5 5]);
-
-
 %% speed trajectory very constant along the flight - example
-axes(panel_J); 
+axes(panel_I); 
 cla
 hold on
-text(-0.13,1.1, 'J', 'Units','normalized','FontWeight','bold');
+text(-0.13,1.1, 'I', 'Units','normalized','FontWeight','bold');
 % panel_J_opt = 4;
 panel_J_data_options = {
     'b0034_d180313';
@@ -854,11 +740,11 @@ xlabel('Position (m)','Units','normalized','Position',[0.5 -0.25]);
 ylabel('Flight speed (m/s)','Units','normalized','Position',[-0.07 0.41]);
 
 
-%% panel K - speed trajectory very constant along the flight - population
-axes(panel_K);
+%% panel J - speed trajectory very constant along the flight - population
+axes(panel_J);
 cla
 hold on
-text(-0.4,1.1, 'K', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.1, 'J', 'Units','normalized','FontWeight','bold');
 dir_colors = prm.graphics.colors.flight_directions;
 for ii_dir = 1:2
     cv = [speed_traj_all(:,ii_dir).speed_cv];
@@ -879,24 +765,28 @@ ha=gca;
 ha.XTick = [0 0.04 0.08];
 ha.TickLength = [0.04 0.04];
 ha.XRuler.TickLabelGapMultiplier = -0.1;
-ha.YRuler.TickLabelGapMultiplier = 0.2;
+ha.YRuler.TickLabelGapMultiplier = 0;
 xlabel('CV of speed','Units','normalized','Position',[0.5 -0.25]);
 ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
 % add direction arrows
-arrow_x = [0.48 0.50] + 0.0231;
-arrow_y = repelem(0.45,2);
+% arrow_x = [0.48 0.50] + 0.0231 + 0.155;
+% arrow_y = repelem(0.45,2) + 0.155;
+arrow_x = ha.Position(1) + 0.75*ha.Position(3) + [0 0.4];
+arrow_y = ha.Position(2) + 1*ha.Position(4) + [0 0] + 0.3;
+arrow_x = arrow_x / figure_size_cm(1);
+arrow_y = arrow_y / figure_size_cm(2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
 h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
 [h.HeadWidth] = disperse([5 5]);
 [h.HeadLength] = disperse([5 5]);
 
-%% panel L - number of laps
-axes(panel_L);
+%% panel K - number of laps
+axes(panel_K);
 cla
 hold on
-text(-0.4,1.1, 'L', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.1, 'K', 'Units','normalized','FontWeight','bold');
 dir_colors = prm.graphics.colors.flight_directions;
 directions = [-1 1];
 for ii_dir = 1:2
@@ -915,26 +805,31 @@ end
 ha=gca;
 ha.XLim(1) = 0;
 ha.XLim(2) = 65;
+ha.XTick = [0 30 60];
 ha.TickLength = [0.04 0.04];
 ha.XRuler.TickLabelGapMultiplier = -0.1;
-ha.YRuler.TickLabelGapMultiplier = 0.2;
+ha.YRuler.TickLabelGapMultiplier = 0;
 xlabel('No. of flights','Units','normalized','Position',[0.5 -0.25]);
 ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
 % add direction arrows
-arrow_x = 0.67 + [0 0.02] + 0.0231;
-arrow_y = repelem(0.45,2);
+% arrow_x = 0.67 + [0 0.02] + 0.0231;
+% arrow_y = repelem(0.45,2);
+arrow_x = ha.Position(1) + 0.75*ha.Position(3) + [0 0.4];
+arrow_y = ha.Position(2) + 1*ha.Position(4) + [0 0] + 0.3;
+arrow_x = arrow_x / figure_size_cm(1);
+arrow_y = arrow_y / figure_size_cm(2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
 h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
 [h.HeadWidth] = disperse([5 5]);
 [h.HeadLength] = disperse([5 5]);
 
-%% panel M - Total distance 
-axes(panel_M);
+%% panel L - Total distance 
+axes(panel_L);
 cla 
 hold on
-text(-0.44,1.1, 'M', 'Units','normalized','FontWeight','bold');
+text(-0.44,1.1, 'L', 'Units','normalized','FontWeight','bold');
 total_dist_by_dir = 0;
 if total_dist_by_dir
     %% (per direction)
@@ -975,9 +870,9 @@ else
     ha.XTick = [0:5:25];
 end
 ha=gca;
-ha.TickLength = [0.04 0.04];
+ha.TickLength = [0.04 0.035];
 ha.XRuler.TickLabelGapMultiplier = -0.1;
-ha.YRuler.TickLabelGapMultiplier = 0.2;
+ha.YRuler.TickLabelGapMultiplier = 0;
 xlabel('Distance flown (km)','Units','normalized','Position',[0.5 -0.25]);
 ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
@@ -985,7 +880,7 @@ ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 data_opt_str = {
     'data options:'
     sprintf('panel C - option %d: %s               ',panel_C_opt,panel_C_opt_str);
-    sprintf('panel G - option %d: %s               ',panel_G_opt,panel_G_data_options{panel_G_opt});
+%     sprintf('panel G - option %d: %s               ',panel_G_opt,panel_G_data_options{panel_G_opt});
     sprintf('panel I - option %d: %s, dir=%d, x0=%d',panel_I_opt,panel_I_data_options{panel_I_opt,:});
     sprintf('panel J - option %d: %s               ',panel_J_opt,panel_J_data_options{panel_J_opt});
     
