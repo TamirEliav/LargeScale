@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_S7';
+fig_name_str = 'fig_S7';
 fig_caption_str = 'robustness of results with different paramsets';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -116,12 +116,12 @@ for ii_paramset = 1:length(paramsets)
     nFields2plot = nFields(ii_paramset,:,:);
     h = histogram(nFields2plot(:));
     h.FaceColor = 0.5*[1 1 1];
-    nBinEdges = 14;
+    nBinEdges = 12;
     h.BinEdges = linspace(0,35,nBinEdges);
     ha = gca;
     ha.YScale = 'log';
     ha.YLim = [0.7 max(h.Values)*1.05];
-    ha.XLim = [0 33];
+    ha.XLim = [0 35.5];
     ha.XTick = [0:10:30];
     ha.YTick = [1 10 100];
     ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
@@ -132,7 +132,7 @@ for ii_paramset = 1:length(paramsets)
     ylabel('No. of cells')
     switch ii_paramset
         case {length(paramsets)}
-            xlabel('No. of fields per direction', 'Units','normalized','Position',[0.5 -0.18]);
+            xlabel('No. of fields per direction', 'Units','normalized','Position',[0.5 -0.2]);
     end
 end
 
@@ -179,7 +179,7 @@ for ii_paramset = 1:length(paramsets)
     ylabel('Counts','Units','normalized','Position',[-0.18 0.5])
     switch ii_paramset
         case {length(paramsets)}
-            xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.18]);
+            xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.2]);
     end
 end
 
@@ -230,7 +230,7 @@ for ii_paramset = 1:length(paramsets)
     ylabel('No. of cells','Units','normalized','Position',[-0.18 0.5])
     switch ii_paramset
         case {length(paramsets)}
-            xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
+            xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.2]);
     end
 end
 

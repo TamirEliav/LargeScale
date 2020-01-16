@@ -48,10 +48,10 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 % create panels
 panel_A_size = [7 3];
 panel_B_size = [3 3];
-panel_A(1) = axes('position', [ 4   20.3 panel_A_size]);
+panel_A(1) = axes('position', [ 4   21.0 panel_A_size]);
 panel_A(2) = axes('position', [ 4   16   panel_A_size]);
-panel_B(1) = axes('position', [12.5 20.3 panel_B_size]);
-panel_B(2) = axes('position', [12.5 16   panel_B_size]);
+panel_B(1) = axes('position', [13.2 21.0 panel_B_size]);
+panel_B(2) = axes('position', [13.2 16   panel_B_size]);
 
 
 %% load population data
@@ -134,11 +134,11 @@ for ii_dir = 1:2
 %     plot(x+0.5*(rand(size(x))-.5), y, '.', 'Color',c); % uniform jitter
     plot(x+0.1*randn(size(x)), y, '.', 'Color',c); % gaussian jitter
     lm = fitlm(x,y);
-    [r,r_pal] = corr(x',y','type','Pearson');
-    [rho,rho_pal] = corr(x',y','type','Spearman');
-    text(0.75,0.9,{ ['{\rho} = ' sprintf('%.2g',rho)    ];...
-                    ['P = '      sprintf('%.2g',rho_pal)]},...
-                    'Units','normalized', 'HorizontalAlignment','left','FontSize',7);
+    [r,r_pval] = corr(x',y','type','Pearson');
+    [rho,rho_pval] = corr(x',y','type','Spearman');
+    text(0.95,1.07,{    ['Spearman {\rho} = '   sprintf('%.2f',rho) ', P = '      sprintf('%.2f',rho_pval) ];...
+                        ['Pearson r = '         sprintf('%.2f',r)   ', P = '      sprintf('%.2f',r_pval)   ]},...
+                    'Units','normalized', 'HorizontalAlignment','right', 'FontSize',7);
     xlabel('Inter-Landmark distance (m)','Units','normalized','Position',[0.5 -0.13])
     ylabel('Field size (m)','Units','normalized','Position',[-0.09 0.5]);
     xlim([0 25]);
@@ -158,26 +158,28 @@ for ii_dir = 1:2
     x = abs([fields.loc] - [fields.LM_nearest_by_peak]);
     y = [fields.width_prc];
     plot(x,y,'.', 'Color', prm.graphics.colors.flight_directions{ii_dir})
-    [r,r_pal] = corr(x',y','type','Pearson');
-    [rho,rho_pal] = corr(x',y','type','Spearman');
-    text(0.7,0.9,{ ['{\rho} = ' sprintf('%.2g',rho)    ];...
-                    ['P = '      sprintf('%.2g',rho_pal)]},...
-                    'Units','normalized', 'HorizontalAlignment','left','FontSize',7);
+    [r,r_pval] = corr(x',y','type','Pearson');
+    [rho,rho_pval] = corr(x',y','type','Spearman');
+    text(1.15,1.07,{    ['Spearman {\rho} = '   sprintf('%.2f',rho) ', P = '      sprintf('%.2f',rho_pval) ];...
+                        ['Pearson r = '         sprintf('%.2f',r)   ', P = '      sprintf('%.2f',r_pval)   ]},...
+                    'Units','normalized', 'HorizontalAlignment','right', 'FontSize',7);
 
     % set axis properties
     ha = gca;
+    ha.YLim = [0 35];
+    ha.YTick = 0:5:35;
     ha.TickDir='out';
     ha.TickLength = [0.025 0.025];
     ha.XRuler.TickLabelGapMultiplier = -0.2;
-    ha.YRuler.TickLabelGapMultiplier = 0.001;
+    ha.YRuler.TickLabelGapMultiplier = 0.2;
     xlabel({'Distance of fields';'to nearest landmark (m)'}, 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel('Field size (m)', 'Units','normalized','Position',[-0.15 0.5]);
+    ylabel('Field size (m)', 'Units','normalized','Position',[-0.19 0.5]);
     
 end
 axes(panel_A(1));
-text(-0.13,1.1, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.18,1.2, 'A', 'Units','normalized','FontWeight','bold');
 axes(panel_B(1));
-text(-0.2,1.1, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.3,1.2, 'B', 'Units','normalized','FontWeight','bold');
 
 
 %% add direction arrows

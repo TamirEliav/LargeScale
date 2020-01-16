@@ -61,12 +61,12 @@ panel_C    = axes('position', [15.2 21.0  5 5]);
 panel_D    = axes('position', [ 1.15 20.75 3.0 2.4]);
 panel_E    = axes('position', [ 1.1 18 8 2.3]);
 panel_F    = axes('position', [ 0   12.5 9 5]);
-panel_G    = axes('position', [10.0 18 2 2]);
+panel_G    = axes('position', [10.3 18 2 2]);
 panel_H    = axes('position', [9.2 14.25 3 2.5]);
-panel_I    = axes('position', [14.0 18    6 2]);
-panel_J    = axes('position', [13.0 14.5 1.8 2]);
-panel_K    = axes('position', [15.7 14.5 1.8 2]);
-panel_L    = axes('position', [18.4 14.5 1.8 2]);
+panel_I    = axes('position', [14.3 18    6 2]);
+panel_J    = axes('position', [13.0 14.4 1.8 2]);
+panel_K    = axes('position', [15.7 14.4 1.8 2]);
+panel_L    = axes('position', [18.4 14.4 1.8 2]);
 
 %
 prm = PARAMS_GetAll();
@@ -108,8 +108,8 @@ linkaxes(panel_B,'xy')
 
 % add panel letter
 axes(panel_B(1));
-text(-0.05,1.05, 'B', 'Units','normalized','FontWeight','bold');
-text(0.06,0.85, 'Spikes recorded in-flight', 'Units','normalized','FontWeight','bold', 'FontSize',9);
+text(-0.04,1.05, 'B', 'Units','normalized','FontWeight','bold');
+text(0.06,0.85, 'Spikes recorded in-flight', 'Units','normalized', 'FontSize',9);
 
 %% add time/voltage scales
 axes(panel_B(4));
@@ -264,9 +264,9 @@ ha.XTick = floor(ha.XLim/100)*100;
 ha.YTick = floor(ha.YLim/100)*100;
 ha.ZTick = floor(ha.ZLim/100)*100;
 
-h1=text([236 1610],[650 680],  [0 0],    ""+ha.XRuler.TickValues,'FontSize',7);
-h2=text([1560 1810],[140 683], [-20 15], ""+ha.YRuler.TickValues,'FontSize',7);
-h3=text([1645 1740],[140 120], [70 960], ""+ha.ZRuler.TickValues,'FontSize',7);
+h1=text([236 1610],[650 680],  [-15 0],    ""+ha.XRuler.TickValues,'FontSize',7);
+h2=text([1575 1810],[140 683], [-20 20], ""+ha.YRuler.TickValues,'FontSize',7);
+h3=text([1660 1740],[140 120], [70 960], ""+ha.ZRuler.TickValues,'FontSize',7);
 ha.XRuler.TickLabels = {};
 ha.YRuler.TickLabels = {};
 ha.ZRuler.TickLabels = {};
@@ -299,7 +299,7 @@ hx.Rotation = 2;
 hy.Rotation = -24;
 hz.Rotation = 90;
 
-text(-0.215,0.95, 'C', 'Units','normalized','FontWeight','bold');
+text(-0.2,0.95, 'C', 'Units','normalized','FontWeight','bold');
 
 %% show images
 % logger_image_filename = 'D:\Tamir\PROJECTS\Neurologger\miniBat\pics\minibat_good_pic.jpg';
@@ -325,7 +325,7 @@ xa = xlimits(1) + [0 scale_pixels];
 ya = ylimits(1) + [0 0];
 [xaf,yaf] = ds2nfu(xa,ya);
 xaf = xaf + 0.04;
-yaf = yaf - 0.004;
+yaf = yaf - 0.002;
 annotation('line', xaf,yaf, 'Linewidth',scale_line_width);
 h=annotation('textbox', [mean(xaf)-0.0005 mean(yaf)-0.008 0 0], 'String', sprintf('%dmm',scale_mm),...
     'VerticalAlignment','middle','HorizontalAlignment','center','FontSize',8);
@@ -575,14 +575,14 @@ pause(eps)
 % add north arrow
 h=annotation('arrow',[0 0],[0 0]);
 h.Units = 'centimeters';
-center = [7.8 15.8];
+center = [7.7 15.8];
 l = 1;
 width  = l*cos(deg2rad(90-(TAZA_rotation+north_rotation)));
 height = l*sin(deg2rad(90-(TAZA_rotation+north_rotation)));
 h.Position = [center width height];
 h.HeadLength = 8;
 h.HeadWidth = 8;
-h=text(1525,2570,'North','FontSize',9,'HorizontalAlignment','center');
+h=text(1522,2570,'North','FontSize',9,'HorizontalAlignment','center');
 h.Rotation = -(TAZA_rotation+north_rotation);
 
 % add scale bar
@@ -692,7 +692,7 @@ ystd_median_all = arrayfun(@(x)(x.ystd_median), pos_y_dev_all);
 
 %% calculate fraction of missing position data 
 if 0
-% missing_data_frac = cellfun(@(x)(exp_calc_position_holes_stats(x)), exp_list);
+missing_data_frac = cellfun(@(x)(exp_calc_position_holes_stats(x)), exp_list);
 fprintf('Raw data percentage: mean=%.4f, std=%.4f\n',...
     100*mean([missing_data_frac.rawdata_fraction]),...
     100*std([missing_data_frac.rawdata_fraction]));
@@ -705,7 +705,7 @@ end
 axes(panel_I); 
 cla
 hold on
-text(-0.13,1.1, 'I', 'Units','normalized','FontWeight','bold');
+text(-0.15,1.1, 'I', 'Units','normalized','FontWeight','bold');
 % panel_J_opt = 4;
 panel_J_data_options = {
     'b0034_d180313';
@@ -744,7 +744,7 @@ ylabel('Flight speed (m/s)','Units','normalized','Position',[-0.07 0.41]);
 axes(panel_J);
 cla
 hold on
-text(-0.4,1.1, 'J', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.15, 'J', 'Units','normalized','FontWeight','bold');
 dir_colors = prm.graphics.colors.flight_directions;
 for ii_dir = 1:2
     cv = [speed_traj_all(:,ii_dir).speed_cv];
@@ -786,7 +786,7 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors
 axes(panel_K);
 cla
 hold on
-text(-0.4,1.1, 'K', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.15, 'K', 'Units','normalized','FontWeight','bold');
 dir_colors = prm.graphics.colors.flight_directions;
 directions = [-1 1];
 for ii_dir = 1:2
@@ -829,7 +829,7 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors
 axes(panel_L);
 cla 
 hold on
-text(-0.44,1.1, 'L', 'Units','normalized','FontWeight','bold');
+text(-0.44,1.15, 'L', 'Units','normalized','FontWeight','bold');
 total_dist_by_dir = 0;
 if total_dist_by_dir
     %% (per direction)
@@ -873,7 +873,7 @@ ha=gca;
 ha.TickLength = [0.04 0.035];
 ha.XRuler.TickLabelGapMultiplier = -0.1;
 ha.YRuler.TickLabelGapMultiplier = 0;
-xlabel('Distance flown (km)','Units','normalized','Position',[0.5 -0.25]);
+xlabel('Distance flown (km)','Units','normalized','Position',[0.42 -0.25]);
 ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
 %%

@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_S3';
+fig_name_str = 'fig_S3';
 fig_caption_str = '1-Dim behavior';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -99,7 +99,7 @@ ystd_median_all = arrayfun(@(x)(x.ystd_median), pos_y_dev_all);
 axes(panel_A);
 cla
 hold on
-text(-0.115,1.15, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.14,1.15, 'A', 'Units','normalized','FontWeight','bold');
 exp_ID = 'b0034_d180413';
 exp = exp_load_data(exp_ID,'flight');
 for ii_dir = 1:2
@@ -117,7 +117,7 @@ for ii_dir = 1:2
 
     plot(x, y, '.', 'Color',c, 'MarkerSize',.0001);
 end
-xlabel('Position (m)','Units','normalized','Position',[0.5 -0.15]);
+xlabel('Position (m)','Units','normalized','Position',[0.5 -0.2]);
 ylabel('Y (m)','Units','normalized','Position',[-0.055 0.5]);
 ha = gca;
 ha.XLim = [0 200];
@@ -141,7 +141,7 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors
 %% panel B - behavioral trajectory is 1D (small y deviations) - Population
 axes(panel_B);
 cla
-text(-0.34,1.15, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.15, 'B', 'Units','normalized','FontWeight','bold');
 hold on
 % arrange data
 data = {};

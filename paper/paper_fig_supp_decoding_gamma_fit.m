@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_S5';
+fig_name_str = 'fig_S5';
 fig_caption_str = 'Theoretical analysis - fields size distribution gamma/log-normal fit';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -86,7 +86,7 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.2;
-xlabel('Field size (m)')
+xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.16])
 ylabel('Probability density function','Units','normalized','Position',[-0.18 0.5])
 ha.XScale = 'linear';
 ha.YScale = 'linear';
@@ -94,11 +94,11 @@ ha.YScale = 'linear';
 plot([12 16],[0.20 0.20], 'r', 'LineWidth', 2)
 plot([12 16],[0.12 0.12], 'g', 'LineWidth', 2)
 text(0.5,1.0, 'Log-Normal distribution',              'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
-text(0.55,0.9, ['\mu= ' num2str(logn_phat(1),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
-text(0.55,0.8, ['\sigma= '   num2str(logn_phat(2),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+text(0.55,0.9, ['\mu = ' num2str(logn_phat(1),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+text(0.55,0.8, ['\sigma = '   num2str(logn_phat(2),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
 text(0.5,0.6, 'Gamma distribution',                   'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
 text(0.55,0.5, ['\alpha = ' num2str(gamma_phat(1),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
-text(0.55,0.4, ['\beta= '   num2str(gamma_phat(2),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+text(0.55,0.4, ['\beta = '   num2str(gamma_phat(2),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
 
 
 %% panel A - field size distribution gamma fit (log scale)
@@ -127,7 +127,7 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.2;
-xlabel('Field size (m)')
+xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.16])
 ylabel('Probability density function','Units','normalized','Position',[-0.18 0.5])
 ha.XScale = 'log';
 ha.YScale = 'linear';

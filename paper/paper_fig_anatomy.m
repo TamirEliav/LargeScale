@@ -47,7 +47,7 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 
 % create panels
 panel_CDE_size = [4.5 3];
-panel_A(1) = axes('position', [ 0.6 13 8 16]);
+panel_A(1) = axes('position', [ 0.6 12.5 8 16]);
 panel_B(1) = axes('position', [ 8.6 19 4 5]);
 panel_B(2) = axes('position', [13.6 21 6 5]);
 panel_B(3) = axes('position', [13.6 16.5 6 5]);
@@ -89,7 +89,7 @@ TT_z_new = ALL_fitted_points(ind,3)+0.050;%so the points will be above the surfa
 axes(panel_A);
 cla
 hold on
-text(0.15,0.91, 'A', 'Units','normalized','FontWeight','bold');
+text(0.15,0.955, 'A', 'Units','normalized','FontWeight','bold');
 
 long_axis = linspace(100,0,size(X,1))';
 s = surf(X,Y,Z, repmat(long_axis,1,size(X,2)));
@@ -122,9 +122,9 @@ APMLDV_pos_offset = scale_bar_length.*1.3;
 line(scale_bar_center(1)+scale_bar_length,scale_bar_center(2)+[0 0],scale_bar_center(3)+[0 0],'Color','k','LineWidth',1.5);
 line(scale_bar_center(1)+[0 0],scale_bar_center(2)+scale_bar_length,scale_bar_center(3)+[0 0],'Color','k','LineWidth',1.5);
 line(scale_bar_center(1)+[0 0],scale_bar_center(2)+[0 0],scale_bar_center(3)+scale_bar_length,'Color','k','LineWidth',1.5);
-text(scale_bar_center(1)+APMLDV_pos_offset,scale_bar_center(2)+[0 0],scale_bar_center(3)+[0 0], {'A';'P'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
+text(scale_bar_center(1)+APMLDV_pos_offset+[0 0.2],scale_bar_center(2)+[0 0],scale_bar_center(3)+[0 0], {'A';'P'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
 text(scale_bar_center(1)+[0 0],scale_bar_center(2)+APMLDV_pos_offset,scale_bar_center(3)+[0 0], {'M';'L'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
-text(scale_bar_center(1)+[0 0],scale_bar_center(2)+[0 0],scale_bar_center(3)+APMLDV_pos_offset, {'V';'D'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
+text(scale_bar_center(1)+[0 0],scale_bar_center(2)+[0 0],scale_bar_center(3)+APMLDV_pos_offset+[0.07 0], {'V';'D'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
 
 text(1,1.5,-5,    {'Septal';'pole'}, 'FontSize',8,'HorizontalAlignment','left');
 text(1,2.3,-10.3, {'Temporal';'pole'}, 'FontSize',8,'HorizontalAlignment','left');

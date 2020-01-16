@@ -70,19 +70,18 @@ end
 panel_A = panel_A(:,3:-1:1,:);
 panel_A = reshape(panel_A,[9 3]);
 
-panel_BCDE_size = [2 2];
-panel_B    = axes('position', [ 2.0  8.5  panel_BCDE_size           ]);
-panel_C    = axes('position', [ 5.3  8.5  panel_BCDE_size           ]);
-panel_D(1) = axes('position', [ 8.6  8.5  panel_BCDE_size.*[1 0.9]  ]);
-panel_D(2) = axes('position', [ 8.6  8.5  panel_BCDE_size.*[1 0.9]  ]);
-panel_E =    axes('position', [12.2  8.5  panel_BCDE_size.*[1.3 1]  ]);
-panel_F = axes('position', [16.0  8.5  panel_BCDE_size           ]);
+panels_size = [2 2];
+panel_B    = axes('position', [ 2.0  8.5  panels_size           ]);
+panel_C    = axes('position', [ 5.3  8.5  panels_size           ]);
+panel_D(1) = axes('position', [ 8.6  8.5  panels_size.*[1 0.9]  ]);
+panel_D(2) = axes('position', [ 8.6  8.5  panels_size.*[1 0.9]  ]);
+panel_E =    axes('position', [12.2  8.5  panels_size.*[1.3 1]  ]);
+panel_F = axes('position', [16.0  8.5  panels_size           ]);
 
-panel_GHIJ_size = [2 2];
-panel_G = axes('position', [ 2.0  5 panel_GHIJ_size]          );
-panel_H = axes('position', [ 5.3  5 panel_GHIJ_size.*[1.4 1] ]);
-panel_I = axes('position', [ 9.1  5 panel_GHIJ_size]          );
-panel_J = axes('position', [12.3  5 panel_GHIJ_size.*[1.2 1] ]);
+panel_G = axes('position', [ 2.0  5 panels_size]          );
+panel_H = axes('position', [ 5.3  5 panels_size.*[1.4 1] ]);
+panel_I = axes('position', [ 9.1  5 panels_size]          );
+panel_J = axes('position', [12.3  5 panels_size.*[1.2 1] ]);
 panel_K = axes('position', [16.0  4.4 3 3]);
 
 %%
@@ -369,12 +368,12 @@ clear cells stats cells_details cells_t
 cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map','FE')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
 
-%% panel G - field count histogram
+%% panel F - field count histogram
 % figure
-axes(panel_G);
+axes(panel_F);
 cla
 hold on
-text(-0.45,1.15, 'G', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'F', 'Units','normalized','FontWeight','bold');
 nFields = nan(2,length(cells));
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -392,15 +391,15 @@ for ii_dir = 1:2
 end
 h = histogram(nFields(:));
 h.FaceColor = 0.5*[1 1 1];
-nBinEdges = 19; % 9 or 19 are good options
+nBinEdges = 12;
 h.BinEdges = linspace(0,35,nBinEdges);
-xlabel({'No. of fields';'per direction'},'Units','normalized','Position',[0.5 -0.18]);
+xlabel({'No. of fields per direction'},'Units','normalized','Position',[0.5 -0.18]);
 ylabel('No. of cells')
 ha = gca;
 ha.YScale = 'log';
 % ha.YLim = [0.7 130];
 ha.YLim = [0.7 max(h.Values)*1.05];
-ha.XLim = [0 33];
+ha.XLim = [0 35.5];
 ha.XTick = [0:10:30];
 ha.YTick = [1 10 100];
 ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
@@ -704,7 +703,7 @@ histogram(data,    'Normalization','pdf','BinEdges',edges,'FaceColor', 0.5*[1 1 
 histogram(shuffle, 'Normalization','pdf','BinEdges',edges,'DisplayStyle','stairs','EdgeColor','k','LineWidth',1.5);
 [~,P_KS] = kstest2(data, shuffle);
 P_RankSum = ranksum(data, shuffle);
-text(1,0.9, sprintf('P_{KS}=%.02f',P_KS),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
+text(1,0.9, sprintf('P_{KS} = %.02f',P_KS),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
 % text(1,0.9, sprintf('P=%.02f',P_RankSum),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
 
 ha= gca;
@@ -720,11 +719,11 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel('Map correlation', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('Probability', 'Units','normalized','Position',[-0.17 0.5])
 
-%% Panel F - percentage of out-of-field spikes
-axes(panel_F);
+%% Panel G - percentage of out-of-field spikes
+axes(panel_G);
 cla
 hold on
-text(-0.4,1.15, 'F', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'G', 'Units','normalized','FontWeight','bold');
 
 in_field_spikes_prc = nan(length(cells),2);
 for ii_cell = 1:length(cells)
@@ -835,7 +834,7 @@ switch corr_type
         text(0.1,1, {sprintf('r = %.2f',r);sprintf('P = %.2f',r_pval)}, ...
             'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
     case 'spearman'
-        text(0.54,1.05, {['{\rho}' sprintf(' = %.3f',rho)];sprintf('P = %.3f',rho_pval)}, ...
+        text(0.52,1.06, {['{\rho}' sprintf(' = %.3f',rho)];sprintf('P = %.3f',rho_pval)}, ...
             'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
 end
 xlabel('Speed ratio', 'Units','normalized', 'Position',[0.5 -0.12]);

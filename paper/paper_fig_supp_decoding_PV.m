@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_S10';
+fig_name_str = 'fig_S10';
 fig_caption_str = 'Theoretical analysis with PV decoder';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -142,7 +142,7 @@ plot(L/100,NerrPVG(:,jerr),'Color',clr(7,:),'LineWidth',2) ; hold on ;
 xlim([20 1000]) ;
 ylim([10 250]) ;
 xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-ylabel(['min N required for error < ' num2str(errs(jerr)) 'm'], 'Units','normalized','Position',[ -0.15 0.5]);
+ylabel(['Minimal N required for error < ' num2str(errs(jerr)) 'm'], 'Units','normalized','Position',[ -0.15 0.45]);
 h = gca;
 h.XRuler.TickLabelGapOffset = -1;
 h.XRuler.TickLength = [0.02 0.02];
@@ -221,7 +221,7 @@ for ii_scheme = 1:4
     else
         signif_str = 'n.s.';
         signif_str_font_size = 6;
-        signif_str_offset = 0.05;
+        signif_str_offset = 0.035;
     end
     text(mean(X),m+0.02+signif_str_offset, signif_str, 'HorizontalAlignment','center','FontSize',signif_str_font_size);
 end
@@ -295,7 +295,7 @@ for ii_N = 1:length(jN_options)
 %     ylim([0.1 2000]) ;
     xlim([20 1000]) ;
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel([num2str(prc(jprc)) '% decoding error (m)'], 'Units','normalized','Position',[ -0.12 0.5]);
+    ylabel([num2str(prc(jprc)) '% decoding error (m)'], 'Units','normalized','Position',[ -0.125 0.5]);
     h = gca;
     h.XScale = 'log';
 %     h.YScale = 'log';
@@ -307,7 +307,7 @@ for ii_N = 1:length(jN_options)
 %     text(0.95,1, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
     if ii_N == 1
         text(-0.19,1.1, 'D', 'Units','normalized','FontWeight','bold');
-        text(0.5,1.1, 'Catastrophic errors (size)', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
+        text(0.5,1.1, 'Catastrophic errors: size', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
     
     % zoom-in inset
@@ -363,8 +363,8 @@ for ii_N = 1:length(jN_options)
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
     if ii_N == 1
-        text(-0.19,1.1, 'E', 'Units','normalized','FontWeight','bold');
-        text(0.5,1.1, 'Catastrophic errors (probability)', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
+        text(-0.20,1.1, 'E', 'Units','normalized','FontWeight','bold');
+        text(0.5,1.1, 'Catastrophic errors: probability', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
 end
 

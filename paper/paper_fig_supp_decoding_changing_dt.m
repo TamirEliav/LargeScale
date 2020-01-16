@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_S11';
+fig_name_str = 'fig_S11';
 fig_caption_str = 'Theoretical analysis - error vs. integration time (dt)';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -125,7 +125,7 @@ for ii_scnr = 1:5
 end
 axes(panel_A(1));
 text(-0.4,1.1, 'A', 'Units','normalized','FontWeight','bold');
-text(3,1.5, 'Integration time window of 200 ms instead of 500 ms', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
+text(3,1.5, 'Integration time window of {\Delta} = 200 ms instead of 500 ms', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
 ylabel('Example neuron no.','Units','normalized','Position',[-0.2 0.5]);
 
 %% panel B - minimum N required for error < 1 m
@@ -144,7 +144,7 @@ plot(L/100,NerrMLG(:,jerr),'Color',clr(7,:),'LineWidth',2) ; hold on ;
 xlim([20 1000]) ;
 ylim([10 250]) ;
 xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-ylabel(['min N required for error < ' num2str(errs(jerr)) 'm'], 'Units','normalized','Position',[ -0.15 0.5]);
+ylabel(['Minimal N required for error < ' num2str(errs(jerr)) 'm'], 'Units','normalized','Position',[ -0.15 0.45]);
 h = gca;
 h.XRuler.TickLabelGapOffset = -1;
 h.XRuler.TickLength = [0.02 0.02];
@@ -297,7 +297,7 @@ for ii_N = 1:length(jN_options)
 %     ylim([0.1 2000]) ;
     xlim([20 1000]) ;
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel([num2str(prc(jprc)) '% decoding error (m)'], 'Units','normalized','Position',[ -0.12 0.5]);
+    ylabel([num2str(prc(jprc)) '% decoding error (m)'], 'Units','normalized','Position',[ -0.125 0.5]);
     h = gca;
     h.XScale = 'log';
 %     h.YScale = 'log';
@@ -309,7 +309,7 @@ for ii_N = 1:length(jN_options)
 %     text(0.95,1, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
     if ii_N == 1
         text(-0.19,1.1, 'D', 'Units','normalized','FontWeight','bold');
-        text(0.5,1.1, 'Catastrophic errors (size)', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
+        text(0.5,1.1, 'Catastrophic errors: size', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
     
     % zoom-in inset
@@ -366,8 +366,8 @@ for ii_N = 1:length(jN_options)
     h.XRuler.TickLength = [0.03 0.03];
     h.YLim(1) = 1e-4;
     if ii_N == 1
-        text(-0.19,1.1, 'E', 'Units','normalized','FontWeight','bold');
-        text(0.5,1.1, 'Catastrophic errors (probability)', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
+        text(-0.20,1.1, 'E', 'Units','normalized','FontWeight','bold');
+        text(0.5,1.1, 'Catastrophic errors: probability', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
 end
 
@@ -375,8 +375,8 @@ end
 axes(panel_F);
 cla
 hold on
-text(-0.2,1.15, 'F', 'Units','normalized','FontWeight','bold');
-text(0.5,1.15, 'Various integration time windows', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
+text(-0.3,1.15, 'F', 'Units','normalized','FontWeight','bold');
+text(0.5,1.15, 'Varying the integration time window {\Delta}t', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
 
 % load data
 switch coverage
@@ -406,7 +406,7 @@ ha.TickDir='out';
 ha.TickLength = [0.02 0.02];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
-xlabel('Integration window (ms)')
+xlabel('Integration time window (ms)')
 ylabel('Mean decoding error (m)','Units','normalized','Position',[-0.12 0.5]);
 ha.XScale = 'linear';
 ha.YScale = 'log';
