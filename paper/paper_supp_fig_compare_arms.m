@@ -51,12 +51,10 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 
 % create panels
 panels_size = [4 4];
-panel_A(1) = axes('position', [ 2   20 panels_size]);
-panel_A(2) = axes('position', [ 8   20 panels_size]);
-panel_B(1) = axes('position', [ 2   14 panels_size]);
-panel_B(2) = axes('position', [ 5.3 17 0.35 0.2]);
-panel_A_legend(1) = axes('position', [ 4.5 22.5 0.5 0.3]);
-panel_A_legend(2) = axes('position', [10.5 22.5 0.5 0.3]);
+panel_A = axes('position', [ 4 18 panels_size]);
+panel_B = axes('position', [10 18 panels_size]);
+panel_A_legend = axes('position', [ 6.5 20.5 0.5 0.3]);
+panel_B_legend = axes('position', [12.5 20.5 0.5 0.3]);
 
 %% load population data
 % =========================================================================
@@ -111,74 +109,60 @@ nFields = cellfun(@length, fields_size);
 nFields(nFields==0) = nan;
 
 % plot
-% figure
-for ii_dir = 1:2
-    axes(panel_A(ii_dir));
-%     subplot(1,2,ii_dir)
-    cla
-    hold on
-    
-    x1 = [fields_size{:,ii_dir,1}];
-    x2 = [fields_size{:,ii_dir,2}];
-    
-    c = prm.graphics.colors.flight_directions{ii_dir};
-    nBins = 15;
-    h1 = histogram( x1 );
-    h1.NumBins = nBins;
-    h1.Normalization = 'pdf';
-    h1.DisplayStyle = 'stairs';
-    h1.EdgeColor = c;
-    h1.LineWidth = 2; % long arm
-    h2 = histogram( x2 );
-    h2.NumBins = nBins;
-    h2.Normalization = 'pdf';
-    h2.DisplayStyle = 'stairs';
-    h2.EdgeColor = c;
-    h2.LineWidth = 1; % short arm
-    [H,P_KS,KSSTAT] = kstest2(x1,x2);
-    text(1,1,sprintf('P_{KS} = %.2f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
-    P_ranksum = ranksum(x1,x2);
+axes(panel_A);
+cla
+hold on
+x1 = [fields_size{:,:,1}];
+x2 = [fields_size{:,:,2}];
+x1(isnan(x1))=[];
+x2(isnan(x2))=[];
+c = [0 0 0];
+nBins = 15;
+h1 = histogram( x1 );
+h1.NumBins = nBins;
+h1.Normalization = 'pdf';
+h1.DisplayStyle = 'stairs';
+h1.EdgeColor = c;
+h1.LineWidth = 2; % long arm
+h2 = histogram( x2 );
+h2.NumBins = nBins;
+h2.Normalization = 'pdf';
+h2.DisplayStyle = 'stairs';
+h2.EdgeColor = c;
+h2.LineWidth = 1; % short arm
+[H,P_KS,KSSTAT] = kstest2(x1,x2,'Tail','unequal');
+text(1,1,sprintf('P_{KS} = %.3f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+P_ranksum = ranksum(x1,x2);
 %     text(1,0.9,sprintf('P_{Wilc}=%.2f',P_ranksum),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
-    ha=gca;
-    ha.YLim(1) = 6e-4;
-    ha.YScale = yscale_opt;
-    ha.XRuler.TickLabelGapOffset = -1;
-    ha.TickLength = [0.03 0.03];
-%     title("dir "+ii_dir);
-    xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.12]);
-    ylabel('Probability', 'Units','normalized','Position',[-0.20 0.5]);
-end
-axes(panel_A(1));
-text(-0.3,1.15, 'A', 'Units','normalized','FontWeight','bold');
-
-%% add direction arrows
-arrow_vec = 0.025*[-1 1];
-arrow_y = 0.915*[1 1];
-clear h
-h(1)=annotation('arrow',      arrow_vec +0.18, arrow_y, 'Color', prm.graphics.colors.flight_directions{1});
-h(2)=annotation('arrow', flip(arrow_vec)+0.46, arrow_y, 'Color', prm.graphics.colors.flight_directions{2});
-[h.HeadWidth] = disperse([5 5]);
-[h.HeadLength] = disperse([5 5]);
+ha=gca;
+ha.YLim = [0.6e-3 0.2];
+ha.YScale = yscale_opt;
+ha.XRuler.TickLabelGapOffset = -1;
+ha.TickLength = [0.03 0.03];
+ha.YTick = 10.^[-3 -2 -1];
+ha.YTickLabel = {'10^{ -3}'; '10^{ -2}'; '10^{ -1}';};
+xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.14]);
+ylabel('Probability', 'Units','normalized','Position',[-0.20 0.5]);
+axes(panel_A);
+text(-0.3,1.1, 'A', 'Units','normalized','FontWeight','bold');
 
 %% legend for long/short arms
-for ii_dir = 1:2
-    axes(panel_A_legend(ii_dir));
-    cla
-    hold on
-    plot([1 2], [2 2], 'Color', prm.graphics.colors.flight_directions{ii_dir}, 'LineWidth', 2); % long arm
-    plot([1 2], [1 1], 'Color', prm.graphics.colors.flight_directions{ii_dir}, 'LineWidth', 1); % shorty arm
-    xlim([0.5 2.5])
-    text(2.5, 1, 'Short arm', 'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
-    text(2.5, 2, 'Long arm',  'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
-    set(gca,'visible','off');
-end
-
-
+axes(panel_A_legend);
+cla
+hold on
+plot([1 2], [2 2], 'Color', 'k', 'LineWidth', 2, 'Clipping', 'off'); % long arm
+plot([1 2], [1 1], 'Color', 'k', 'LineWidth', 1, 'Clipping', 'off'); % shorty arm
+xlim([0.5 2.5])
+ylim([0 1])
+text(2.5, 1, 'Short arm', 'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
+text(2.5, 2, 'Long arm',  'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
+set(gca,'visible','off');
 
 
 %% field size ratio - from fields only in the long arm
 % ------------------------------------------------------------------------
-LS_field_ratio_all = nan(1,length(cells));
+LS_field_ratio_all_long  = nan(1,length(cells));
+LS_field_ratio_all_short = nan(1,length(cells));
 LS_field_ratio_dir = nan(2,length(cells));
 pos_thr = turn_point_LM.pos_proj;
 for ii_cell = 1:length(cells)
@@ -199,10 +183,15 @@ for ii_cell = 1:length(cells)
             end
         end
         fields([fields.in_low_speed_area])=[];
-        long_arm_fields = [fields.loc] < pos_thr;
-        fields = fields(long_arm_fields);
-        if length(fields) >= 2
-            LS_field_ratio_all(ii_cell) = max([fields.width_prc]) / min([fields.width_prc]);
+        IX1 = [fields.loc] <  pos_thr;
+        IX2 = [fields.loc] >= pos_thr;
+        long_arm_fields = fields(IX1);
+        short_arm_fields = fields(IX2);
+        if length(long_arm_fields) >= 2
+            LS_field_ratio_all_long(ii_cell) = max([long_arm_fields.width_prc]) / min([long_arm_fields.width_prc]);
+        end
+        if length(short_arm_fields) >= 2
+            LS_field_ratio_all_short(ii_cell) = max([short_arm_fields.width_prc]) / min([short_arm_fields.width_prc]);
         end
     end
     
@@ -221,43 +210,62 @@ for ii_cell = 1:length(cells)
 end
 
 %% now plot
-axes(panel_B(1));
+axes(panel_B);
 cla
 hold on
 text(-0.3,1.1, 'B', 'Units','normalized','FontWeight','bold');
 
+x1=LS_field_ratio_all_long;
+x2=LS_field_ratio_all_short;
+x1(isnan(x1))=[];
+x2(isnan(x2))=[];
+
 nBinEdges = 9;
 edges = logspace(0,log10(25),nBinEdges);
-h=histogram(LS_field_ratio_all(:));
-h.BinEdges = edges;
-h.FaceColor = 0.5*[1 1 1];
+c = [0 0 0];
+h1=histogram(x1);
+h1.BinEdges = edges;
+h1.Normalization = 'pdf';
+h1.DisplayStyle = 'stairs';
+h1.EdgeColor = c;
+h1.LineWidth = 2; % long arm
+h2=histogram(x2);
+h2.BinEdges = edges;
+h2.Normalization = 'pdf';
+h2.DisplayStyle = 'stairs';
+h2.EdgeColor = c;
+h2.LineWidth = 1; % short arm
+
+[H,P_KS,KSSTAT] = kstest2(x1, x2, 'Tail','unequal');
+text(1,1,sprintf('P_{KS} = %.3f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+
 ha=gca;
 ha.YScale = yscale_opt;
+% ha.YScale = 'linear';
 ha.XScale = 'log';
 ha.XLim = [0 27];
-ha.YLim = [7e-1 1.2*max(h.Values)];
-% ha.YLim = [7e-1 100];
-ha.YTick = [1 10 100];
 ha.XTick = [1 2 5 10 20];
-ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
+ha.YLim = [3e-4 1.2];
+ha.YTick = 10.^[-3 -2 -1];
+ha.YTickLabel = {'10^{ -3}'; '10^{ -2}'; '10^{ -1}';};
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
-xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
-ylabel('No. of cells','Units','normalized','Position',[-0.20 0.5])
+xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.12]);
+ylabel('Probability','Units','normalized','Position',[-0.18 0.5]);
 
 % add legend
-axes(panel_B(2));
+axes(panel_B_legend);
 cla
 hold on
-area([0 1],[1 1], 'FaceColor',0.5*[1 1 1],'Clipping','off');
-text(1.2, 0.5, 'Long arm', 'VerticalAlignment','middle', 'HorizontalAlignment','left','FontSize',7);
-xlim([0 1])
+plot([1 2], [2 2], 'Color', 'k', 'LineWidth', 2,'Clipping','off'); % long arm
+plot([1 2], [1 1], 'Color', 'k', 'LineWidth', 1,'Clipping','off'); % shorty arm
+xlim([0.5 2.5])
 ylim([0 1])
-box off
-set(gca,'Visible','off')
-
+text(2.5, 1, 'Short arm', 'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
+text(2.5, 2, 'Long arm',  'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
+set(gca,'visible','off');
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, sprintf('%s_yscale_%s',fig_name_str,yscale_opt));
