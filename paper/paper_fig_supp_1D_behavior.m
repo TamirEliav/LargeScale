@@ -4,6 +4,9 @@
 clear 
 clc
 
+%% data options
+panel_A_opt = [4 6 7];
+
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
@@ -13,6 +16,9 @@ log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
 log_name_str = strrep(log_name_str , ' ', '_');
 log_name_out = fullfile(res_dir, log_name_str);
+
+%%
+fig_name_str = sprintf('%s_opt_%d_%d_%d', fig_name_str , panel_A_opt)
 
 %% open log file
 diary off
@@ -46,8 +52,12 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
 % create panels
-panel_A = axes('position', [ 3 20 6 2]);
-panel_B = axes('position', [10.5 20 2 2]);
+panel_A(1) = axes('position', [ 2 9 5 15]);
+panel_A(2) = axes('position', [ 8 9 5 15]);
+panel_A(3) = axes('position', [14 9 5 15]);
+panel_B    = axes('position', [ 4 5  6  2]);
+panel_C    = axes('position', [12 5  2  2]);
+
 
 %% load population data
 % load params
@@ -95,11 +105,67 @@ pos_y_dev_all = cat(1,exps_flight.pos_y_std);
 speed_traj_all = cat(1,exps_flight.speed_traj);
 ystd_median_all = arrayfun(@(x)(x.ystd_median), pos_y_dev_all);
 
-%% panel A - behavioral trajectory is 1D (small y deviations) - example
-axes(panel_A);
+%% panel A - Behavioral trajectories (time vs pos) - examples
+exp_ID_options = {
+    'b0034_d180310';
+    'b0034_d180312';
+    'b0034_d180313';
+    'b0079_d160915';
+    'b0079_d160921';
+    'b0079_d160928';
+    'b0079_d161004';
+    'b0079_d161005';
+    'b0148_d170613';
+    'b0148_d170802';
+    'b0148_d170807';
+    'b9861_d180524';
+    'b9861_d180525';
+    'b9861_d180527';
+    'b9861_d180529';
+    'b9861_d180603';
+    'b9861_d180615';
+};
+for ii_exp = 1:length(panel_A_opt)
+    % get exp data
+    exp_ID = exp_ID_options{panel_A_opt(ii_exp)};
+    exp = exp_load_data(exp_ID,'flight','pos');
+
+    x = exp.pos.proc_1D.pos;
+    y = exp.pos.proc_1D.ts;
+    session_ts = exp_get_sessions_ti(exp_ID, 'Behave');
+    t0 = session_ts(1);
+    
+    % plot!
+    axes(panel_A(ii_exp));
+    cla('reset')
+    hold on
+    plot(x,y,'.k','MarkerSize',4)
+    
+    % labels
+    xlabel('Position (m)','Units','normalized','Position',[0.5 -0.04]);
+    ylabel('Time (min)','Units','normalized','Position',[-0.1 0.5]);
+    ha = gca;
+    ha.XLim = [0 200];
+    ha.YLim = session_ts;
+%     ha.YLim = [-1.5 1.5];
+    ha.XTick = [0:50:200];
+%     ha.YTick = [-2:1:2];
+    ha.TickDir='out';
+    ha.TickLength = [0.01 0.01];
+    ha.XRuler.TickLabelGapMultiplier = -0.3;
+    ha.YRuler.TickLabelGapMultiplier = 0.001;
+    
+    rescale_plot_data('y',[1e-6/60,t0]);
+    
+end
+axes(panel_A(1));
+text(-0.08,1.03, 'A', 'Units','normalized','FontWeight','bold');
+
+%% panel B - behavioral trajectory is 1D (small y deviations) - example
+axes(panel_B);
 cla
 hold on
-text(-0.14,1.15, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.14,1.15, 'B', 'Units','normalized','FontWeight','bold');
 exp_ID = 'b0034_d180413';
 exp = exp_load_data(exp_ID,'flight');
 for ii_dir = 1:2
@@ -130,18 +196,18 @@ ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 
 % add direction arrows
-arrow_x = [0 0.05] + 0.35;
-arrow_y = repelem(0.82,2);
+arrow_x = [0 0.05] + 0.38;
+arrow_y = repelem(0.25,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
 h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
 [h.HeadWidth] = disperse([5 5]);
 [h.HeadLength] = disperse([5 5]);
 
-%% panel B - behavioral trajectory is 1D (small y deviations) - Population
-axes(panel_B);
+%% panel C - behavioral trajectory is 1D (small y deviations) - Population
+axes(panel_C);
 cla
-text(-0.4,1.15, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.15, 'C', 'Units','normalized','FontWeight','bold');
 hold on
 % arrange data
 data = {};
@@ -232,8 +298,8 @@ switch yvar_pop_plot
 end
 
 % add direction arrows
-arrow_x = [0 0.03] + 0.542;
-arrow_y = repelem(0.82,2);
+arrow_x = [0 0.03] + 0.61;
+arrow_y = repelem(0.25,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
 h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
