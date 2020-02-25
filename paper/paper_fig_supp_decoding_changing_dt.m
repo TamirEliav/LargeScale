@@ -60,7 +60,8 @@ panel_C(1,2) = axes('position', [ 2.5   10.7  2.8 2]);
 panel_D(1,1) = axes('position', [ 8.1  8.7  panel_BCDE_size]);
 panel_D(1,2) = axes('position', [ 8.7 10.7  2.5 2]);
 panel_E(1)   = axes('position', [14.4    8.7  panel_BCDE_size]);
-panel_F      = axes('position', [ 7.4 2.0 6 4]);
+panel_F      = axes('position', [ 4   2 6 4]);
+panel_G      = axes('position', [12.5 2 6 4]);
 panel_legend = axes('position', [9.8 16.6 0.4 2]);
 
 %% arrange data
@@ -86,9 +87,9 @@ plot([0 1], 2*[1 1], 'Color',clr(6,:),'LineWidth',2) ; hold on ;
 plot([0 1], 1*[1 1], 'Color',clr(7,:),'LineWidth',2) ; hold on ; 
 text(1.2,5,'1: Single small field', 'FontSize', 9);
 text(1.2,4,'2: Single large field', 'FontSize', 9);
-text(1.2,3,'3: multiple small fields (Rich et al. 2014)', 'FontSize', 9);
-text(1.2,2,'4: multi-scale (population)', 'FontSize', 9);
-text(1.2,1,'5: multi-scale (single-cell)', 'FontSize', 9);
+text(1.2,3,'3: Multiple small fields (Rich et al. 2014)', 'FontSize', 9);
+text(1.2,2,'4: Multi-scale (population)', 'FontSize', 9);
+text(1.2,1,'5: Multi-scale (single-cell)', 'FontSize', 9);
 axis off
 xlim([0 1])
 ylim([1 5])
@@ -121,11 +122,19 @@ for ii_scnr = 1:5
     h.YTick = [1 5 10];
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
-    title("Scheme "+ii_scnr,'Units','normalized','Position',[0.5 1.06]);
+    ht=title("Scheme "+ii_scnr,'Units','normalized','Position',[0.5 1.06]);
+    schemes_IX = [1 3 2 6 7];
+    schemes_title_color_opt = 2;
+    switch schemes_title_color_opt
+        case 1
+            ht.Color = clr(schemes_IX(ii_scnr),:);
+        case 2
+            plot([0 25]+14, 11.8*[1 1], 'Color', clr(schemes_IX(ii_scnr),:), 'LineWidth', 1.5, 'Clipping','off');
+    end
 end
 axes(panel_A(1));
 text(-0.4,1.1, 'A', 'Units','normalized','FontWeight','bold');
-text(3,1.5, 'Integration time window of {\Delta} = 200 ms instead of 500 ms', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
+text(3,1.5, 'Integration time window of  {\Delta}t = 200 ms instead of 500 ms', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
 ylabel('Example neuron no.','Units','normalized','Position',[-0.2 0.5]);
 
 %% panel B - minimum N required for error < 1 m
@@ -328,11 +337,12 @@ for ii_N = 1:length(jN_options)
     h.YScale = 'log';
     h.XTick = [100 1000];
     h.XTickLabel = {'100';'1000'};
-    h.YTick = [1 100];
-    h.YTickLabel = {'1';'100'};
+    h.YTick = [1 10 100];
+    h.YTickLabel = {'1';'10';'100'};
     h.YRuler.TickLabelGapOffset = 2;
     h.XRuler.TickLabelGapOffset = -1;
-    h.XRuler.TickLength = [0.03 0.03];
+    h.XRuler.TickLength = [0.06 0.06];
+    h.YRuler.TickLength = [0.05 0.05];
 end
 
 %% panel E - 99th prc error
@@ -361,22 +371,24 @@ for ii_N = 1:length(jN_options)
     h.YScale = 'log';
     h.XTick = [20 100 1000];
     h.XTickLabel = {'20';'100';'1000'};
+    h.YTick = 10.^[-4 -3 -2 -1 0];
+    h.YTickLabel = {'10^{ -4}'; '10^{ -3}'; '10^{ -2}'; '10^{ -1}'; '10^{ 0}'};
     h.YRuler.TickLabelGapOffset = -0.1;
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
-    h.YLim(1) = 1e-4;
+    h.YLim = 10.^[-4 0];
     if ii_N == 1
         text(-0.20,1.1, 'E', 'Units','normalized','FontWeight','bold');
         text(0.5,1.1, 'Catastrophic errors: probability', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
 end
 
-%% panel F - decoding error vs. dt
+%% panel F - decoding mean error vs. dt
 axes(panel_F);
 cla
 hold on
-text(-0.3,1.15, 'F', 'Units','normalized','FontWeight','bold');
-text(0.5,1.15, 'Varying the integration time window {\Delta}t', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
+text(-0.2,1.05, 'F', 'Units','normalized','FontWeight','bold');
+text(1,1.25, 'Varying the integration time window  {\Delta}t', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
 
 % load data
 switch coverage
@@ -390,18 +402,18 @@ ds = 20 ;
 
 jN = find(ismember(N, [50]));
 jL = find(ismember(L, [20000]));
-plot(dt.*1e3, squeeze(meMLA(jN,:,jL)), 'Color', clr(1,:), 'LineWidth', 2);
-plot(dt.*1e3, squeeze(meMLB(jN,:,jL)), 'Color', clr(3,:), 'LineWidth', 2);
-plot(dt.*1e3, squeeze(meMLI(jN,:,jL)), 'Color', clr(2,:), 'LineWidth', 2);
-plot(dt.*1e3, squeeze(meMLF(jN,:,jL)), 'Color', clr(6,:), 'LineWidth', 2);
-plot(dt.*1e3, squeeze(meMLG(jN,:,jL)), 'Color', clr(7,:), 'LineWidth', 2);
+plot(dt.*1e3, squeeze(meMLA(jN,:,jL))*ds/100, 'Color', clr(1,:), 'LineWidth', 2);
+plot(dt.*1e3, squeeze(meMLB(jN,:,jL))*ds/100, 'Color', clr(3,:), 'LineWidth', 2);
+plot(dt.*1e3, squeeze(meMLI(jN,:,jL))*ds/100, 'Color', clr(2,:), 'LineWidth', 2);
+plot(dt.*1e3, squeeze(meMLF(jN,:,jL))*ds/100, 'Color', clr(6,:), 'LineWidth', 2);
+plot(dt.*1e3, squeeze(meMLG(jN,:,jL))*ds/100, 'Color', clr(7,:), 'LineWidth', 2);
 
 ha= gca;
 ha.XLim = [20 500];
-% ha.YLim = [0.8 310];
+ha.YLim = [0.3 100];
 ha.XTick = [20 100:100:500];
-% ha.YTick = [1 10 100];
-% ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
+ha.YTick = 10.^[0 1 2 3];
+ha.YTickLabel = {'10^{ 0}'; '10^{ 1}'; '10^{ 2}'; '10^{ 3}'};
 ha.TickDir='out';
 ha.TickLength = [0.02 0.02];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
@@ -411,11 +423,59 @@ ylabel('Mean decoding error (m)','Units','normalized','Position',[-0.12 0.5]);
 ha.XScale = 'linear';
 ha.YScale = 'log';
 
+%% panel G - Catastrophic errors vs. dt
+axes(panel_G);
+cla
+hold on
+text(-0.24,1.05, 'G', 'Units','normalized','FontWeight','bold');
+
+% load data
+switch coverage
+    case 0.20
+        panel_G_data = load('L:\Theory\Yonatan_code_data\ProbLargeError_L200_dt.mat');
+    case 0.15
+        error('no data')
+end
+nL = length(L);
+ds = 20 ;
+
+jN = find(ismember(panel_G_data.N, [50]));
+plot(panel_G_data.dt.*1e3, squeeze(panel_G_data.peL_MLA(jN,:)), 'Color', clr(1,:), 'LineWidth', 2);
+plot(panel_G_data.dt.*1e3, squeeze(panel_G_data.peL_MLB(jN,:)), 'Color', clr(3,:), 'LineWidth', 2);
+plot(panel_G_data.dt.*1e3, squeeze(panel_G_data.peL_MLI(jN,:)), 'Color', clr(2,:), 'LineWidth', 2);
+plot(panel_G_data.dt.*1e3, squeeze(panel_G_data.peL_MLF(jN,:)), 'Color', clr(6,:), 'LineWidth', 2);
+plot(panel_G_data.dt.*1e3, squeeze(panel_G_data.peL_MLG(jN,:)), 'Color', clr(7,:), 'LineWidth', 2);
+
+ha= gca;
+ha.XLim = [20 500];
+ha.YLim = [0.8e-3 1e0];
+ha.XTick = [20 100:100:500];
+ha.YTick = 10.^[-3 -2 -1 0];
+ha.YTickLabel = {'10^{ -3}'; '10^{ -2}'; '10^{ -1}'; '10^{ 0}'};
+ha.TickDir='out';
+ha.TickLength = [0.02 0.02];
+ha.XRuler.TickLabelGapMultiplier = -0.3;
+ha.YRuler.TickLabelGapMultiplier = 0.001;
+xlabel('Integration time window (ms)')
+ylabel('Prob.(error>5% of environment size)','Units','normalized','Position',[-0.12 0.45]);
+ha.XScale = 'linear';
+ha.YScale = 'log';
+
+
 %% print/save the figure
-% fig_name_out = fullfile(res_dir, fig_name_str);
-fig_name_out = fullfile(res_dir, [fig_name_str '_dt_' strrep(num2str(panels_AE_dt),'.','_') '_coverage=' num2str(100*coverage)]);
+fig_name_out = fullfile(res_dir, sprintf('%s_dt_%s_coverage=%d_title_opt=%d', ...
+    fig_name_str, ...
+    strrep(num2str(panels_AE_dt),'.','_'), ...
+    100*coverage, ...
+    schemes_title_color_opt));
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
 disp('figure was successfully saved to pdf/tiff/fig formats');
+
+
+
+
+%%
+
 

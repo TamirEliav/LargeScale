@@ -84,9 +84,9 @@ plot([0 1], 2*[1 1], 'Color',clr(6,:),'LineWidth',2) ; hold on ;
 plot([0 1], 1*[1 1], 'Color',clr(7,:),'LineWidth',2) ; hold on ; 
 text(1.2,5,'1: Single small field', 'FontSize', 9);
 text(1.2,4,'2: Single large field', 'FontSize', 9);
-text(1.2,3,'3: multiple small fields (Rich et al. 2014)', 'FontSize', 9);
-text(1.2,2,'4: multi-scale (population)', 'FontSize', 9);
-text(1.2,1,'5: multi-scale (single-cell)', 'FontSize', 9);
+text(1.2,3,'3: Multiple small fields (Rich et al. 2014)', 'FontSize', 9);
+text(1.2,2,'4: Multi-scale (population)', 'FontSize', 9);
+text(1.2,1,'5: Multi-scale (single-cell)', 'FontSize', 9);
 axis off
 xlim([0 1])
 ylim([1 5])
@@ -119,7 +119,15 @@ for ii_scnr = 1:5
     h.YTick = [1 5 10];
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
-    title("Scheme "+ii_scnr,'Units','normalized','Position',[0.5 1.06]);
+    ht=title("Scheme "+ii_scnr,'Units','normalized','Position',[0.5 1.06]);
+    schemes_IX = [1 3 2 6 7];
+    schemes_title_color_opt = 2;
+    switch schemes_title_color_opt
+        case 1
+            ht.Color = clr(schemes_IX(ii_scnr),:);
+        case 2
+            plot([0 25]+14, 11.8*[1 1], 'Color', clr(schemes_IX(ii_scnr),:), 'LineWidth', 1.5, 'Clipping','off');
+    end
 end
 axes(panel_A(1));
 text(-0.4,1.1, 'A', 'Units','normalized','FontWeight','bold');
@@ -325,11 +333,12 @@ for ii_N = 1:length(jN_options)
     h.YScale = 'log';
     h.XTick = [100 1000];
     h.XTickLabel = {'100';'1000'};
-    h.YTick = [1 100];
-    h.YTickLabel = {'1';'100'};
+    h.YTick = [1 10 100];
+    h.YTickLabel = {'1';'10';'100'};
     h.YRuler.TickLabelGapOffset = 2;
     h.XRuler.TickLabelGapOffset = -1;
-    h.XRuler.TickLength = [0.03 0.03];
+    h.XRuler.TickLength = [0.06 0.06];
+    h.YRuler.TickLength = [0.05 0.05];
 end
 
 %% panel E - 99th prc error
@@ -358,6 +367,9 @@ for ii_N = 1:length(jN_options)
     h.YScale = 'log';
     h.XTick = [20 100 1000];
     h.XTickLabel = {'20';'100';'1000'};
+    h.YTick = 10.^[-3 -2 -1 0];
+    h.YTickLabel = {'10^{ -3}'; '10^{ -2}'; '10^{ -1}'; '10^{ 0}'};
+    ylim([0.7e-3 1])
     h.YRuler.TickLabelGapOffset = -0.1;
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
@@ -369,9 +381,19 @@ end
 
 
 %% print/save the figure
-fig_name_out = fullfile(res_dir, [fig_name_str '_dt_' strrep(num2str(dt),'.','_') '_coverage=' num2str(100*coverage)]);
+fig_name_out = fullfile(res_dir, sprintf('%s_dt_%s_coverage=%d_title_opt=%d', ...
+    fig_name_str, ...
+    strrep(num2str(dt),'.','_'), ...
+    100*coverage, ...
+    schemes_title_color_opt));
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
 disp('figure was successfully saved to pdf/tiff/fig formats');
+
+
+
+
+%%
+
 
