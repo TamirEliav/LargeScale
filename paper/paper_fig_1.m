@@ -52,7 +52,7 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 
 % create panels
 panel_B_size = [9.5 1];
-panel_A    = axes('position', [ 1.25 23.6  2 2]);
+panel_A    = axes('position', [ 1.25 23.4  2.2 2.2]);
 panel_B(1) = axes('position', [ 4.5 24.5  panel_B_size]);
 panel_B(2) = axes('position', [ 4.5 23.5  panel_B_size]);
 panel_B(3) = axes('position', [ 4.5 22.5  panel_B_size]);
@@ -164,7 +164,7 @@ clusters_single_unit = [1 1 1 1 1 1 1 0 1 0 0 0];
 % clusters_single_unit = [1 0 0 0 0 0 0 0 0 0 0 0];
 
 %% ---------------------- spikes clusters ---------------------------------
-NTT_file = 'L:\Analysis\pre_proc\0148\20170625\spikes_sorting\spikes_b0148_d170625_TT4.NTT';
+NTT_file = 'L:\Analysis\pre_proc\0148\20170625\spikes_sorting\spikes_b0148_d170625_TT4_.NTT';
 exp_ID = 'b0148_d170625';
 exp=exp_load_data(exp_ID,'details','flight');
 prm = PARAMS_GetAll();
@@ -313,7 +313,7 @@ histology_slice_example_file = 'L:\resources\Histology\processed\Tamir_bat148_Se
 axes(panel_A);
 image = imread(logger_image_filename);
 imshow(image);
-text(-0.29,1.16, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.28,1.17, 'A', 'Units','normalized','FontWeight','bold');
 % add scale bar
 scale_mm = 10;
 pixel_mm_ratio = 720/11; % 720 pixels is measured manually using ginput amd sd card width is 11mm
@@ -527,7 +527,7 @@ y = y(1:50:end);
 tunnel_plot = 'middle';
 switch tunnel_plot
     case 'middle'
-        plot(x,y, '-k','LineWidth',3);
+        plot(x,y, '-', 'color',0.3*[1 1 1] ,'LineWidth',3);
     case 'walls';
         [joinedx, joinedy] = offsetCurve(x, y, 1.25);
         plot(joinedx, joinedy, '-k','LineWidth',0.000001)
