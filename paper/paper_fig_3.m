@@ -113,6 +113,11 @@ for ii_dir = 1:2
         name = LM(ii_LM).name;
         plot(repelem(x,2), [0 1], '-', 'color', 0.7.*[1 1 1], 'LineWidth',0.5);
     end
+    % legend for LM
+    if ii_dir==1
+        plot([130 140]+5, 1.1*[1 1], 'Clipping','off', 'color', 0.7.*[1 1 1], 'LineWidth',1);
+        text(150, 1.1, 'Landmarks', 'FontSize',7, 'HorizontalAlignment','left');
+    end
     
     % plot cdf
     h = cdfplot([fields.loc]);
@@ -125,11 +130,13 @@ for ii_dir = 1:2
     % labels & graphics
     xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.14]);
     ylabel({'Cumulative';'fraction'}, 'Units','normalized','Position',[-0.025 0.5]);
+    xlim([0 200])
+    ylim([0 1])
     ha= gca;
     ha.TickDir='out';
     ha.TickLength = [0.015 0.015];
     ha.XTick = [0:50:200];
-    ha.YTick = ha.YLim;
+    ha.YTick = [0 1];
     ha.XRuler.TickLabelGapMultiplier = -0.3;
     ha.YRuler.TickLabelGapMultiplier = 0.001;
 end
@@ -286,13 +293,14 @@ for ii_dir = 1:2
     end
     ha.Y = [2 2];
     ha.LineWidth  = 1;
-    ha.HeadWidth  = 4;
-    ha.HeadLength = 4;
+    ha.HeadWidth  = 5;
+    ha.HeadLength = 5;
+    ha.Color = prm.graphics.colors.flight_directions{ii_dir};
     xlim([0 10]);
     ylim([0 4]);
     set(gca,'Visible','off');
 end
-    
+
 %% panel C - field size vs. pos
 % =========================================================================
 % figure

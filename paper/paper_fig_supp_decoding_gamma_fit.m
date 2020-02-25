@@ -71,10 +71,10 @@ h.BinWidth = 1;
 h.Normalization = 'pdf';
 
 X = linspace(1,50,100);
-Y = lognpdf(X, logn_phat(1), logn_phat(2));
-plot(X,Y,'-r', 'LineWidth', 1.5);
 Y = gampdf(X, gamma_phat(1), gamma_phat(2));
 plot(X,Y,'-g', 'LineWidth', 1.5);
+Y = lognpdf(X, logn_phat(1), logn_phat(2));
+plot(X,Y,'-r', 'LineWidth', 1.5);
 
 ha= gca;
 ha.XLim = [0 35];
@@ -112,10 +112,10 @@ h.BinWidth = 1;
 h.Normalization = 'pdf';
 
 X = linspace(1,50,100);
-Y = lognpdf(X, logn_phat(1), logn_phat(2));
-plot(X,Y,'-r', 'LineWidth', 1.5);
 Y = gampdf(X, gamma_phat(1), gamma_phat(2));
 plot(X,Y,'-g', 'LineWidth', 1.5);
+Y = lognpdf(X, logn_phat(1), logn_phat(2));
+plot(X,Y,'-r', 'LineWidth', 1.5);
 
 ha= gca;
 ha.XLim = [0 35];
