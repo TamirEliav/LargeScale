@@ -76,13 +76,11 @@ panel_C    = axes('position', [ 5.3  8.5  panels_size           ]);
 panel_D(1) = axes('position', [ 8.6  8.5  panels_size.*[1 0.9]  ]);
 panel_D(2) = axes('position', [ 8.6  8.5  panels_size.*[1 0.9]  ]);
 panel_E =    axes('position', [12.2  8.5  panels_size.*[1.3 1]  ]);
-panel_F = axes('position', [16.0  8.5  panels_size           ]);
-
-panel_G = axes('position', [ 2.0  5 panels_size]          );
-panel_H = axes('position', [ 5.3  5 panels_size.*[1.4 1] ]);
-panel_I = axes('position', [ 9.1  5 panels_size]          );
-panel_J = axes('position', [12.3  5 panels_size.*[1.2 1] ]);
-panel_K = axes('position', [16.0  4.4 3 3]);
+panel_F = axes('position', [ 2.0  5 panels_size          ]);
+panel_G = axes('position', [ 5.3  5 panels_size.*[1.4 1] ]);
+panel_H = axes('position', [ 9.1  5 panels_size]          );
+panel_I = axes('position', [12.3  5 panels_size.*[1.2 1] ]);
+panel_J = axes('position', [16.0  4.4 3 3]);
 
 %%
 prm = PARAMS_GetAll();
@@ -347,6 +345,12 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y      ,  'Color', prm.graphics.colo
 
 end
 
+
+
+
+
+
+
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 %% load population data
 prm = PARAMS_GetAll();
@@ -367,6 +371,183 @@ cells_ID([meanFR.all]>prm.inclusion.interneuron_FR_thr)=[];
 clear cells stats cells_details cells_t
 cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map','FE')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
+
+%% save loaded population data
+% save( fullfile(res_dir,'Fig2_cells_data'), 'cells');
+
+
+%% arragne population SI/sparsity/coverage (panels B,C,D)
+signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
+SI = arrayfun(@(x)([x.dir.SI_bits_spike]), cat(1,cells.stats),'UniformOutput',0);
+sparsity = arrayfun(@(x)([x.dir.sparsity]), cat(1,cells.stats),'UniformOutput',0);
+SI = cat(1,SI{:});
+SI(~signif) = nan;
+SI = SI(:);
+SI(isnan(SI)) = [];
+sparsity = cat(1,sparsity{:});
+sparsity(~signif) = nan;
+sparsity = sparsity(:);
+sparsity(isnan(sparsity)) = [];
+
+% count total fields coverage per cell per direction
+total_area = nan(length(cells),2);
+for ii_cell = 1:length(cells)
+    cell = cells(ii_cell);
+    for ii_dir = 1:2
+        if ~cell.signif(ii_dir).TF
+            continue;
+        end
+        fields = cell.fields{ii_dir};
+        fields([fields.in_low_speed_area]) = [];
+        total_area(ii_cell, ii_dir) = sum([fields.width_prc]);
+    end
+end
+
+%% panel B - spatial info histogram
+axes(panel_B);
+cla
+hold on
+text(-0.45,1.15, 'B', 'Units','normalized','FontWeight','bold');
+h = histogram(SI);
+h.NumBins = 12;
+h.FaceColor = 0.5*[1 1 1];
+ha=gca;
+ha.TickDir='out';
+ha.TickLength = [0.03 0.03];
+ha.XRuler.TickLabelGapMultiplier = -0.35;
+ha.YRuler.TickLabelGapMultiplier = 0.1;
+% ha.YScale = 'linear';
+ha.YScale = 'log';
+xlabel({'Spatial information';'(bits/spike)'}, 'Units','normalized','Position',[0.5 -0.17]);
+ylabel('No. of cells', 'Units','normalized','Position',[-0.28 0.5])
+
+%% panel C - sparsity histogram
+axes(panel_C);
+cla
+hold on
+text(-0.45,1.15, 'C', 'Units','normalized','FontWeight','bold');
+h = histogram(sparsity);
+h.NumBins = 15;
+h.FaceColor = 0.5*[1 1 1];
+xlim([0 1])
+ha=gca;
+ha.TickDir='out';
+ha.TickLength = [0.03 0.03];
+ha.XRuler.TickLabelGapMultiplier = -0.35;
+ha.YRuler.TickLabelGapMultiplier = 0.1;
+% ha.YScale = 'linear';
+ha.YScale = 'log';
+xlabel('Sparsity', 'Units','normalized','Position',[0.5 -0.17])
+ylabel('No. of cells', 'Units','normalized','Position',[-0.28 0.5])
+
+%% panel D - Total area histogram
+axes(panel_D(1));
+cla
+hold on
+text(-0.45,1.275, 'D', 'Units','normalized','FontWeight','bold');
+
+exp=exp_load_data(cell.details.exp_ID);
+IX=find(contains({exp.LM.name},'ball'));
+LM_locs = [exp.LM.pos_proj];
+ball2ball_dist = diff(LM_locs(IX));
+% total_area_L = ball2ball_dist;
+total_area_L = diff(prm.fields.valid_speed_pos);
+
+h = histogram(total_area(:));
+h.NumBins = 17;
+h.FaceColor = 0.5*[1 1 1];
+xlim([0 0.9*total_area_L])
+ha=gca;
+ha.XTick = [0:50:150];
+ha.TickDir='out';
+ha.TickLength = [0.03 0.03];
+ha.XRuler.TickLabelGapMultiplier = -0.35;
+ha.YRuler.TickLabelGapMultiplier = 0.1;
+% ha.YScale = 'linear';
+ha.YScale = 'log';
+xlabel('Coverage (m)', 'Units','normalized','Position',[0.5 -0.17])
+ylabel('No. of cells', 'Units','normalized','Position',[-0.28 0.5])
+ha.XLim(1) = 0;
+
+fprintf( 'Average total area in meters : %.4g\n\r',nanmean(total_area(:)) )
+fprintf( 'Average total area in prc (%%): %.4g\n\r',100*nanmean(total_area(:)) / total_area_L )
+fprintf( 'Median total area in meters : %.4g\n\r',nanmedian(total_area(:)) )
+fprintf( 'Median total area in prc (%%): %.4g\n\r',100*nanmedian(total_area(:)) / total_area_L )
+
+% add normalized x-axis
+axes(panel_D(2));
+cla
+hold on
+hax = gca;
+hax.XLim = 100 * panel_D(1).XLim / total_area_L;
+hax.XTick = [0:30:90];
+hax.XAxisLocation = 'top';
+hax.YAxisLocation = 'right';
+hax.Color = 'none';
+hax.XColor = 'k';
+hax.YColor = 'none';
+box off
+hax.XRuler.TickLabelGapMultiplier = -0.35;
+hax.TickLength = panel_D(1).TickLength;
+xlabel('Coverage (%)', 'Units','normalized','Position',[0.45 1.2]);
+
+%% panel E - map correlations histogram
+% figure
+axes(panel_E);
+cla
+hold on
+text(-0.4,1.15, 'E', 'Units','normalized','FontWeight','bold');
+
+% arrange data
+signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
+FR_maps_all = cat(1,cells.FR_map);
+FR_maps_all = reshape([FR_maps_all.all],size(FR_maps_all,1),size(FR_maps_all,2),[]);
+M = cat(1,FR_maps_all.PSTH);
+M = reshape(M,size(FR_maps_all,1),size(FR_maps_all,2),[]);
+signif = repmat(signif,1,1,size(M,3));
+M(~signif) = nan;
+pos_bins = cells(1).FR_map(1).all.bin_centers;
+invalid_pos_IX = pos_bins<=prm.fields.valid_speed_pos(1) | pos_bins>=prm.fields.valid_speed_pos(2);
+M(:,:,invalid_pos_IX) = nan;
+ccc = corr(squeeze(M(:,1,:))', squeeze(M(:,2,:))' ,'rows', 'pairwise');
+data = diag(ccc);
+switch 2
+    case 1 % compare all PSTH from other cells/dir
+        M2 = reshape(M,size(M,1)*size(M,2),[]);
+        ccc_shuffle = corr(M2' ,'rows', 'pairwise');
+        mask = tril(true(size(ccc_shuffle)),-1);
+        shuffle = ccc_shuffle(mask);
+    case 2 % compare only different cells betweeb different directions
+        mask = tril(true(size(ccc)),-1);
+        shuffle = ccc(mask);
+end
+
+data(isnan(data))=[];
+shuffle(isnan(shuffle))=[];
+
+% plot
+nBinEdges = 21;
+edges = linspace(-1,1,nBinEdges);
+histogram(data,    'Normalization','pdf','BinEdges',edges,'FaceColor', 0.5*[1 1 1]);
+histogram(shuffle, 'Normalization','pdf','BinEdges',edges,'DisplayStyle','stairs','EdgeColor','k','LineWidth',1.5);
+[~,P_KS] = kstest2(data, shuffle);
+P_RankSum = ranksum(data, shuffle);
+text(1,0.9, sprintf('P_{KS} = %.02f',P_KS),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
+% text(1,0.9, sprintf('P=%.02f',P_RankSum),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
+
+ha= gca;
+ha.XLim = [-1 1];
+ha.XTick = -1:0.5:1;
+ha.TickDir = 'out';
+ha.TickLength = [0.03 0.03];
+ha=gca;
+ha.TickDir='out';
+ha.TickLength = [0.03 0.03];
+ha.XRuler.TickLabelGapMultiplier = -0.35;
+ha.YRuler.TickLabelGapMultiplier = 0.001;
+xlabel('Map correlation', 'Units','normalized','Position',[0.5 -0.17])
+ylabel('Probability', 'Units','normalized','Position',[-0.17 0.5])
+
 
 %% panel F - field count histogram
 % figure
@@ -391,12 +572,14 @@ for ii_dir = 1:2
 end
 h = histogram(nFields(:));
 h.FaceColor = 0.5*[1 1 1];
-nBinEdges = 12;
-h.BinEdges = linspace(0,35,nBinEdges);
+% nBinEdges = 12;
+% h.BinEdges = linspace(0,35,nBinEdges);
+h.BinEdges = 0.5+[0:35];
 xlabel({'No. of fields per direction'},'Units','normalized','Position',[0.5 -0.18]);
-ylabel('No. of cells')
+ylabel('No. of cells','Units','normalized','Position',[-0.28 0.5])
 ha = gca;
 ha.YScale = 'log';
+% ha.YScale = 'linear';
 % ha.YLim = [0.7 130];
 ha.YLim = [0.7 max(h.Values)*1.05];
 ha.XLim = [0 35.5];
@@ -412,12 +595,12 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 
-%% panel H - field size histogram
+%% panel G - field size histogram
 % figure
-axes(panel_H);
+axes(panel_G);
 cla
 hold on
-text(-0.35,1.15, 'H', 'Units','normalized','FontWeight','bold');
+text(-0.35,1.15, 'G', 'Units','normalized','FontWeight','bold');
 fields_size = [];
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -451,16 +634,16 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 
 save( fullfile(res_dir,'pop_dist_fields_size'), 'fields_size');
 
-%% panel I - smallest / largest field size
+%% panel H - smallest / largest field size
 % figure
-axes(panel_I);
+axes(panel_H);
 cla
 hold on
-text(-0.45,1.15, 'I', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'H', 'Units','normalized','FontWeight','bold');
 LS_field_size = nan(2,length(cells));
 for ii_cell = 1:length(cells)
     cell = cells(ii_cell);
-    if ~all([cell.signif.TF]) % at least one direction is significant
+    if ~any([cell.signif.TF]) % at least one direction is significant
         continue;
     end
     LS_field_size(1,ii_cell) = cell.stats.all.field_smallest;
@@ -494,12 +677,11 @@ ylabel('Field size (m)','Units','normalized','Position',[-0.21 0.5])
 
 
 
-%% panel J - field ratio (largest/smallest)
-% figure
-axes(panel_J);
+%% panel I - field ratio (largest/smallest)
+axes(panel_I);
 cla
 hold on
-text(-0.4,1.15, 'J', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.15, 'I', 'Units','normalized','FontWeight','bold');
 LS_field_ratio_all = nan(1,length(cells));
 LS_field_ratio_dir = nan(2,length(cells));
 for ii_cell = 1:length(cells)
@@ -551,239 +733,8 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
 ylabel('No. of cells','Units','normalized','Position',[-0.24 0.5])
 
-%% arragne population SI/sparsity
-signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
-% TODO: check why SI/sparsity can be nan in the original cell calculation?
-SI = arrayfun(@(x)([x.dir.SI_bits_spike]), cat(1,cells.stats),'UniformOutput',0);
-sparsity = arrayfun(@(x)([x.dir.sparsity]), cat(1,cells.stats),'UniformOutput',0);
-SI = cat(1,SI{:});
-SI(~signif) = nan;
-SI = SI(:);
-SI(isnan(SI)) = [];
-sparsity = cat(1,sparsity{:});
-sparsity(~signif) = nan;
-sparsity = sparsity(:);
-sparsity(isnan(sparsity)) = [];
 
-%% count total fields coverage per cell per direction
-total_area = nan(length(cells),2);
-for ii_cell = 1:length(cells)
-    cell = cells(ii_cell);
-    for ii_dir = 1:2
-        if ~cell.signif(ii_dir).TF
-            continue;
-        end
-        fields = cell.fields{ii_dir};
-        fields([fields.in_low_speed_area]) = [];
-        total_area(ii_cell, ii_dir) = sum([fields.width_prc]);
-    end
-end
-
-% figure
-% hold on
-% histogram(total_area(:,1))
-% histogram(total_area(:,2))
-% histogram(total_area(:))
-
-%% panel B - spatial info histogram
-axes(panel_B);
-cla
-hold on
-text(-0.45,1.15, 'B', 'Units','normalized','FontWeight','bold');
-h = histogram(SI);
-h.NumBins = 12;
-h.FaceColor = 0.5*[1 1 1];
-ha=gca;
-ha.TickDir='out';
-ha.TickLength = [0.03 0.03];
-ha.XRuler.TickLabelGapMultiplier = -0.35;
-ha.YRuler.TickLabelGapMultiplier = 0.1;
-ha.YScale = 'linear';
-xlabel({'Spatial information';'(bits/spike)'}, 'Units','normalized','Position',[0.5 -0.17]);
-ylabel('No. of cells')
-
-%% panel C - sparsity histogram
-axes(panel_C);
-cla
-hold on
-text(-0.45,1.15, 'C', 'Units','normalized','FontWeight','bold');
-h = histogram(sparsity);
-h.NumBins = 15;
-h.FaceColor = 0.5*[1 1 1];
-ha=gca;
-ha.TickDir='out';
-ha.TickLength = [0.03 0.03];
-ha.XRuler.TickLabelGapMultiplier = -0.35;
-ha.YRuler.TickLabelGapMultiplier = 0.1;
-ha.YScale = 'linear';
-xlabel('Sparsity', 'Units','normalized','Position',[0.5 -0.17])
-ylabel('No. of cells', 'Units','normalized','Position',[-0.2 0.5])
-
-%% panel D - Total area histogram
-axes(panel_D(1));
-cla
-hold on
-text(-0.45,1.275, 'D', 'Units','normalized','FontWeight','bold');
-h = histogram(total_area(:));
-h.NumBins = 17;
-h.FaceColor = 0.5*[1 1 1];
-ha=gca;
-ha.XTick = [0:30:150];
-ha.TickDir='out';
-ha.TickLength = [0.03 0.03];
-ha.XRuler.TickLabelGapMultiplier = -0.35;
-ha.YRuler.TickLabelGapMultiplier = 0.1;
-ha.YScale = 'linear';
-xlabel('Coverage (m)', 'Units','normalized','Position',[0.5 -0.17])
-ylabel('No. of cells', 'Units','normalized','Position',[-0.2 0.5])
-ha.XLim(1) = 0;
-
-exp=exp_load_data(cell.details.exp_ID);
-IX=find(contains({exp.LM.name},'ball'));
-LM_locs = [exp.LM.pos_proj];
-ball2ball_dist = diff(LM_locs(IX));
-% total_area_L = ball2ball_dist;
-total_area_L = diff(prm.fields.valid_speed_pos);
-fprintf( 'Average total area in meters : %.4g\n\r',nanmean(total_area(:)) )
-fprintf( 'Average total area in prc (%%): %.4g\n\r',100*nanmean(total_area(:)) / total_area_L )
-fprintf( 'Median total area in meters : %.4g\n\r',nanmedian(total_area(:)) )
-fprintf( 'Median total area in prc (%%): %.4g\n\r',100*nanmedian(total_area(:)) / total_area_L )
-
-% add normalized x-axis
-axes(panel_D(2));
-cla
-hold on
-hax = gca;
-hax.XLim = 100 * panel_D(1).XLim / total_area_L;
-hax.XAxisLocation = 'top';
-hax.YAxisLocation = 'right';
-hax.Color = 'none';
-hax.XColor = 'k';
-hax.YColor = 'none';
-box off
-hax.XRuler.TickLabelGapMultiplier = -0.35;
-hax.TickLength = panel_D(1).TickLength;
-xlabel('Coverage (%)', 'Units','normalized','Position',[0.45 1.2]);
-
-%% panel E - map correlations histogram
-% figure
-axes(panel_E);
-cla
-hold on
-text(-0.4,1.15, 'E', 'Units','normalized','FontWeight','bold');
-
-% arrange data
-signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
-FR_maps_all = cat(1,cells.FR_map);
-FR_maps_all = reshape([FR_maps_all.all],size(FR_maps_all,1),size(FR_maps_all,2),[]);
-M = cat(1,FR_maps_all.PSTH);
-M = reshape(M,size(FR_maps_all,1),size(FR_maps_all,2),[]);
-signif = repmat(signif,1,1,size(M,3));
-M(~signif) = nan;
-pos_bins = cells(1).FR_map(1).all.bin_centers;
-invalid_pos_IX = pos_bins<=prm.fields.valid_speed_pos(1) | pos_bins>=prm.fields.valid_speed_pos(2);
-M(:,:,invalid_pos_IX) = nan;
-ccc = corr(squeeze(M(:,1,:))', squeeze(M(:,2,:))' ,'rows', 'pairwise');
-data = diag(ccc);
-switch 2
-    case 1 % compare all PSTH from other cells/dir
-        M2 = reshape(M,size(M,1)*size(M,2),[]);
-        ccc_shuffle = corr(M2' ,'rows', 'pairwise');
-        mask = tril(true(size(ccc_shuffle)),-1);
-        shuffle = ccc_shuffle(mask);
-    case 2 % compare only different cells betweeb different directions
-        mask = tril(true(size(ccc)),-1);
-        shuffle = ccc(mask);
-end
-
-% plot
-nBinEdges = 21;
-edges = linspace(-1,1,nBinEdges);
-histogram(data,    'Normalization','pdf','BinEdges',edges,'FaceColor', 0.5*[1 1 1]);
-histogram(shuffle, 'Normalization','pdf','BinEdges',edges,'DisplayStyle','stairs','EdgeColor','k','LineWidth',1.5);
-[~,P_KS] = kstest2(data, shuffle);
-P_RankSum = ranksum(data, shuffle);
-text(1,0.9, sprintf('P_{KS} = %.02f',P_KS),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
-% text(1,0.9, sprintf('P=%.02f',P_RankSum),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
-
-ha= gca;
-ha.XLim = [-1 1];
-ha.XTick = -1:0.5:1;
-ha.TickDir = 'out';
-ha.TickLength = [0.03 0.03];
-ha=gca;
-ha.TickDir='out';
-ha.TickLength = [0.03 0.03];
-ha.XRuler.TickLabelGapMultiplier = -0.35;
-ha.YRuler.TickLabelGapMultiplier = 0.001;
-xlabel('Map correlation', 'Units','normalized','Position',[0.5 -0.17])
-ylabel('Probability', 'Units','normalized','Position',[-0.17 0.5])
-
-%% Panel G - percentage of out-of-field spikes
-axes(panel_G);
-cla
-hold on
-text(-0.45,1.15, 'G', 'Units','normalized','FontWeight','bold');
-
-in_field_spikes_prc = nan(length(cells),2);
-for ii_cell = 1:length(cells)
-    cell = cells(ii_cell);
-    for ii_dir = 1:2
-        if ~cell.signif(ii_dir).TF
-            continue;
-        end
-        fields = cell.fields{ii_dir};
-        fields([fields.in_low_speed_area])=[];
-        fields_spikes_ts = [fields.spikes_ts];
-        FE_spikes_ts = [cell.FE{ii_dir}.spikes_ts];
-        FE_spikes_pos = [cell.FE{ii_dir}.spikes_pos];
-        invalid_IX =( FE_spikes_pos < prm.fields.valid_speed_pos(1) | ...
-                      FE_spikes_pos > prm.fields.valid_speed_pos(2) );
-        FE_spikes_ts(invalid_IX)=[];
-        FE_spikes_pos(invalid_IX)=[];
-        in_field_spikes = ismember(FE_spikes_ts, fields_spikes_ts);
-        in_field_spikes_prc(ii_cell,ii_dir) = 100 * sum(in_field_spikes) / length(in_field_spikes);
-    end
-end
-
-h = histogram(in_field_spikes_prc(:));
-h.NumBins = 12;
-h.FaceColor = 0.5*[1 1 1];
-ha=gca;
-ha.XLim = [0 100];
-ha.XTick = [0 50 100];
-ha.TickDir='out';
-ha.TickLength = [0.03 0.03];
-ha.XRuler.TickLabelGapMultiplier = -0.35;
-ha.YRuler.TickLabelGapMultiplier = 0.1;
-ha.YScale = 'linear';
-xlabel('In-field spikes (%)', 'Units','normalized','Position',[0.5 -0.17]);
-ylabel('No. of cells')
-
-%%
-if 0
-figure
-subplot(2,2,1)
-hold on
-histogram(in_field_spikes_prc(:,1),'Normalization','pdf','FaceColor',prm.graphics.colors.flight_directions{1})
-histogram(in_field_spikes_prc(:,2),'Normalization','pdf','FaceColor',prm.graphics.colors.flight_directions{2})
-subplot(2,2,2)
-axis equal
-plot(in_field_spikes_prc(:,1),in_field_spikes_prc(:,2),'.')
-h=refline(1,0);
-h.Color='k';
-subplot(2,2,3)
-h=violinplot(in_field_spikes_prc);
-h(1).ViolinColor = prm.graphics.colors.flight_directions{1};
-h(2).ViolinColor = prm.graphics.colors.flight_directions{2};
-% h(1).ScatterPlot.MarkerFaceColor = prm.graphics.colors.flight_directions{1};
-% h(2).ScatterPlot.MarkerFaceColor = prm.graphics.colors.flight_directions{2};
-subplot(2,2,4)
-boxplot(in_field_spikes_prc)
-suptitle('Percentage of in-field-spikes is different between directions')
-end
-
-%% panels I&J - prepare data
+%% panel J - prepare data
 distances_all = [];
 field_size_diff_all = [];
 field_size_all = [];
@@ -804,12 +755,12 @@ for ii_cell = 1:length(cells)
     end
 end
 
-%% panel K - field size ratio vs. speed ratio (direct control for speed!)
+%% panel J - field size ratio vs. speed ratio (direct control for speed!)
 % figure
-axes(panel_K);
+axes(panel_J);
 cla
 hold on
-text(-0.27,0.9667, 'K', 'Units','normalized','FontWeight','bold');
+text(-0.27,0.9667, 'J', 'Units','normalized','FontWeight','bold');
 % arrange data
 cells_signif = cat(1,cells.signif);
 cells_signif = arrayfun(@(x)(x.TF), cells_signif);
@@ -861,7 +812,7 @@ disp('figure was successfully saved to pdf/tiff/fig formats');
 
 
 
-%% calc some more stats...
+%% calc some more stats... (old version = pooling directions)
 single_PF_cells_IX = find(nansum(nFields)==1);
 single_PF_cells = cells(single_PF_cells_IX);
 
@@ -874,11 +825,31 @@ single_PF_field_size_mean = mean([fields.width_prc]);
 single_PF_field_size_std  = std([fields.width_prc]);
 
 % print stats
-disp(' ')
+disp('Old version = pooling directions')
 fprintf('no. of single field cells = %d/%d (%.2f%%),\n with mean field size = %.1fm std=%.1fm\n',...
     length(single_PF_cells), ...
     length(cells), ...
     100 * length(single_PF_cells) / length(cells),...
+    single_PF_field_size_mean,...
+    single_PF_field_size_std);
+
+%% calc some more stats... (new version = per direction)
+single_PF_cells_IX = (nFields==1)';
+signif_cells_IX = ~isnan(nFields)';
+fields=cat(1,cells.fields);
+fields = fields(single_PF_cells_IX);
+fields=[fields{:}];
+fields([fields.in_low_speed_area])=[];
+
+single_PF_field_size_mean = mean([fields.width_prc]);
+single_PF_field_size_std  = std([fields.width_prc]);
+
+% print stats
+disp('New version = per direction')
+fprintf('no. of single field cells x directions = %d/%d (%.2f%%),\n with mean field size = %.1fm std=%.1fm\n',...
+    sum(single_PF_cells_IX,'all'), ...
+    sum(signif_cells_IX,'all'), ...
+    100 * sum(single_PF_cells_IX,'all') / sum(signif_cells_IX,'all'),...
     single_PF_field_size_mean,...
     single_PF_field_size_std);
 
