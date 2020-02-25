@@ -46,12 +46,12 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
 % create panels
-panel_A_size = [7 3];
-panel_B_size = [3 3];
-panel_A(1) = axes('position', [ 4   21.0 panel_A_size]);
-panel_A(2) = axes('position', [ 4   16   panel_A_size]);
-panel_B(1) = axes('position', [13.2 21.0 panel_B_size]);
-panel_B(2) = axes('position', [13.2 16   panel_B_size]);
+panel_A_size = [3 3];
+panel_B_size = [7 3];
+panel_A(1) = axes('position', [ 4  21  panel_A_size]);
+panel_A(2) = axes('position', [ 4  16  panel_A_size]);
+panel_B(1) = axes('position', [10  21  panel_B_size]);
+panel_B(2) = axes('position', [10  16  panel_B_size]);
 
 
 %% load population data
@@ -123,7 +123,7 @@ for ii_dir = 1:2
     fields(isnan([fields.LM_nearest_by_peak])) = [];
     
     %% scatter plot - field size vs. inter-LM-dist
-    axes(panel_A(ii_dir));
+    axes(panel_B(ii_dir));
     cla
     hold on
     c = prm.graphics.colors.flight_directions{ii_dir};
@@ -152,7 +152,7 @@ for ii_dir = 1:2
     ha.YRuler.TickLabelGapMultiplier = 0.1;
 
     %% scatter plot - field size vs. distance to nearest LM
-    axes(panel_B(ii_dir));
+    axes(panel_A(ii_dir));
     cla
     hold on
     x = abs([fields.loc] - [fields.LM_nearest_by_peak]);
@@ -177,14 +177,13 @@ for ii_dir = 1:2
     
 end
 axes(panel_A(1));
-text(-0.18,1.2, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.3,1.2, 'A', 'Units','normalized','FontWeight','bold');
 axes(panel_B(1));
-text(-0.3,1.2, 'B', 'Units','normalized','FontWeight','bold');
-
+text(-0.18,1.2, 'B', 'Units','normalized','FontWeight','bold');
 
 %% add direction arrows
-arrow_x = 0.22 +[0 0.05];
-arrow_y = repelem(0.88,2);
+arrow_x = 0.29 +[0 0.04];
+arrow_y = repelem(0.87,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.008,  'Color', prm.graphics.colors.flight_directions{1});
 h(2)=annotation('arrow',flip(arrow_x),arrow_y      ,  'Color', prm.graphics.colors.flight_directions{2});

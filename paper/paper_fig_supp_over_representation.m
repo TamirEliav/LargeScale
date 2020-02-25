@@ -50,17 +50,17 @@ panel_A_size = [7 3];
 % panel_B_size = [3 3];
 panel_C_size = [7 3];
 % panel_D_size = [3 3];
-panel_A(1) = axes('position', [ 2 22 panel_A_size]);
-panel_A(2) = axes('position', [ 2 18 panel_A_size]);
+% panel_A(1) = axes('position', [ 2 22 panel_A_size]);
+% panel_A(2) = axes('position', [ 2 18 panel_A_size]);
 % panel_B(1) = axes('position', [11 22 panel_B_size]);
 % panel_B(2) = axes('position', [11 18 panel_B_size]);
-panel_C(1) = axes('position', [ 2 13.5 panel_C_size]);
-panel_C(2) = axes('position', [ 2  9.5 panel_C_size]);
+panel_C(1) = axes('position', [ 2 22 panel_C_size]);
+panel_C(2) = axes('position', [ 2 18 panel_C_size]);
 % panel_D(1) = axes('position', [11 13.5 panel_D_size]);
 % panel_D(2) = axes('position', [11  9.5 panel_D_size]);
 panel_legend = axes('position', [9.5 23.5 0.5 0.5]);
 
-%%
+%% legend panel
 axes(panel_legend);
 % figure
 cla
@@ -108,52 +108,52 @@ LM( contains({LM.name},{'enter'}) ) = [];
 %% panel A - field pos CDF
 % =========================================================================
 % figure
-for ii_dir = 1:2
-%     subplot(1,2,ii_dir)
-    axes(panel_A(ii_dir));
-    cla
-    hold on
-    
-    % arrange data
-    signif = cat(1,cells.signif);
-    cells_dir = cells([signif(:,ii_dir).TF]);
-    fields = cellfun(@(x)(x{ii_dir}), {cells_dir.fields},'UniformOutput',0);
-    fields =[fields{:}];
-%     fields( [fields.in_low_speed_area] ) = [];
-
-    % plot LM
-    for ii_LM=1:length(LM)
-        x = LM(ii_LM).pos_proj;
-        name = LM(ii_LM).name;
-        LM_line_type = '-';
-        if ismember(ii_LM,[1 length(LM)])
-            LM_line_type = '--';
-        end
-        plot(repelem(x,2), [0 1], LM_line_type, 'color', 0.7.*[1 1 1], 'LineWidth',0.5);
-    end
-
-    % plot cdf
-    h = cdfplot([fields.loc]);
-    h.Color = prm.graphics.colors.flight_directions{ii_dir};
-    h.LineWidth = 0.9;
-    title('');
-    ha=gca;
-    ha.GridLineStyle = 'none';
-        
-    % labels & graphics
-    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.14]);
-    ylabel({'Cumulative';'fraction'}, 'Units','normalized','Position',[-0.025 0.5]);
-    ha= gca;
-    ha.TickDir='out';
-    ha.TickLength = [0.015 0.015];
-    ha.XTick = [0:50:200];
-    ha.YTick = ha.YLim;
-    ha.XRuler.TickLabelGapMultiplier = -0.3;
-    ha.YRuler.TickLabelGapMultiplier = 0.001;
-end
-
-axes(panel_A(1));
-text(-0.13,1.1, 'A', 'Units','normalized','FontWeight','bold');
+% % % % % for ii_dir = 1:2
+% % % % % %     subplot(1,2,ii_dir)
+% % % % %     axes(panel_A(ii_dir));
+% % % % %     cla
+% % % % %     hold on
+% % % % %     
+% % % % %     % arrange data
+% % % % %     signif = cat(1,cells.signif);
+% % % % %     cells_dir = cells([signif(:,ii_dir).TF]);
+% % % % %     fields = cellfun(@(x)(x{ii_dir}), {cells_dir.fields},'UniformOutput',0);
+% % % % %     fields =[fields{:}];
+% % % % % %     fields( [fields.in_low_speed_area] ) = [];
+% % % % % 
+% % % % %     % plot LM
+% % % % %     for ii_LM=1:length(LM)
+% % % % %         x = LM(ii_LM).pos_proj;
+% % % % %         name = LM(ii_LM).name;
+% % % % %         LM_line_type = '-';
+% % % % %         if ismember(ii_LM,[1 length(LM)])
+% % % % %             LM_line_type = '--';
+% % % % %         end
+% % % % %         plot(repelem(x,2), [0 1], LM_line_type, 'color', 0.7.*[1 1 1], 'LineWidth',0.5);
+% % % % %     end
+% % % % % 
+% % % % %     % plot cdf
+% % % % %     h = cdfplot([fields.loc]);
+% % % % %     h.Color = prm.graphics.colors.flight_directions{ii_dir};
+% % % % %     h.LineWidth = 0.9;
+% % % % %     title('');
+% % % % %     ha=gca;
+% % % % %     ha.GridLineStyle = 'none';
+% % % % %         
+% % % % %     % labels & graphics
+% % % % %     xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.14]);
+% % % % %     ylabel({'Cumulative';'fraction'}, 'Units','normalized','Position',[-0.025 0.5]);
+% % % % %     ha= gca;
+% % % % %     ha.TickDir='out';
+% % % % %     ha.TickLength = [0.015 0.015];
+% % % % %     ha.XTick = [0:50:200];
+% % % % %     ha.YTick = ha.YLim;
+% % % % %     ha.XRuler.TickLabelGapMultiplier = -0.3;
+% % % % %     ha.YRuler.TickLabelGapMultiplier = 0.001;
+% % % % % end
+% % % % % 
+% % % % % axes(panel_A(1));
+% % % % % text(-0.13,1.1, 'A', 'Units','normalized','FontWeight','bold');
 
 %% add arrows indicating over-represented LM
 if 0
@@ -351,8 +351,8 @@ for ii_dir = 1:2
     ha.YRuler.TickLabelGapMultiplier = 0.1;
 end
 
-axes(panel_C(1));
-text(-0.13,1.1, 'B', 'Units','normalized','FontWeight','bold');
+% axes(panel_C(1));
+% text(-0.13,1.1, 'B', 'Units','normalized','FontWeight','bold');
 
 
 %% panel D - field size - near vs. far from LM
