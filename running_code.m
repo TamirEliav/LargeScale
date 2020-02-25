@@ -2142,7 +2142,48 @@ end
 % findpeaks(FR_sleep_zscored, 'MinPeakHeight', 3);
 
 %%
+cell_ID = 'b0148_d170625_TT4_SS02';
+exp_ID = cell.details.exp_ID;
+exp=exp_load_data(exp_ID);
 
+%%
+figure
+spikes_size = squeeze(range(cell.spikes.waveforms,1));
+% x = squeeze(cell.spikes.waveforms(8,2,:));
+% y = squeeze(cell.spikes.waveforms(8,3,:));
+% z = squeeze(cell.spikes.waveforms(8,4,:));
+x = spikes_size(2,:);
+y = spikes_size(3,:);
+z = spikes_size(4,:);
+plot3(x,y,z,'.')
+
+%%
+IX = find(z>500);
+length(IX)
+bad_spikes_ts = cell.spikes.ts(IX);
+[IX, IX_per_ti, t2, t2_per_ti] = get_data_in_ti(bad_spikes_ts, exp.details.session_ts)
+FE_dir1_ts = [cell.FE{1}.start_ts; cell.FE{1}.end_ts]';
+FE_dir2_ts = [cell.FE{2}.start_ts; cell.FE{2}.end_ts]';
+IX1 = get_data_in_ti(bad_spikes_ts, FE_dir1_ts);
+IX2 = get_data_in_ti(bad_spikes_ts, FE_dir2_ts);
+
+%% check what nan do to histogram plot
+figure
+x = [1 2 3 4 5 nan nan nan];
+subplot(211)
+histogram(x,'Normalization','pdf')
+subplot(212)
+histogram(x(~isnan(x)),'Normalization','pdf')
+
+
+%% check de facto numbers...
+stats= [cells.stats];
+stats_dir = cat(1,stats.dir);
+sdf=cat(1,stats_dir(signif_cells_IX).spikes_num_air);
+
+%%
+sdf=arrayfun(@(x)(x.spikes_num_air), stats_dir);
+IX = sdf<50 & ~signif_cells_IX;
 
 %%
 
@@ -2150,10 +2191,8 @@ end
 
 
 
+
 %%
-
-
-
 
 
 

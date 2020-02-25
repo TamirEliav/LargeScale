@@ -85,9 +85,9 @@ try
 %     cell_calc_FR_map(cell_ID);
 %     cell_calc_FR_map_shuffles(cell_ID);
 %     cell_calc_Ipos(cell_ID);
-%     cell_calc_fields(cell_ID);
+    cell_calc_fields(cell_ID);
     cell_calc_fields_properties(cell_ID);
-%     cell_calc_significant(cell_ID);
+    cell_calc_significant(cell_ID);
     cell_calc_stats(cell_ID);
 %     cell_calc_inclusion(cell_ID);
 %     cell_calc_time_AC(cell_ID);
@@ -98,7 +98,7 @@ try
 %     cell_plot_map_fields(cell_ID);
 %     cell_plot_time_AC(cell_ID);
 
-%     cell_plot_figure_choose_examples(cell_ID)
+    cell_plot_figure_choose_examples(cell_ID)
     toc
     
 catch err
