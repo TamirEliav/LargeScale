@@ -47,16 +47,15 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 
 % create panels
 panels_size = [3.5 2];
-paramsets = 0:7;
-paramsets(6) = 8;
+paramsets = [0 1 2 3 4 8 6 7 9];
 x_positions =      linspace(2,16,4);
 x_positions(end)=[];
-y_positions = flip(linspace(3,23,length(paramsets)));
+y_positions = flip(linspace(1.5,23.5,length(paramsets)));
 for ii_paramset = 1:length(paramsets)
     y = y_positions(ii_paramset);
     for ii_x = 1:length(x_positions)
         x = x_positions(ii_x);
-        panel_AB(ii_paramset,ii_x) = axes('position', [ x y panels_size]);
+        panels(ii_paramset,ii_x) = axes('position', [ x y panels_size]);
     end
 end
 
@@ -93,11 +92,11 @@ end
 disp('Go back to default paramset (0)')
 PARAMS_SetParamset(0);
 
-%% 1) panels A+B - No. of fields
+%% 1) No. of fields
 nFields = nan(length(paramsets),2,length(cells));
 for ii_paramset = 1:length(paramsets)
     %% choose axis
-    axes(panel_AB(ii_paramset,1));
+    axes(panels(ii_paramset,1));
     cla
     hold on
     %% arrange data
@@ -116,8 +115,9 @@ for ii_paramset = 1:length(paramsets)
     nFields2plot = nFields(ii_paramset,:,:);
     h = histogram(nFields2plot(:));
     h.FaceColor = 0.5*[1 1 1];
-    nBinEdges = 12;
-    h.BinEdges = linspace(0,35,nBinEdges);
+%     nBinEdges = 12;
+%     h.BinEdges = linspace(0,35,nBinEdges);
+    h.BinEdges = 0.5+[0:35];
     ha = gca;
     ha.YScale = 'log';
     ha.YLim = [0.7 max(h.Values)*1.05];
@@ -134,14 +134,16 @@ for ii_paramset = 1:length(paramsets)
         case {length(paramsets)}
             xlabel('No. of fields per direction', 'Units','normalized','Position',[0.5 -0.2]);
     end
+    n = sum(~isnan(nFields2plot),'all');
+    text(0.6, 0.95, "n = "+n, 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
 end
 
 
-%% 2) panels A+B - Field size
+%% 2) Field size
 fields_size_all = {};
 for ii_paramset = 1:length(paramsets)
     %% choose axis
-    axes(panel_AB(ii_paramset,2));
+    axes(panels(ii_paramset,2));
     cla
     hold on
     %% arrange data
@@ -181,15 +183,17 @@ for ii_paramset = 1:length(paramsets)
         case {length(paramsets)}
             xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.2]);
     end
+    n = length(fields_size);
+    text(0.6, 0.95, "n = "+n, 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
 end
 
 
-%% 3) panels A+B - LS ratio
+%% 3) LS ratio
 LS_field_ratio_all = nan( length(paramsets),    length(cells) );
 LS_field_ratio_dir = nan( length(paramsets), 2, length(cells) );
 for ii_paramset = 1:length(paramsets)
     %% choose axis
-    axes(panel_AB(ii_paramset,3));
+    axes(panels(ii_paramset,3));
     cla
     hold on
     %% arrange data
@@ -232,6 +236,8 @@ for ii_paramset = 1:length(paramsets)
         case {length(paramsets)}
             xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.2]);
     end
+    n = sum(~isnan(LS_field_ratio_all_2plot),'all');
+    text(0.6, 0.95, "n = "+n, 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
 end
 
 
@@ -271,7 +277,7 @@ end
 %% Add Paramsets labels (letters A-H)
 paramsets_letters = char('A'+[0:length(paramsets)-1]);
 for ii_paramset = 1:length(paramsets)
-    axes(panel_AB(ii_paramset,1));
+    axes(panels(ii_paramset,1));
     text(-0.4,1, paramsets_letters(ii_paramset), 'Units','normalized','FontWeight','bold','VerticalAlignment','middle');
 end
 
