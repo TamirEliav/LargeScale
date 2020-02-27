@@ -2185,10 +2185,26 @@ sdf=cat(1,stats_dir(signif_cells_IX).spikes_num_air);
 sdf=arrayfun(@(x)(x.spikes_num_air), stats_dir);
 IX = sdf<50 & ~signif_cells_IX;
 
-%%
+%% generate Fig 2 with the different paramsets
+paramsets = [3 4 8 6 7 9 0];
+for ii_paramset = 1:length(paramsets)
+    ii_paramset
+    paramsets = [3 4 8 6 7 9 0];
+    paramset = paramsets(ii_paramset);
+    fprintf('loading paramset %d results...\n',paramset)
+    PARAMS_SetParamset(paramset);
+    paper_fig_2
+    close all
+end
+% go back to default paramset (0)
+disp('Go back to default paramset (0)')
+PARAMS_SetParamset(0);
 
-
-
+%% 3D plot of tunnel calib
+load('L:\DATA\9861_Somo\calib\20180606_calib_middle_line_top_14_anchors_active\bsp\client\bsp_pos_tag_708.mat');
+figure
+plot3(bsp_pos.pos(:,1),bsp_pos.pos(:,2),bsp_pos.pos(:,3),'.')
+% axis equal
 
 
 

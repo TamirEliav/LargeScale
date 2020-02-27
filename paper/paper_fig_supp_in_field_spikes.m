@@ -55,7 +55,7 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 
 % create panels
 panel_A = axes('position', [ 3 20 3 3]);
-panel_B = axes('position', [ 8 20 5 3]);
+panel_B = axes('position', [ 7.5 20 2.5 3]);
 
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
@@ -142,7 +142,7 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.1;
 ha.YScale = 'linear';
-xlabel('In-field spikes (%)', 'Units','normalized','Position',[0.5 -0.17]);
+xlabel('In-field spikes (%)', 'Units','normalized','Position',[0.5 -0.13]);
 ylabel('No. of cells')
 
 %% Panel B - percentage of out-of-field spikes
@@ -164,11 +164,14 @@ switch plot_style
         x = unique(grps); % in/out
         y = accumarray(grps, values, [], @nanmean, nan);
         err = accumarray(grps, values, [], @nansem, nan);
+        fprintf('in-field mean FR = %.2f +- %.2f\n', y(1), err(1));
+        fprintf('out-of-field mean FR = %.2f +- %.2f\n', y(2), err(2));
         h=bar(x,y);
-        h.FaceColor = 0.5*[1 1 1];
+        h.FaceColor = 0.65*[1 1 1];
         h=errorbar(x,y,err);
         h.LineStyle='none';
         h.Color = 'k';
+        h.LineWidth = 1.1;
     case 'boxplot'
         boxplot(values, grps);
     case 'violin'

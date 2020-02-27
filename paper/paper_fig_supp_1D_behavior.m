@@ -18,7 +18,7 @@ log_name_str = strrep(log_name_str , ' ', '_');
 log_name_out = fullfile(res_dir, log_name_str);
 
 %%
-fig_name_str = sprintf('%s_opt_%d_%d_%d', fig_name_str , panel_A_opt)
+% fig_name_str = sprintf('%s_opt_%d_%d_%d', fig_name_str , panel_A_opt)
 
 %% open log file
 diary off
@@ -52,11 +52,11 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
 % create panels
-panel_A(1) = axes('position', [ 2 9 5 15]);
-panel_A(2) = axes('position', [ 8 9 5 15]);
-panel_A(3) = axes('position', [14 9 5 15]);
-panel_B    = axes('position', [ 4 5  6  2]);
-panel_C    = axes('position', [12 5  2  2]);
+panel_A(1) = axes('position', [ 2 9    5 15]);
+panel_A(2) = axes('position', [ 8 9    5 15]);
+panel_A(3) = axes('position', [14 9    5 15]);
+panel_B    = axes('position', [ 4 4.6  6  2]);
+panel_C    = axes('position', [12 4.6  2  2]);
 
 
 %% load population data
@@ -135,6 +135,11 @@ for ii_exp = 1:length(panel_A_opt)
     session_ts = exp_get_sessions_ti(exp_ID, 'Behave');
     t0 = session_ts(1);
     
+    % down-sample (too many dots!!)
+    ds = 10;
+    x = x(1:ds:end);
+    y = y(1:ds:end);
+    
     % plot!
     axes(panel_A(ii_exp));
     cla('reset')
@@ -142,7 +147,7 @@ for ii_exp = 1:length(panel_A_opt)
     plot(x,y,'.k','MarkerSize',4)
     
     % labels
-    xlabel('Position (m)','Units','normalized','Position',[0.5 -0.04]);
+    xlabel('Position (m)','Units','normalized','Position',[0.5 -0.035]);
     ylabel('Time (min)','Units','normalized','Position',[-0.1 0.5]);
     ha = gca;
     ha.XLim = [0 200];
@@ -159,7 +164,7 @@ for ii_exp = 1:length(panel_A_opt)
     
 end
 axes(panel_A(1));
-text(-0.08,1.03, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.15,1.03, 'A', 'Units','normalized','FontWeight','bold');
 
 %% panel B - behavioral trajectory is 1D (small y deviations) - example
 axes(panel_B);
@@ -197,7 +202,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 
 % add direction arrows
 arrow_x = [0 0.05] + 0.38;
-arrow_y = repelem(0.25,2);
+arrow_y = repelem(0.24,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
 h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
@@ -299,7 +304,7 @@ end
 
 % add direction arrows
 arrow_x = [0 0.03] + 0.61;
-arrow_y = repelem(0.25,2);
+arrow_y = repelem(0.24,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
 h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
@@ -309,9 +314,11 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors
 
 
 %% print/save the figure
-fig_name_out = fullfile(res_dir, fig_name_str);
+fig_name_out = fullfile(res_dir, sprintf('%s_ds=%d',fig_name_str,ds));
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
 disp('figure was successfully saved to pdf/tiff/fig formats');
 
+
+%%

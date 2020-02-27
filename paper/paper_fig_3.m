@@ -115,8 +115,8 @@ for ii_dir = 1:2
     end
     % legend for LM
     if ii_dir==1
-        plot([130 140]+5, 1.1*[1 1], 'Clipping','off', 'color', 0.7.*[1 1 1], 'LineWidth',1);
-        text(150, 1.1, 'Landmarks', 'FontSize',7, 'HorizontalAlignment','left');
+        plot([130 140]+5, 1.2*[1 1], 'Clipping','off', 'color', 0.7.*[1 1 1], 'LineWidth',1);
+        text(150, 1.2, 'Landmarks', 'FontSize',7, 'HorizontalAlignment','left');
     end
     
     % plot cdf

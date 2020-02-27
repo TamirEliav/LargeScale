@@ -79,8 +79,8 @@ panel_E =    axes('position', [12.2  8.5  panels_size.*[1.3 1]  ]);
 panel_F = axes('position', [ 2.0  5 panels_size          ]);
 panel_G = axes('position', [ 5.3  5 panels_size.*[1.4 1] ]);
 panel_H = axes('position', [ 9.1  5 panels_size]          );
-panel_I = axes('position', [12.3  5 panels_size.*[1.2 1] ]);
-panel_J = axes('position', [16.0  4.4 3 3]);
+panel_I = axes('position', [12.5  5 panels_size.*[1.2 1] ]);
+panel_J = axes('position', [16.2  4.4 3 3]);
 
 %%
 prm = PARAMS_GetAll();
@@ -409,11 +409,15 @@ cla
 hold on
 text(-0.45,1.15, 'B', 'Units','normalized','FontWeight','bold');
 h = histogram(SI);
-h.NumBins = 12;
 h.FaceColor = 0.5*[1 1 1];
+h.BinEdges = 0:0.5:6;
+xlim([0 6])
+ylim([0.7e0 1.4e2])
 ha=gca;
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
+ha.YTick = [1 10 100];
+ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.1;
 % ha.YScale = 'linear';
@@ -427,12 +431,15 @@ cla
 hold on
 text(-0.45,1.15, 'C', 'Units','normalized','FontWeight','bold');
 h = histogram(sparsity);
-h.NumBins = 15;
+h.NumBins = 12;
 h.FaceColor = 0.5*[1 1 1];
 xlim([0 1])
+ylim([0.7e0 1.4e2])
 ha=gca;
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
+ha.YTick = [1 10 100];
+ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.1;
 % ha.YScale = 'linear';
@@ -454,13 +461,16 @@ ball2ball_dist = diff(LM_locs(IX));
 total_area_L = diff(prm.fields.valid_speed_pos);
 
 h = histogram(total_area(:));
-h.NumBins = 17;
+h.NumBins = 14;
 h.FaceColor = 0.5*[1 1 1];
 xlim([0 0.9*total_area_L])
+ylim([0.7e0 1.4e2])
 ha=gca;
 ha.XTick = [0:50:150];
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
+ha.YTick = [1 10 100];
+ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.1;
 % ha.YScale = 'linear';
@@ -574,15 +584,14 @@ h = histogram(nFields(:));
 h.FaceColor = 0.5*[1 1 1];
 % nBinEdges = 12;
 % h.BinEdges = linspace(0,35,nBinEdges);
-h.BinEdges = 0.5+[0:35];
+h.BinEdges = 0.5+[0:20];
+h.Data(h.Data > h.BinLimits(2)) = h.BinLimits(2);
 xlabel({'No. of fields per direction'},'Units','normalized','Position',[0.5 -0.18]);
 ylabel('No. of cells','Units','normalized','Position',[-0.28 0.5])
 ha = gca;
 ha.YScale = 'log';
-% ha.YScale = 'linear';
-% ha.YLim = [0.7 130];
-ha.YLim = [0.7 max(h.Values)*1.05];
-ha.XLim = [0 35.5];
+ha.YLim = [0.7e0 1.4e2];
+ha.XLim = [0 h.BinLimits(2)];
 ha.XTick = [0:10:30];
 ha.YTick = [1 10 100];
 ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
@@ -600,7 +609,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 axes(panel_G);
 cla
 hold on
-text(-0.35,1.15, 'G', 'Units','normalized','FontWeight','bold');
+text(-0.34,1.15, 'G', 'Units','normalized','FontWeight','bold');
 fields_size = [];
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -720,8 +729,8 @@ ha.YScale = 'log';
 ha.XScale = 'log';
 ha.XLim = [0 27];
 % ha.YLim = [0 10];
-% ha.YLim = [7e-1 260];
-ha.YLim = [0.7 max(h(2).Values)*1.05];
+% ha.YLim = [7e-1 120];
+ha.YLim = [0.7 max(h(2).Values)*1.1];
 % ha.XTick = [0:5:35];
 ha.YTick = [1 10 100];
 ha.XTick = [1 2 5 10 20];
@@ -805,10 +814,14 @@ ha.YRuler.TickLabelGapMultiplier = 0.1;
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, sprintf('%s__corr_%s_%d',fig_name_str,corr_type,field_speed_opt));
+% fig_name_out = fullfile(res_dir, sprintf('%s__corr_%s_%d_paramset_%d',fig_name_str,corr_type,field_speed_opt,prm.parmaset));
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
 disp('figure was successfully saved to pdf/tiff/fig formats');
+
+
+
 
 
 

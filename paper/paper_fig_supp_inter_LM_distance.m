@@ -48,10 +48,10 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 % create panels
 panel_A_size = [3 3];
 panel_B_size = [7 3];
-panel_A(1) = axes('position', [ 4  21  panel_A_size]);
-panel_A(2) = axes('position', [ 4  16  panel_A_size]);
-panel_B(1) = axes('position', [10  21  panel_B_size]);
-panel_B(2) = axes('position', [10  16  panel_B_size]);
+panel_A(1) = axes('position', [ 4    21    panel_A_size]);
+panel_A(2) = axes('position', [ 4    15.8  panel_A_size]);
+panel_B(1) = axes('position', [10.6  21    panel_B_size]);
+panel_B(2) = axes('position', [10.6  15.8  panel_B_size]);
 
 
 %% load population data
@@ -177,9 +177,9 @@ for ii_dir = 1:2
     
 end
 axes(panel_A(1));
-text(-0.3,1.2, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.35,1.2, 'A', 'Units','normalized','FontWeight','bold');
 axes(panel_B(1));
-text(-0.18,1.2, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.16,1.2, 'B', 'Units','normalized','FontWeight','bold');
 
 %% add direction arrows
 arrow_x = 0.29 +[0 0.04];

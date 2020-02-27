@@ -129,7 +129,7 @@ for ii_scnr = 1:5
         case 1
             ht.Color = clr(schemes_IX(ii_scnr),:);
         case 2
-            plot([0 25]+14, 11.8*[1 1], 'Color', clr(schemes_IX(ii_scnr),:), 'LineWidth', 1.5, 'Clipping','off');
+            plot([0 25]+14, 11.8*[1 1], 'Color', clr(schemes_IX(ii_scnr),:), 'LineWidth', 2, 'Clipping','off');
     end
 end
 axes(panel_A(1));
@@ -285,7 +285,11 @@ for ii_N = 1:length(jN_options)
     h.XTick = [20 100 1000];
     h.XTickLabel = {'20';'100';'1000'};
     h.XRuler.TickLabelGapOffset = -1;
+    h.YRuler.TickLabelGapOffset = 0.5;
     h.XRuler.TickLength = [0.03 0.03];
+    h.YRuler.TickLength = [0.015 0.015];
+    h.XRuler.FontSize = 6.5;
+    h.YRuler.FontSize = 6.5;
 end
 
 %% panel D - 99th prc error
@@ -339,10 +343,12 @@ for ii_N = 1:length(jN_options)
     h.XTickLabel = {'100';'1000'};
     h.YTick = [1 10 100];
     h.YTickLabel = {'1';'10';'100'};
-    h.YRuler.TickLabelGapOffset = 2;
     h.XRuler.TickLabelGapOffset = -1;
+    h.YRuler.TickLabelGapOffset = 0.5;
     h.XRuler.TickLength = [0.06 0.06];
-    h.YRuler.TickLength = [0.05 0.05];
+    h.YRuler.TickLength = [0.04 0.04];
+    h.XRuler.FontSize = 6.5;
+    h.YRuler.FontSize = 6.5;
 end
 
 %% panel E - 99th prc error
@@ -364,7 +370,7 @@ for ii_N = 1:length(jN_options)
     xlim([20 1000]) ;
     ylim(ylimits_options(ii_N,:))
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel('Prob.(error>5% of environment size)', 'Units','normalized','Position',[ -0.12 0.44]);
+    ylabel('Prob.(error > 5% of environment size)', 'Units','normalized','Position',[ -0.14 0.4]);
 %     text(0.95,1.03, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
     h = gca;
     h.XScale = 'log';
@@ -376,6 +382,7 @@ for ii_N = 1:length(jN_options)
     h.YRuler.TickLabelGapOffset = -0.1;
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
+    h.YRuler.TickLength = [0.03 0.03];
     h.YLim = 10.^[-4 0];
     if ii_N == 1
         text(-0.20,1.1, 'E', 'Units','normalized','FontWeight','bold');
@@ -457,17 +464,16 @@ ha.TickLength = [0.02 0.02];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel('Integration time window (ms)')
-ylabel('Prob.(error>5% of environment size)','Units','normalized','Position',[-0.12 0.45]);
+ylabel('Prob.(error > 5% of environment size)','Units','normalized','Position',[-0.12 0.4]);
 ha.XScale = 'linear';
 ha.YScale = 'log';
 
 
 %% print/save the figure
-fig_name_out = fullfile(res_dir, sprintf('%s_dt_%s_coverage=%d_title_opt=%d', ...
+fig_name_out = fullfile(res_dir, sprintf('%s_dt_%s_coverage=%d', ...
     fig_name_str, ...
     strrep(num2str(panels_AE_dt),'.','_'), ...
-    100*coverage, ...
-    schemes_title_color_opt));
+    100*coverage));
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');

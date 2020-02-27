@@ -54,11 +54,11 @@ panel_C_size = [7 3];
 % panel_A(2) = axes('position', [ 2 18 panel_A_size]);
 % panel_B(1) = axes('position', [11 22 panel_B_size]);
 % panel_B(2) = axes('position', [11 18 panel_B_size]);
-panel_C(1) = axes('position', [ 2 22 panel_C_size]);
-panel_C(2) = axes('position', [ 2 18 panel_C_size]);
+panel_C(1) = axes('position', [ 2 22   panel_C_size]);
+panel_C(2) = axes('position', [ 2 17.5 panel_C_size]);
 % panel_D(1) = axes('position', [11 13.5 panel_D_size]);
 % panel_D(2) = axes('position', [11  9.5 panel_D_size]);
-panel_legend = axes('position', [9.5 23.5 0.5 0.5]);
+panel_legend = axes('position', [6.5 25.35 0.5 0.4]);
 
 %% legend panel
 axes(panel_legend);
@@ -69,8 +69,8 @@ t = linspace(0,1,100);
 % x = cos(3*2*pi*linspace(0,1,100));
 x = pulstran(t,linspace(0,1,3),'rectpuls',1/6);
 x(x>0) = nan;x(~isnan(x)) = 1;
-plot(  t  ,   x  , '-' , 'color', 0.7.*[1 1 1], 'LineWidth',1.5);
-plot([0 1], [2 2], '-', 'color', 0.7.*[1 1 1], 'LineWidth',1.5);
+plot(  t  ,   x  , '-' , 'color', 0.7.*[1 1 1], 'LineWidth',1);
+plot([0 1], [2 2], '-', 'color', 0.7.*[1 1 1], 'LineWidth',1);
 text(1.3, 2, 'Landmarks','FontSize',7,'HorizontalAlignment','left');
 text(1.3, 1, 'Landing balls','FontSize',7,'HorizontalAlignment','left');
 xlim([0 1]);
