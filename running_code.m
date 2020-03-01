@@ -2181,9 +2181,22 @@ stats= [cells.stats];
 stats_dir = cat(1,stats.dir);
 sdf=cat(1,stats_dir(signif_cells_IX).spikes_num_air);
 
-%%
+%% #spikes in-air
 sdf=arrayfun(@(x)(x.spikes_num_air), stats_dir);
 IX = sdf<50 & ~signif_cells_IX;
+
+%% #spikes in-air (only valid speed zone)
+nSpikeHighSpeed = zeros(length(cells),2);
+nSpikeInAir = zeros(length(cells),2);
+for ii_cell = 1:length(cells)
+    for ii_dir = 1:2
+        FE = cells(ii_cell).FE{ii_dir};
+        nSpikeHighSpeed(ii_cell,ii_dir) = length(get_data_in_ti( [FE.spikes_pos], prm.fields.valid_speed_pos));
+        nSpikeInAir(ii_cell,ii_dir) = length( [FE.spikes_pos] );
+    end
+end
+nSpikeHighSpeed(~signif_cells_IX) = nan;
+nSpikeInAir(~signif_cells_IX) = nan;
 
 %% generate Fig 2 with the different paramsets
 paramsets = [3 4 8 6 7 9 0];
@@ -2206,9 +2219,42 @@ figure
 plot3(bsp_pos.pos(:,1),bsp_pos.pos(:,2),bsp_pos.pos(:,3),'.')
 % axis equal
 
+%% 27/02/2020 - calc arms lengths and angle between them
+exp_ID = 'b2289_d180615';
+exp = exp_load_data(exp_ID, 'pos','LM');
+turnpoint_LM = exp.LM(contains({exp.LM.name},{'turn-point'}));
+% turnpoint_LM.pos
+ball1_LM = exp.LM(2);
+ball2_LM = exp.LM(end);
 
+%%
+figure
+hold on
+plot(exp.pos.calib_tunnel.curvexy(:,1), exp.pos.calib_tunnel.curvexy(:,2), '.')
+plot(turnpoint_LM.pos_X, turnpoint_LM.pos_Y, 'or')
+plot(turnpoint_LM.pos_X+[-50 0], turnpoint_LM.pos_Y+[-50 0], '--r')
+axis equal
+lm1=fitlm(xy1(:,1),xy1(:,2));
+lm2=fitlm(xy2(:,1),xy2(:,2));
+plot(lm1)
+plot(lm2)
+
+%% calc tunnel total length
+xy = exp.pos.calib_tunnel.curvexy;
+tunnel_length = sum( sqrt(sum(diff(xy).^2,2)) )
+arm1_length   = sum( sqrt(sum(diff(xy1).^2,2)) )
+arm2_length   = sum( sqrt(sum(diff(xy2).^2,2)) )
+m1 = lm1.Coefficients.Estimate(2);
+m2 = lm2.Coefficients.Estimate(2);
+phi = rad2deg( atan(m1) - atan(m2) )
 
 %%
 
 
 
+
+
+
+
+
+%%

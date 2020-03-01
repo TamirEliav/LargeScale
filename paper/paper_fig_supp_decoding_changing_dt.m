@@ -1,4 +1,4 @@
-%% Large Scale - Fig. S11 - decoder with shorter dt (200ms) + error vs. dt
+%% Large Scale - Fig. S12 - decoder with shorter dt (200ms) + error vs. dt
 
 %%
 clear 
@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S11';
+fig_name_str = 'fig_S12';
 fig_caption_str = 'Theoretical analysis - error vs. integration time (dt)';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');

@@ -15,7 +15,7 @@ plot_style = 'errorbars';
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S4_new';
+fig_name_str = 'fig_S4';
 fig_caption_str = 'In-field spikes';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -150,7 +150,7 @@ axes(panel_B);
 % cla RESET
 cla(gca,'reset')
 hold on
-text(-0.2,1.15, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.35,1.15, 'B', 'Units','normalized','FontWeight','bold');
 box off
 
 x1 = [InOutFieldFR.in_field_FR_median];

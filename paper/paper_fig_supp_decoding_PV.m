@@ -1,4 +1,4 @@
-%% Large Scale - Fig. S10 - PV decoder
+%% Large Scale - Fig. S11 - PV decoder
 
 %%
 clear 
@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S10';
+fig_name_str = 'fig_S11';
 fig_caption_str = 'Theoretical analysis with PV decoder';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
