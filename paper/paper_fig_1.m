@@ -52,7 +52,7 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 
 % create panels
 panel_B_size = [9.5 1];
-panel_A    = axes('position', [ 1.25 23.4  2.2 2.2]);
+panel_A    = axes('position', [ 1.2 23.45  2.2 2.2]);
 panel_B(1) = axes('position', [ 4.5 24.5  panel_B_size]);
 panel_B(2) = axes('position', [ 4.5 23.5  panel_B_size]);
 panel_B(3) = axes('position', [ 4.5 22.5  panel_B_size]);
@@ -313,7 +313,7 @@ histology_slice_example_file = 'L:\resources\Histology\processed\Tamir_bat148_Se
 axes(panel_A);
 image = imread(logger_image_filename);
 imshow(image);
-text(-0.28,1.17, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.24,1.15, 'A', 'Units','normalized','FontWeight','bold');
 % add scale bar
 scale_mm = 10;
 pixel_mm_ratio = 720/11; % 720 pixels is measured manually using ginput amd sd card width is 11mm
@@ -731,12 +731,12 @@ baseval = 0.1;
 area([4 prm.fields.valid_speed_pos(1)]    , ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
 area([  prm.fields.valid_speed_pos(2) 194], ylimits([2 2]), baseval, 'FaceColor',0.8*[1 1 1],'EdgeColor','none','ShowBaseLine','off');
 plot(x,y,'.','Color', 'k','MarkerSize',1);
-% plot(prm.fields.valid_speed_pos([1 1]), ylimits,'--m','LineWidth',2)
-% plot(prm.fields.valid_speed_pos([2 2]), ylimits,'--m','LineWidth',2)
 set(gca,'xtick',0:50:200,'ytick',[-10 0 8],'xlim',[0 200])
 set(gca,'tickdir','out','TickLength',repelem(0.01,2));
+h=gca;
+h.XRuler.TickLabelGapOffset = -1;
 ylim(ylimits);
-xlabel('Position (m)','Units','normalized','Position',[0.5 -0.25]);
+xlabel('Position (m)','Units','normalized','Position',[0.5 -0.2]);
 ylabel('Flight speed (m/s)','Units','normalized','Position',[-0.07 0.41]);
 
 
@@ -772,17 +772,18 @@ ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 % add direction arrows
 % arrow_x = [0.48 0.50] + 0.0231 + 0.155;
 % arrow_y = repelem(0.45,2) + 0.155;
-arrow_x = ha.Position(1) + 0.75*ha.Position(3) + [0 0.4];
+arrow_x = ha.Position(1) + 0.7*ha.Position(3) + [0 0.4];
 arrow_y = ha.Position(2) + 1*ha.Position(4) + [0 0] + 0.3;
 arrow_x = arrow_x / figure_size_cm(1);
 arrow_y = arrow_y / figure_size_cm(2);
 clear h
-h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
-h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
+h(1)=annotation('arrow',arrow_x,      arrow_y+0.01,  'Color', prm.graphics.colors.flight_directions{1});
+h(2)=annotation('arrow',flip(arrow_x),arrow_y+0.001, 'Color', prm.graphics.colors.flight_directions{2});
 [h.HeadWidth] = disperse([5 5]);
 [h.HeadLength] = disperse([5 5]);
 
 %% panel K - number of laps
+clc
 axes(panel_K);
 cla
 hold on
@@ -794,9 +795,10 @@ for ii_dir = 1:2
     FE_dir = cellfun(@(FE)(FE([FE.direction]==direction)), {exps_flight.FE},'UniformOutput',0);
     nFlights = cellfun(@(FE)(sum([FE.distance]>prm.flight.full_min_distance)),FE_dir);
     h=histogram(nFlights);
-    h.NumBins = 10;
-%     h.BinEdges = linspace(12,58,11);
-    h.BinEdges = h.BinEdges + (ii_dir-1)*0.33*h.BinWidth;
+%     h.NumBins = 10;
+    h.BinEdges = linspace(12,58,11);
+    h.BinEdges = h.BinEdges + (ii_dir-1)*0.26*h.BinWidth;
+    h.BinEdges
     h.FaceColor = [1 1 1];
     h.EdgeColor = dir_colors{ii_dir};
     h.Normalization = 'Count';
@@ -816,13 +818,13 @@ ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 % add direction arrows
 % arrow_x = 0.67 + [0 0.02] + 0.0231;
 % arrow_y = repelem(0.45,2);
-arrow_x = ha.Position(1) + 0.75*ha.Position(3) + [0 0.4];
+arrow_x = ha.Position(1) + 0.7*ha.Position(3) + [0 0.4];
 arrow_y = ha.Position(2) + 1*ha.Position(4) + [0 0] + 0.3;
 arrow_x = arrow_x / figure_size_cm(1);
 arrow_y = arrow_y / figure_size_cm(2);
 clear h
-h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});
-h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors.flight_directions{2});
+h(1)=annotation('arrow',arrow_x,      arrow_y+0.01,   'Color', prm.graphics.colors.flight_directions{1});
+h(2)=annotation('arrow',flip(arrow_x),arrow_y+0.001  , 'Color', prm.graphics.colors.flight_directions{2});
 [h.HeadWidth] = disperse([5 5]);
 [h.HeadLength] = disperse([5 5]);
 
@@ -874,7 +876,7 @@ ha=gca;
 ha.TickLength = [0.04 0.035];
 ha.XRuler.TickLabelGapMultiplier = -0.1;
 ha.YRuler.TickLabelGapMultiplier = 0;
-xlabel('Distance flown (km)','Units','normalized','Position',[0.42 -0.25]);
+xlabel('Distance flown (km)','Units','normalized','Position',[0.5 -0.25]);
 ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
 %%

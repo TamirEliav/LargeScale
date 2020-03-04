@@ -144,10 +144,11 @@ for ii_exp = 1:length(panel_A_opt)
     axes(panel_A(ii_exp));
     cla('reset')
     hold on
-    plot(x,y,'.k','MarkerSize',4)
+%     plot(x,y,'.k','MarkerSize',4)
+    plot(x,y,'-k','LineWidth',1)
     
     % labels
-    xlabel('Position (m)','Units','normalized','Position',[0.5 -0.035]);
+    xlabel('Position (m)','Units','normalized','Position',[0.5 -0.03]);
     ylabel('Time (min)','Units','normalized','Position',[-0.1 0.5]);
     ha = gca;
     ha.XLim = [0 200];
@@ -156,9 +157,9 @@ for ii_exp = 1:length(panel_A_opt)
     ha.XTick = [0:50:200];
 %     ha.YTick = [-2:1:2];
     ha.TickDir='out';
-    ha.TickLength = [0.01 0.01];
-    ha.XRuler.TickLabelGapMultiplier = -0.3;
-    ha.YRuler.TickLabelGapMultiplier = 0.001;
+    ha.TickLength = [0.007 0.01];
+    ha.XRuler.TickLabelGapOffset = 0.5;
+    ha.YRuler.TickLabelGapOffset = 1.5;
     
     rescale_plot_data('y',[1e-6/60,t0]);
     

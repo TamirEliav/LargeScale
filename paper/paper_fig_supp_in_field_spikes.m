@@ -55,7 +55,7 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 
 % create panels
 panel_A = axes('position', [ 3 20 3 3]);
-panel_B = axes('position', [ 7.5 20 2.5 3]);
+panel_B = axes('position', [ 8 20 2.9 3]);
 
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
@@ -167,6 +167,7 @@ switch plot_style
         fprintf('in-field mean FR = %.2f +- %.2f\n', y(1), err(1));
         fprintf('out-of-field mean FR = %.2f +- %.2f\n', y(2), err(2));
         h=bar(x,y);
+        h.BarWidth = 0.7;
         h.FaceColor = 0.65*[1 1 1];
         h=errorbar(x,y,err);
         h.LineStyle='none';

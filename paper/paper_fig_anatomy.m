@@ -118,13 +118,13 @@ ha.ZLim = [-11 -2];
 % add x/y/z scale bar
 scale_bar_center = [2,3,-7];
 scale_bar_length = [-1 1];
-APMLDV_pos_offset = scale_bar_length.*1.3;
 line(scale_bar_center(1)+scale_bar_length,scale_bar_center(2)+[0 0],scale_bar_center(3)+[0 0],'Color','k','LineWidth',1.5);
 line(scale_bar_center(1)+[0 0],scale_bar_center(2)+scale_bar_length,scale_bar_center(3)+[0 0],'Color','k','LineWidth',1.5);
 line(scale_bar_center(1)+[0 0],scale_bar_center(2)+[0 0],scale_bar_center(3)+scale_bar_length,'Color','k','LineWidth',1.5);
-text(scale_bar_center(1)+APMLDV_pos_offset+[0 0.2],scale_bar_center(2)+[0 0],scale_bar_center(3)+[0 0], {'A';'P'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
-text(scale_bar_center(1)+[0 0],scale_bar_center(2)+APMLDV_pos_offset,scale_bar_center(3)+[0 0], {'M';'L'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
-text(scale_bar_center(1)+[0 0],scale_bar_center(2)+[0 0],scale_bar_center(3)+APMLDV_pos_offset+[0.07 0], {'V';'D'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
+
+text([0.7 3.5],[3 3.05],[-7 -7], {'A';'P'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
+text([2 2],[1.7 4.25],[-7 -7], {'M';'L'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
+text([2 2],[3 3],[-8.23 -5.7], {'V';'D'}, 'FontWeight','bold','FontSize',10,'HorizontalAlignment','center', 'VerticalAlignment','middle');
 
 text(1,1.5,-5,    {'Septal';'pole'}, 'FontSize',8,'HorizontalAlignment','left');
 text(1,2.3,-10.3, {'Temporal';'pole'}, 'FontSize',8,'HorizontalAlignment','left');
@@ -137,7 +137,7 @@ POSf([3 4]) = [0.01 0.10];
 % colorbar_ax_pos = [panel_A(1).Position(1:2)+[panel_A(1).Position(3) 1] 0.7 3];
 c=colorbar('location','EastOutside', 'position', POSf);
 c.Ticks = [0,100];
-c.TickLabels = {'100','0'};
+c.TickLabels = {'100 ','0'};
 c.Label.String = 'Longitudinal axis (%)';
 c.Label.FontSize = 8;
 
@@ -327,7 +327,7 @@ hl=annotation('line',xaf,yaf);
 hl.LineWidth = 2;
 hl.Color = 'k';
 % annotation('textbox',[xaf(2)+0.001 yaf(1) 0.1 0.1], 'String',sprintf('%dmm',scale_bar_mm), 'FitBoxToText','on', 'LineStyle','none');
-text(300, 1270, sprintf('%dmm',scale_bar_mm), 'HorizontalAlignment','center', 'VerticalAlignment','middle','FontSize',8);
+text(300, 1290, sprintf('%dmm',scale_bar_mm), 'HorizontalAlignment','center', 'VerticalAlignment','middle','FontSize',8);
 
 %%
 if 0

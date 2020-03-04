@@ -48,7 +48,7 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 % create panels
 panels_size = [3.5 2];
 paramsets = [0 1 2 3 4 8 6 7 9];
-x_positions =      linspace(2,16,4);
+x_positions =      linspace(2,16.4,4);
 x_positions(end)=[];
 y_positions = flip(linspace(1.5,23.5,length(paramsets)));
 for ii_paramset = 1:length(paramsets)
@@ -117,11 +117,12 @@ for ii_paramset = 1:length(paramsets)
     h.FaceColor = 0.5*[1 1 1];
 %     nBinEdges = 12;
 %     h.BinEdges = linspace(0,35,nBinEdges);
-    h.BinEdges = 0.5+[0:35];
+    h.BinEdges = 0.5+[0:20];
+    h.Data(h.Data > h.BinLimits(2)) = h.BinLimits(2);
     ha = gca;
     ha.YScale = 'log';
     ha.YLim = [0.7 max(h.Values)*1.05];
-    ha.XLim = [0 35.5];
+    ha.XLim = [0 h.BinLimits(2)];
     ha.XTick = [0:10:30];
     ha.YTick = [1 10 100];
     ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};

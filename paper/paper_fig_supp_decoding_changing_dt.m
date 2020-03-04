@@ -117,7 +117,7 @@ for ii_scnr = 1:5
     colormap(cmap)
     xlim([0 200])
     ylim([0.5 10.5])
-    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.15]);
+    xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.17]);
     h = gca;
     h.YTick = [1 5 10];
     h.XRuler.TickLabelGapOffset = -1;
@@ -133,9 +133,9 @@ for ii_scnr = 1:5
     end
 end
 axes(panel_A(1));
-text(-0.4,1.1, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.2, 'A', 'Units','normalized','FontWeight','bold');
 text(3,1.5, 'Integration time window of  {\Delta}t = 200 ms instead of 500 ms', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
-ylabel('Example neuron no.','Units','normalized','Position',[-0.2 0.5]);
+ylabel('Example neuron no.','Units','normalized','Position',[-0.18 0.5]);
 
 %% panel B - minimum N required for error < 1 m
 axes(panel_B(1));
@@ -234,7 +234,7 @@ for ii_scheme = 1:4
         signif_str_font_size = 6;
         signif_str_offset = 0.05;
     end
-    text(mean(X),m+0.02+signif_str_offset, signif_str, 'HorizontalAlignment','center','FontSize',signif_str_font_size);
+    text(mean(X),m+0.05+signif_str_offset, signif_str, 'HorizontalAlignment','center','FontSize',signif_str_font_size);
 end
 
 
@@ -310,18 +310,18 @@ for ii_N = 1:length(jN_options)
 %     ylim([0.1 2000]) ;
     xlim([20 1000]) ;
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel([num2str(prc(jprc)) '% decoding error (m)'], 'Units','normalized','Position',[ -0.125 0.5]);
+    ylabel([num2str(prc(jprc)) '% decoding error (m)'], 'Units','normalized','Position',[ -0.135 0.5]);
     h = gca;
     h.XScale = 'log';
 %     h.YScale = 'log';
     h.XTick = [20 100 1000];
     h.XTickLabel = {'20';'100';'1000'};
-    h.YRuler.TickLabelGapOffset = 2;
+    h.YRuler.TickLabelGapOffset = 2.4;
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
 %     text(0.95,1, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
     if ii_N == 1
-        text(-0.19,1.1, 'D', 'Units','normalized','FontWeight','bold');
+        text(-0.21,1.1, 'D', 'Units','normalized','FontWeight','bold');
         text(0.5,1.1, 'Catastrophic errors: size', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
     
@@ -344,7 +344,7 @@ for ii_N = 1:length(jN_options)
     h.YTick = [1 10 100];
     h.YTickLabel = {'1';'10';'100'};
     h.XRuler.TickLabelGapOffset = -1;
-    h.YRuler.TickLabelGapOffset = 0.5;
+    h.YRuler.TickLabelGapOffset = 1.2;
     h.XRuler.TickLength = [0.06 0.06];
     h.YRuler.TickLength = [0.04 0.04];
     h.XRuler.FontSize = 6.5;
@@ -382,10 +382,10 @@ for ii_N = 1:length(jN_options)
     h.YRuler.TickLabelGapOffset = -0.1;
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
-    h.YRuler.TickLength = [0.03 0.03];
+    h.YRuler.TickLength = [0.024 0.03];
     h.YLim = 10.^[-4 0];
     if ii_N == 1
-        text(-0.20,1.1, 'E', 'Units','normalized','FontWeight','bold');
+        text(-0.22,1.1, 'E', 'Units','normalized','FontWeight','bold');
         text(0.5,1.1, 'Catastrophic errors: probability', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
 end
@@ -434,7 +434,7 @@ ha.YScale = 'log';
 axes(panel_G);
 cla
 hold on
-text(-0.24,1.05, 'G', 'Units','normalized','FontWeight','bold');
+text(-0.25,1.05, 'G', 'Units','normalized','FontWeight','bold');
 
 % load data
 switch coverage

@@ -52,9 +52,9 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 % create panels
 panels_size = [4 4];
 panel_A = axes('position', [ 4    18 panels_size]);
-panel_B = axes('position', [10.5  18 panels_size]);
+panel_B = axes('position', [10.8  18 panels_size]);
 panel_A_legend = axes('position', [ 6.5 21 0.5 0.3]);
-panel_B_legend = axes('position', [13   21 0.5 0.3]);
+panel_B_legend = axes('position', [13.3   21 0.5 0.3]);
 % panel_A(1) = axes('position', [ 4   18 panels_size]);
 % panel_A(2) = axes('position', [ 4   13 panels_size]);
 % panel_A(3) = axes('position', [ 4    8 panels_size]);
@@ -204,7 +204,7 @@ h2.DisplayStyle = 'stairs';
 h2.EdgeColor = c;
 h2.LineWidth = 1; % short arm
 [H,P_KS,KSSTAT] = kstest2(x1,x2,'Tail','unequal');
-text(1,1,sprintf('P_{KS} = %.3f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+text(1,1.05,sprintf('P_{KS} = %.3f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 % P_ranksum = ranksum(x1,x2);
 % text(1,0.85,sprintf('P_{Wilc}=%.3f',P_ranksum),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 ha=gca;
@@ -352,7 +352,7 @@ end
 axes(panel_B);
 cla
 hold on
-text(-0.3,1.15, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.28,1.15, 'B', 'Units','normalized','FontWeight','bold');
 
 x1=LS_field_ratio_all_long;
 x2=LS_field_ratio_all_short;
@@ -376,7 +376,7 @@ h2.EdgeColor = c;
 h2.LineWidth = 1; % short arm
 
 [H,P_KS,KSSTAT] = kstest2(x1, x2, 'Tail','unequal');
-text(1,1,sprintf('P_{KS} = %.3f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+text(1,1.05,sprintf('P_{KS} = %.3f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 % P_ranksum = ranksum(x1,x2);
 % text(1,0.95,sprintf('P_{Wilc}=%.3f',P_ranksum),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 
@@ -393,7 +393,7 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapOffset = -1;
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.12]);
-ylabel('Probability','Units','normalized','Position',[-0.18 0.5]);
+ylabel('Probability','Units','normalized','Position',[-0.2 0.5]);
 
 %% add legend
 axes(panel_B_legend);

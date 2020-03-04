@@ -115,8 +115,8 @@ for ii_dir = 1:2
     end
     % legend for LM
     if ii_dir==1
-        plot([130 140]+5, 1.2*[1 1], 'Clipping','off', 'color', 0.7.*[1 1 1], 'LineWidth',1);
-        text(150, 1.2, 'Landmarks', 'FontSize',7, 'HorizontalAlignment','left');
+        plot([130 140]+5, 1.2*[1 1], 'Clipping','off', 'color', 0.7.*[1 1 1], 'LineWidth',1.2);
+        text(147, 1.2, 'Landmarks', 'FontSize',7, 'HorizontalAlignment','left');
     end
     
     % plot cdf
@@ -173,7 +173,7 @@ end
 for ii_dir = 1:2
 %     subplot(1,2,ii_dir)
     axes(panel_B(ii_dir));
-    cla
+    cla('reset')
     hold on
     
     %% arrange data - same as in panel C
@@ -268,7 +268,8 @@ for ii_dir = 1:2
     ha.TickLength = [0.03 0.03];
     ha.YTick = ha.YLim;
     ha.XRuler.TickLabelGapMultiplier = -0.5;
-    ha.YRuler.TickLabelGapMultiplier = -0.04;
+%     ha.YRuler.TickLabelGapMultiplier = -0.04;
+    ha.YRuler.TickLabelGapOffset = 2.2;
     xlabel({'Distance of fields';'to nearest landmark (m)'}, 'Units','normalized','Position',[0.5 -0.13])
     ylabel('Probability', 'Units','normalized','Position',[-0.08 0.5])
 end
@@ -347,7 +348,7 @@ for ii_dir = 1:2
     ha.YLim = [0 y_clipping];
     ha.YTick = ha.YLim;
     ha.XRuler.TickLabelGapMultiplier = -0.3;
-    ha.YRuler.TickLabelGapMultiplier = 0.1;
+    ha.YRuler.TickLabelGapOffset = 2.2;
 end
 
 axes(panel_C(1));
@@ -356,13 +357,11 @@ text(-0.13,1.12, 'C', 'Units','normalized','FontWeight','bold');
 
 %% panel D - field size - near vs. far from LM
 % =========================================================================
-% figure
 axes(panel_D(1));
 text(-0.3,1.12, 'D', 'Units','normalized','FontWeight','bold');
 for ii_dir = 1:2
-%     subplot(1,2,ii_dir)
     axes(panel_D(ii_dir));
-%     cla
+%     cla('reset')
     hold on
     
     %% arrange data
@@ -435,7 +434,8 @@ for ii_dir = 1:2
     ha.YTick = ha.YLim;
     ha.XLim = [0 20];
     ha.XRuler.TickLabelGapMultiplier = -0.3;
-    ha.YRuler.TickLabelGapMultiplier = 0.001;
+%     ha.YRuler.TickLabelGapMultiplier = 0.001;
+    ha.YRuler.TickLabelGapOffset = 2.2;
     xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.13]);
     ylabel('Probability', 'Units','normalized','Position',[-0.08 0.5]);
 %     legend_pos = [ha.Position([1 2])+[2.2 0.5].*ha.Position([3 4]) 0.1 0.03];

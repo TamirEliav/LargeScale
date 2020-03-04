@@ -407,7 +407,7 @@ end
 axes(panel_B);
 cla
 hold on
-text(-0.45,1.15, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.6,1.15, 'B', 'Units','normalized','FontWeight','bold');
 h = histogram(SI);
 h.FaceColor = 0.5*[1 1 1];
 h.BinEdges = 0:0.5:6;
@@ -506,7 +506,7 @@ xlabel('Coverage (%)', 'Units','normalized','Position',[0.45 1.2]);
 axes(panel_E);
 cla
 hold on
-text(-0.4,1.15, 'E', 'Units','normalized','FontWeight','bold');
+text(-0.36,1.15, 'E', 'Units','normalized','FontWeight','bold');
 
 % arrange data
 signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
@@ -564,7 +564,7 @@ ylabel('Probability', 'Units','normalized','Position',[-0.17 0.5])
 axes(panel_F);
 cla
 hold on
-text(-0.45,1.15, 'F', 'Units','normalized','FontWeight','bold');
+text(-0.6,1.15, 'F', 'Units','normalized','FontWeight','bold');
 nFields = nan(2,length(cells));
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
@@ -629,7 +629,7 @@ h.BinWidth = 1;
 ha=gca;
 ha.YScale = 'log';
 xlabel('Field size (m)')
-ylabel('Counts','Units','normalized','Position',[-0.23 0.5])
+ylabel('Counts','Units','normalized','Position',[-0.22 0.5])
 ha = gca;
 % ha.XLim = [0 35];
 ha.YLim = [0.8 300];
@@ -769,7 +769,7 @@ end
 axes(panel_J);
 cla
 hold on
-text(-0.27,0.9667, 'J', 'Units','normalized','FontWeight','bold');
+text(-0.3,0.9667, 'J', 'Units','normalized','FontWeight','bold');
 % arrange data
 cells_signif = cat(1,cells.signif);
 cells_signif = arrayfun(@(x)(x.TF), cells_signif);
@@ -788,13 +788,16 @@ end
 y = [stats_all.field_ratio_LS];
 [r,r_pval] = corr(x',y','rows','pairwise','type','Pearson')
 [rho,rho_pval] = corr(x',y','rows','pairwise','type','Spearman')
+[~,ttest_P] = ttest(x,1);
+signtest_P = signtest(x,1);
+fprintf('LS speed ratio: P=%.2g (ttest), P=%.2g (signtest)\n',ttest_P,signtest_P);
 plot(x, y, '.k');
 switch corr_type
     case 'pearson'
         text(0.1,1, {sprintf('r = %.2f',r);sprintf('P = %.2f',r_pval)}, ...
             'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
     case 'spearman'
-        text(0.52,1.06, {['{\rho}' sprintf(' = %.3f',rho)];sprintf('P = %.3f',rho_pval)}, ...
+        text(0.52,1.06, {['{\rho}' sprintf(' = %.3f',rho)];sprintf('P = %.2f',rho_pval)}, ...
             'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
 end
 xlabel('Speed ratio', 'Units','normalized', 'Position',[0.5 -0.12]);

@@ -139,7 +139,7 @@ switch corr_type
         text(1,1,   {sprintf('r = %.3f',r);sprintf('P = %.2f',pval_r)}, ...
             'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     case 'spearman'
-        text(1,1, {['{\rho}' sprintf(' = %.3f',rho)];sprintf('P = %.3f',pval_rho)}, ...
+        text(0.94,1, {['{\rho}' sprintf(' = %.3f',rho)];sprintf('P = %.3f',pval_rho)}, ...
             'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 end
 
@@ -152,7 +152,7 @@ fprintf('panel A number of cells=%d\n',sum(~isnan(y)))
 axes(panel_B);
 cla
 hold on
-text(-0.27,1.1, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.35,1.1, 'B', 'Units','normalized','FontWeight','bold');
 
 x = [CQ.Isolation_dis_mean];
 y = [stats_all.field_ratio_LS];
@@ -167,7 +167,7 @@ switch corr_type
         text(1,1,   {sprintf('r = %.3f',r);sprintf('P = %.2f',pval_r)}, ...
             'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     case 'spearman'
-        text(1,1, {['{\rho}' sprintf(' = %.3f',rho)];sprintf('P = %.3f',pval_rho)}, ...
+        text(0.94,1, {['{\rho}' sprintf(' = %.3f',rho)];sprintf('P = %.3f',pval_rho)}, ...
             'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 end
 xlabel('Isolation distance','Units','normalized','Position',[0.5 -0.13]);

@@ -58,7 +58,7 @@ panel_C(1) = axes('position', [ 2 22   panel_C_size]);
 panel_C(2) = axes('position', [ 2 17.5 panel_C_size]);
 % panel_D(1) = axes('position', [11 13.5 panel_D_size]);
 % panel_D(2) = axes('position', [11  9.5 panel_D_size]);
-panel_legend = axes('position', [6.5 25.35 0.5 0.4]);
+panel_legend = axes('position', [6.5 25.45 0.5 0.4]);
 
 %% legend panel
 axes(panel_legend);
