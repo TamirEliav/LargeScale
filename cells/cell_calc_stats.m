@@ -16,7 +16,7 @@ FE_all = [FE{:}];
 fields = cell.fields;
 fields_all = [];
 for ii_dir = 1:2
-    if isempty(fields{ii_dir})
+    if ~cell.signif(ii_dir).TF
         continue
     end
     fields_to_add = fields{ii_dir};

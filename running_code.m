@@ -2198,15 +2198,15 @@ end
 nSpikeHighSpeed(~signif_cells_IX) = nan;
 nSpikeInAir(~signif_cells_IX) = nan;
 
-%% generate Fig 2 with the different paramsets
-paramsets = [3 4 8 6 7 9 0];
+%% Run code with the different paramsets
+paramsets = 1:9;
 for ii_paramset = 1:length(paramsets)
     ii_paramset
-    paramsets = [3 4 8 6 7 9 0];
+    paramsets = 1:9;
     paramset = paramsets(ii_paramset);
     fprintf('loading paramset %d results...\n',paramset)
     PARAMS_SetParamset(paramset);
-    paper_fig_2
+    PIP_cell_analyses
     close all
 end
 % go back to default paramset (0)
@@ -2248,8 +2248,20 @@ m1 = lm1.Coefficients.Estimate(2);
 m2 = lm2.Coefficients.Estimate(2);
 phi = rad2deg( atan(m1) - atan(m2) )
 
-%%
+%% check
+figure
+hold on
+h=histogram(LS_field_ratio_all);
+h.DisplayStyle = 'stairs';
+h=histogram(LS_field_ratio_all2);
+h.DisplayStyle = 'stairs';
+legend({'original';'corrected'})
 
+%%
+clc
+LS_field_ratio_all(LS_field_ratio_all ~= LS_field_ratio_all2)
+LS_field_ratio_all2(LS_field_ratio_all ~= LS_field_ratio_all2)
+sum(~isnan(LS_field_ratio_all(LS_field_ratio_all ~= LS_field_ratio_all2)))
 
 
 
