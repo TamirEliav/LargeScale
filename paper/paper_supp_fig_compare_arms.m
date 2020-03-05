@@ -186,7 +186,7 @@ cla
 hold on
 text(-0.3,1.15, 'A', 'Units','normalized','FontWeight','bold');
 x1 = [fields_size{:,:,1}];
-x2 = [fields_size{:,:,2}];
+x2 = [fields_size{:,:,:}];
 x1(isnan(x1))=[];
 x2(isnan(x2))=[];
 c = [0 0 0];
@@ -196,15 +196,15 @@ h1.NumBins = nBins;
 h1.Normalization = 'pdf';
 h1.DisplayStyle = 'stairs';
 h1.EdgeColor = c;
-h1.LineWidth = 2; % long arm
+h1.LineWidth = 2;
 h2 = histogram( x2 );
 h2.NumBins = nBins;
 h2.Normalization = 'pdf';
 h2.DisplayStyle = 'stairs';
 h2.EdgeColor = c;
-h2.LineWidth = 1; % short arm
+h2.LineWidth = 1;
 [H,P_KS,KSSTAT] = kstest2(x1,x2,'Tail','unequal');
-text(1,1.05,sprintf('P_{KS} = %.3f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+text(1,1.05,sprintf('P_{KS} = %.2f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 % P_ranksum = ranksum(x1,x2);
 % text(1,0.85,sprintf('P_{Wilc}=%.3f',P_ranksum),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 ha=gca;
@@ -224,13 +224,15 @@ hold on
 plot([1 2], [2 2], 'Color', 'k', 'LineWidth', 2, 'Clipping', 'off'); % long arm
 plot([1 2], [1 1], 'Color', 'k', 'LineWidth', 1, 'Clipping', 'off'); % shorty arm
 xlim([0.5 2.5])
-text(2.5, 1, 'Short arm', 'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
 text(2.5, 2, 'Long arm',  'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
+text(2.5, 1, 'Entire tunnel', 'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
 set(gca,'visible','off');
 
 
 %% field size ratio - from fields only in the long arm
 % ------------------------------------------------------------------------
+LS_field_ratio_all = nan(1,length(cells));
+LS_field_ratio_all2 = nan(1,length(cells)); % just to double check we did it correctly as in cell_calc_stats
 LS_field_ratio_all_long  = nan(1,length(cells));
 LS_field_ratio_all_short = nan(1,length(cells));
 LS_field_ratio_dir_long = nan(2,length(cells));
@@ -241,6 +243,7 @@ for ii_cell = 1:length(cells)
     
     %% pooled stats - check at least one direction is signif
     if any([cell.signif.TF])
+        LS_field_ratio_all(ii_cell) = cell.stats.all.field_ratio_LS;
         fields=[];
         for ii_dir = 1:2
             if cell.signif(ii_dir).TF 
@@ -263,6 +266,9 @@ for ii_cell = 1:length(cells)
         end
         if length(short_arm_fields) >= 2
             LS_field_ratio_all_short(ii_cell) = max([short_arm_fields.width_prc]) / min([short_arm_fields.width_prc]);
+        end
+        if length(fields) >= 2
+            LS_field_ratio_all2(ii_cell) = max([fields.width_prc]) / min([fields.width_prc]);
         end
     end
     
@@ -355,7 +361,7 @@ hold on
 text(-0.28,1.15, 'B', 'Units','normalized','FontWeight','bold');
 
 x1=LS_field_ratio_all_long;
-x2=LS_field_ratio_all_short;
+x2=LS_field_ratio_all;
 x1(isnan(x1))=[];
 x2(isnan(x2))=[];
 
@@ -376,7 +382,7 @@ h2.EdgeColor = c;
 h2.LineWidth = 1; % short arm
 
 [H,P_KS,KSSTAT] = kstest2(x1, x2, 'Tail','unequal');
-text(1,1.05,sprintf('P_{KS} = %.3f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+text(1,1.05,sprintf('P_{KS} = %.2f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 % P_ranksum = ranksum(x1,x2);
 % text(1,0.95,sprintf('P_{Wilc}=%.3f',P_ranksum),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 
@@ -402,8 +408,8 @@ hold on
 plot([1 2], [2 2], 'Color', 'k', 'LineWidth', 2,'Clipping','off'); % long arm
 plot([1 2], [1 1], 'Color', 'k', 'LineWidth', 1,'Clipping','off'); % shorty arm
 xlim([0.5 2.5])
-text(2.5, 1, 'Short arm', 'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
 text(2.5, 2, 'Long arm',  'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
+text(2.5, 1, 'Entire tunnel', 'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
 set(gca,'visible','off');
 
 %% print/save the figure
