@@ -790,7 +790,7 @@ y = [stats_all.field_ratio_LS];
 [rho,rho_pval] = corr(x',y','rows','pairwise','type','Spearman')
 [~,ttest_P] = ttest(x,1);
 signtest_P = signtest(x,1);
-fprintf('LS speed ratio: P=%.2g (ttest), P=%.2g (signtest)\n',ttest_P,signtest_P);
+fprintf('LS speed ratio: P=%.2g (ttest), P=%.2g (signtest), std=%.3g\n',ttest_P,signtest_P,nanstd(x));
 plot(x, y, '.k');
 switch corr_type
     case 'pearson'

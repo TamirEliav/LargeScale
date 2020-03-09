@@ -55,7 +55,14 @@ for ii_paramset = 1:length(paramsets)
     y = y_positions(ii_paramset);
     for ii_x = 1:length(x_positions)
         x = x_positions(ii_x);
-        panels(ii_paramset,ii_x) = axes('position', [ x y panels_size]);
+        panel_size = panels_size;
+        switch ii_x
+            case 1
+                panel_size = panel_size .* [0.75 1];
+            case 2
+                x = x - 0.4;
+        end
+        panels(ii_paramset,ii_x) = axes('position', [ x y panel_size]);
     end
 end
 
@@ -121,7 +128,8 @@ for ii_paramset = 1:length(paramsets)
     h.Data(h.Data > h.BinLimits(2)) = h.BinLimits(2);
     ha = gca;
     ha.YScale = 'log';
-    ha.YLim = [0.7 max(h.Values)*1.05];
+%     ha.YLim = [0.7 max(h.Values)*1.05];
+    ha.YLim = [0.7e0 1.4e2];
     ha.XLim = [0 h.BinLimits(2)];
     ha.XTick = [0:10:30];
     ha.YTick = [1 10 100];
@@ -279,7 +287,7 @@ end
 paramsets_letters = char('A'+[0:length(paramsets)-1]);
 for ii_paramset = 1:length(paramsets)
     axes(panels(ii_paramset,1));
-    text(-0.4,1, paramsets_letters(ii_paramset), 'Units','normalized','FontWeight','bold','VerticalAlignment','middle');
+    text(-0.53,1, paramsets_letters(ii_paramset), 'Units','normalized','FontWeight','bold','VerticalAlignment','middle');
 end
 
 %% print/save the figure
