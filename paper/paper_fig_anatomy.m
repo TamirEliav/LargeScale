@@ -51,17 +51,22 @@ panel_A(1) = axes('position', [ 0.6 12.5 8 16]);
 panel_B(1) = axes('position', [ 8.6 19 4 5]);
 panel_B(2) = axes('position', [13.6 21 6 5]);
 panel_B(3) = axes('position', [13.6 16.5 6 5]);
-% panel_C(1) = axes('position', [3 12   panel_CDE_size]);
+panel_C(1) = axes('position', [3 12   panel_CDE_size]);
 % panel_C(2) = axes('position', [9 12   panel_CDE_size]);
 % panel_D(1) = axes('position', [3  7.5 panel_CDE_size]);
 % panel_D(2) = axes('position', [9  7.5 panel_CDE_size]);
 % panel_E(1) = axes('position', [3  3   panel_CDE_size]);
 % panel_E(2) = axes('position', [9  3   panel_CDE_size]);
-panel_legend = axes('position', [8.5 23.5 1 1]);
+panel_legend = axes('position', [8.5 23.8 1 1]);
 
 
+%% bat ID-num map
+bat_ID_num_map = containers.Map([34 79 148 2289 9861],...
+                                 1:5);
+                             
 %% prepare 3D data for panel A
-load('L:\TTs_position\plot_3D_surf_CA1\atlas_coordinates_Tamir_Nov2019.mat')
+% load('L:\TTs_position\plot_3D_surf_CA1\atlas_coordinates_Tamir_Nov2019.mat')
+load('L:\TTs_position\plot_3D_surf_CA1\atlas_coordinates_Tamir_Sep2020.mat')
 load('L:\TTs_position\plot_3D_surf_CA1\CA1_3D_struct.mat')
 
 X = CA1_3D_struct.x;
@@ -148,7 +153,7 @@ colormap cool
 % =========================================================================
 prm = PARAMS_GetAll();
 cells_t = DS_get_cells_summary();
-bats = [79,148,9861,2289];
+bats = [79,148,2289,9861];
 cells_t(~ismember(cells_t.bat, bats ),:) = [];
 cells = cellfun(@(c)(cell_load_data(c,'details')), cells_t.cell_ID, 'UniformOutput',0);
 cells = [cells{:}];
@@ -168,7 +173,8 @@ whos cells
 
 % load('L:\TTs_position\atlas_coordinates_Tamir_sep2019.mat');
 % load('L:\TTs_position\Prox2dist_curve.mat');
-load('L:\TTs_position\atlas_coordinates_Tamir_Nov2019.mat');
+% load('L:\TTs_position\atlas_coordinates_Tamir_Nov2019.mat');
+load('L:\TTs_position\atlas_coordinates_Tamir_Sep2020.mat');
 atlas_coordinates = struct2table(atlas_coordinates_Tamir);
 
 %% get population stats
@@ -205,7 +211,7 @@ TT_pos_color = cat(1,cells_signif_color{IA});
 scatter(TT_pos_PD*100, TT_pos_Long*100, 5, TT_pos_color);
 
 xlim([0 100])
-ylim([10 20]);
+ylim([15 22]);
 xlabel('Proximo-distal axis (%)');
 ylabel('Longitudinal axis (%)');
 
@@ -243,10 +249,12 @@ for ii_bat = 1:length(bats)
     bat_num = bats(ii_bat);
     c = bats_colors(bat_num);
     scatter(1,ii_bat,9,c);
-    text(1+0.25, ii_bat, sprintf('Bat %d',bat_num), 'FontSize',7,'HorizontalAlignment','Left');
+    text(1+0.25, ii_bat, sprintf('Bat %d',bat_ID_num_map(bat_num)), 'FontSize',7,'HorizontalAlignment','Left');
 end
 xlim([0 1]);
 ylim([1 length(bats)]);
+hax=gca;
+hax.YDir = 'reverse';
 set(gca,'Visible','off');
 
 
@@ -328,6 +336,41 @@ hl.LineWidth = 2;
 hl.Color = 'k';
 % annotation('textbox',[xaf(2)+0.001 yaf(1) 0.1 0.1], 'String',sprintf('%dmm',scale_bar_mm), 'FitBoxToText','on', 'LineStyle','none');
 text(300, 1290, sprintf('%dmm',scale_bar_mm), 'HorizontalAlignment','center', 'VerticalAlignment','middle','FontSize',8);
+
+%%
+TT_pos_labels = {'Proximo-distal axis (%)';'Longitudinal axis (%)'};
+TT_pos_limits = [0 100; 10 20];
+scatter_jitter_std = [1 0.10];
+%%
+ii_pos_TT_opt=1;
+axes(panel_C(ii_pos_TT_opt));
+cla('reset')
+hold on
+text(-0.3,1.1, 'C', 'Units','normalized','FontWeight','bold');
+cells_signif = pop_details(signif_at_least_one_dir_IX);
+cells_signif_color = {pop_bat_color{signif_at_least_one_dir_IX}};
+stats_signif = [pop_stats(signif_at_least_one_dir_IX).all];
+x = cat(1,cells_signif.TT_pos_prc) .* 100;
+y = [stats_signif.field_ratio_LS];
+TT_pos_color = cat(1,cells_signif_color{:});
+rng(0);
+h=scatter(x(:,ii_pos_TT_opt)+scatter_jitter_std(ii_pos_TT_opt)*randn(size(x,1),1), y, 5, 'k');
+
+[r,pval_r]     = corr(x(:,ii_pos_TT_opt),y','rows','pairwise','type','Pearson');
+[rho,pval_rho] = corr(x(:,ii_pos_TT_opt),y','rows','pairwise','type','Spearman');
+% text(0.05,0.95, {sprintf('r = %.2f',r);sprintf('P = %.2f',pval_r)}, ...
+%     'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+text(0.05,0.95, {sprintf('%s = %.2f','\rho',rho);sprintf('P = %.2f',pval_rho)}, ...
+    'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+
+hax=gca;
+hax.YScale = 'log';
+hax.YTick = [1 2 3 5 10 15 20];
+xlim(TT_pos_limits(ii_pos_TT_opt,:))
+% ylim([0 15]);
+xlabel(TT_pos_labels{ii_pos_TT_opt});
+ylabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[-0.1 0.5]);
+
 
 %%
 if 0

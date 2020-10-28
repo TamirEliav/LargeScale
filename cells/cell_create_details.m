@@ -20,7 +20,8 @@ details.depth = exp.details.depth(details.TT);
 
 %% add TT position 
 % TT_pos_t = load('L:\TTs_position\atlas_coordinates_Tamir_sep2019.mat');
-TT_pos_t = load('L:\TTs_position\atlas_coordinates_Tamir_Nov2019.mat');
+% TT_pos_t = load('L:\TTs_position\atlas_coordinates_Tamir_Nov2019.mat');
+TT_pos_t = load('L:\TTs_position\atlas_coordinates_Tamir_Sep2020.mat');
 TT_pos_t = struct2table(TT_pos_t.atlas_coordinates_Tamir);
 str = sprintf('bat_%04d_TT%d',details.bat, details.TT);
 TT_IX = find(contains(TT_pos_t.name,str));
