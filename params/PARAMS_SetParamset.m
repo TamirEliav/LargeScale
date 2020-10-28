@@ -47,8 +47,9 @@ for ii_fields = 1:length(field_options)
     % first, remove the link folder
     delete(link_dir)
     
-    % now create the symbolic link!
-    command = sprintf('mklink /D "%s" "%s"', link_dir , target_dir );
+    % now create the symbolic link! (junction link is safer and doesn't
+    % require permissions, i.e. using /J instead of /D).
+    command = sprintf('mklink /J "%s" "%s"', link_dir , target_dir );
     [status,cmdout] = system(command,'-echo');
     if status
         fprintf('mklink error %d: %s', status,cmdout);

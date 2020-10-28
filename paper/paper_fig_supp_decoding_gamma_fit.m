@@ -132,6 +132,43 @@ ylabel('Probability density function','Units','normalized','Position',[-0.18 0.5
 ha.XScale = 'log';
 ha.YScale = 'linear';
 
+%% Goodnes-of-fit
+pd_logn = makedist('Lognormal','mu',logn_phat(1),'sigma',logn_phat(2));
+pd_gamma = makedist('Gamma','a',gamma_phat(1),'b',gamma_phat(2));
+[~,pval_logn, ksstat_logn ] = kstest(fields_size,'CDF',pd_logn);
+[~,pval_gamma,ksstat_gamma] = kstest(fields_size,'CDF',pd_gamma);
+fprintf('logn:  P=%.2g,\t\tks2stat=%.2g\n',pval_logn,  ksstat_logn);
+fprintf('gamma: P=%.2g,\tks2stat=%.2g\n',pval_gamma ,ksstat_gamma);
+% [cdf_data,X] = ecdf(fields_size);
+% figure
+% hold on
+% plot(X,cdf_data,'k');
+% plot(X,pd_gamma.cdf(X),'b');
+% plot(X,pd_logn.cdf(X),'r');
+% legend('data','gamma','logn')
+
+% we decided to report both pval and KS_stat in the fig legend
+
+%% Goodness-of-fit - ignore!
+% % % % [cdf_data,X] = ecdf(fields_size);
+% % % % cdf_gamma = gamcdf(X, gamma_phat(1), gamma_phat(2));
+% % % % cdf_logn = logncdf(X, logn_phat(1), logn_phat(2));
+% % % % n = size(fields_size);
+% % % % n = [1 1e4];
+% % % % fields_size_gamma = gamrnd(gamma_phat(1), gamma_phat(2), n);
+% % % % fields_size_logn = lognrnd(logn_phat(1), logn_phat(2), n);
+% % % % [h1,p1,ks2stat1] = kstest2(fields_size, fields_size_logn);
+% % % % [h2,p2,ks2stat2] = kstest2(fields_size, fields_size_gamma);
+% % % % figure
+% % % % hold on
+% % % % plot(X,cdf_data,'k');
+% % % % plot(X,cdf_gamma,'b');
+% % % % plot(X,cdf_logn,'r');
+% % % % fprintf('logn: P=%.2g, ks2stat=%.2g, manual ks2stat=%.2g, \n',p1,ks2stat1, max(abs(cdf_data-cdf_logn)));
+% % % % fprintf('gamma: P=%.2g, ks2stat=%.2g, manual ks2stat=%.2g, \n',p2,ks2stat2, max(abs(cdf_data-cdf_gamma)));
+% % % % legend('data','gamma','logn')
+
+
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, fig_name_str);

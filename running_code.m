@@ -2264,6 +2264,64 @@ LS_field_ratio_all2(LS_field_ratio_all ~= LS_field_ratio_all2)
 sum(~isnan(LS_field_ratio_all(LS_field_ratio_all ~= LS_field_ratio_all2)))
 
 
+%% 
+cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','signif','fields','FR_map','cluster_quality')), cells_ID, 'UniformOutput',0);
+signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
+
+%%
+corr_even_odd = arrayfun(@(c)([c.stats.dir.corr_odd_even]), cells,'UniformOutput',0);
+corr_even_odd = cat(1,corr_even_odd{:});
+corr_begin_end = arrayfun(@(c)([c.stats.dir.corr_begin_end]), cells,'UniformOutput',0);
+corr_begin_end = cat(1,corr_begin_end{:});
+corr_bins = linspace(-1,1,50);
+figure
+subplot(211)
+hold on
+% histogram(corr_even_odd(signif),corr_bins )
+histogram(corr_even_odd(signif(:,1)),corr_bins )
+histogram(corr_even_odd(signif(:,2)),corr_bins )
+title('corr even odd')
+subplot(212)
+hold on
+% histogram(corr_begin_end(signif),corr_bins )
+histogram(corr_begin_end(signif(:,1)),corr_bins )
+histogram(corr_begin_end(signif(:,2)),corr_bins )
+title('corr begin end')
+
+%% 07/04/2020 - copy cells figure for cells with large fields (> 10 m)
+clear
+clc
+load('L:\Analysis\Results\cells_paramset_0\cells_data.mat')
+%% find relevant cells
+field_size_thr = 10;
+signif=cat(1,cells.signif);
+signif=arrayfun(@(x)(x.TF),signif);
+cells2copy = zeros(1,length(cells));
+for ii_cell = 1:length(cells)
+    cell = cells(ii_cell);
+    for ii_dir = 1:2
+        if cell.signif(ii_dir).TF
+            fields = cell.fields{ii_dir};
+            if any([fields.width_prc] > field_size_thr )
+                cells2copy(ii_cell) = 1;
+            end
+        end
+    end
+end
+cells_details = [cells.details];
+cells_ID = {cells_details.cell_ID}';
+cells2copy_ID = cells_ID( find(cells2copy ));
+%% copy
+dir_IN = 'L:\Analysis\Results\cells_paramset_0\figures';
+dir_OUT = '';
+util_copy_files_by_template(dir_IN, dir_OUT, cells2copy_ID, 'tif')
+
+%%
+
+
+
+
+
 
 
 

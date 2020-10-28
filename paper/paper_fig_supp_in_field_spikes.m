@@ -10,6 +10,8 @@ plot_style = 'errorbars';
 % plot_style = 'violin';
 % plot_style = 'lines';
 % plot_style = 'hist';
+burst_ISI_thr = 6; % 6ms  as in Mizuseki 2011
+% burst_ISI_thr = 7; % 7ms as Csicsvari, J., Hirase, H., Czurko, A., Buzsáki, G., 1998. Reliability and state dependence of pyramidal cell–interneuron synapses in the hippocampus: an ensemble approach in the behaving rat. Neuron 21, 179–189.
 
 
 %% define output files
@@ -56,7 +58,11 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 % create panels
 panel_A = axes('position', [ 3 20 3 3]);
 panel_B = axes('position', [ 8 20 2.9 3]);
-
+panel_C = axes('position', [ 3 15 3 3]);
+panel_D(1) = axes('position', [ 8 15 2.9 3]);
+% panel_D(2) = axes('position', [ 13 15 2.9 3]);
+panel_E = axes('position', [ 3 10 3 3]);
+panel_F = axes('position', [ 8 10 2.9 3]);
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 %% load population data
@@ -78,6 +84,12 @@ cells_ID([meanFR.all]>prm.inclusion.interneuron_FR_thr)=[];
 clear cells stats cells_details cells_t
 cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map','FE')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
+% take only signif cells
+signif = cat(1,cells.signif);
+signif = arrayfun(@(x)(x.TF),signif);
+signif = any(signif,2);
+cells(~signif)=[];
+clear signif
 
 %% arrange data
 in_field_spikes_prc = nan(length(cells),2);
@@ -88,6 +100,11 @@ for ii_cell = 1:length(cells)
         if ~cell.signif(ii_dir).TF
             continue;
         end
+        %% add cell num to each field
+        for ii_field = 1:length(cell.fields{ii_dir})
+            cells(ii_cell).fields{ii_dir}(ii_field).cell_num = cell.details.cell_num;
+        end
+        
         %% in-field spikes percentage
         fields = cell.fields{ii_dir};
         fields([fields.in_low_speed_area])=[];
@@ -121,9 +138,43 @@ for ii_cell = 1:length(cells)
         InOutFieldFR(ii_cell,ii_dir).in_field_FR_median = in_field_FR_median;
         InOutFieldFR(ii_cell,ii_dir).out_field_FR_mean = out_field_FR_mean;
         InOutFieldFR(ii_cell,ii_dir).out_field_FR_median = out_field_FR_median;
-        
     end
 end
+
+%% arrange pop data
+signif = cat(1,cells.signif);
+signif = arrayfun(@(x)(x.TF),signif);
+stats = [cells.stats];
+stats_all = [stats.all];
+stats_dir = cat(1,stats.dir);
+fields = cat(1,cells.fields);
+fields = fields(signif);
+fields = [fields{:}];
+fields([fields.in_low_speed_area])=[];
+
+%% calc burstyness stats (per field)
+ISI_all = [];
+spikes_in_burst_all = [];
+spikes_in_burst_prc_all_fields = [];
+for ii_field = 1:length(fields)
+    field = fields(ii_field);
+    ISI = diff(field.spikes_ts);
+    ISI = ISI .* 1e-3; % convert to ms
+    ISI_all = [ISI_all ISI];
+    spikes_in_burst = zeros(1,length(ISI)+1);
+    TF = ISI < burst_ISI_thr;
+    spikes_in_burst([TF false]) = 1;
+    spikes_in_burst([false TF]) = 1;
+    spikes_in_burst_prc = sum(spikes_in_burst)/length(spikes_in_burst);
+    spikes_in_burst_all = [spikes_in_burst_all spikes_in_burst];
+    spikes_in_burst_prc_all_fields = [spikes_in_burst_prc_all_fields spikes_in_burst_prc];
+end
+
+%% calc burstyness stats (per cell)
+subs = [fields.cell_num];
+vals = spikes_in_burst_prc_all_fields;
+spikes_in_burst_prc_all_cells = accumarray(subs',vals',[],@mean,nan);
+spikes_in_burst_prc_all_cells(isnan(spikes_in_burst_prc_all_cells)) = [];
 
 %% Panel A - percentage of out-of-field spikes
 axes(panel_A);
@@ -205,8 +256,134 @@ switch plot_style
         ylabel('No. of cells')
 end
 
+%% within-field ISI hist
+axes(panel_C);
+cla('reset')
+hold on
+text(-0.35,1.15, 'C', 'Units','normalized','FontWeight','bold');
+
+hh=histogram(ISI_all,[0:1:1000]);
+hh.EdgeColor='k';
+hh.FaceColor='k';
+hh.Normalization='pdf';
+% hl=xline(burst_ISI_thr);
+% hl.Color='r';
+% hl.LineWidth=1;
+
+ha=gca;
+ha.XLim = [0 300];
+ha.YLim = [0 0.025];
+ha.XTick = [0:100:1000];
+ha.YTick = ha.YLim;
+ha.TickDir='out';
+ha.TickLength = [0.03 0.03];
+ha.XRuler.TickLabelGapMultiplier = -0.35;
+ha.YRuler.TickLabelGapMultiplier = 0.5;
+ha.YRuler.TickLabelGapOffset = 1;
+ha.YScale = 'linear';
+xlabel({'In-field inter spike interval (ms)'}, 'Units','normalized','Position',[0.5 -0.13]);
+ylabel('PDF','Units','normalized','Position',[-0.13 0.5]);
+
+%% percentage of bursty spikes (per field)
+axes(panel_D(1));
+cla('reset')
+hold on
+text(-0.35,1.15, 'D', 'Units','normalized','FontWeight','bold');
+
+hh=histogram(spikes_in_burst_prc_all_fields.*100);
+hh.BinLimits = [0 100];
+hh.NumBins = 100;
+hh.Normalization='count';
+hh.FaceColor = 0.5*[1 1 1];
+ha=gca;
+ha.XLim = [0 100];
+ha.XTick = [0:25:100];
+ha.TickDir='out';
+ha.TickLength = [0.03 0.03];
+ha.XRuler.TickLabelGapMultiplier = -0.35;
+ha.YRuler.TickLabelGapMultiplier = 0.1;
+ha.YScale = 'log';
+xlabel('In-field bursty spikes (%)', 'Units','normalized','Position',[0.5 -0.13]);
+ylabel('No. of fields');
+% text(0.5,0.85,"n="+length(spikes_in_burst_prc_all_fields),'Units','normalized');
+
+%% percentage of bursty spikes (per cell)
+% % % % % % % % % % axes(panel_D(2));
+% % % % % % % % % % cla('reset')
+% % % % % % % % % % hold on
+% % % % % % % % % % % text(-0.35,1.15, 'D', 'Units','normalized','FontWeight','bold');
+% % % % % % % % % % 
+% % % % % % % % % % hh=histogram(spikes_in_burst_prc_all_cells.*100);
+% % % % % % % % % % hh.BinLimits = [0 100];
+% % % % % % % % % % hh.NumBins = 100;
+% % % % % % % % % % hh.Normalization='count';
+% % % % % % % % % % hh.FaceColor = 0.5*[1 1 1];
+% % % % % % % % % % ha=gca;
+% % % % % % % % % % ha.YScale = 'log';
+% % % % % % % % % % ha.XLim = [0 100];
+% % % % % % % % % % ha.XTick = [0:25:100];
+% % % % % % % % % % ha.TickDir='out';
+% % % % % % % % % % ha.TickLength = [0.03 0.03];
+% % % % % % % % % % ha.XRuler.TickLabelGapMultiplier = -0.35;
+% % % % % % % % % % ha.YRuler.TickLabelGapMultiplier = 0.1;
+% % % % % % % % % % ha.YScale = 'linear';
+% % % % % % % % % % xlabel('In-field bursty spikes (%)', 'Units','normalized','Position',[0.5 -0.13]);
+% % % % % % % % % % ylabel('No. of cells');
+% % % % % % % % % % text(0.85,0.85,"n="+length(spikes_in_burst_prc_all_cells),'Units','normalized');
+
+%% mean firing rate hist
+axes(panel_E);
+cla('reset')
+hold on
+text(-0.35,1.15, 'E', 'Units','normalized','FontWeight','bold');
+
+hh = histogram([stats_all.meanFR_flight]);
+% hh.NumBins = 12;
+hh.FaceColor = 0.5*[1 1 1];
+ha=gca;
+ha.XLim = [0 10];
+ha.XTick = [0 5 10];
+ha.TickDir='out';
+ha.TickLength = [0.03 0.03];
+ha.XRuler.TickLabelGapMultiplier = -0.35;
+ha.YRuler.TickLabelGapMultiplier = 0.1;
+ha.YScale = 'linear';
+xlabel('Mean firing rate (Hz)', 'Units','normalized','Position',[0.5 -0.13]);
+ylabel('No. of cells');
+
+%% field peak rate vs field size
+axes(panel_F);
+cla('reset')
+hold on
+text(-0.35,1.15, 'F', 'Units','normalized','FontWeight','bold');
+x = [fields.width_prc];
+y = [fields.peak];
+plot(x,y,'.k');
+% lm = fitlm(x,y);
+% [rho, pval] = corr(x',y','type','pearson');
+[rho, pval] = corr(x',y','type','spearman');
+text(0.75,0.95, ['{\rho}' sprintf(' = %.2f',rho)] ,'units','normalized');
+if pval == 0
+    text(0.75,0.8, 'P < 10^{ -300}' ,'units','normalized');
+else
+    text(0.75,0.8, ['{\rho}' sprintf(' = %.2f',rho)] ,'units','normalized');
+end
+
+ha=gca;
+ha.XLim = [0 35];
+ha.XTick = [0 10 20 30];
+ha.TickDir='out';
+ha.TickLength = [0.03 0.03];
+ha.XRuler.TickLabelGapMultiplier = -0.35;
+ha.YRuler.TickLabelGapMultiplier = 0.1;
+ha.YScale = 'linear';
+xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.13]);
+ylabel('Field peak rate (Hz)');
+
+
+
 %% print/save the figure
-fig_name_out = fullfile(res_dir, [fig_name_str '_style_' plot_style]);
+fig_name_out = fullfile(res_dir, fig_name_str+"_style_"+plot_style+"_burst_thr_"+burst_ISI_thr);
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');

@@ -69,6 +69,7 @@ end
 % panel_A = permute(panel_A,[2 1 3]);
 panel_A = panel_A(:,3:-1:1,:);
 panel_A = reshape(panel_A,[9 3]);
+% panel_A_legend = axes('position', [2.2 24.7 0.5 0.15]);
 
 panels_size = [2 2];
 panel_B    = axes('position', [ 2.0  8.5  panels_size           ]);
@@ -85,6 +86,22 @@ panel_J = axes('position', [16.2  4.4 3 3]);
 %%
 prm = PARAMS_GetAll();
 
+%%
+% delete(panel_A_legend);
+% panel_A_legend = axes('position', [2.2 24.7 0.5 0.15]);
+
+% axes(panel_A_legend);
+% cla
+% hold on
+% box off
+% set(gca,'Visible','off');
+% plot([0 1],[1 1],'Color',prm.graphics.colors.flight_directions{1},'LineWidth',2);
+% plot([0 1],[0 0 ],'Color',prm.graphics.colors.flight_directions{2},'LineWidth',2);
+% text(1.2, 0.5, 'Detected fields');
+
+%%
+bat_ID_num_map = containers.Map([34 79 148 2289 9861],...
+                                 1:5);
 
 %% FR map + rasters - 9 examples
 cell_examples = {
@@ -140,11 +157,13 @@ for ii_cell = 1:length(cell_examples)
     
     
     % cell details
-    cell_num_str_pos_x   = [0.50 0.50 0.50 0.50 0.50 0.45 0.50 0.50 0.50];
+    cell_num_str_pos_x   = [0.50 0.50 0.50 0.50 0.45 0.35 0.45 0.50 0.30];
     cell_num_str_pos_y   = [1.05 1.05 1.05 0.85 0.90 0.90 0.90 0.90 0.90];
     cell_stats_str_pos_x = [0.80 0.95 0.80 0.80 0.80 0.80 0.12 0.50 0.85];
     cell_stats_str_pos_y = [1.20 1.05 1.15 0.90 1.10 1.10 1.10 0.90 0.90]+0.05;
-    text(cell_num_str_pos_x(ii_cell), cell_num_str_pos_y(ii_cell), "cell "+ ii_cell,...
+    text(cell_num_str_pos_x(ii_cell),...
+         cell_num_str_pos_y(ii_cell),...
+         sprintf('Cell %d',ii_cell),...
         'Units','normalized','HorizontalAlignment','center','VerticalAlignment','bottom','FontSize',8);
     switch ii_cell
         case {1,2,3,4,5,6,7,8}
@@ -370,6 +389,7 @@ meanFR = [cells.meanFR];
 cells_ID([meanFR.all]>prm.inclusion.interneuron_FR_thr)=[];
 clear cells stats cells_details cells_t
 cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map','FE')), cells_ID, 'UniformOutput',0);
+% cells = cellfun(@(c)(cell_load_data(c,'details')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
 
 %% save loaded population data
@@ -425,6 +445,12 @@ ha.YScale = 'log';
 xlabel({'Spatial information';'(bits/spike)'}, 'Units','normalized','Position',[0.5 -0.17]);
 ylabel('No. of cells', 'Units','normalized','Position',[-0.28 0.5])
 
+x = SI;
+hl=xline(nanmean(x)); hl.Color='r';
+m = ha.YLim(2) + 0.15*range(ha.YLim);
+plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
+plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
+
 %% panel C - sparsity histogram
 axes(panel_C);
 cla
@@ -446,6 +472,12 @@ ha.YRuler.TickLabelGapMultiplier = 0.1;
 ha.YScale = 'log';
 xlabel('Sparsity', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('No. of cells', 'Units','normalized','Position',[-0.28 0.5])
+
+x = sparsity;
+hl=xline(nanmean(x)); hl.Color='r';
+m = ha.YLim(2) + 0.15*range(ha.YLim);
+plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
+plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
 
 %% panel D - Total area histogram
 axes(panel_D(1));
@@ -478,6 +510,13 @@ ha.YScale = 'log';
 xlabel('Coverage (m)', 'Units','normalized','Position',[0.5 -0.17])
 ylabel('No. of cells', 'Units','normalized','Position',[-0.28 0.5])
 ha.XLim(1) = 0;
+ha.YLim(2) = 2e2;
+
+x = total_area(:);
+hl=xline(nanmean(x)); hl.Color='r';
+m = ha.YLim(2) - 0.27*range(ha.YLim);
+plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
+plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
 
 fprintf( 'Average total area in meters : %.4g\n\r',nanmean(total_area(:)) )
 fprintf( 'Average total area in prc (%%): %.4g\n\r',100*nanmean(total_area(:)) / total_area_L )
@@ -604,6 +643,13 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 
+x = nFields(:);
+hl=xline(nanmean(x)); hl.Color='r';
+m = ha.YLim(2) + 0.15*range(ha.YLim);
+plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
+plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
+
+
 %% panel G - field size histogram
 % figure
 axes(panel_G);
@@ -632,7 +678,7 @@ xlabel('Field size (m)')
 ylabel('Counts','Units','normalized','Position',[-0.22 0.5])
 ha = gca;
 % ha.XLim = [0 35];
-ha.YLim = [0.8 300];
+ha.YLim = [0.8 350];
 % ha.XTick = [0:5:35];
 ha.YTick = [1 10 100];
 ha.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
@@ -640,6 +686,12 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
+
+x = fields_size;
+hl=xline(nanmean(x)); hl.Color='r';
+m = ha.YLim(2) + 0.15*range(ha.YLim);
+plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
+plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
 
 save( fullfile(res_dir,'pop_dist_fields_size'), 'fields_size');
 
@@ -741,6 +793,12 @@ ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
 ylabel('No. of cells','Units','normalized','Position',[-0.24 0.5])
+
+x = LS_field_ratio_all;
+hl=xline(nanmean(x)); hl.Color='r';
+m = ha.YLim(2) + 0.15*range(ha.YLim);
+plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
+plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
 
 
 %% panel J - prepare data

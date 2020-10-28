@@ -58,9 +58,10 @@ panel_C(1) = axes('position', [ 2 13 panel_C_size]);
 panel_C(2) = axes('position', [ 2  9 panel_C_size]);
 panel_D(1) = axes('position', [11 13 panel_D_size]);
 panel_D(2) = axes('position', [11  9 panel_D_size]);
+panel_E(1) = axes('position', [ 2  4.3 3 3]);
 panel_B_legend(1) = axes('position', [13.6 23 2 1.3]);
 panel_B_legend(2) = axes('position', [13.6 19 2 1.3]);
-
+panel_E_legend(1) = axes('position', [4 6.5 0.2 0.4]);
 
 %% load population data
 % =========================================================================
@@ -271,7 +272,7 @@ for ii_dir = 1:2
 %     ha.YRuler.TickLabelGapMultiplier = -0.04;
     ha.YRuler.TickLabelGapOffset = 2.2;
     xlabel({'Distance of fields';'to nearest landmark (m)'}, 'Units','normalized','Position',[0.5 -0.13])
-    ylabel('Probability', 'Units','normalized','Position',[-0.08 0.5])
+    ylabel('PDF', 'Units','normalized','Position',[-0.08 0.5])
 end
 
 axes(panel_B(1));
@@ -437,7 +438,7 @@ for ii_dir = 1:2
 %     ha.YRuler.TickLabelGapMultiplier = 0.001;
     ha.YRuler.TickLabelGapOffset = 2.2;
     xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.13]);
-    ylabel('Probability', 'Units','normalized','Position',[-0.08 0.5]);
+    ylabel('PDF', 'Units','normalized','Position',[-0.08 0.5]);
 %     legend_pos = [ha.Position([1 2])+[2.2 0.5].*ha.Position([3 4]) 0.1 0.03];
 %     legend({'<thr';'>thr'},'Location','eastoutside','Units','centimeters','Position',legend_pos);
 %     text(2.2,0.15, {"thr="+thr;...
@@ -458,6 +459,72 @@ for ii_dir = 1:2
 %     text(3,2, "Distance$\geq$"+thr+"m",'FontSize',7,'Interpreter','latex')
     set(gca,'Visible','off');
 end
+
+
+%%
+axes(panel_E);
+cla('reset')
+hold on
+text(-0.3,1.12, 'E', 'Units','normalized','FontWeight','bold');
+
+gaps = [];
+for ii_cell = 1:length(cells)
+    cell = cells(ii_cell);
+    for ii_dir=1:2
+        if ~cell.signif(ii_dir).TF
+            continue;
+        end
+        fields = cell.fields{ii_dir};
+        fields([fields.in_low_speed_area]) = [];
+        gaps = [gaps abs(diff([fields.loc]))];
+    end
+end
+
+hh=histogram(gaps);
+hh.FaceColor = 0.5*[1 1 1];
+hh.BinEdges = 0:11:140; % 8 or 11 - good , 16 - maybe good. we chose 11
+hh.Normalization = 'pdf';
+gaps_exp_fit=expfit(gaps);
+
+x = 0.5*(hh.BinEdges(1:end-1)+hh.BinEdges(2:end));
+y1 = exppdf(x,gaps_exp_fit);
+y2 = hh.Values;
+plot(x,y1,'LineWidth',2,'Color','k');
+% [fitobject,gof,output] = fit(x',y2','exp1');
+% gof.rsquare
+% We decided to NOT report the GOF for this panel
+
+x = hh.BinEdges;
+y = exppdf(hh.BinEdges,gaps_exp_fit);
+plot(x,y,'LineWidth',2,'Color','k');
+
+hax=gca;
+hax.YScale = 'log';
+% hax.YScale = 'linear';
+hax.YLim(1) = 0.0001;
+hax.YLim(2) = 0.1;
+% ha.YLim = [0.7e0 240];
+hax.XTick = [0:50:200];
+hax.YTick = 10.^[-4 -3 -2 -1 0];
+hax.YTickLabel = {'10^{ -4}'; '10^{ -3}'; '10^{ -2}'; '10^{ -1}'; '10^{ 0}'};
+hax.TickDir='out';
+hax.TickLength = [0.03 0.03];
+hax.XRuler.TickLabelGapMultiplier = -0.3;
+hax.YRuler.TickLabelGapMultiplier = 0.001;
+xlabel('Gaps between fields (m)','Units','normalized','Position',[0.5 -0.14]);
+ylabel('PDF','Units','normalized','Position',[-0.26 0.5])
+
+% add legend
+axes(panel_E_legend);
+cla('reset');
+hold on
+patch([1 1 2 2], 2*[1 1 1 1]+.3*[-1 1 1 -1], 0.5*[1 1 1],'EdgeColor','k');
+plot([1 2],      1*[1 1], 'k','LineWidth',2);
+text(2.6, 2, 'Data','FontSize',7,'HorizontalAlignment','left');
+text(2.6, 1, 'Exponential fit','FontSize',7,'HorizontalAlignment','left');
+hax=gca;
+hax.Visible='off';
+
 
 %% add direction arrows
 arrow_x = 0.1 +[0 0.05];
