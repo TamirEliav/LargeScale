@@ -76,7 +76,7 @@ panel_B    = axes('position', [ 2.0  8.5  panels_size           ]);
 panel_C    = axes('position', [ 5.3  8.5  panels_size           ]);
 panel_D(1) = axes('position', [ 8.6  8.5  panels_size.*[1 0.9]  ]);
 panel_D(2) = axes('position', [ 8.6  8.5  panels_size.*[1 0.9]  ]);
-panel_E =    axes('position', [12.2  8.5  panels_size.*[1.3 1]  ]);
+panel_E =    axes('position', [12.5  8.5  panels_size.*[1.3 1]  ]);
 panel_F = axes('position', [ 2.0  5 panels_size          ]);
 panel_G = axes('position', [ 5.3  5 panels_size.*[1.4 1] ]);
 panel_H = axes('position', [ 9.1  5 panels_size]          );
@@ -545,7 +545,7 @@ xlabel('Coverage (%)', 'Units','normalized','Position',[0.45 1.2]);
 axes(panel_E);
 cla
 hold on
-text(-0.36,1.15, 'E', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.15, 'E', 'Units','normalized','FontWeight','bold');
 
 % arrange data
 signif = arrayfun(@(x)(x.TF), cat(1,cells.signif));
@@ -595,7 +595,7 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel('Map correlation', 'Units','normalized','Position',[0.5 -0.17])
-ylabel('Probability', 'Units','normalized','Position',[-0.17 0.5])
+ylabel({'Probability';'density function'}, 'Units','normalized','Position',[-0.17 0.5])
 
 
 %% panel F - field count histogram
@@ -675,7 +675,7 @@ h.BinWidth = 1;
 ha=gca;
 ha.YScale = 'log';
 xlabel('Field size (m)')
-ylabel('Counts','Units','normalized','Position',[-0.22 0.5])
+ylabel('No. of fields','Units','normalized','Position',[-0.22 0.5])
 ha = gca;
 % ha.XLim = [0 35];
 ha.YLim = [0.8 350];

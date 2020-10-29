@@ -213,7 +213,7 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y     , 'Color', prm.graphics.colors
 %% panel C - behavioral trajectory is 1D (small y deviations) - Population
 axes(panel_C);
 cla
-text(-0.4,1.15, 'C', 'Units','normalized','FontWeight','bold');
+text(-0.7,1.15, 'C', 'Units','normalized','FontWeight','bold');
 hold on
 % arrange data
 data = {};
@@ -253,7 +253,7 @@ switch yvar_pop_plot
             plot(xi,ystd_density,'Color',prm.graphics.colors.flight_directions{ii_dir},'LineWidth',1.5);
         end
         xlabel('Y s.d. (cm)');
-        ylabel('Probability','Units','normalized','Position',[-0.1 0.5]);
+        ylabel({'Probability';'density function'},'Units','normalized','Position',[-0.3 0.5]);
         ha=gca;
         ha.XLim = [0 40];
         ha.XTick = 0:10:40;

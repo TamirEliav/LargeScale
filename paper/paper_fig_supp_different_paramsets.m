@@ -1,4 +1,4 @@
-%% Large Scale - Fig. S8 - robustness of results with different paramsets
+%% Large Scale - Fig. S10 - robustness of results with different paramsets
 
 %%
 clear 
@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S8';
+fig_name_str = 'fig_S10';
 fig_caption_str = 'robustness of results with different paramsets';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -187,7 +187,7 @@ for ii_paramset = 1:length(paramsets)
     ha.TickLength = [0.03 0.03];
     ha.XRuler.TickLabelGapMultiplier = -0.3;
     ha.YRuler.TickLabelGapMultiplier = 0.001;
-    ylabel('Counts','Units','normalized','Position',[-0.18 0.5])
+    ylabel('No. of fields','Units','normalized','Position',[-0.18 0.5])
     switch ii_paramset
         case {length(paramsets)}
             xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.2]);

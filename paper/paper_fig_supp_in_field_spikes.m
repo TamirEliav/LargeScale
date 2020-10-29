@@ -1,4 +1,4 @@
-%% Large Scale - Fig. S4 - high spatial tuning with low baseline activity
+%% Large Scale - Fig. S5 - high spatial tuning with low baseline activity
 
 %%
 clear 
@@ -17,7 +17,7 @@ burst_ISI_thr = 6; % 6ms  as in Mizuseki 2011
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S4';
+fig_name_str = 'fig_S5';
 fig_caption_str = 'In-field spikes';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -186,7 +186,7 @@ h = histogram(in_field_spikes_prc(:));
 h.NumBins = 12;
 h.FaceColor = 0.5*[1 1 1];
 ha=gca;
-ha.XLim = [0 100];
+ha.XLim = [0 101];
 ha.XTick = [0 50 100];
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
@@ -282,7 +282,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.5;
 ha.YRuler.TickLabelGapOffset = 1;
 ha.YScale = 'linear';
 xlabel({'In-field inter spike interval (ms)'}, 'Units','normalized','Position',[0.5 -0.13]);
-ylabel('PDF','Units','normalized','Position',[-0.13 0.5]);
+ylabel({'Probability';'density function'},'Units','normalized','Position',[-0.13 0.5]);
 
 %% percentage of bursty spikes (per field)
 axes(panel_D(1));
@@ -362,11 +362,11 @@ plot(x,y,'.k');
 % lm = fitlm(x,y);
 % [rho, pval] = corr(x',y','type','pearson');
 [rho, pval] = corr(x',y','type','spearman');
-text(0.75,0.95, ['{\rho}' sprintf(' = %.2f',rho)] ,'units','normalized');
+text(0.75,0.95, ['{\rho}' sprintf(' = %.2f',rho)] ,'units','normalized','FontSize',8);
 if pval == 0
-    text(0.75,0.8, 'P < 10^{ -300}' ,'units','normalized');
+    text(0.75,0.8, 'P < 10^{ -300}' ,'units','normalized','FontSize',8);
 else
-    text(0.75,0.8, ['{\rho}' sprintf(' = %.2f',rho)] ,'units','normalized');
+    text(0.75,0.8, sprintf('P = %.2f',pval) ,'units','normalized','FontSize',8);
 end
 
 ha=gca;

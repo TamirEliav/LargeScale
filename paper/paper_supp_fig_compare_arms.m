@@ -1,4 +1,4 @@
-%% Large Scale - supp fig - comparing the two arms
+%% Large Scale - supp fig 6 - comparing the two arms
 
 %%
 clear 
@@ -11,7 +11,7 @@ yscale_opt = 'log';
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S5';
+fig_name_str = 'fig_S6';
 fig_caption_str = 'compare firing patterns between the two arms (long vs. short)';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -215,7 +215,7 @@ ha.TickLength = [0.03 0.03];
 ha.YTick = 10.^[-3 -2 -1];
 ha.YTickLabel = {'10^{ -3}'; '10^{ -2}'; '10^{ -1}';};
 xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.14]);
-ylabel('Probability', 'Units','normalized','Position',[-0.20 0.5]);
+ylabel('Fraction of fields', 'Units','normalized','Position',[-0.20 0.5]);
 
 %% legend for long/short arms
 axes(panel_A_legend);
@@ -399,7 +399,7 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapOffset = -1;
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.12]);
-ylabel('Probability','Units','normalized','Position',[-0.2 0.5]);
+ylabel('Fraction of cells','Units','normalized','Position',[-0.2 0.5]);
 
 %% add legend
 axes(panel_B_legend);

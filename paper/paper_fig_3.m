@@ -54,14 +54,14 @@ panel_A(1) = axes('position', [ 2 22 panel_A_size]);
 panel_A(2) = axes('position', [ 2 18 panel_A_size]);
 panel_B(1) = axes('position', [11 22 panel_B_size]);
 panel_B(2) = axes('position', [11 18 panel_B_size]);
-panel_C(1) = axes('position', [ 2 13 panel_C_size]);
-panel_C(2) = axes('position', [ 2  9 panel_C_size]);
-panel_D(1) = axes('position', [11 13 panel_D_size]);
-panel_D(2) = axes('position', [11  9 panel_D_size]);
-panel_E(1) = axes('position', [ 2  4.3 3 3]);
+panel_D(1) = axes('position', [ 2 13 panel_C_size]);
+panel_D(2) = axes('position', [ 2  9 panel_C_size]);
+panel_E(1) = axes('position', [11 13 panel_D_size]);
+panel_E(2) = axes('position', [11  9 panel_D_size]);
+panel_C(1) = axes('position', [ 17 22 3 3]);
 panel_B_legend(1) = axes('position', [13.6 23 2 1.3]);
 panel_B_legend(2) = axes('position', [13.6 19 2 1.3]);
-panel_E_legend(1) = axes('position', [4 6.5 0.2 0.4]);
+panel_C_legend(1) = axes('position', [17+2 22+2.2 0.2 0.4]);
 
 %% load population data
 % =========================================================================
@@ -272,7 +272,7 @@ for ii_dir = 1:2
 %     ha.YRuler.TickLabelGapMultiplier = -0.04;
     ha.YRuler.TickLabelGapOffset = 2.2;
     xlabel({'Distance of fields';'to nearest landmark (m)'}, 'Units','normalized','Position',[0.5 -0.13])
-    ylabel('PDF', 'Units','normalized','Position',[-0.08 0.5])
+    ylabel({'Probability';'density function'}, 'Units','normalized','Position',[-0.08 0.5])
 end
 
 axes(panel_B(1));
@@ -308,7 +308,7 @@ end
 % figure
 for ii_dir = 1:2
 %     subplot(1,2,ii_dir)
-    axes(panel_C(ii_dir));
+    axes(panel_D(ii_dir));
     cla
     hold on
     
@@ -352,16 +352,16 @@ for ii_dir = 1:2
     ha.YRuler.TickLabelGapOffset = 2.2;
 end
 
-axes(panel_C(1));
-text(-0.13,1.12, 'C', 'Units','normalized','FontWeight','bold');
+axes(panel_D(1));
+text(-0.13,1.12, 'D', 'Units','normalized','FontWeight','bold');
 
 
 %% panel D - field size - near vs. far from LM
 % =========================================================================
-axes(panel_D(1));
-text(-0.3,1.12, 'D', 'Units','normalized','FontWeight','bold');
+axes(panel_E(1));
+text(-0.3,1.12, 'E', 'Units','normalized','FontWeight','bold');
 for ii_dir = 1:2
-    axes(panel_D(ii_dir));
+    axes(panel_E(ii_dir));
 %     cla('reset')
     hold on
     
@@ -438,7 +438,7 @@ for ii_dir = 1:2
 %     ha.YRuler.TickLabelGapMultiplier = 0.001;
     ha.YRuler.TickLabelGapOffset = 2.2;
     xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.13]);
-    ylabel('PDF', 'Units','normalized','Position',[-0.08 0.5]);
+    ylabel({'Probability';'density function'}, 'Units','normalized','Position',[-0.08 0.5]);
 %     legend_pos = [ha.Position([1 2])+[2.2 0.5].*ha.Position([3 4]) 0.1 0.03];
 %     legend({'<thr';'>thr'},'Location','eastoutside','Units','centimeters','Position',legend_pos);
 %     text(2.2,0.15, {"thr="+thr;...
@@ -462,10 +462,10 @@ end
 
 
 %%
-axes(panel_E);
+axes(panel_C);
 cla('reset')
 hold on
-text(-0.3,1.12, 'E', 'Units','normalized','FontWeight','bold');
+text(-0.5,1.12, 'C', 'Units','normalized','FontWeight','bold');
 
 gaps = [];
 for ii_cell = 1:length(cells)
@@ -511,11 +511,11 @@ hax.TickDir='out';
 hax.TickLength = [0.03 0.03];
 hax.XRuler.TickLabelGapMultiplier = -0.3;
 hax.YRuler.TickLabelGapMultiplier = 0.001;
-xlabel('Gaps between fields (m)','Units','normalized','Position',[0.5 -0.14]);
-ylabel('PDF','Units','normalized','Position',[-0.26 0.5])
+xlabel('Gap between fields (m)','Units','normalized','Position',[0.5 -0.14]);
+ylabel({'Probability';'density function'},'Units','normalized','Position',[-0.26 0.5])
 
 % add legend
-axes(panel_E_legend);
+axes(panel_C_legend);
 cla('reset');
 hold on
 patch([1 1 2 2], 2*[1 1 1 1]+.3*[-1 1 1 -1], 0.5*[1 1 1],'EdgeColor','k');
