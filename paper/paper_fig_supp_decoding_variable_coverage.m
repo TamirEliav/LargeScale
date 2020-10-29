@@ -1,18 +1,18 @@
-%% Large Scale - Fig. S11 - PV decoder
+%% Large Scale - Fig. Sxxx - Theoretical analysis (decoding) - including schemes 5v,6v
 
 %%
 % clear 
 clc
 
 %% params
-use_absolute_error = 1;     % 0 - 5% of env. error; 1 - 2m error
+use_absolute_error = 1;
 
 %% define output files
 res_dir = hc3_get_res_dir();
 res_dir = fullfile(res_dir,'paper_figures');
 mkdir(res_dir)
-fig_name_str = 'fig_S11_decoder_PV';
-fig_caption_str = 'Theoretical analysis with PV decoder';
+fig_name_str = 'Fig_Sxxx_decoding_variable_coverage';
+fig_caption_str = 'Theoretical analysis_decoding';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
 log_name_str = strrep(log_name_str , ' ', '_');
@@ -65,8 +65,12 @@ panel_C(1,2) = axes('position', [ 2.5   10.7  2.8 2]);
 panel_D(1,1) = axes('position', [ 8.1  8.7  panel_BCDE_size]);
 panel_D(1,2) = axes('position', [ 8.7 10.7  2.5 2]);
 panel_E(1)   = axes('position', [14.4    8.7  panel_BCDE_size]);
-
+% panel_F      = axes('position', [   2    3.0  panel_BCDE_size]);
+panel_F      = axes('position', [   2    3.8  3 3]);
+panel_G      = axes('position', [   7    3.8  3 3]);
 panel_legend = axes('position', [9.8 16.6 0.4 2]);
+panel_F_legend = axes('position', [3.2 6  0.2 0.4]);
+panel_G_legend = axes('position', [9.5 6  0.2 0.75]);
 
 %% color variable for different schemes
 clr = [1.0 0.0 0.0 ; ...
@@ -143,7 +147,6 @@ for ii_scm = 1:6
 end
 axes(panel_A(1));
 text(-0.4,1.2, 'A', 'Units','normalized','FontWeight','bold');
-text(3,1.5, 'Population Vector decoder instead of Maximum Likelihood decoder', 'Units','normalized','FontWeight','bold','FontSize',12,'HorizontalAlignment','center');
 ylabel('Example neuron no.','Units','normalized','Position',[-0.18 0.5]);
 
 %% panel B - minimum N required for error <2m (or <5%)
@@ -154,23 +157,23 @@ text(-0.24,1.13, 'B', 'Units','normalized','FontWeight','bold');
 text(0.5,1.13, {'Minimal no. of neurons';'required for decoding'}, 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
 
 if use_absolute_error
-    plot(L,Nerr_PV_S1(:,jdt),'Color',clr(1,:),'LineWidth',2) ;
-    plot(L,Nerr_PV_S3(:,jdt),'Color',clr(3,:),'LineWidth',2) ;
-    plot(L,Nerr_PV_S2(:,jdt),'Color',clr(2,:),'LineWidth',2) ;
-    plot(L,Nerr_PV_S4(:,jdt),'Color',clr(4,:),'LineWidth',2) ;
-    plot(L,Nerr_PV_S5(:,jdt),'Color',clr(5,:),'LineWidth',2) ;
-    plot(L,Nerr_PV_S6(:,jdt),'Color',clr(6,:),'LineWidth',2) ;
-    plot(L,Nerr_PV_S5v(:,jdt),'Color',clr(5,:),'LineWidth',2,'LineStyle','--') ;
-    plot(L,Nerr_PV_S6v(:,jdt),'Color',clr(6,:),'LineWidth',2,'LineStyle','--') ;
+    plot(L,Nerr_ML_S1(:,jdt),'Color',clr(1,:),'LineWidth',2) ;
+    plot(L,Nerr_ML_S3(:,jdt),'Color',clr(3,:),'LineWidth',2) ;
+    plot(L,Nerr_ML_S2(:,jdt),'Color',clr(2,:),'LineWidth',2) ;
+    plot(L,Nerr_ML_S4(:,jdt),'Color',clr(4,:),'LineWidth',2) ;
+    plot(L,Nerr_ML_S5(:,jdt),'Color',clr(5,:),'LineWidth',2) ;
+    plot(L,Nerr_ML_S6(:,jdt),'Color',clr(6,:),'LineWidth',2) ;
+    plot(L,Nerr_ML_S5v(:,jdt),'Color',clr(5,:),'LineWidth',2,'LineStyle','--') ;
+    plot(L,Nerr_ML_S6v(:,jdt),'Color',clr(6,:),'LineWidth',2,'LineStyle','--') ;
 else
-    plot(L,Nrerr_PV_S1(:,jdt),'Color',clr(1,:),'LineWidth',2) ;
-    plot(L,Nrerr_PV_S3(:,jdt),'Color',clr(3,:),'LineWidth',2) ;
-    plot(L,Nrerr_PV_S2(:,jdt),'Color',clr(2,:),'LineWidth',2) ;
-    plot(L,Nrerr_PV_S4(:,jdt),'Color',clr(4,:),'LineWidth',2) ;
-    plot(L,Nrerr_PV_S5(:,jdt),'Color',clr(5,:),'LineWidth',2) ;
-    plot(L,Nrerr_PV_S6(:,jdt),'Color',clr(6,:),'LineWidth',2) ;
-    plot(L,Nrerr_PV_S5v(:,jdt),'Color',clr(5,:),'LineWidth',2,'LineStyle','--') ;
-    plot(L,Nrerr_PV_S6v(:,jdt),'Color',clr(6,:),'LineWidth',2,'LineStyle','--') ;
+    plot(L,Nrerr_ML_S1(:,jdt),'Color',clr(1,:),'LineWidth',2) ;
+    plot(L,Nrerr_ML_S3(:,jdt),'Color',clr(3,:),'LineWidth',2) ;
+    plot(L,Nrerr_ML_S2(:,jdt),'Color',clr(2,:),'LineWidth',2) ;
+    plot(L,Nrerr_ML_S4(:,jdt),'Color',clr(4,:),'LineWidth',2) ;
+    plot(L,Nrerr_ML_S5(:,jdt),'Color',clr(5,:),'LineWidth',2) ;
+    plot(L,Nrerr_ML_S6(:,jdt),'Color',clr(6,:),'LineWidth',2) ;
+    plot(L,Nrerr_ML_S5v(:,jdt),'Color',clr(5,:),'LineWidth',2,'LineStyle','--') ;
+    plot(L,Nrerr_ML_S6v(:,jdt),'Color',clr(6,:),'LineWidth',2,'LineStyle','--') ;
 end
 xlim([20 1000]) ;
 ylim([10 max(N)]) ;
@@ -245,7 +248,6 @@ h=gca;
 h.XTick = [];
 h.YTick = [0 m];
 ylabel('Slope (N per meter)', 'Units','normalized','Position',[-0.11 0.5]);
-
 % fill bar with dots for schemes 5v & 6v
 for ii=7:8
     barw = 0.8; % bar width
@@ -356,14 +358,14 @@ for ii_N = 1:length(jN_options)
     axes(panel_C(ii_N,1));
     cla
     hold on
-    plot(L,merr_PV_S1(jN,:,jdt)*ds/100,'Color',clr(1,:),'LineWidth',2);
-    plot(L,merr_PV_S2(jN,:,jdt)*ds/100,'Color',clr(2,:),'LineWidth',2);
-    plot(L,merr_PV_S3(jN,:,jdt)*ds/100,'Color',clr(3,:),'LineWidth',2);
-    plot(L,merr_PV_S4(jN,:,jdt)*ds/100,'Color',clr(4,:),'LineWidth',2);
-    plot(L,merr_PV_S5(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2);
-    plot(L,merr_PV_S6(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2);
-    plot(L,merr_PV_S5v(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2,'LineStyle','--');
-    plot(L,merr_PV_S6v(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2,'LineStyle','--');
+    plot(L,merr_ML_S1(jN,:,jdt)*ds/100,'Color',clr(1,:),'LineWidth',2);
+    plot(L,merr_ML_S2(jN,:,jdt)*ds/100,'Color',clr(2,:),'LineWidth',2);
+    plot(L,merr_ML_S3(jN,:,jdt)*ds/100,'Color',clr(3,:),'LineWidth',2);
+    plot(L,merr_ML_S4(jN,:,jdt)*ds/100,'Color',clr(4,:),'LineWidth',2);
+    plot(L,merr_ML_S5(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2);
+    plot(L,merr_ML_S6(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2);
+    plot(L,merr_ML_S5v(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2,'LineStyle','--');
+    plot(L,merr_ML_S6v(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2,'LineStyle','--');
     xlim([20 1000]) ;
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
     ylabel('Mean decoding error (m)', 'Units','normalized','Position',[ -0.15 0.5]);
@@ -384,14 +386,14 @@ for ii_N = 1:length(jN_options)
     axes(panel_C(ii_N,2));
     cla
     hold on
-    plot(L,merr_PV_S1(jN,:,jdt)*ds/100,'Color',clr(1,:),'LineWidth',2);
-    plot(L,merr_PV_S2(jN,:,jdt)*ds/100,'Color',clr(2,:),'LineWidth',2);
-    plot(L,merr_PV_S3(jN,:,jdt)*ds/100,'Color',clr(3,:),'LineWidth',2);
-    plot(L,merr_PV_S4(jN,:,jdt)*ds/100,'Color',clr(4,:),'LineWidth',2);
-    plot(L,merr_PV_S5(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2);
-    plot(L,merr_PV_S6(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2);
-    plot(L,merr_PV_S5v(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2,'LineStyle','--');
-    plot(L,merr_PV_S6v(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2,'LineStyle','--');
+    plot(L,merr_ML_S1(jN,:,jdt)*ds/100,'Color',clr(1,:),'LineWidth',2);
+    plot(L,merr_ML_S2(jN,:,jdt)*ds/100,'Color',clr(2,:),'LineWidth',2);
+    plot(L,merr_ML_S3(jN,:,jdt)*ds/100,'Color',clr(3,:),'LineWidth',2);
+    plot(L,merr_ML_S4(jN,:,jdt)*ds/100,'Color',clr(4,:),'LineWidth',2);
+    plot(L,merr_ML_S5(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2);
+    plot(L,merr_ML_S6(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2);
+    plot(L,merr_ML_S5v(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2,'LineStyle','--');
+    plot(L,merr_ML_S6v(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2,'LineStyle','--');
     xlim([20 1000]) ;
     ylim(ylimits_options(ii_N,:))
     h = gca;
@@ -417,14 +419,14 @@ for ii_N = 1:length(jN_options)
     axes(panel_D(ii_N,1));
     cla
     hold on
-    plot(L,perr_PV_S1(jN,:,jdt)*ds/100,'Color',clr(1,:),'LineWidth',2);
-    plot(L,perr_PV_S2(jN,:,jdt)*ds/100,'Color',clr(2,:),'LineWidth',2);
-    plot(L,perr_PV_S3(jN,:,jdt)*ds/100,'Color',clr(3,:),'LineWidth',2);
-    plot(L,perr_PV_S4(jN,:,jdt)*ds/100,'Color',clr(4,:),'LineWidth',2);
-    plot(L,perr_PV_S5(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2);
-    plot(L,perr_PV_S6(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2);
-    plot(L,perr_PV_S5v(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2,'LineStyle','--');
-    plot(L,perr_PV_S6v(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2,'LineStyle','--');
+    plot(L,perr_ML_S1(jN,:,jdt)*ds/100,'Color',clr(1,:),'LineWidth',2);
+    plot(L,perr_ML_S2(jN,:,jdt)*ds/100,'Color',clr(2,:),'LineWidth',2);
+    plot(L,perr_ML_S3(jN,:,jdt)*ds/100,'Color',clr(3,:),'LineWidth',2);
+    plot(L,perr_ML_S4(jN,:,jdt)*ds/100,'Color',clr(4,:),'LineWidth',2);
+    plot(L,perr_ML_S5(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2);
+    plot(L,perr_ML_S6(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2);
+    plot(L,perr_ML_S5v(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2,'LineStyle','--');
+    plot(L,perr_ML_S6v(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2,'LineStyle','--');
 %     ylim([0.1 2000]) ;
     xlim([20 1000]) ;
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
@@ -447,14 +449,14 @@ for ii_N = 1:length(jN_options)
     axes(panel_D(ii_N,2));
     cla
     hold on
-    plot(L,perr_PV_S1(jN,:,jdt)*ds/100,'Color',clr(1,:),'LineWidth',2);
-    plot(L,perr_PV_S2(jN,:,jdt)*ds/100,'Color',clr(2,:),'LineWidth',2);
-    plot(L,perr_PV_S3(jN,:,jdt)*ds/100,'Color',clr(3,:),'LineWidth',2);
-    plot(L,perr_PV_S4(jN,:,jdt)*ds/100,'Color',clr(4,:),'LineWidth',2);
-    plot(L,perr_PV_S5(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2);
-    plot(L,perr_PV_S6(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2);
-    plot(L,perr_PV_S5v(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2,'LineStyle','--');
-    plot(L,perr_PV_S6v(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2,'LineStyle','--');
+    plot(L,perr_ML_S1(jN,:,jdt)*ds/100,'Color',clr(1,:),'LineWidth',2);
+    plot(L,perr_ML_S2(jN,:,jdt)*ds/100,'Color',clr(2,:),'LineWidth',2);
+    plot(L,perr_ML_S3(jN,:,jdt)*ds/100,'Color',clr(3,:),'LineWidth',2);
+    plot(L,perr_ML_S4(jN,:,jdt)*ds/100,'Color',clr(4,:),'LineWidth',2);
+    plot(L,perr_ML_S5(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2);
+    plot(L,perr_ML_S6(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2);
+    plot(L,perr_ML_S5v(jN,:,jdt)*ds/100,'Color',clr(5,:),'LineWidth',2,'LineStyle','--');
+    plot(L,perr_ML_S6v(jN,:,jdt)*ds/100,'Color',clr(6,:),'LineWidth',2,'LineStyle','--');
 %     ylim([0.1 2000]) ;
     xlim([100 1000]) ;
     h = gca;
@@ -484,14 +486,14 @@ for ii_N = 1:length(jN_options)
 
     prob_offset = (2e6)^(-1); % at least in one simulation there was a catastrophic error
     prob_offset = 0;
-    plot(L,plerr_PV_S1(jN,:,jdt)+prob_offset,'Color',clr(1,:),'LineWidth',2);
-    plot(L,plerr_PV_S2(jN,:,jdt)+prob_offset,'Color',clr(2,:),'LineWidth',2);
-    plot(L,plerr_PV_S3(jN,:,jdt)+prob_offset,'Color',clr(3,:),'LineWidth',2);
-    plot(L,plerr_PV_S4(jN,:,jdt)+prob_offset,'Color',clr(4,:),'LineWidth',2);
-    plot(L,plerr_PV_S5(jN,:,jdt)+prob_offset,'Color',clr(5,:),'LineWidth',2);
-    plot(L,plerr_PV_S6(jN,:,jdt)+prob_offset,'Color',clr(6,:),'LineWidth',2);
-    plot(L,plerr_PV_S5v(jN,:,jdt)+prob_offset,'Color',clr(5,:),'LineWidth',2,'LineStyle','--');
-    plot(L,plerr_PV_S6v(jN,:,jdt)+prob_offset,'Color',clr(6,:),'LineWidth',2,'LineStyle','--');
+    plot(L,plerr_ML_S1(jN,:,jdt)+prob_offset,'Color',clr(1,:),'LineWidth',2);
+    plot(L,plerr_ML_S2(jN,:,jdt)+prob_offset,'Color',clr(2,:),'LineWidth',2);
+    plot(L,plerr_ML_S3(jN,:,jdt)+prob_offset,'Color',clr(3,:),'LineWidth',2);
+    plot(L,plerr_ML_S4(jN,:,jdt)+prob_offset,'Color',clr(4,:),'LineWidth',2);
+    plot(L,plerr_ML_S5(jN,:,jdt)+prob_offset,'Color',clr(5,:),'LineWidth',2);
+    plot(L,plerr_ML_S6(jN,:,jdt)+prob_offset,'Color',clr(6,:),'LineWidth',2);
+    plot(L,plerr_ML_S5v(jN,:,jdt)+prob_offset,'Color',clr(5,:),'LineWidth',2,'LineStyle','--');
+    plot(L,plerr_ML_S6v(jN,:,jdt)+prob_offset,'Color',clr(6,:),'LineWidth',2,'LineStyle','--');
     xlim([20 1000]) ;
     ylim(ylimits_options(ii_N,:))
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
@@ -505,7 +507,6 @@ for ii_N = 1:length(jN_options)
     h.YTick = 10.^[-3 -2 -1 0];
     h.YTickLabel = {'10^{ -3}'; '10^{ -2}'; '10^{ -1}'; '10^{ 0}'};
     ylim([0.7e-3 1])
-    ylim(10.^[-3 0])
     h.YRuler.TickLabelGapOffset = -0.1;
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
@@ -516,132 +517,141 @@ for ii_N = 1:length(jN_options)
     end
 end
 
-
-%% print/save the figure
-fig_name = sprintf('%s_dt_%s', ...
-    fig_name_str, ...
-    strrep(num2str(panels_AE_dt),'.','_'));
-file_out = fullfile(res_dir, fig_name);
-print(gcf, file_out, '-dpdf', '-cmyk', '-painters');
-% print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
-% saveas(gcf , fig_name_out, 'fig');
-disp('figure was successfully saved to pdf/tiff/fig formats');
-
-
-
-%%
-function plot_panel_F(panel_axes)
-
-load('C:\Tamir\work\Projects\LargeScale\Yonatan_theory\20200630__new_simulations_data+script\SummaryDecoderResults_EnvironmentSizeScaling.mat')
-nalp = length(alp) ;
-L = Lv*ds/100 ; % environment size variable in meters
-jN = 2 ; % chooses N = 50
-
-% color variable for S6 advantage (blue/red gradient)
-nclr = 50 ;  % number of colors 
-cmin = -1.5 ;
-cbi  = -1   ;
-c0   = 0 ;
-cri  = 1 ;
-cmax = 1.5 ;
-cx   = linspace(cmin,cmax,nclr) ;
-clrf = zeros(nclr,3) ;
-iclr1 = find(cx<=cbi) ;
-iclr2 = intersect(find(cx<=c0),find(cx>=cbi)) ;
-iclr3 = intersect(find(cx<=cri),find(cx>=c0)) ;
-iclr4 = find(cx>=cri) ;
-
-clrf(iclr1,3) = linspace(0.5,1,length(iclr1)) ;
-clrf(iclr2,1) = linspace(0  ,1,length(iclr2)) ;
-clrf(iclr2,2) = linspace(0  ,1,length(iclr2)) ;
-clrf(iclr2,3) = 1 ; 
-
-clrf(iclr3,1) = 1 ; 
-clrf(iclr3,2) = linspace(1,0  ,length(iclr3)) ;
-clrf(iclr3,3) = linspace(1,0  ,length(iclr3)) ;
-clrf(iclr4,1) = linspace(1,0.5,length(iclr4)) ;
-
-Lint = logspace(log10(20),3,100) ; % interpolation of environment size variable
-alpint = 0.1:0.01:0.9 ;            % interpolation of scaling exponent variable
-[Lm,alpm] = meshgrid(L,alp) ;
-[Lmint,alpmint] = meshgrid(Lint,alpint) ;
-merr_PV_S1i = interp2(Lm,alpm,ones(nalp,1)*merr_PV_S1(jN,:),Lmint,alpmint) ;
-merr_PV_S2i = interp2(Lm,alpm,squeeze(merr_PV_S2(jN,:,:))',Lmint,alpmint) ;
-merr_PV_S3i = interp2(Lm,alpm,squeeze(merr_PV_S3(jN,:,:))',Lmint,alpmint) ;
-merr_PV_S4i = interp2(Lm,alpm,squeeze(merr_PV_S4(jN,:,:))',Lmint,alpmint) ;
-merr_PV_S5i = interp2(Lm,alpm,squeeze(merr_PV_S5(jN,:,:))',Lmint,alpmint) ;
-merr_PV_S6i = interp2(Lm,alpm,squeeze(merr_PV_S6(jN,:,:))',Lmint,alpmint) ;
-
-plerr_PV_S1i = interp2(Lm,alpm,ones(nalp,1)*plerr_PV_S1(jN,:),Lmint,alpmint) ;
-plerr_PV_S2i = interp2(Lm,alpm,squeeze(plerr_PV_S2(jN,:,:))',Lmint,alpmint) ;
-plerr_PV_S3i = interp2(Lm,alpm,squeeze(plerr_PV_S3(jN,:,:))',Lmint,alpmint) ;
-plerr_PV_S4i = interp2(Lm,alpm,squeeze(plerr_PV_S4(jN,:,:))',Lmint,alpmint) ;
-plerr_PV_S5i = interp2(Lm,alpm,squeeze(plerr_PV_S5(jN,:,:))',Lmint,alpmint) ;
-plerr_PV_S6i = interp2(Lm,alpm,squeeze(plerr_PV_S6(jN,:,:))',Lmint,alpmint) ;
-
-min_merr_PV_S12345i = min(merr_PV_S1i,merr_PV_S2i) ;
-min_merr_PV_S12345i = min(min_merr_PV_S12345i,merr_PV_S3i) ;
-min_merr_PV_S12345i = min(min_merr_PV_S12345i,merr_PV_S4i) ;
-min_merr_PV_S12345i = min(min_merr_PV_S12345i,merr_PV_S5i) ;
-
-min_plerr_PV_S12345i = min(plerr_PV_S1i,plerr_PV_S2i) ;
-min_plerr_PV_S12345i = min(min_plerr_PV_S12345i,plerr_PV_S3i) ;
-min_plerr_PV_S12345i = min(min_plerr_PV_S12345i,plerr_PV_S4i) ;
-min_plerr_PV_S12345i = min(min_plerr_PV_S12345i,plerr_PV_S5i) ;
-
-axes(panel_axes);
+%% panel F - coverage exp fit
+axes(panel_F);
 cla
-imagesc(Lint,alpint,log10(plerr_PV_S6i./min_plerr_PV_S12345i),[cmin cmax]); set(gca,'xscale','log') ;
-axis square xy;
-colorbar ;
-colormap(gca,clrf)
-hl = yline(0.3);
-hl.Color = 'r';
-hl.LineStyle = '--';
-hl.LineWidth = 1.2;
+hold on
+load('C:\Tamir\work\Projects\LargeScale\rodents_data\results\paper_figures\total_area.mat');
+h=histogram(total_area,'Normalization','pdf');
+h.Normalization = 'pdf';
+h.FaceColor = 0.5*[1 1 1];
+h.FaceAlpha = 1;
+cvrg=expfit(total_area);
+plot(h.BinEdges,exppdf(h.BinEdges,cvrg),'LineWidth',2,'Color','k');
 hax = gca;
-hax.XScale = 'log';
-hax.XLim = [20 1000];
-% hax.YLim = [20 1000];
-hax.XTick = [100 1000];
-hax.YTick = [0.1:0.1:0.9];
-% hax.XTickLabel = {};
+hax.XLim = [0 160];
+hax.XTick = [0:50:200];
+hax.YTick = hax.YLim;
 hax.YRuler.TickLabelGapOffset = -0.1;
 hax.XRuler.TickLabelGapOffset = -1;
 hax.XRuler.TickLength = [0.03 0.03];
 hax.YRuler.TickLength = [0.024 0.03];
-xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.16]);
-ylabel('Scaling factor', 'Units','normalized','Position',[ -0.25 0.5]);
+xlabel('Coverage (m)', 'Units','normalized','Position',[0.5 -0.14]);
+ylabel('PDF', 'Units','normalized','Position',[ -0.12 0.5]);
 text(-0.35,1.15, 'F', 'Units','normalized','FontWeight','bold');
 
-end
+% add legend
+axes(panel_F_legend);
+cla('reset');
+hold on
+patch([1 1 2 2], 2*[1 1 1 1]+.3*[-1 1 1 -1], 0.5*[1 1 1],'EdgeColor','k');
+plot([1 2],      1*[1 1], 'k','LineWidth',2);
+text(2.6, 2, 'Data','FontSize',7,'HorizontalAlignment','left');
+text(2.6, 1, 'Exponential fit','FontSize',7,'HorizontalAlignment','left');
+hax=gca;
+hax.Visible='off';
 
-%%
-function coverage = calc_schemes_coverage(L,alp)
+%% load data for panel G
+% load data
+load('C:\Tamir\work\Projects\LargeScale\rodents_data\results\datasets\cells_bat_200m.mat');
+signif = cat(1,cells.signif);
+signif = arrayfun(@(x)(x.TF),signif);
+signif = any(signif,2);
+cells(~signif)=[];
+signif = cat(1,cells.signif);
+signif = arrayfun(@(x)(x.TF),signif);
+stats = [cells.stats];
+stats_all = [stats.all];
+stats_dir = cat(1,stats.dir);
+fields = cat(1,cells.fields);
+fields = fields(signif);
+fields = [fields{:}];
+fields([fields.in_low_speed_area])=[];
+field_num = [stats_dir(signif).field_num];
+field_size = [fields.width_prc];
+ratio_LS = [stats_all.field_ratio_LS];
+ratio_LS(isnan(ratio_LS))=[];
+% load simulations ratio LS
+% load('C:\Tamir\work\Projects\LargeScale\Yonatan_theory\20200806__model_ratio_LS\Model_S6_S6v_RatioLargestSmallestField.mat');
+load('C:\Tamir\work\Projects\LargeScale\Yonatan_theory\20200816__model_ratio_LS_updated_remoevd_1_field_cells\Model_S6_S6v_RatioLargestSmallestField.mat')
+rLS(K==1)=[];
+rLSv(Kv==1)=[];
 
-L0_S6   = 200  ; % anchoring environment size for scheme 6
-L0_S4   = 50 ;   % anchoring environment size for scheme 4
-phi0    = 0.15 ;
-phimax   = 0.5 ;
-gmaAL_th0 = 1/7.75 ;
-gmaAL_k   = 0.57 ;
+%% panel G - ratio L/S model+data
+axes(panel_G);
+cla
+hold on
+text(-0.35,1.15, 'G', 'Units','normalized','FontWeight','bold');
 
-coverage = zeros(6,length(L));
-coverage(1,:) = 1./L;
-% coverage(2,:) = phi0.*L0_S6.*(L./L0_S6).^alp ./ L;
-coverage(2,:) = phi0 .* (L0_S6./L).^alp;
-coverage(3,:) = mean(coverage([1 2],:));
-% coverage(4,:) = L0_S4*gmaAL_k*gmaAL_th0.*(L./L0_S4).^alp ./ L;
-coverage(4,:) = 0.41.*L.^-0.37; % fit results to the actual simulations
-coverage(5,:) = coverage(2,:);
-coverage(6,:) = coverage(2,:);
-coverage = min(coverage,phimax) ;
+nBinEdges = 9;
+edges = logspace(0,log10(25),nBinEdges);
+% plot data
+h=histogram(ratio_LS);
+h.Normalization = 'probability';
+h.BinEdges = edges;
+h.FaceColor = 0.5*[1 1 1];
+h.FaceAlpha = 1;
+% plot model (S6)
+h=histogram(rLS);
+h.Normalization = 'probability';
+h.BinEdges = edges;
+h.DisplayStyle = 'stairs';
+h.EdgeColor = clr(6,:);
+h.FaceAlpha = 1;
+h.LineWidth = 2;
+% plot model (S6v)
+h=histogram(rLSv);
+h.Normalization = 'probability';
+h.BinEdges = edges;
+h.DisplayStyle = 'stairs';
+h.EdgeColor = clr(6,:);
+h.FaceAlpha = 1;
+h.LineWidth = 2;
+h.LineStyle = '-.';
 
-% figure
-% h=plot(L,coverage(:,:)','LineWidth',2);
-% legend("s"+[1:6]);
+hax=gca;
+hax.XScale = 'log';
+hax.YScale = 'log';
+hax.XLim = [0 27];
+% hax.YLim = [0.07  1.05 * hax.YLim(2)];
+hax.YLim = [0.005 0.5];
+% hax.YLim = [0.7 200];
+hax.XTick = [1 2 5 10 20];
+hax.YTick = hax.YLim;
+hax.YTick = [0.005 0.05 0.5];
+hax.TickDir='out';
+hax.TickLength = [0.03 0.03];
+hax.XRuler.TickLabelGapMultiplier = -0.35;
+hax.YRuler.TickLabelGapMultiplier = 0.001;
+xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
+ylabel('Probability','Units','normalized','Position',[-0.25 0.5])
 
-end
+% add legend
+axes(panel_G_legend);
+cla('reset');
+hold on
+dashed_line = linspace(1,2,11);
+dashed_line([ 5 6 7]) = nan;
+patch([1 1 2 2], 1*[1 1 1 1]+.3*[-1 1 1 -1], 0.5*[1 1 1],'EdgeColor','k');
+plot([1 2],      2*[1 1], 'Color',clr(6,:), 'LineWidth',2);
+% plot([1 2],      3*[1 1], 'Color',clr(6,:), 'LineWidth',.2);
+plot(dashed_line,      3*ones(length(dashed_line)), 'Color',clr(6,:), 'LineWidth',2);
+text(2.6, 1, 'Data','FontSize',7,'HorizontalAlignment','left');
+text(2.6, 2, 'Model (Scheme 6)','FontSize',7,'HorizontalAlignment','left');
+text(2.6, 3, 'Model (Scheme 6v - variable coverage)','FontSize',7,'HorizontalAlignment','left');
+hax=gca;
+hax.Visible='off';
+hax.YDir='reverse';
+
+
+%% print/save the figure
+fig_name_out = fullfile(res_dir, sprintf('%s_dt_%s', ...
+    fig_name_str, ...
+    strrep(num2str(panels_AE_dt),'.','_')));
+print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
+% print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
+% saveas(gcf , fig_name_out, 'fig');
+disp('figure was successfully saved to pdf/tiff/fig formats');
 
 %% signif astricks string
 function str = signif_astricks(pval)
