@@ -180,6 +180,15 @@ nFields(nFields==0) = nan;
 % % %     set(gca,'visible','off');
 % % % end
 
+%% calculate stats for comparing short vs. long arm (per direction)
+for ii_dir = 1:2
+    x1 = [fields_size{:,ii_dir,1}];
+    x2 = [fields_size{:,ii_dir,2}];
+    
+    [H,P_KS,KSSTAT] = kstest2(x1,x2);
+    fprintf('field size long vs. short: direction %d\t P_KS=%.2f D=%.2f n=%d m=%d\n',ii_dir,P_KS, KSSTAT, length(x1), length(x2));
+end
+
 %% panel A - plot (directions pooled)
 axes(panel_A);
 cla
@@ -204,6 +213,7 @@ h2.DisplayStyle = 'stairs';
 h2.EdgeColor = c;
 h2.LineWidth = 1;
 [H,P_KS,KSSTAT] = kstest2(x1,x2,'Tail','unequal');
+fprintf('field size long vs. all\t\t\t\t\t P_KS=%.2f D=%.2f n=%d m=%d\n',P_KS, KSSTAT, length(x1), length(x2));
 text(1,1.05,sprintf('P_{KS} = %.2f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 % P_ranksum = ranksum(x1,x2);
 % text(1,0.85,sprintf('P_{Wilc}=%.3f',P_ranksum),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
@@ -382,6 +392,7 @@ h2.EdgeColor = c;
 h2.LineWidth = 1; % short arm
 
 [H,P_KS,KSSTAT] = kstest2(x1, x2, 'Tail','unequal');
+fprintf('field size ratio long vs. all\t\t\t P_KS=%.2f D=%.2f n=%d m=%d\n',P_KS, KSSTAT, length(x1), length(x2));
 text(1,1.05,sprintf('P_{KS} = %.2f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 % P_ranksum = ranksum(x1,x2);
 % text(1,0.95,sprintf('P_{Wilc}=%.3f',P_ranksum),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);

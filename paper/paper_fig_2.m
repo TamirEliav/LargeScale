@@ -844,11 +844,14 @@ switch field_speed_opt
         x = abs([stats_all.field_ratio_LS_vel3]);
 end
 y = [stats_all.field_ratio_LS];
-[r,r_pval] = corr(x',y','rows','pairwise','type','Pearson')
-[rho,rho_pval] = corr(x',y','rows','pairwise','type','Spearman')
-[~,ttest_P] = ttest(x,1);
-signtest_P = signtest(x,1);
-fprintf('LS speed ratio: P=%.2g (ttest), P=%.2g (signtest), std=%.3g\n',ttest_P,signtest_P,nanstd(x));
+[r,r_pval] = corr(x',y','rows','pairwise','type','Pearson');
+[rho,rho_pval] = corr(x',y','rows','pairwise','type','Spearman');
+fprintf('field size ratio vs speed ratio corr (pearson): r=%.2f p=%.2f df=%d \n',r,r_pval,sum(~isnan(y))-2);
+fprintf('field size ratio vs speed ratio corr (spearman): rho=%.2f p=%.2f df=%d \n',rho,rho_pval,sum(~isnan(y))-2);
+[~,ttest_P,~,ttest_stats] = ttest(x,1);
+[signtest_P,~,signtest_stats] = signtest(x,1);
+fprintf('LS speed ratio: (ttest) P=%.2g t=%.2g df=%d sd=%.3g\n',ttest_P,ttest_stats.tstat,ttest_stats.df,ttest_stats.sd);
+fprintf('LS speed ratio: (signtest) P=%.2g sign=%d zval=%.3g\n',signtest_P,signtest_stats.sign,signtest_stats.zval);
 plot(x, y, '.k');
 switch corr_type
     case 'pearson'

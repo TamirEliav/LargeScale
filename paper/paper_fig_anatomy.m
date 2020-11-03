@@ -358,6 +358,8 @@ h=scatter(x(:,ii_pos_TT_opt)+scatter_jitter_std(ii_pos_TT_opt)*randn(size(x,1),1
 
 [r,pval_r]     = corr(x(:,ii_pos_TT_opt),y','rows','pairwise','type','Pearson');
 [rho,pval_rho] = corr(x(:,ii_pos_TT_opt),y','rows','pairwise','type','Spearman');
+fprintf('field size ratio vs proximo-distal correlation (pearson): r=%.2f p=%.2f df=%d \n',r,pval_r,sum(~isnan(y))-2);
+fprintf('field size ratio vs proximo-distal correlation (spearman): rho=%.2f p=%.2f df=%d \n',rho,pval_rho,sum(~isnan(y))-2);
 % text(0.05,0.95, {sprintf('r = %.2f',r);sprintf('P = %.2f',pval_r)}, ...
 %     'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
 text(0.05,0.95, {sprintf('%s = %.2f','\rho',rho);sprintf('P = %.2f',pval_rho)}, ...

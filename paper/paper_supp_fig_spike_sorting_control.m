@@ -132,8 +132,8 @@ plot(x, y, '.k');
 xlim([0 100])
 [r,pval_r]     = corr(x',y','rows','pairwise','type','Pearson');
 [rho,pval_rho] = corr(x',y','rows','pairwise','type','Spearman');
-fprintf('num_field vs. IsoDist corr: r=%.2f, P=%.2f\n',r,pval_r);
-fprintf('num_field vs. IsoDist corr: rho=%.2f, P=%.2f\n',rho,pval_rho);
+fprintf('num_field vs. IsoDist corr: r=%.2f, P=%.2f df=%d\n',r,pval_r,sum(~isnan(y))-2);
+fprintf('num_field vs. IsoDist corr: rho=%.2f, P=%.2f df=%d\n',rho,pval_rho,sum(~isnan(y))-2);
 switch corr_type
     case 'pearson'
         text(1,1,   {sprintf('r = %.3f',r);sprintf('P = %.2f',pval_r)}, ...
@@ -160,8 +160,8 @@ plot(x, y, '.k');
 xlim([0 100])
 [r,pval_r]     = corr(x',y','rows','pairwise','type','Pearson');
 [rho,pval_rho] = corr(x',y','rows','pairwise','type','Spearman');
-fprintf('field size ratio vs. IsoDist corr: r=%.2f, P=%.2f\n',r,pval_r);
-fprintf('field size ratio vs. IsoDist corr: rho=%.2f, P=%.2f\n',rho,pval_rho);
+fprintf('field size ratio vs. IsoDist corr: r=%.2f, P=%.2f df=%d\n',r,pval_r,sum(~isnan(y))-2);
+fprintf('field size ratio vs. IsoDist corr: rho=%.2f, P=%.2f df=%d\n',rho,pval_rho,sum(~isnan(y))-2);
 switch corr_type
     case 'pearson'
         text(1,1,   {sprintf('r = %.3f',r);sprintf('P = %.2f',pval_r)}, ...

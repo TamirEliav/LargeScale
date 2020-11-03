@@ -136,6 +136,9 @@ for ii_dir = 1:2
     lm = fitlm(x,y);
     [r,r_pval] = corr(x',y','type','Pearson');
     [rho,rho_pval] = corr(x',y','type','Spearman');
+    fprintf('dir %d\n',ii_dir)
+    fprintf('field size vs inter-LM-dist corr (pearson): r=%.2f p=%.2f df=%d \n',rho,r_pval,sum(~isnan(x))-2);
+    fprintf('field size vs inter-LM-dist corr (spearman): rho=%.2f p=%.2f df=%d \n',rho,rho_pval,sum(~isnan(x))-2);
     text(0.95,1.07,{    ['Spearman {\rho} = '   sprintf('%.2f',rho) ', P = '      sprintf('%.2f',rho_pval) ];...
                         ['Pearson r = '         sprintf('%.2f',r)   ', P = '      sprintf('%.2f',r_pval)   ]},...
                     'Units','normalized', 'HorizontalAlignment','right', 'FontSize',7);
@@ -160,6 +163,8 @@ for ii_dir = 1:2
     plot(x,y,'.', 'Color', prm.graphics.colors.flight_directions{ii_dir})
     [r,r_pval] = corr(x',y','type','Pearson');
     [rho,rho_pval] = corr(x',y','type','Spearman');
+    fprintf('field size vs distance to nearest LM corr (pearson): r=%.2f p=%.2f df=%d \n',rho,r_pval,sum(~isnan(x))-2);
+    fprintf('field size vs distance to nearest LM corr (spearman): rho=%.2f p=%.2f df=%d \n',rho,rho_pval,sum(~isnan(x))-2);
     text(1.15,1.07,{    ['Spearman {\rho} = '   sprintf('%.2f',rho) ', P = '      sprintf('%.2f',rho_pval) ];...
                         ['Pearson r = '         sprintf('%.2f',r)   ', P = '      sprintf('%.2f',r_pval)   ]},...
                     'Units','normalized', 'HorizontalAlignment','right', 'FontSize',7);
