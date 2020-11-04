@@ -1,18 +1,17 @@
 %% Large Scale - Fig. Sxxx - Theoretical analysis (mechanism)
 
 %%
-clear 
+% clear 
 clc
 
 %%
-paper_fig_8_arrange_sim_data
+% paper_fig_8_arrange_sim_data
 data = paper_fig_8_arrange_real_data();
 
 %% define output files
-res_dir = hc3_get_res_dir();
-res_dir = fullfile(res_dir,'paper_figures');
+res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_Sxxx_mechanism';
+fig_name_str = 'fig_S19';
 fig_caption_str = 'Theoretical analysis - Mechanism';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -52,23 +51,23 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 
 % create panels
 panel_A_size = [2.5 2.5];
-panel_B_size = [2.5 3];
-panel_CD_size = [3 3];
+panel_D_size = [2.5 3];
+panel_BC_size = [3 3];
 panel_A(1) = axes('position', [ 2.0 22 panel_A_size]);
 panel_A(2) = axes('position', [ 5.5 22 panel_A_size]);
 panel_A(3) = axes('position', [ 9.0 22 panel_A_size]);
 panel_A(4) = axes('position', [12.5 22 panel_A_size]);
 panel_A(5) = axes('position', [16.0 22 panel_A_size]);
-panel_B(1) = axes('position', [ 2.0 17.5 panel_B_size]);
-panel_B(2) = axes('position', [ 5.7 17.5 panel_B_size]);
-panel_B(3) = axes('position', [ 9.0 17.5 panel_B_size]);
-panel_B(4) = axes('position', [ 12 19.5 0.5 0.65]);
-panel_CD(1) = axes('position', [ 2.0 11.8 panel_CD_size]);
-panel_CD(2) = axes('position', [ 2.0  7.0 panel_CD_size]);
-panel_E(1) = axes('position', [ 7.0 11.8 5 3]);
-panel_E(2) = axes('position', [ 9.2 13.1 2.5 1.7]);
-panel_F(1) = axes('position', [ 7.0 7 4 3]);
-panel_G(1) = axes('position', [ 7.0 2.5 5 3]);
+panel_BC(1) = axes('position', [ 2.0 11.8+4.5 panel_BC_size]);
+panel_BC(2) = axes('position', [ 2.0  7.0+4.5 panel_BC_size]);
+panel_D(1) = axes('position', [ 2.0 17.5-11 panel_D_size]);
+panel_D(2) = axes('position', [ 5.7 17.5-11 panel_D_size]);
+panel_D(3) = axes('position', [ 9.0 17.5-11 panel_D_size]);
+panel_D(4) = axes('position', [ 12 19.5-11 0.5 0.65]);
+panel_E(1) = axes('position', [ 7.0 11.8+4.5 5 3]);
+panel_E(2) = axes('position', [ 9.2 13.1+4.5 2.5 1.7]);
+panel_F(1) = axes('position', [ 7.0 7+4 4 3]);
+panel_G(1) = axes('position', [ 7.0 2 5 3]);
 for ii_bat = 1:5
     panel_size = [5 2.5];
     panel_size_inset = [2.5 1.25];
@@ -82,17 +81,8 @@ for ii_bat = 1:5
     panel_H(ii_bat,2) = axes('position', [panel_pos_inset   panel_size_inset]);
 end
 panel_H = flipud(panel_H);
-% panel_H(1,1) = axes('position', [14   13 5 2.5]);
-% panel_H(2,1) = axes('position', [14   10 5 2.5]);
-% panel_H(3,1) = axes('position', [14    7 5 2.5]);
-% panel_H(4,1) = axes('position', [14    4 5 2.5]);
-% panel_H(5,1) = axes('position', [14    1 5 2.5]);
-% panel_H(1,2) = axes('position', [16.5 14.25 2.5 1.25]);
-% panel_H(2,2) = axes('position', [16.5 11.25 2.5 1.25]);
-% panel_H(3,2) = axes('position', [16.5  8.25 2.5 1.25]);
-% panel_H(4,2) = axes('position', [16.5  5.25 2.5 1.25]);
-% panel_H(5,2) = axes('position', [16.5  2.25 2.5 1.25]);
 
+%%
 colormap gray
 lw = 2;
 
@@ -109,7 +99,7 @@ end
 
 for ia = 1:naMEC
     axes(panel_A(ia)); cla; hold on;
-    imagesc(x,x,1-f2(:,:,ia)) ; hold on ;
+    imagesc(xFF,xFF,1-f2(:,:,ia)) ; hold on ;
     h=gca;
     h.XLim=[0 50];
     h.YLim=[0 50];
@@ -126,7 +116,7 @@ for ia = 1:naMEC
     end
     text(0.5,1.15, "Module "+ia, 'Units','normalized','HorizontalAlignment','center');
     for iang = [1 iang] 
-        plot([0 x(end)*cos(thMEC2(iang))],3+[0 x(end)*sin(thMEC2(iang))],'-r','LineWidth',lw/5) ; hold on ;
+        plot([0 xFF(end)*cos(thMEC2(iang))],3+[0 xFF(end)*sin(thMEC2(iang))],'-r','LineWidth',lw/5) ; hold on ;
         axis square xy ; xlim([0 50]) ; ylim([0 50]) ;
         
     end
@@ -138,15 +128,15 @@ text(-0.4,1.25, 'A', 'Units','normalized','FontWeight','bold');
 %% models stats - field number/size/ratio
 lw=2;
 
-axes(panel_B(1)); cla; hold on;
-text(-0.4,1.15, 'B', 'Units','normalized','FontWeight','bold');
+axes(panel_D(1)); cla; hold on;
+text(-0.55,1.15, 'D', 'Units','normalized','FontWeight','bold');
 plot(xnField,squeeze(pnFieldXs(i3,:,:))','-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
 pnFieldS(pnFieldS==0)=eps;
 % pnFieldS(pnFieldS==eps)=0;
 plot(xnField,pnFieldS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 plot(xnField,pnFieldM,'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
 xlabel({'No. of fields per direction'},'Units','normalized','Position',[0.5 -0.18]);
-ylabel('PDF','Units','normalized','Position',[-0.3 0.5]);
+ylabel({'Probability';'density function'},'Units','normalized','Position',[-0.3 0.5]);
 hax=gca;
 hax.YScale='log';
 hax.XLim = [0 25];
@@ -154,12 +144,12 @@ hax.YLim = [1e-3 1.5e-1];
 hax.XTick = 0:10:40;
 hax.YTick = 10.^[-4:0];
 
-axes(panel_B(2)); cla; hold on;
+axes(panel_D(2)); cla; hold on;
 plot(xField,squeeze(pFieldSizeXs(i3,:,:))','-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
 plot(xField,pFieldSizeS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 plot(xField,pFieldSizeM,'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
 xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.18]);
-ylabel('PDF','Units','normalized','Position',[-0.3 0.5]);
+% ylabel('PDF','Units','normalized','Position',[-0.3 0.5]);
 hax=gca;
 hax.YScale='log';
 hax.XLim = [0 30];
@@ -167,12 +157,12 @@ hax.YLim = [2e-4 0.2];
 hax.XTick = 0:10:40;
 hax.YTick = 10.^[-4:0];
 
-axes(panel_B(3)); cla; hold on;
+axes(panel_D(3)); cla; hold on;
 plot(xMaxMinRatio,squeeze(pMaxMinRatioXs(i3,:,:))','-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
 plot(xMaxMinRatio,pMaxMinRatioS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 plot(xMaxMinRatio,pMaxMinRatioM,'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
-ylabel('PDF','Units','normalized','Position',[-0.25 0.5]);
+% ylabel('PDF','Units','normalized','Position',[-0.25 0.5]);
 hax=gca;
 hax.YScale='log';
 hax.XLim = [0 30];
@@ -181,7 +171,7 @@ hax.XTick = 0:10:40;
 hax.YTick = 10.^[-4:0];
 
 % legend
-axes(panel_B(4)); cla; hold on;
+axes(panel_D(4)); cla; hold on;
 axis off
 plot([0 1],[1 1],'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
 plot([0 1],[2 2],'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
@@ -194,9 +184,9 @@ text(-0.2, 1, 'Multi-field CA3', 'FontSize',7,'HorizontalAlignment','right');
 text(-0.2, 3, 'MEC, all slice angles', 'FontSize',7,'HorizontalAlignment','right');
 
 %% MEC input/output cell examples
-axes(panel_CD(1)); cla; hold on;
-text(-0.4,1.25, 'C', 'Units','normalized','FontWeight','bold');
-imagesc(x,1:nplot2,1-fP(:,round(linspace(1,Nmax,nplot2)),iang)') ; hold on ;
+axes(panel_BC(1)); cla; hold on;
+text(-0.4,1.25, 'B', 'Units','normalized','FontWeight','bold');
+imagesc(xFF,1:nplot2,1-fP(:,round(linspace(1,Nmax,nplot2)),iang)') ; hold on ;
 for i = 1:naMEC-1
     plot([0 L]*ds/100,[1 1]*i*nplot2/naMEC+0.5,'-','Color',[0.6 0.6 0.6]) ;
 end
@@ -218,14 +208,14 @@ h.YLim = [0.5 20.5];
 h.XAxis.TickLength(1) = 0.03;
 h.YRuler.TickLabelGapOffset = 0.5;
 
-axes(panel_CD(2)); cla; hold on;
-text(-0.4,1.15, 'D', 'Units','normalized','FontWeight','bold');
+axes(panel_BC(2)); cla; hold on;
+text(-0.4,1.15, 'C', 'Units','normalized','FontWeight','bold');
 i3 = 1;
 % find some periodic output examples
 [~,IX] = sort(max(diff(abs(fft(fResXs(:,:,i3),[],1)).^2)),'descend');
 IX = IX([9 7 51:58]);
 IX([5 10]) = IX([10 5]);
-imagesc(x,1:nplot1,1-fResXs(:,IX,i3)') ;
+imagesc(xFF,1:nplot1,1-fResXs(:,IX,i3)') ;
 box on
 ylabel('Output neuron no.') ;
 xlabel('Position (m)','Units','normalized','Position',[0.5 -0.07]) ;
@@ -242,7 +232,7 @@ h.YRuler.TickLabelGapOffset = 0.5;
 %% add arrow from input -> output
 har=annotation('arrow');
 har.Units='centimeters';
-har.Position = [3.5 11.1 0 -0.5];
+har.Position = [3.5 15.6 0 -0.5];
 har.HeadWidth = 5;
 har.HeadLength = 5;
 har.LineWidth = 1.5;
@@ -320,7 +310,7 @@ hax.ColorScale='log';
 hax.XLim = xlimits;
 xlabel('Spatial frequency (1/m)') ;
 ylabel('Slice angle (\circ)') ;
-title('Equal CA3 and MEC input','FontWeight','bold') ;
+title({'CA1 spectra for';'equal CA3 and MEC input'},'FontWeight','bold') ;
 
 % colorbar
 colorbar_loc = hax.Position([1 2]) + hax.Position([3 4]).*[1.07 0.25];

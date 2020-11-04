@@ -1,17 +1,17 @@
-%% Large Scale - Fig. S11 - PV decoder
+%% Large Scale - fig. S16 - PV decoder
 
 %%
 % clear 
+clearvars -except f
 clc
 
 %% params
 use_absolute_error = 1;     % 0 - 5% of env. error; 1 - 2m error
 
 %% define output files
-res_dir = hc3_get_res_dir();
-res_dir = fullfile(res_dir,'paper_figures');
+res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S11_decoder_PV';
+fig_name_str = 'fig_S16';
 fig_caption_str = 'Theoretical analysis with PV decoder';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -86,7 +86,7 @@ pos = 1:ds:exampleL;
 pos = pos / 100; % back to meter
 if ~exist('f','var')
     rng(0);
-    [f] = MultiscalePlace_GenerateTuning_AllModels_Rev1(exampleL);
+    [f] = MultiscalePlace_GenerateTuning_AllModels(exampleL);
 end
 
 %% choose dt
@@ -244,8 +244,7 @@ ylim([0 m]);
 h=gca;
 h.XTick = [];
 h.YTick = [0 m];
-ylabel('Slope (N per meter)', 'Units','normalized','Position',[-0.11 0.5]);
-
+ylabel('Slope (N per meter)', 'Units','normalized','Position',[-0.10 0.5]);
 % fill bar with dots for schemes 5v & 6v
 for ii=7:8
     barw = 0.8; % bar width
@@ -428,13 +427,13 @@ for ii_N = 1:length(jN_options)
 %     ylim([0.1 2000]) ;
     xlim([20 1000]) ;
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel([num2str(prc) '% decoding error (m)'], 'Units','normalized','Position',[ -0.135 0.5]);
+    ylabel([num2str(prc) '% decoding error (m)'], 'Units','normalized','Position',[ -0.145 0.5]);
     h = gca;
     h.XScale = 'log';
 %     h.YScale = 'log';
     h.XTick = [20 100 1000];
     h.XTickLabel = {'20';'100';'1000'};
-    h.YRuler.TickLabelGapOffset = 2.4;
+    h.YRuler.TickLabelGapOffset = 1.5;
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
 %     text(0.95,1, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
@@ -495,7 +494,7 @@ for ii_N = 1:length(jN_options)
     xlim([20 1000]) ;
     ylim(ylimits_options(ii_N,:))
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel('Prob.(error > 5% of environment size)', 'Units','normalized','Position',[ -0.14 0.4]);
+    ylabel('Prob.(error > 5% of environment size)', 'Units','normalized','Position',[ -0.18 0.4]);
 %     text(0.95,1.03, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
     h = gca;
     h.XScale = 'log';

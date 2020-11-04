@@ -9,10 +9,9 @@ load('L:\Misha_attractor\20200902__new_simulations\sim.mat');
 load('L:\Misha_attractor\20200902__new_simulations\sim_res.mat');
 
 %% define output files
-res_dir = hc3_get_res_dir();
-res_dir = fullfile(res_dir,'paper_figures');
+res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S19_attractor_model';
+fig_name_str = 'fig_S18';
 fig_caption_str = 'attractor_model';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -147,16 +146,16 @@ axes(panel_C(1));
 cla('reset')
 hold on
 text(-0.45, 1.25, 'C', 'Units','normalized','FontWeight','bold');
-text( 0.07, 1.25, 'Control model: Uncoupled attractors', 'Units','normalized','FontWeight','bold');
+text( 0.07, 1.25, 'Control model: Independent attractors', 'Units','normalized','FontWeight','bold');
 h=histogram(res0.fnumber);
-h.Normalization = 'pdf';
+h.Normalization = 'probability';
 h.BinEdges = 0.5+[0:5];
 % h.DisplayStyle = 'stairs';
 h.LineWidth = 2;
 h.EdgeColor = 'k';
 h.FaceColor = 0.5*[1 1 1];
 xlabel('No. of fields')
-ylabel('PDF')
+ylabel('Fraction of cells');
 hax=gca;
 hax.YScale = 'linear';
 % hax.YLim = 10.^[-3 0];
@@ -175,13 +174,13 @@ x = x .* seg_size';
 h=histogram(x(:));
 % h.NumBins = 200;
 h.BinWidth = .01;
-h.Normalization = 'pdf';
+h.Normalization = 'probability';
 % h.DisplayStyle = 'stairs';
 h.LineWidth = 0.1;
 h.EdgeColor = 'k';
 h.FaceColor = 0.5*[1 1 1];
 xlabel('Field size (m)')
-ylabel('PDF')
+ylabel('Fraction of fields')
 hax=gca;
 % hax.YScale = 'log';
 hax.YScale = 'linear';

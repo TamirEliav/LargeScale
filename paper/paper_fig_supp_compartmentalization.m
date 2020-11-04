@@ -5,10 +5,9 @@ clear
 clc
 
 %% define output files
-res_dir = hc3_get_res_dir();
-res_dir = fullfile(res_dir,'paper_figures');
+res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_Sxxx_compartmentalization';
+fig_name_str = 'fig_S11';
 fig_caption_str = 'compartmentalization';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -52,7 +51,7 @@ panel_B = axes('position', [ 8 20 2.9 3]);
 panel_legend = axes('position', [12 22  0.2 0.4]);
 
 %% load data
-load('L:\rodents_data\results\datasets\cells_bat_200m.mat');
+load('L:\processed_data_structs\cells_bat_200m.mat');
 load('L:\Yonatan_theory\20200806__model_ratio_LS\SegmentSmallScaleModel_FieldStatistics.mat');
 
 %% arrange data
@@ -90,14 +89,14 @@ x2 = FieldSize_PoissonGamma.*bin_size;
 
 h = histogram(x1);
 h.BinWidth = 1;
-h.Normalization = 'pdf';
-% h.Normalization = 'probability';
+% h.Normalization = 'pdf';
+h.Normalization = 'probability';
 h.FaceColor = 0.5*[1 1 1];
 
 h = histogram(x2);
 h.BinWidth = 0.6;
-h.Normalization = 'pdf';
-% h.Normalization = 'probability';
+% h.Normalization = 'pdf';
+h.Normalization = 'probability';
 h.DisplayStyle = 'stairs';
 h.EdgeColor = 'c';
 h.LineWidth=1.5;
@@ -119,7 +118,7 @@ ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.1;
 ha.YScale = 'log';
 xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.13]);
-ylabel('PDF')
+ylabel('Fraction of cells')
 
 %% Fields size ratio (max/min) hist
 axes(panel_B);
@@ -159,7 +158,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.1;
 ha.XScale = 'log';
 ha.YScale = 'log';
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
-ylabel('Probability')
+ylabel('Fraction of cells')
 
 %% add legend
 axes(panel_legend);

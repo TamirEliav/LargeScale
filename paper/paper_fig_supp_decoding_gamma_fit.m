@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S6';
+fig_name_str = 'fig_S7';
 fig_caption_str = 'Theoretical analysis - fields size distribution gamma/log-normal fit';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');

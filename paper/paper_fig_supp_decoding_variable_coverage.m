@@ -1,17 +1,17 @@
-%% Large Scale - Fig. Sxxx - Theoretical analysis (decoding) - including schemes 5v,6v
+%% Large Scale - fig. S15- Theoretical analysis (decoding) - including schemes 5v,6v
 
 %%
 % clear 
+clearvars -except f
 clc
 
 %% params
 use_absolute_error = 1;
 
 %% define output files
-res_dir = hc3_get_res_dir();
-res_dir = fullfile(res_dir,'paper_figures');
+res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_Sxxx_decoding_variable_coverage';
+fig_name_str = 'fig_S15';
 fig_caption_str = 'Theoretical analysis_decoding';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -90,7 +90,7 @@ pos = 1:ds:exampleL;
 pos = pos / 100; % back to meter
 if ~exist('f','var')
     rng(0);
-    [f] = MultiscalePlace_GenerateTuning_AllModels_Rev1(exampleL);
+    [f] = MultiscalePlace_GenerateTuning_AllModels(exampleL);
 end
 
 %% choose dt
@@ -247,7 +247,7 @@ ylim([0 m]);
 h=gca;
 h.XTick = [];
 h.YTick = [0 m];
-ylabel('Slope (N per meter)', 'Units','normalized','Position',[-0.11 0.5]);
+ylabel('Slope (N per meter)', 'Units','normalized','Position',[-0.10 0.5]);
 % fill bar with dots for schemes 5v & 6v
 for ii=7:8
     barw = 0.8; % bar width
@@ -430,13 +430,13 @@ for ii_N = 1:length(jN_options)
 %     ylim([0.1 2000]) ;
     xlim([20 1000]) ;
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel([num2str(prc) '% decoding error (m)'], 'Units','normalized','Position',[ -0.135 0.5]);
+    ylabel([num2str(prc) '% decoding error (m)'], 'Units','normalized','Position',[ -0.145 0.5]);
     h = gca;
     h.XScale = 'log';
 %     h.YScale = 'log';
     h.XTick = [20 100 1000];
     h.XTickLabel = {'20';'100';'1000'};
-    h.YRuler.TickLabelGapOffset = 2.4;
+    h.YRuler.TickLabelGapOffset = 1.5;
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
 %     text(0.95,1, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
@@ -497,7 +497,7 @@ for ii_N = 1:length(jN_options)
     xlim([20 1000]) ;
     ylim(ylimits_options(ii_N,:))
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel('Prob.(error > 5% of environment size)', 'Units','normalized','Position',[ -0.14 0.4]);
+    ylabel('Prob.(error > 5% of environment size)', 'Units','normalized','Position',[ -0.18 0.4]);
 %     text(0.95,1.03, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
     h = gca;
     h.XScale = 'log';
@@ -521,7 +521,7 @@ end
 axes(panel_F);
 cla
 hold on
-load('C:\Tamir\work\Projects\LargeScale\rodents_data\results\paper_figures\total_area.mat');
+load('L:\processed_data_structs\total_area.mat');
 h=histogram(total_area,'Normalization','pdf');
 h.Normalization = 'pdf';
 h.FaceColor = 0.5*[1 1 1];
@@ -537,7 +537,7 @@ hax.XRuler.TickLabelGapOffset = -1;
 hax.XRuler.TickLength = [0.03 0.03];
 hax.YRuler.TickLength = [0.024 0.03];
 xlabel('Coverage (m)', 'Units','normalized','Position',[0.5 -0.14]);
-ylabel('PDF', 'Units','normalized','Position',[ -0.12 0.5]);
+ylabel({'Probability';'density function'}, 'Units','normalized','Position',[ -0.12 0.5]);
 text(-0.35,1.15, 'F', 'Units','normalized','FontWeight','bold');
 
 % add legend
@@ -553,7 +553,7 @@ hax.Visible='off';
 
 %% load data for panel G
 % load data
-load('C:\Tamir\work\Projects\LargeScale\rodents_data\results\datasets\cells_bat_200m.mat');
+load('L:\processed_data_structs\cells_bat_200m.mat');
 signif = cat(1,cells.signif);
 signif = arrayfun(@(x)(x.TF),signif);
 signif = any(signif,2);
@@ -573,7 +573,7 @@ ratio_LS = [stats_all.field_ratio_LS];
 ratio_LS(isnan(ratio_LS))=[];
 % load simulations ratio LS
 % load('C:\Tamir\work\Projects\LargeScale\Yonatan_theory\20200806__model_ratio_LS\Model_S6_S6v_RatioLargestSmallestField.mat');
-load('C:\Tamir\work\Projects\LargeScale\Yonatan_theory\20200816__model_ratio_LS_updated_remoevd_1_field_cells\Model_S6_S6v_RatioLargestSmallestField.mat')
+load('L:\Yonatan_theory\20200816__model_ratio_LS_updated_remoevd_1_field_cells\Model_S6_S6v_RatioLargestSmallestField.mat')
 rLS(K==1)=[];
 rLSv(Kv==1)=[];
 
@@ -624,7 +624,7 @@ hax.TickLength = [0.03 0.03];
 hax.XRuler.TickLabelGapMultiplier = -0.35;
 hax.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
-ylabel('Probability','Units','normalized','Position',[-0.25 0.5])
+ylabel('Fraction of cells','Units','normalized','Position',[-0.25 0.5])
 
 % add legend
 axes(panel_G_legend);

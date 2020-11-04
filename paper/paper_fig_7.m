@@ -2,6 +2,7 @@
 
 %%
 clear 
+clearvars -except f
 clc
 
 %% params
@@ -10,8 +11,7 @@ ATP_per_flight = 0;         % 0 - per sec;          1 - per flight
 % panel_G_interp_for_missing_schemes = 0;
 
 %% define output files
-res_dir = hc3_get_res_dir();
-res_dir = fullfile(res_dir,'paper_figures');
+res_dir = 'L:\paper_figures';
 mkdir(res_dir)
 fig_name_str = 'Fig_7';
 fig_caption_str = 'Theoretical analysis_decoding';
@@ -68,7 +68,7 @@ panel_D(1,1) = axes('position', [ 8.1  8.7  panel_BCDE_size]);
 panel_D(1,2) = axes('position', [ 8.7 10.7  2.5 2]);
 panel_E(1)   = axes('position', [14.4    8.7  panel_BCDE_size]);
 panel_F      = axes('position', [   2    3.0  panel_BCDE_size]);
-panel_G(1)   = axes('position', [   8.1  2.5  panel_BCDE_size]);
+panel_G(1)   = axes('position', [   8.5  2.5  panel_BCDE_size]);
 % panel_G(2)   = axes('position', [  14.1  2.5  panel_BCDE_size]);
 panel_legend = axes('position', [9.8 16.6 0.4 2]);
 
@@ -90,7 +90,7 @@ pos = 1:ds:exampleL;
 pos = pos / 100; % back to meter
 if ~exist('f','var')
     rng(0);
-    [f] = MultiscalePlace_GenerateTuning_AllModels_Rev1(exampleL);
+    [f] = MultiscalePlace_GenerateTuning_AllModels(exampleL);
 end
 
 %% choose dt
@@ -458,7 +458,7 @@ for ii_N = 1:length(jN_options)
     xlim([20 1000]) ;
     ylim(ylimits_options(ii_N,:))
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel('Prob.(error > 5% of environment size)', 'Units','normalized','Position',[ -0.16 0.4]);
+    ylabel('Prob.(error > 5% of environment size)', 'Units','normalized','Position',[ -0.18 0.4]);
 %     text(0.95,1.03, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
     h = gca;
     h.XScale = 'log';
@@ -473,7 +473,7 @@ for ii_N = 1:length(jN_options)
     h.XRuler.TickLength = [0.03 0.03];
     h.YRuler.TickLength = [0.024 0.03];
     if ii_N == 1
-        text(-0.22,1.1, 'E', 'Units','normalized','FontWeight','bold');
+        text(-0.24,1.1, 'E', 'Units','normalized','FontWeight','bold');
         text(0.5,1.1, 'Catastrophic errors: probability', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
 end
@@ -674,6 +674,7 @@ hax.YRuler.TickLength = [0.024 0.03];
 xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.16]);
 ylabel('Scaling factor', 'Units','normalized','Position',[ -0.25 0.5]);
 text(-0.35,1.15, 'F', 'Units','normalized','FontWeight','bold');
+text(1.52,0.5, {'Log ratio prob. error';'(scheme 6 / other schemes)'}, 'Units','normalized','Rotation',-90,'FontSize',7,'HorizontalAlignment','center');
 
 end
 

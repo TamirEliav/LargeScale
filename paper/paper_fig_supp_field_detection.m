@@ -1,4 +1,4 @@
-%% Large Scale - Fig. supp XXX - field detection explanation
+%% Large Scale - fig. S4 - field detection explanation
 
 %%
 clear 
@@ -10,10 +10,9 @@ prm.fields.valid_speed_pos = [10 187.5];
 clr = prm.graphics.colors.flight_directions;
 
 %% define output files
-res_dir = hc3_get_res_dir();
-res_dir = fullfile(res_dir,'paper_figures');
+res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_Sxxx_field_detection';
+fig_name_str = 'fig_S4';
 fig_caption_str = 'Field detection explanation';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -69,7 +68,7 @@ end
 panel_A = squeeze(panel_A)';
 
 %% load data ==============================================================
-load('L:\rodents_data\results\datasets\cells_bat_200m.mat');
+load('L:\processed_data_structs\cells_bat_200m.mat');
 % choose example
 cell_example_opt = 1:9;
 cell_examples_list = [
@@ -87,7 +86,7 @@ cell_examples = cells(IX);
 cell_num = 628;
 switch 1
     case 1
-        load(['L:\rodents_data\results\datasets\cell_' num2str(cell_num) '.mat']);
+        load(['L:\processed_data_structs\cell_' num2str(cell_num) '.mat']);
     case 2
         cell=cell_load_data(cell_num);
 end
@@ -160,11 +159,13 @@ for ii_dir=1:2
         case 1
             hax.XTick = [];
             hax.YTickLabel = {'',num2str(m)};
+            a = 0.1;
         case 2
             hax.XTick = 0:50:200;
             hax.XRuler.TickLabelGapOffset = -2;
             hax.YTickLabel = {'1',num2str(m)};
             hax.TickDir = 'out';
+            a = 0.2;
     end
     
     % field href area
@@ -177,7 +178,7 @@ for ii_dir=1:2
         x = fields(ii_field).edges_href;
         y = hax.YLim([2 2]);
         area(x,y, hax.YLim(1), 'FaceColor',clr{ii_dir}, 'EdgeColor','none',...
-            'ShowBaseLine','off','Clipping','off','FaceAlpha',0.1);
+            'ShowBaseLine','off','Clipping','off','FaceAlpha',a);
     end
     
 end

@@ -1,7 +1,7 @@
 function data = paper_fig_8_arrange_real_data()
 
 %% load data
-load('L:\rodents_data\results\datasets\cells_bat_200m.mat')
+load('L:\processed_data_structs\cells_bat_200m.mat')
 
 %% work only with signif cells
 signif = cat(1,cells.signif);

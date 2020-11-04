@@ -32,8 +32,7 @@ cell_examples_IX = [29 3988 74 391 54]; % chosen examples
 
 
 %% define output files
-res_dir = hc3_get_res_dir();
-res_dir = fullfile(res_dir,'paper_figures');
+res_dir = 'L:\paper_figures';
 mkdir(res_dir)
 fig_name_str = 'Fig_8';
 fig_caption_str = 'Theoretical analysis - Mechanism';
@@ -86,12 +85,12 @@ panel_F(1) = axes('position', [ 2.0 12.5 panel_F_size.*[0.75 1]]);
 panel_F(2) = axes('position', [ 4.4 12.5 panel_F_size.*[0.85 1]]);
 panel_F(3) = axes('position', [ 7.0 12.5 panel_F_size.*[0.85 1]]);
 panel_F(4) = axes('position', [ 2.4 15.0 0.35 0.85]);
-panel_G(1) = axes('position', [10.5 12.5 panel_F_size.*[1.25 1]]);
-panel_H(1) = axes('position', [15.0 21.1 5 3]);
-panel_H(2) = axes('position', [17.2 22.4 2.5 1.7]);
-panel_I(1) = axes('position', [15.0 17.7 5 2]);
-panel_J(1) = axes('position', [15.0 12.5 5 3]);
-panel_J(2) = axes('position', [17.7 14.0 2.5 1.5]);
+panel_G(1) = axes('position', [15.0 21.1 5 3]);
+panel_G(2) = axes('position', [17.2 22.4 2.5 1.7]);
+panel_H(1) = axes('position', [15.0 17.7 5 2]);
+panel_I(1) = axes('position', [10.5 12.5 5 3]);
+panel_I(2) = axes('position', [13.2 14.0 2.5 1.5]);
+panel_J(1) = axes('position', [17.2 12.5 panel_F_size.*[1.25 1]]);
 
 % Attractor panels
 panel_A = axes('position', [ 2 7.3 11 3]);
@@ -106,12 +105,12 @@ else
 end
 panel_B = flip(panel_B);
 panel_C(1) = axes('position', [ 14.5 7.5 2.5 2.5]);
-panel_C(2) = axes('position', [ 18   7.5 2.5 2.5]);
+panel_C(2) = axes('position', [ 18.3 7.5 2.5 2.5]);
 panel_C(3) = axes('position', [ 14.5 3.5 2.5 2.5]);
 
 FF_offset = -10.5;
 CANN_offset = +14.3;
-FF_panels = [panel_D(:);panel_E(:);panel_F(:);panel_G(:);panel_H(:);panel_I(:);panel_J(:)];
+FF_panels = [panel_D(:);panel_E(:);panel_F(:);panel_J(:);panel_G(:);panel_H(:);panel_I(:)];
 CANN_panels = [panel_A(:);panel_B(:);panel_C(:)];
 for ii_panel = 1:length(FF_panels)
     FF_panels(ii_panel).Position(2) = FF_panels(ii_panel).Position(2) + FF_offset;
@@ -161,6 +160,7 @@ h.YTick=[1 5 10];
 h.XLim = [0 200];
 h.YLim = [0.5 10.5];
 h.XAxis.TickLength(1) = 0.03;
+h.XRuler.TickLabelGapOffset = -1;
 h.YRuler.TickLabelGapOffset = 0.5;
 
 axes(panel_D(2)); cla; hold on;
@@ -177,6 +177,7 @@ h.YTick=[1 5 10];
 h.XLim = [0 200];
 h.YLim = [0.5 10.5];
 h.XAxis.TickLength(1) = 0.03;
+h.XRuler.TickLabelGapOffset = -1;
 h.YRuler.TickLabelGapOffset = 0.5;
 
 axes(panel_E(1)); cla; hold on;
@@ -194,6 +195,7 @@ h.YTick=[1 5 10];
 h.XLim = [0 200];
 h.YLim = [0.5 10.5];
 h.XAxis.TickLength(1) = 0.03;
+h.XRuler.TickLabelGapOffset = -1;
 h.YRuler.TickLabelGapOffset = 0.5;
 
 axes(panel_E(2)); cla; hold on;
@@ -212,6 +214,7 @@ h.YTick=[1 5 10];
 h.XLim = [0 200];
 h.YLim = [0.5 10.5];
 h.XAxis.TickLength(1) = 0.03;
+h.XRuler.TickLabelGapOffset = -1;
 h.YRuler.TickLabelGapOffset = 0.5;
 
 %% MEC input cell examples
@@ -247,6 +250,7 @@ h.YTick=[1 5 10 15 20];
 h.XLim = [0 200];
 h.YLim = [0.5 20.5];
 h.XAxis.TickLength(1) = 0.03;
+h.XRuler.TickLabelGapOffset = -1;
 h.YRuler.TickLabelGapOffset = 0.5;
 
 %% MEC output cell examples
@@ -270,6 +274,7 @@ h.YTick=[1 5 10 15 20];
 h.XLim = [0 200];
 h.YLim = [0.5 10.5];
 h.XAxis.TickLength(1) = 0.03;
+h.XRuler.TickLabelGapOffset = -1;
 h.YRuler.TickLabelGapOffset = 0.5;
 
 
@@ -311,7 +316,7 @@ hax.YAxis.TickLength(1) = 0.025;
 hax.YMinorTick = 'on';
 hax.XRuler.TickLabelGapOffset = -1;
 xlabel({'No. of fields';'per direction'},'Units','normalized','Position',[0.5 -0.18]);
-ylabel('PDF','Units','normalized','Position',[-0.45 0.5]);
+ylabel({'Probability';'density function'},'Units','normalized','Position',[-0.45 0.5]);
 
 axes(panel_F(2)); cla; hold on;
 xlimits = [0 35];
@@ -374,8 +379,8 @@ text(1.2, 1, 'Periodic MEC model', 'FontSize',7);
 text(1.2, 0, 'Data', 'FontSize',7);
 
 %% field dynamics
-axes(panel_G(1)); cla; hold on;
-text(-0.35,1.15, 'G', 'Units','normalized','FontWeight','bold');
+axes(panel_J(1)); cla; hold on;
+text(-0.25,1.15, 'J', 'Units','normalized','FontWeight','bold');
 
 % load data
 ii_prc = 4;
@@ -392,6 +397,7 @@ hb.CData = [[0 0 0]; [0.6 0.6 0.6]; [0 0 0]; [0.6 0.6 0.6]; [0 0 0]; [0.6 0.6 0.
 % hb.CData(1:2:5,:) = 1.0.*clr(1:3,:);
 % hb.CData(2:2:6,:) = 0.5.*clr(1:3,:);
 he=errorbar(x,y,err);
+he.Clipping = 'off';
 he.CapSize = 2;
 he.LineWidth = 1;
 he.LineStyle = 'none';
@@ -401,30 +407,56 @@ h=gca;
 % h.XTick = x;
 % h.XTickLabels = {'MEC','model', 'Multi-field','CA3 model', 'Single-field','CA3 model'};
 % h.XTickLabelRotation = 45;
-h.XTick=[];
+% h.XTick=[1 2 3];
 xtick = mean(reshape(x,2,[]));
-text(xtick, repelem(ylimits(1)-0.25*range(ylimits),length(xtick)),...
-    {{'MEC';'model'}, {'Multi-field';'CA3 model'}, {'Single-field';'CA3 model'}},...
-    'Rotation',45, 'Fontsize',6,'HorizontalAlignment','Center');
+% text(xtick, repelem(ylimits(1)-0.25*range(ylimits),length(xtick)),...
+%     {{'MEC';'model'}, {'Multi-field';'CA3 model'}, {'Single-field';'CA3 model'}},...
+%     'Rotation',45, 'Fontsize',6,'HorizontalAlignment','Center');
+
+text(xtick-0.2, repelem(ylimits(1)-0.23*range(ylimits),length(xtick)),...
+    {{'MEC'}, {'Multi-field'}, {'Single-field'}},...
+    'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+text(xtick+0.2, repelem(ylimits(1)-0.32*range(ylimits),length(xtick)),...
+    {{'model'}, {'CA3 model'}, {'CA3 model'}},...
+    'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+
+% add signif lines and aestricks
+lw=1;
+plot(xtick(1)+[-0.6 0.6], [1 1 ]*0.5, '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick(2)+[-0.6 0.6], [1 1 ]*0.5, '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick(3)+[-0.6 0.6], [1 1 ]*1.1, '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick([3 1])+[0.15 0], [1 1]*1.50, '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick([3 2])-[0.15 0], [1 1]*1.25, '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick([1 1]), [0.5 1.50], '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick([2 2]), [0.5 1.25], '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick([3 3])+0.15, [1.1 1.50], '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick([3 3])-0.15, [1.1 1.25], '-k', 'LineWidth',lw, 'Clipping','off');
+text([1 1]*mean(xtick([1 3])),[1 1]*1.58, '***','fontSize',11,'HorizontalAlignment','center');
+text([1 1]*mean(xtick([2 3])),[1 1]*1.32, '***','fontSize',11,'HorizontalAlignment','center');
+
 h.YLim = ylimits;
+h.XTick = xtick;
+h.XTickLabel = [];
 h.YTick = [-1 0 1];
 h.TickLength = [0.01 0.01];
-h.XAxis.TickLength = [0 0];
-ylabel('Corr (data,model)','Units','normalized','Position',[-0.2 0.5]);
+h.XAxis.TickLength = [1 1].*0.03;
+ylabel('Corr (data, model)','Units','normalized','Position',[-0.13 0.5]);
 h.XRuler.TickLabelGapMultiplier = -0.3;
 h.YRuler.TickLabelGapMultiplier = 0.001;
 
 % legend
-patch([1 1 1.5 1.5],[0 .1 .1 0]+1.0, 0.0*[1 1 1], 'Clipping','off');
-patch([1 1 1.5 1.5],[0 .1 .1 0]+0.7, 0.6*[1 1 1], 'Clipping','off');
-text(1.8,1.05,'P_1^2', 'HorizontalAlignment','left','FontSize',7);
-text(1.8,0.75,'P_2', 'HorizontalAlignment','left','FontSize',7);
+offset_x = 5.2;
+offset_y = -1.35;
+patch([1 1 1.5 1.5]+offset_x, [0 .1 .1 0]+1.0+offset_y, 0.0*[1 1 1], 'Clipping','off');
+patch([1 1 1.5 1.5]+offset_x, [0 .1 .1 0]+0.7+offset_y, 0.6*[1 1 1], 'Clipping','off');
+text(1.8+offset_x,1.05+offset_y,'P_1^2', 'HorizontalAlignment','left','FontSize',7);
+text(1.8+offset_x,0.75+offset_y,'P_2', 'HorizontalAlignment','left','FontSize',7);
 
 %% MEC/CA3 spectrum
 lw = 1 ;
-axes(panel_H(1)); cla; hold on;
-colorbar(panel_H(1), 'off');
-text(-0.25,1.2, 'H', 'Units','normalized','FontWeight','bold');
+axes(panel_G(1)); cla; hold on;
+colorbar(panel_G(1), 'off');
+text(-0.25,1.2, 'G', 'Units','normalized','FontWeight','bold');
 for i3 = 1:nrCA3
     plot(kPow,powOutXs(:,i3,iang),'Color',clrrCA3(i3,:),'LineWidth',lw) ; hold on ;
 end
@@ -435,7 +467,8 @@ hax.XLim = [0 0.25];
 hax.YTick = 10.^[-1 0 1 2];
 hax.YScale = 'log';
 hax.TickLength(1)=0.02;
-xlabel('Spatial frequency (1/m)') ;
+hax.XRuler.TickLabelGapOffset = -1;
+xlabel('Spatial frequency (1/m)', 'Units','normalized','Position',[0.5 -0.15]);
 ylabel('Power (norm.)', 'Units','normalized','Position',[-0.14 0.5]);
 title('Model: Predicted spectrum of CA1 neurons','FontWeight','bold','Units','normalized','Position',[0.5 1.05]) ;
 % zoom box
@@ -450,7 +483,7 @@ plot(zoom_x([2 2]),zoom_y,'k-')
 colorbar_loc = hax.Position([1 2]) + hax.Position([3 4]).*[1 0.25];
 colorbar_size = [0.2 0.5*hax.Position(4)];
 colorbar_pos = [colorbar_loc colorbar_size];
-hc=colorbar(panel_H(1),'manual');
+hc=colorbar(panel_G(1),'manual');
 hc.Units = 'centimeters';
 hc.Position = colorbar_pos;
 hc.Direction='reverse';
@@ -459,10 +492,10 @@ hc.Direction='reverse';
 hc.Ticks = [];
 text(1.02,0.808, 'MEC', 'Units','normalized','FontSize',6,'HorizontalAlignment','center');
 text(1.02,0.2, 'CA3', 'Units','normalized','FontSize',6,'HorizontalAlignment','center');
-colormap(panel_H(1),clrrCA3);
+colormap(panel_G(1),clrrCA3);
 
 % zoom inset panel
-axes(panel_H(2)); cla; hold on;
+axes(panel_G(2)); cla; hold on;
 for i3 = 1:nrCA3
     plot(kPow,powOutXs(:,i3,iang),'Color',clrrCA3(i3,:),'LineWidth',lw) ; hold on ;
 end
@@ -477,8 +510,8 @@ hax.Box='on';
 
 
 %% Relative MEC/CA3 input sparsity - Spectrum peakedness
-axes(panel_I(1)); cla; hold on;
-text(-0.25,1.15, 'I', 'Units','normalized','FontWeight','bold');
+axes(panel_H(1)); cla; hold on;
+text(-0.25,1.15, 'H', 'Units','normalized','FontWeight','bold');
 plot(1-[rCA3 1],rMaxdpowOutXs(:,iang),'o-k','MarkerFaceColor','k','MarkerSize',4) ; hold on ;
 xlabel('Relative CA3 vs. MEC input');
 ylabel({'Spectral';'peak (norm.)'});
@@ -489,8 +522,8 @@ hax.XRuler.TickLabelGapOffset = -1;
 hax.TickLength(1) = 0.025;
 
 %% Spectrum of real data maps (pooled over bats)
-axes(panel_J(1)); cla; hold on;
-text(-0.25,1.2, 'J', 'Units','normalized','FontWeight','bold');
+axes(panel_I(1)); cla; hold on;
+text(-0.25,1.2, 'I', 'Units','normalized','FontWeight','bold');
 shadedErrorBar(data.freq, data.maps_spec, {@mean,@nansem});
 hax=gca;
 hax.YScale = 'log';
@@ -503,7 +536,7 @@ ylabel('Power (norm.)')
 title('Data: Measured spectrum of CA1 neurons','FontWeight','bold','Units','normalized','Position',[0.5 1.05]) ;
 
 % inset - binarized maps
-axes(panel_J(2)); cla; hold on;
+axes(panel_I(2)); cla; hold on;
 shadedErrorBar(data.freq, data.maps01_spec, {@mean,@nansem});
 hax=gca;
 hax.YScale = 'log';
@@ -521,8 +554,8 @@ hax.YRuler.TickLabelGapOffset = -0.5;
 %% ===================== Attractor netwoek model =========================
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 %% load data
-load('C:\Tamir\work\Projects\LargeScale\Misha_attractor\20200902__new_simulations\sim.mat');
-load('C:\Tamir\work\Projects\LargeScale\Misha_attractor\20200902__new_simulations\sim_res.mat');
+load('L:\Misha_attractor\20200902__new_simulations\sim.mat');
+load('L:\Misha_attractor\20200902__new_simulations\sim_res.mat');
 
 %% model schematics
 axes(panel_A);
@@ -640,7 +673,7 @@ if multiple_panels
         cla('reset')
         hold on
         run=10;
-        plot(locs, m(:,cell_examples_IX(ii_cell),run),'LineWidth',2,'Color', clr(ii_cell,:));
+        plot(locs, m(:,cell_examples_IX(ii_cell),run),'LineWidth',1.5,'Color', clr(ii_cell,:));
         text(0.01,0.85,"Cell "+ii_cell,'Units','normalized','FontSize',8);
 %         text(0.01,0.85,"Cell "+cell_examples_IX(ii_cell),'Units','normalized','FontSize',8);
         hax=gca;
@@ -678,17 +711,17 @@ else % single panel
     
 end
 
-%%
+%% field num
 axes(panel_C(1));
 cla('reset')
 hold on
 text(-0.45,1.2, 'C', 'Units','normalized','FontWeight','bold');
 h=histogram(res.fnumber);
-h.Normalization = 'pdf';
+h.Normalization = 'probability';
 h.BinEdges = 0.5+[0:5];
 h.FaceColor = 0.5*[1 1 1];
 xlabel({'No. of fields per direction'},'Units','normalized','Position',[0.5 -0.18]);
-ylabel('PDF','Units','normalized','Position',[-0.35 0.5])
+ylabel('Fraction of cells','Units','normalized','Position',[-0.3 0.5])
 hax=gca;
 hax.YScale = 'log';
 hax.YLim = [1e-3 5e-1];
@@ -698,32 +731,32 @@ hax.TickDir='out';
 hax.TickLength = [0.03 0.03];
 hax.XRuler.TickLabelGapOffset = -.5;
 
-%%
+%% field size
 axes(panel_C(2));
 cla('reset')
 hold on
 
 h=histogram(res.fsizes_all.*bin_size);
-h.Normalization = 'pdf';
+h.Normalization = 'probability';
 h.FaceColor = 0.5*[1 1 1];
 h.EdgeColor = 'none';
 
 h=histogram(res.fsizes_all.*bin_size);
-h.Normalization = 'pdf';
+h.Normalization = 'probability';
 h.DisplayStyle = 'stairs';
 h.EdgeColor = 'k';
 xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.18]);
-ylabel('PDF','Units','normalized','Position',[-0.35 0.5]);
+ylabel('Fraction of fields','Units','normalized','Position',[-0.3 0.5]);
 hax=gca;
 hax.YScale = 'log';
 hax.XTick = [0 20 40];
 hax.YTick = 10.^[-3 -2 -1 0];
-hax.XLim = [0 45];
+hax.XLim = [0 40];
 hax.YLim = [1e-3 2e-1];
 hax.TickLength = [0.03 0.03];
 hax.XRuler.TickLabelGapOffset = -.5;
 
-%%
+%% field ratio L/S
 axes(panel_C(3));
 cla('reset')
 hold on
@@ -731,7 +764,7 @@ h=histogram(res.sratio);
 h.Normalization = 'pdf';
 h.FaceColor = 0.5*[1 1 1];
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
-ylabel('PDF','Units','normalized','Position',[-0.35 0.5]);
+ylabel('Fraction of cells','Units','normalized','Position',[-0.3 0.5]);
 xlim([0 20])
 hax=gca;
 hax.XScale = 'log';

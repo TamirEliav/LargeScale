@@ -37,7 +37,9 @@ while ii_argin<nargin
             for ii_child = 1:length(h.Children)
                 hchild = h.Children(ii_child);
                 switch class(hchild)
-                    case {'matlab.graphics.chart.primitive.Line','matlab.graphics.chart.primitive.Bar'}
+                    case {'matlab.graphics.chart.primitive.Line',...
+                          'matlab.graphics.chart.primitive.Area',...
+                          'matlab.graphics.chart.primitive.Bar'}
                         hchild.XData = (hchild.XData-offset).*gain;
                     case 'matlab.graphics.primitive.Text'
                         hchild.Position(1) = (hchild.Position(1)-offset).*gain;
@@ -48,7 +50,9 @@ while ii_argin<nargin
             for ii_child = 1:length(h.Children)
                 hchild = h.Children(ii_child);
                 switch class(hchild)
-                    case {'matlab.graphics.chart.primitive.Line','matlab.graphics.chart.primitive.Bar'}
+                    case {'matlab.graphics.chart.primitive.Line',...
+                          'matlab.graphics.chart.primitive.Area',...
+                          'matlab.graphics.chart.primitive.Bar'}
                         hchild.YData = (hchild.YData-offset).*gain;
                     case 'matlab.graphics.primitive.Text'
                         hchild.Position(2) = (hchild.Position(2)-offset).*gain;
@@ -59,7 +63,9 @@ while ii_argin<nargin
             for ii_child = 1:length(h.Children)
                 hchild = h.Children(ii_child);
                 switch class(hchild)
-                    case {'matlab.graphics.chart.primitive.Line','matlab.graphics.chart.primitive.Bar'}
+                    case {'matlab.graphics.chart.primitive.Line',...
+                          'matlab.graphics.chart.primitive.Area',...
+                          'matlab.graphics.chart.primitive.Bar'}
                         hchild.ZData = (hchild.ZData-offset).*gain;
                     case 'matlab.graphics.primitive.Text'
                         hchild.Position(3) = (hchild.Position(3)-offset).*gain;

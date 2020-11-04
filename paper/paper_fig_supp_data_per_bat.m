@@ -9,10 +9,9 @@ bat_ID_num_map = containers.Map([34 79 148 2289 9861],...
                                  1:5);
 
 %% define output files
-res_dir = hc3_get_res_dir();
-res_dir = fullfile(res_dir,'paper_figures');
+res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_Sxxx_data_per_bat';
+fig_name_str = 'fig_S8';
 fig_caption_str = 'Data per bat';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -82,7 +81,7 @@ clear cells
 details = [cells_all.details];
 cells_bat_num = [details.bat];
 bats = unique(cells_bat_num);
-n_str_pos_x = [1 1 1.1; 1 1 1.1; 1 1 1.1; 1 1 1.1; 1 1 1.1];
+n_str_pos_x = [1 1 1.2; 1 1 1.1; 1 1 1.1; 1 1 1.1; 1 1 1.1];
 n_str_pos_y = [1 1 1; 0.9 0.9 0.9; 0.9 0.9 0.9; 0.9 0.9 0.9; 0.9 0.9 0.9];
 for ii_bat = 1:length(bats)
     
@@ -151,7 +150,11 @@ for ii_bat = 1:length(bats)
         xlabel({'No. of fields per direction'},'Units','normalized','Position',[0.5 -0.18]);
     end
     ylabel('No. of cells','Units','normalized','Position',[-0.28 0.5])
-    text(n_str_pos_x(ii_bat,1),n_str_pos_y(ii_bat,1), "n = "+sum(~isnan(x)),...
+    n_str = "n = "+sum(~isnan(x));
+    if ii_bat == 1
+        n_str = n_str + " cells";
+    end
+    text(n_str_pos_x(ii_bat,1),n_str_pos_y(ii_bat,1), n_str,...
         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     text(-0.6, 0.5, "Bat "+bat_ID_num_map(bat),...
         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',8,'FontWeight','bold');
@@ -181,8 +184,12 @@ for ii_bat = 1:length(bats)
     if ii_bat == length(bats)
         xlabel('Field size (m)')
     end
-    ylabel('Counts','Units','normalized','Position',[-0.28 0.5])
-    text(n_str_pos_x(ii_bat,2),n_str_pos_y(ii_bat,2), "n = "+sum(~isnan(x)),...
+    ylabel('No. of fields','Units','normalized','Position',[-0.28 0.5])
+    n_str = "n = "+sum(~isnan(x));
+    if ii_bat == 1
+        n_str = n_str + " fields";
+    end
+    text(n_str_pos_x(ii_bat,2),n_str_pos_y(ii_bat,2), n_str,...
         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     
     hl=xline(nanmean(x)); hl.Color='r';
@@ -217,7 +224,11 @@ for ii_bat = 1:length(bats)
         xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
     end
     ylabel('No. of cells','Units','normalized','Position',[-0.28 0.5])
-    text(n_str_pos_x(ii_bat,3),n_str_pos_y(ii_bat,3), "n = "+length(x),...
+    n_str = "n = "+length(x);
+    if ii_bat == 1
+        n_str = n_str + " cells";
+    end
+    text(n_str_pos_x(ii_bat,3),n_str_pos_y(ii_bat,3), n_str,...
         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     
     hl=xline(nanmean(x)); hl.Color='r';

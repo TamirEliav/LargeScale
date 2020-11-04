@@ -5,8 +5,7 @@ clc
 rng(0);
 
 %% define output files
-res_dir = hc3_get_res_dir();
-res_dir = fullfile(res_dir,'paper_figures');
+res_dir = 'L:\paper_figures';
 mkdir(res_dir)
 fig_name_str = 'Fig_8_Dynamics_panel_options';
 fig_caption_str = ' ';
@@ -166,12 +165,21 @@ for ii_prc = 1:5
     corr_p2_M_rnd = corr(p2_data_rnd, p2_M_rnd,'type', 'spearman');
     corr_p2_P_rnd = corr(p2_data_rnd, p2_P_rnd,'type', 'spearman');
     
-    ste_corr_p1_square_S = std(corr_p1_square_S_rnd(:))/sqrt(n_samples^2);
-    ste_corr_p1_square_M = std(corr_p1_square_M_rnd(:))/sqrt(n_samples^2);
-    ste_corr_p1_square_P = std(corr_p1_square_P_rnd(:))/sqrt(n_samples^2);
-    ste_corr_p2_S = std(corr_p2_S_rnd(:))/sqrt(n_samples^2);
-    ste_corr_p2_M = std(corr_p2_M_rnd(:))/sqrt(n_samples^2);
-    ste_corr_p2_P = std(corr_p2_P_rnd(:))/sqrt(n_samples^2);
+    % the next 6 lines were the original code from shir using SEM (but why
+    % sqrt(n^2) and not sqrt(n)?
+%     ste_corr_p1_square_S = std(corr_p1_square_S_rnd(:))/sqrt(n_samples^2);
+%     ste_corr_p1_square_M = std(corr_p1_square_M_rnd(:))/sqrt(n_samples^2);
+%     ste_corr_p1_square_P = std(corr_p1_square_P_rnd(:))/sqrt(n_samples^2);
+%     ste_corr_p2_S = std(corr_p2_S_rnd(:))/sqrt(n_samples^2);
+%     ste_corr_p2_M = std(corr_p2_M_rnd(:))/sqrt(n_samples^2);
+%     ste_corr_p2_P = std(corr_p2_P_rnd(:))/sqrt(n_samples^2);
+    
+    ste_corr_p1_square_S = std(corr_p1_square_S_rnd(:));
+    ste_corr_p1_square_M = std(corr_p1_square_M_rnd(:));
+    ste_corr_p1_square_P = std(corr_p1_square_P_rnd(:));
+    ste_corr_p2_S = std(corr_p2_S_rnd(:));
+    ste_corr_p2_M = std(corr_p2_M_rnd(:));
+    ste_corr_p2_P = std(corr_p2_P_rnd(:));
     
     axes(panel_PRC(ii_prc));
     cla;

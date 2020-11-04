@@ -1,17 +1,17 @@
-%% Large Scale - Fig. S12 - decoder with shorter dt (200ms) + error vs. dt
+%% Large Scale - fig. S17 - decoder with shorter dt (200ms) + error vs. dt
 
 %%
 % clear 
+clearvars -except f
 clc
 
 %% params
 use_absolute_error = 1;     % 0 - 5% of env. error; 1 - 2m error
 
 %% define output files
-res_dir = hc3_get_res_dir();
-res_dir = fullfile(res_dir,'paper_figures');
+res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S12';
+fig_name_str = 'fig_S17';
 fig_caption_str = 'Theoretical analysis - error vs. integration time (dt)';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -87,7 +87,7 @@ pos = 1:ds:exampleL;
 pos = pos / 100; % back to meter
 if ~exist('f','var')
     rng(0);
-    [f] = MultiscalePlace_GenerateTuning_AllModels_Rev1(exampleL);
+    [f] = MultiscalePlace_GenerateTuning_AllModels(exampleL);
 end
 
 %% choose dt
@@ -245,7 +245,7 @@ ylim([0 m]);
 h=gca;
 h.XTick = [];
 h.YTick = [0 m];
-ylabel('Slope (N per meter)', 'Units','normalized','Position',[-0.11 0.5]);
+ylabel('Slope (N per meter)', 'Units','normalized','Position',[-0.10 0.5]);
 % fill bar with dots for schemes 5v & 6v
 for ii=7:8
     barw = 0.8; % bar width
@@ -428,13 +428,13 @@ for ii_N = 1:length(jN_options)
 %     ylim([0.1 2000]) ;
     xlim([20 1000]) ;
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel([num2str(prc) '% decoding error (m)'], 'Units','normalized','Position',[ -0.135 0.5]);
+    ylabel([num2str(prc) '% decoding error (m)'], 'Units','normalized','Position',[ -0.145 0.5]);
     h = gca;
     h.XScale = 'log';
 %     h.YScale = 'log';
     h.XTick = [20 100 1000];
     h.XTickLabel = {'20';'100';'1000'};
-    h.YRuler.TickLabelGapOffset = 2.4;
+    h.YRuler.TickLabelGapOffset = 1.5;
     h.XRuler.TickLabelGapOffset = -1;
     h.XRuler.TickLength = [0.03 0.03];
 %     text(0.95,1, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
@@ -495,7 +495,7 @@ for ii_N = 1:length(jN_options)
     xlim([20 1000]) ;
     ylim(ylimits_options(ii_N,:))
     xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.11]);
-    ylabel('Prob.(error > 5% of environment size)', 'Units','normalized','Position',[ -0.14 0.4]);
+    ylabel('Prob.(error > 5% of environment size)', 'Units','normalized','Position',[ -0.18 0.4]);
 %     text(0.95,1.03, sprintf('N = %d',N(jN)), 'Units','normalized','FontWeight','normal', 'HorizontalAlignment','right','FontSize',10);
     h = gca;
     h.XScale = 'log';
@@ -521,7 +521,7 @@ end
 %% ========================================================================
 % From here we are using different simulations resutls, with variable dt
 % load data
-load('C:\Tamir\work\Projects\LargeScale\Yonatan_theory\20200710__simulations_updated\SummaryDecoderResults_VariableIntegrationTime_delta0.3.mat');
+load('L:\Yonatan_theory\20200710__simulations_updated\SummaryDecoderResults_VariableIntegrationTime_delta0.3.mat');
 L = Lv*ds/100 ; % environment size variable in meters
 
 %% panel F - decoding mean error vs. dt
@@ -585,7 +585,7 @@ ha.TickLength = [0.02 0.02];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;
 xlabel('Integration time window (ms)')
-ylabel('Prob.(error > 5% of environment size)','Units','normalized','Position',[-0.12 0.4]);
+ylabel('Prob.(error > 5% of environment size)','Units','normalized','Position',[-0.14 0.4]);
 ha.XScale = 'linear';
 ha.YScale = 'log';
 
