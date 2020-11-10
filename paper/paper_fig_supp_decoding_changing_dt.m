@@ -1,7 +1,7 @@
 %% Large Scale - fig. S17 - decoder with shorter dt (200ms) + error vs. dt
 
 %%
-% clear 
+% clear
 clearvars -except f
 clc
 
@@ -77,7 +77,7 @@ clr = [1.0 0.0 0.0 ; ...
        0.2 0.2 1.0 ; ...
        0.5 0.0 0.5 ] ;
 
-    
+
 %% arrange data
 paper_fig_7_arrange_data;
 
@@ -352,7 +352,7 @@ jN_options = find(ismember(N, [50]));
 ylimits_options = [0 20; 0 10];
 for ii_N = 1:length(jN_options)
     jN = jN_options(ii_N);
-    
+
     axes(panel_C(ii_N,1));
     cla
     hold on
@@ -413,7 +413,7 @@ jN_options = find(ismember(N, [50]));
 ylimits_options = [0 20; 0 10];
 for ii_N = 1:length(jN_options)
     jN = jN_options(ii_N);
-    
+
     axes(panel_D(ii_N,1));
     cla
     hold on
@@ -442,7 +442,7 @@ for ii_N = 1:length(jN_options)
         text(-0.21,1.1, 'D', 'Units','normalized','FontWeight','bold');
         text(0.5,1.1, 'Catastrophic errors: size', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
-    
+
     % zoom-in inset
     axes(panel_D(ii_N,2));
     cla
@@ -465,7 +465,7 @@ for ii_N = 1:length(jN_options)
     h.YTick = [1 10 100];
     h.YTickLabel = {'1';'10';'100'};
     h.XRuler.TickLabelGapOffset = -1;
-    h.YRuler.TickLabelGapOffset = 1.2;
+    h.YRuler.TickLabelGapOffset = 0.5;
     h.XRuler.TickLength = [0.06 0.06];
     h.YRuler.TickLength = [0.04 0.04];
     h.XRuler.FontSize = 6.5;
@@ -477,7 +477,7 @@ jN_options = find(ismember(N, [50]));
 ylimits_options = [2e-4 1; 2e-7 1];
 for ii_N = 1:length(jN_options)
     jN = jN_options(ii_N);
-    
+
     axes(panel_E(ii_N));
     cla
     hold on
@@ -512,7 +512,7 @@ for ii_N = 1:length(jN_options)
     h.XRuler.TickLength = [0.03 0.03];
     h.YRuler.TickLength = [0.024 0.03];
     if ii_N == 1
-        text(-0.22,1.1, 'E', 'Units','normalized','FontWeight','bold');
+        text(-0.24,1.1, 'E', 'Units','normalized','FontWeight','bold');
         text(0.5,1.1, 'Catastrophic errors: probability', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
 end

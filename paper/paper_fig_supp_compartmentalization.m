@@ -81,7 +81,7 @@ ratio_LS_with_1s(isnan(ratio_LS_with_1s))=1;
 axes(panel_A);
 cla('reset')
 hold on
-text(-0.35,1.15, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.15, 'A', 'Units','normalized','FontWeight','bold');
 
 bin_size = 0.2;
 x1 = field_size;
@@ -105,7 +105,7 @@ h.LineWidth=1.5;
 if pval==0
     pval = 1e-300;
 end
-text(0.5,1, ['P_{KS} = ' sprintf('%.2g',pval)], 'Units','normalized','FontSize',8);
+text(0.35,1, ['P_{KS} = ' sprintf('%.2g',pval)], 'Units','normalized','FontSize',8);
 
 ha=gca;
 ha.XLim = [0 35];
@@ -118,13 +118,13 @@ ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.1;
 ha.YScale = 'log';
 xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.13]);
-ylabel('Fraction of cells')
+ylabel('Fraction of fields')
 
 %% Fields size ratio (max/min) hist
 axes(panel_B);
 cla('reset')
 hold on
-text(-0.35,1.15, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.42,1.15, 'B', 'Units','normalized','FontWeight','bold');
 
 x1 = ratio_LS;
 x2 = MaxMinRatio_PoissonGamma;

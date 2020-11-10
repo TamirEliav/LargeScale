@@ -1,11 +1,11 @@
 %% Large Scale - Fig. 8 - Theoretical analysis (mechanism)
 
 %%
-clear 
+% clear 
 clc
 
 %%
-paper_fig_8_arrange_sim_data
+% paper_fig_8_arrange_sim_data
 data = paper_fig_8_arrange_real_data;
 
 
@@ -144,7 +144,7 @@ hl = annotation('line',[.6 .95],CANN_title_pos*[1 1]);
 
 %% panels A+B CA3 - input/output cell examples
 axes(panel_D(1)); cla('reset'); hold on;
-text(-0.3,1.15, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.3,1.3, 'D', 'Units','normalized','FontWeight','bold');
 text(1.24,1.27, 'Input from CA3', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',8);
 IX = round(linspace(1,Nmax,nplot1));
 IX(5) = 888;
@@ -295,7 +295,7 @@ lw = 2;
 axes(panel_F(1)); cla; hold on;
 xlimits = [0 25];
 % xlimits = [0 33];
-text(-0.45,1.15, 'F', 'Units','normalized','FontWeight','bold');
+text(-0.45,1.38, 'F', 'Units','normalized','FontWeight','bold');
 plot(xnField,pnFieldS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 plot(xnField,pnFieldM,'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
 plot(xnField,squeeze(pnFieldXs(1,1,:))','-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
@@ -380,7 +380,7 @@ text(1.2, 0, 'Data', 'FontSize',7);
 
 %% field dynamics
 axes(panel_J(1)); cla; hold on;
-text(-0.25,1.15, 'J', 'Units','normalized','FontWeight','bold');
+text(-0.25,1.37, 'J', 'Units','normalized','FontWeight','bold');
 
 % load data
 ii_prc = 4;
@@ -413,12 +413,19 @@ xtick = mean(reshape(x,2,[]));
 %     {{'MEC';'model'}, {'Multi-field';'CA3 model'}, {'Single-field';'CA3 model'}},...
 %     'Rotation',45, 'Fontsize',6,'HorizontalAlignment','Center');
 
-text(xtick-0.2, repelem(ylimits(1)-0.23*range(ylimits),length(xtick)),...
-    {{'MEC'}, {'Multi-field'}, {'Single-field'}},...
-    'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
-text(xtick+0.2, repelem(ylimits(1)-0.32*range(ylimits),length(xtick)),...
-    {{'model'}, {'CA3 model'}, {'CA3 model'}},...
-    'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+% text(xtick-0.2, repelem(ylimits(1)-0.23*range(ylimits),length(xtick)),...
+%     {{'MEC'}, {'Multi-field'}, {'Single-field'}},...
+%     'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+% text(xtick+0.2, repelem(ylimits(1)-0.32*range(ylimits),length(xtick)),...
+%     {{'model'}, {'CA3 model'}, {'CA3 model'}},...
+%     'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+
+text(1.5,-1.3, 'MEC', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+text(2.1,-1.43, 'model', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+text(4.1,-1.45, 'Multi-field', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+text(4.8,-1.6, 'CA3 model', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+text(7.1,-1.45, 'Single-field', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+text(7.8,-1.6, 'CA3 model', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
 
 % add signif lines and aestricks
 lw=1;
@@ -445,12 +452,12 @@ h.XRuler.TickLabelGapMultiplier = -0.3;
 h.YRuler.TickLabelGapMultiplier = 0.001;
 
 % legend
-offset_x = 5.2;
-offset_y = -1.35;
+offset_x = 6;
+offset_y = -1.4;
 patch([1 1 1.5 1.5]+offset_x, [0 .1 .1 0]+1.0+offset_y, 0.0*[1 1 1], 'Clipping','off');
 patch([1 1 1.5 1.5]+offset_x, [0 .1 .1 0]+0.7+offset_y, 0.6*[1 1 1], 'Clipping','off');
-text(1.8+offset_x,1.05+offset_y,'P_1^2', 'HorizontalAlignment','left','FontSize',7);
-text(1.8+offset_x,0.75+offset_y,'P_2', 'HorizontalAlignment','left','FontSize',7);
+text(1.8+offset_x,1.05+offset_y,'p_1^2', 'HorizontalAlignment','left','FontSize',7);
+text(1.8+offset_x,0.75+offset_y,'p_2', 'HorizontalAlignment','left','FontSize',7);
 
 %% MEC/CA3 spectrum
 lw = 1 ;
@@ -523,7 +530,7 @@ hax.TickLength(1) = 0.025;
 
 %% Spectrum of real data maps (pooled over bats)
 axes(panel_I(1)); cla; hold on;
-text(-0.25,1.2, 'I', 'Units','normalized','FontWeight','bold');
+text(-0.25,1.14, 'I', 'Units','normalized','FontWeight','bold');
 shadedErrorBar(data.freq, data.maps_spec, {@mean,@nansem});
 hax=gca;
 hax.YScale = 'log';

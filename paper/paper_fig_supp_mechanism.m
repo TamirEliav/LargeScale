@@ -1,4 +1,4 @@
-%% Large Scale - Fig. Sxxx - Theoretical analysis (mechanism)
+%% Large Scale - Fig. S19 - Theoretical analysis (mechanism)
 
 %%
 % clear 
@@ -67,14 +67,14 @@ panel_D(4) = axes('position', [ 12 19.5-11 0.5 0.65]);
 panel_E(1) = axes('position', [ 7.0 11.8+4.5 5 3]);
 panel_E(2) = axes('position', [ 9.2 13.1+4.5 2.5 1.7]);
 panel_F(1) = axes('position', [ 7.0 7+4 4 3]);
-panel_G(1) = axes('position', [ 7.0 2 5 3]);
+panel_G(1) = axes('position', [ 7.0 1.7 5 3]);
 for ii_bat = 1:5
     panel_size = [5 2.5];
     panel_size_inset = [2.5 1.25];
     inset_offset = [2.6 1.5];
     spacing = 1;
     panel_pos_x = 14.2;
-    panel_pos_y = 2 + (ii_bat-1)*(panel_size(2)+spacing);
+    panel_pos_y = 2.35 + (ii_bat-1)*(panel_size(2)+spacing);
     panel_pos = [panel_pos_x panel_pos_y];
     panel_pos_inset = panel_pos + inset_offset;
     panel_H(ii_bat,1) = axes('position', [panel_pos         panel_size]);
@@ -211,6 +211,8 @@ h.YRuler.TickLabelGapOffset = 0.5;
 axes(panel_BC(2)); cla; hold on;
 text(-0.4,1.15, 'C', 'Units','normalized','FontWeight','bold');
 i3 = 1;
+load(fullfile(sim_data_dir,['CA3MEC_FFModel_fResXw_iangle_' num2str(iang) '.mat']));
+load(fullfile(sim_data_dir,['CA3MEC_FFModel_fResXs_iangle_' num2str(iang) '.mat']));
 % find some periodic output examples
 [~,IX] = sort(max(diff(abs(fft(fResXs(:,:,i3),[],1)).^2)),'descend');
 IX = IX([9 7 51:58]);
@@ -241,8 +243,6 @@ har.LineWidth = 1.5;
 axes(panel_E(1)); cla; hold on;
 colorbar(panel_E(1), 'off');
 text(-0.25,1.25, 'E', 'Units','normalized','FontWeight','bold');
-load(fullfile(sim_data_dir,['CA3MEC_FFModel_fResXw_iangle_' num2str(iang) '.mat']));
-load(fullfile(sim_data_dir,['CA3MEC_FFModel_fResXs_iangle_' num2str(iang) '.mat']));
 lw = 1 ;
 for i3 = 1:nrCA3
     plot(kPow,powOutXs(:,i3,iang),'Color',clrrCA3(i3,:),'LineWidth',lw) ; hold on ;
@@ -256,7 +256,7 @@ hax.YScale = 'log';
 hax.TickLength(1)=0.02;
 xlabel('Spatial frequency (1/m)') ;
 ylabel('Power (norm.)') ;
-title('Model: Predicted spectrum of CA1 neurons','FontWeight','bold','Units','normalized','Position',[0.5 1.05]) ;
+title('Model: Predicted spectrum of CA1 neurons','FontWeight','bold','Units','normalized','Position',[0.5 1.15]) ;
 % zoom box
 zoom_x = [0.03 0.09];
 zoom_y = [6.5e-1 0.7e1];
@@ -357,8 +357,8 @@ for ii_bat = 1:length(bats)
     
     axes(panel_H(ii_bat,1)); cla; hold on;
     if ii_bat==1
-        text(-0.22,1.4, 'H', 'Units','normalized','FontWeight','bold');
-        title({'Data: Measured spectrum of';'CA1 neurons in each bat'},'FontWeight','bold','Units','normalized','Position',[0.5 1.15]) ;
+        text(-0.22,1.45, 'H', 'Units','normalized','FontWeight','bold');
+        title({'Data: Measured spectrum of';'CA1 neurons in each bat'},'FontWeight','bold','Units','normalized','Position',[0.5 1.2]) ;
     end
     shadedErrorBar(data.freq, data.maps_spec(maps_IX,:), {@mean,@nansem});
     hax=gca;

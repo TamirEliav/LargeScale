@@ -1,7 +1,7 @@
 %% Large Scale - Fig. 7 - Theoretical analysis (decoding)
 
 %%
-clear 
+% clear 
 clearvars -except f
 clc
 
@@ -68,7 +68,7 @@ panel_D(1,1) = axes('position', [ 8.1  8.7  panel_BCDE_size]);
 panel_D(1,2) = axes('position', [ 8.7 10.7  2.5 2]);
 panel_E(1)   = axes('position', [14.4    8.7  panel_BCDE_size]);
 panel_F      = axes('position', [   2    3.0  panel_BCDE_size]);
-panel_G(1)   = axes('position', [   8.5  2.5  panel_BCDE_size]);
+panel_G(1)   = axes('position', [   8.7  2.5  panel_BCDE_size]);
 % panel_G(2)   = axes('position', [  14.1  2.5  panel_BCDE_size]);
 panel_legend = axes('position', [9.8 16.6 0.4 2]);
 
@@ -428,7 +428,7 @@ for ii_N = 1:length(jN_options)
     h.YTick = [1 10 100];
     h.YTickLabel = {'1';'10';'100'};
     h.XRuler.TickLabelGapOffset = -1;
-    h.YRuler.TickLabelGapOffset = 1.2;
+    h.YRuler.TickLabelGapOffset = 0.5;
     h.XRuler.TickLength = [0.06 0.06];
     h.YRuler.TickLength = [0.04 0.04];
     h.XRuler.FontSize = 6.5;
@@ -652,9 +652,11 @@ min_plerr_ML_S12345i = min(min_plerr_ML_S12345i,plerr_ML_S5i) ;
 
 axes(panel_axes);
 cla
-imagesc(Lint,alpint,log10(plerr_ML_S6i./min_plerr_ML_S12345i),[cmin cmax]); set(gca,'xscale','log') ;
+imagesc(Lint,alpint,log10(plerr_ML_S6i./min_plerr_ML_S12345i),[cmin cmax]);
+set(gca,'xscale','log') ;
 axis square xy;
-colorbar ;
+hcb = colorbar ;
+hcb.Ruler.TickLabelGapOffset = 0.5;
 colormap(gca,clrf)
 hl = yline(0.3);
 hl.Color = 'r';

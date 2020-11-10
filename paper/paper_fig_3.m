@@ -59,9 +59,9 @@ panel_D(2) = axes('position', [ 2  9 panel_C_size]);
 panel_E(1) = axes('position', [11 13 panel_D_size]);
 panel_E(2) = axes('position', [11  9 panel_D_size]);
 panel_C(1) = axes('position', [ 17 22 3 3]);
-panel_B_legend(1) = axes('position', [13.6 23 2 1.3]);
-panel_B_legend(2) = axes('position', [13.6 19 2 1.3]);
-panel_C_legend(1) = axes('position', [17+2 22+2.2 0.2 0.4]);
+panel_B_legend(1) = axes('position', [13.4 23 2 1.3]);
+panel_B_legend(2) = axes('position', [13.4 19 2 1.3]);
+panel_C_legend(1) = axes('position', [18.8 24.2 0.2 0.4]);
 
 %% load population data
 % =========================================================================
@@ -289,7 +289,7 @@ for ii_dir = 1:2
     text(2.6, 1, 'Shuffle','FontSize',7,'HorizontalAlignment','left');
     ha = annotation('arrow');
     ha.Parent = gca;
-    ha.X = [5 7]+1;
+    ha.X = [0 2]+5.5;
     if ii_dir==2
         ha.X = flip(ha.X);
     end

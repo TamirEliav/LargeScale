@@ -57,7 +57,7 @@ panel_C(1) = axes('position', [3 12   panel_CDE_size]);
 % panel_D(2) = axes('position', [9  7.5 panel_CDE_size]);
 % panel_E(1) = axes('position', [3  3   panel_CDE_size]);
 % panel_E(2) = axes('position', [9  3   panel_CDE_size]);
-panel_legend = axes('position', [8.5 23.8 1 1]);
+panel_legend = axes('position', [8.3 23.8 1 1]);
 
 
 %% bat ID-num map
@@ -212,8 +212,10 @@ scatter(TT_pos_PD*100, TT_pos_Long*100, 5, TT_pos_color);
 
 xlim([0 100])
 ylim([15 22]);
-xlabel('Proximo-distal axis (%)');
-ylabel('Longitudinal axis (%)');
+xlabel('Proximo-distal axis (%)','Units','normalized','Position',[0.5 -0.1]);
+ylabel('Longitudinal axis (%)','Units','normalized','Position',[-0.15 0.5]);
+hax=gca;
+hax.XRuler.TickLabelGapOffset = 1;
 
 %% draw lines from points to histology slides
 slide_examples_TT = {
@@ -236,8 +238,8 @@ xaf = xaf + 0.003;
 yaf = yaf + [1; -1].*0.0015;
 % annotation('line', xaf, yaf)
 % plot(xa,ya)
-annotation('line', [xaf(1) 0.64], [yaf(1) 0.90]);
-annotation('line', [xaf(2) 0.64], [yaf(2) 0.74]);
+annotation('line', [xaf(1) 0.64], [yaf(1) 0.89]);
+annotation('line', [xaf(2) 0.64], [yaf(2) 0.71]);
 
 %% legend panel
 axes(panel_legend);
@@ -371,7 +373,7 @@ hax.YTick = [1 2 3 5 10 15 20];
 xlim(TT_pos_limits(ii_pos_TT_opt,:))
 % ylim([0 15]);
 xlabel(TT_pos_labels{ii_pos_TT_opt});
-ylabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[-0.1 0.5]);
+ylabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[-0.13 0.5]);
 
 
 %%

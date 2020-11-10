@@ -225,7 +225,7 @@ ha.TickLength = [0.03 0.03];
 ha.YTick = 10.^[-3 -2 -1];
 ha.YTickLabel = {'10^{ -3}'; '10^{ -2}'; '10^{ -1}';};
 xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.14]);
-ylabel('Fraction of fields', 'Units','normalized','Position',[-0.20 0.5]);
+ylabel('Fraction of fields', 'Units','normalized','Position',[-0.23 0.5]);
 
 %% legend for long/short arms
 axes(panel_A_legend);
@@ -410,7 +410,7 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapOffset = -1;
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.12]);
-ylabel('Fraction of cells','Units','normalized','Position',[-0.2 0.5]);
+ylabel('Fraction of cells','Units','normalized','Position',[-0.23 0.5]);
 
 %% add legend
 axes(panel_B_legend);

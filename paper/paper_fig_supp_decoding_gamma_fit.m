@@ -87,7 +87,7 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.2;
 xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.16])
-ylabel('Probability density function','Units','normalized','Position',[-0.18 0.5])
+ylabel('Probability density function','Units','normalized','Position',[-0.22 0.5])
 ha.XScale = 'linear';
 ha.YScale = 'linear';
 
@@ -128,7 +128,7 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.2;
 xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.16])
-ylabel('Probability density function','Units','normalized','Position',[-0.18 0.5])
+ylabel('Probability density function','Units','normalized','Position',[-0.22 0.5])
 ha.XScale = 'log';
 ha.YScale = 'linear';
 

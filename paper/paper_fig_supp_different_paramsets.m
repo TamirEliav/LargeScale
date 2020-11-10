@@ -187,7 +187,7 @@ for ii_paramset = 1:length(paramsets)
     ha.TickLength = [0.03 0.03];
     ha.XRuler.TickLabelGapMultiplier = -0.3;
     ha.YRuler.TickLabelGapMultiplier = 0.001;
-    ylabel('No. of fields','Units','normalized','Position',[-0.18 0.5])
+    ylabel('No. of fields','Units','normalized','Position',[-0.2 0.5])
     switch ii_paramset
         case {length(paramsets)}
             xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.2]);
@@ -240,7 +240,7 @@ for ii_paramset = 1:length(paramsets)
     ha.TickLength = [0.03 0.03];
     ha.XRuler.TickLabelGapMultiplier = -0.35;
     ha.YRuler.TickLabelGapMultiplier = 0.001;
-    ylabel('No. of cells','Units','normalized','Position',[-0.18 0.5])
+    ylabel('No. of cells','Units','normalized','Position',[-0.2 0.5])
     switch ii_paramset
         case {length(paramsets)}
             xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.2]);

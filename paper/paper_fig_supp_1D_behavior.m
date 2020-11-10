@@ -56,7 +56,7 @@ panel_A(1) = axes('position', [ 2 9    5 15]);
 panel_A(2) = axes('position', [ 8 9    5 15]);
 panel_A(3) = axes('position', [14 9    5 15]);
 panel_B    = axes('position', [ 4 4.6  6  2]);
-panel_C    = axes('position', [12 4.6  2  2]);
+panel_C    = axes('position', [12.3 4.6  2  2]);
 
 
 %% load population data
@@ -136,9 +136,18 @@ for ii_exp = 1:length(panel_A_opt)
     t0 = session_ts(1);
     
     % down-sample (too many dots!!)
-    ds = 10;
+    % Down sample a lot (!) but make sure to have the original point
+    % before/after nans (so gaps will not increase in size with larger ds)
+    ds = 100; % ds>100 will shorten flights with u-turns
+    near_nan = conv(isnan(x),[1 1 1],'same')~=0;
+    x_near_nan = x(near_nan);
+    y_near_nan = y(near_nan);
     x = x(1:ds:end);
     y = y(1:ds:end);
+    x = [x x_near_nan];
+    y = [y y_near_nan];
+    [y, y_sort_IX] = sort(y);
+    x= x(y_sort_IX);
     
     % plot!
     axes(panel_A(ii_exp));
@@ -149,7 +158,7 @@ for ii_exp = 1:length(panel_A_opt)
     
     % labels
     xlabel('Position (m)','Units','normalized','Position',[0.5 -0.03]);
-    ylabel('Time (min)','Units','normalized','Position',[-0.1 0.5]);
+    ylabel('Time (min)','Units','normalized','Position',[-0.12 0.5]);
     ha = gca;
     ha.XLim = [0 200];
     ha.YLim = session_ts;
@@ -304,7 +313,7 @@ switch yvar_pop_plot
 end
 
 % add direction arrows
-arrow_x = [0 0.03] + 0.61;
+arrow_x = [0 0.03] + 0.61+0.015;
 arrow_y = repelem(0.24,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.01, 'Color', prm.graphics.colors.flight_directions{1});

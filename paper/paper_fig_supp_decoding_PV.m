@@ -1,7 +1,7 @@
 %% Large Scale - fig. S16 - PV decoder
 
 %%
-% clear 
+% clear
 clearvars -except f
 clc
 
@@ -76,7 +76,7 @@ clr = [1.0 0.0 0.0 ; ...
        0.2 0.2 1.0 ; ...
        0.5 0.0 0.5 ] ;
 
-    
+
 %% arrange data
 paper_fig_7_arrange_data;
 
@@ -351,7 +351,7 @@ jN_options = find(ismember(N, [50]));
 ylimits_options = [0 20; 0 10];
 for ii_N = 1:length(jN_options)
     jN = jN_options(ii_N);
-    
+
     axes(panel_C(ii_N,1));
     cla
     hold on
@@ -412,7 +412,7 @@ jN_options = find(ismember(N, [50]));
 ylimits_options = [0 20; 0 10];
 for ii_N = 1:length(jN_options)
     jN = jN_options(ii_N);
-    
+
     axes(panel_D(ii_N,1));
     cla
     hold on
@@ -441,7 +441,7 @@ for ii_N = 1:length(jN_options)
         text(-0.21,1.1, 'D', 'Units','normalized','FontWeight','bold');
         text(0.5,1.1, 'Catastrophic errors: size', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
-    
+
     % zoom-in inset
     axes(panel_D(ii_N,2));
     cla
@@ -464,7 +464,7 @@ for ii_N = 1:length(jN_options)
     h.YTick = [1 10 100];
     h.YTickLabel = {'1';'10';'100'};
     h.XRuler.TickLabelGapOffset = -1;
-    h.YRuler.TickLabelGapOffset = 1.2;
+    h.YRuler.TickLabelGapOffset = 0.5;
     h.XRuler.TickLength = [0.06 0.06];
     h.YRuler.TickLength = [0.04 0.04];
     h.XRuler.FontSize = 6.5;
@@ -476,7 +476,7 @@ jN_options = find(ismember(N, [50]));
 ylimits_options = [2e-4 1; 2e-7 1];
 for ii_N = 1:length(jN_options)
     jN = jN_options(ii_N);
-    
+
     axes(panel_E(ii_N));
     cla
     hold on
@@ -510,7 +510,7 @@ for ii_N = 1:length(jN_options)
     h.XRuler.TickLength = [0.03 0.03];
     h.YRuler.TickLength = [0.024 0.03];
     if ii_N == 1
-        text(-0.22,1.1, 'E', 'Units','normalized','FontWeight','bold');
+        text(-0.24,1.1, 'E', 'Units','normalized','FontWeight','bold');
         text(0.5,1.1, 'Catastrophic errors: probability', 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
     end
 end
@@ -537,7 +537,7 @@ L = Lv*ds/100 ; % environment size variable in meters
 jN = 2 ; % chooses N = 50
 
 % color variable for S6 advantage (blue/red gradient)
-nclr = 50 ;  % number of colors 
+nclr = 50 ;  % number of colors
 cmin = -1.5 ;
 cbi  = -1   ;
 c0   = 0 ;
@@ -553,9 +553,9 @@ iclr4 = find(cx>=cri) ;
 clrf(iclr1,3) = linspace(0.5,1,length(iclr1)) ;
 clrf(iclr2,1) = linspace(0  ,1,length(iclr2)) ;
 clrf(iclr2,2) = linspace(0  ,1,length(iclr2)) ;
-clrf(iclr2,3) = 1 ; 
+clrf(iclr2,3) = 1 ;
 
-clrf(iclr3,1) = 1 ; 
+clrf(iclr3,1) = 1 ;
 clrf(iclr3,2) = linspace(1,0  ,length(iclr3)) ;
 clrf(iclr3,3) = linspace(1,0  ,length(iclr3)) ;
 clrf(iclr4,1) = linspace(1,0.5,length(iclr4)) ;

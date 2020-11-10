@@ -150,7 +150,7 @@ f(8).name_short = '6v';
 
 f(1).name_long = '1: Single small field';
 f(2).name_long = '2: Single large field';
-f(3).name_long = '3: Single field D-V';
+f(3).name_long = '3: Single field, dorso-ventral gradient';
 f(4).name_long = '4: Multiple small fields (Rich et al. 2014)';
 f(5).name_long = '5: Multi-scale (population)';
 f(6).name_long = '6: Multi-scale (single-cell)';

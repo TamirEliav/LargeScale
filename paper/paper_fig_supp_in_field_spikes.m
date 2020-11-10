@@ -279,9 +279,9 @@ ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.5;
-ha.YRuler.TickLabelGapOffset = 1;
+ha.YRuler.TickLabelGapOffset = -1;
 ha.YScale = 'linear';
-xlabel({'In-field inter spike interval (ms)'}, 'Units','normalized','Position',[0.5 -0.13]);
+xlabel({'In-field inter-spike interval (ms)'}, 'Units','normalized','Position',[0.5 -0.13]);
 ylabel({'Probability';'density function'},'Units','normalized','Position',[-0.13 0.5]);
 
 %% percentage of bursty spikes (per field)
@@ -362,11 +362,11 @@ plot(x,y,'.k');
 % lm = fitlm(x,y);
 % [rho, pval] = corr(x',y','type','pearson');
 [rho, pval] = corr(x',y','type','spearman');
-text(0.75,0.95, ['{\rho}' sprintf(' = %.2f',rho)] ,'units','normalized','FontSize',8);
+text(0.75,1.05, ['{\rho}' sprintf(' = %.2f',rho)] ,'units','normalized','FontSize',8);
 if pval == 0
-    text(0.75,0.8, 'P < 10^{ -300}' ,'units','normalized','FontSize',8);
+    text(0.75,0.9, 'P < 10^{ -300}' ,'units','normalized','FontSize',8);
 else
-    text(0.75,0.8, sprintf('P = %.2f',pval) ,'units','normalized','FontSize',8);
+    text(0.75,0.9, sprintf('P = %.2f',pval) ,'units','normalized','FontSize',8);
 end
 
 ha=gca;

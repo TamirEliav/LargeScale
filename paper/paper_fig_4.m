@@ -608,6 +608,9 @@ axes(panel_CDE(3,1));
 text(-0.9,0.5, {'Rat';'small';'environment'}, 'Units','normalized','FontWeight','bold','FontSize',9,'HorizontalAlignment','center');
 
 %%  ============ compare datasets distributions ============ 
+FGHI_xlimits = [0.25 3.75];
+asterisk_font_size = 11;
+
 %%  No. of fields
 axes(panel_FGHI(1)); cla; hold on
 text(-0.55,1., 'F', 'Units','normalized','FontWeight','bold');
@@ -620,6 +623,7 @@ h = errorbar(x,y,err);
 h.Color = [0 0 0];                            
 h.LineStyle = 'none';  
 hax=gca;
+hax.XLim = FGHI_xlimits;
 hax.XTick=1:length(datasets);
 hax.XTickLabel=[];
 hax.YRuler.TickLabelGapOffset = 1;
@@ -642,8 +646,8 @@ str12 = signif_astricks(pval12);
 str13 = signif_astricks(pval13);
 plot([1 2],5.7*[1 1],'k-')
 plot([1 3],6.5*[1 1],'k-')
-text(1.5,  5.9,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',12);
-text(2,    6.7,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',12);
+text(1.5,  5.9,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
+text(2,    6.7,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
 
 %%  fields size
 axes(panel_FGHI(2)); cla; hold on
@@ -657,6 +661,7 @@ h = errorbar(x,y,err);
 h.Color = [0 0 0];                            
 h.LineStyle = 'none';  
 hax=gca;
+hax.XLim = FGHI_xlimits;
 hax.XTick=1:length(datasets);
 hax.XTickLabel=[];
 hax.YRuler.TickLabelGapOffset = 1;
@@ -679,8 +684,8 @@ str12 = signif_astricks(pval12);
 str13 = signif_astricks(pval13);
 plot([1 2],6.3*[1 1],'k-')
 plot([1 3],7.1*[1 1],'k-')
-text(1.5,  6.5,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',12);
-text(2,    7.3,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',12);
+text(1.5,  6.5,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
+text(2,    7.3,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
 
 %%  field size CV
 axes(panel_FGHI(3)); cla; hold on
@@ -704,10 +709,11 @@ h = errorbar(x,y,err1,err2);
 h.Color = [0 0 0];                            
 h.LineStyle = 'none';  
 hax=gca;
+hax.XLim = FGHI_xlimits;
 hax.XTick=1:length(datasets);
 hax.XTickLabel=[];
 hax.YRuler.TickLabelGapOffset = 1;
-ylabel({'Field size';'coefficient of variations'});
+ylabel({'Field size';'coefficient of variation'});
 % signif test
 z12 = (y(1)-y(2)) / sqrt(SD(1)^2+SD(2)^2);
 z13 = (y(1)-y(3)) / sqrt(SD(1)^2+SD(3)^2);
@@ -719,8 +725,8 @@ fprintf('Field size CV 1 vs. 2 (bootstrap): z-test p=%.4g z=%.4g\n',pval12,z12);
 fprintf('Field size CV 1 vs. 3 (bootstrap): z-test p=%.4g z=%.4g\n',pval13,z13);
 plot([1 2],0.75*[1 1],'k-')
 plot([1 3],0.85*[1 1],'k-')
-text(1.5,0.77,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',12);
-text(2,0.87,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',12);
+text(1.5,0.77,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
+text(2,0.87,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
 
 %%  L/S ratio
 axes(panel_FGHI(4)); cla; hold on
@@ -734,7 +740,7 @@ h = errorbar(x,y,err);
 h.Color = [0 0 0];                            
 h.LineStyle = 'none';  
 hax=gca;
-
+hax.XLim = FGHI_xlimits;
 hax.XTick=1:length(datasets);
 hax.XTickLabel=string({datasets.name});
 hax.XTickLabelRotation = 45;
@@ -766,8 +772,8 @@ str12 = signif_astricks(pval12);
 str13 = signif_astricks(pval13);
 plot([1 2],4.5*[1 1],'k-')
 plot([1 3],5.1*[1 1],'k-')
-text(1.5,4.7,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',12);
-text(2,5.3,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',12);
+text(1.5,4.7,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
+text(2,5.3,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
 
 %% print/save the figure
 file_out = fig_name_str;
@@ -804,6 +810,12 @@ function str = signif_astricks(pval)
     end
     if pval<0.001
         str = '***';
+    end
+    if pval<0.0001
+        str = '****';
+    end
+    if pval<0.00001
+        str = '*****';
     end
 end
 

@@ -443,7 +443,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.1;
 % ha.YScale = 'linear';
 ha.YScale = 'log';
 xlabel({'Spatial information';'(bits/spike)'}, 'Units','normalized','Position',[0.5 -0.17]);
-ylabel('No. of cells', 'Units','normalized','Position',[-0.28 0.5])
+ylabel('No. of cells', 'Units','normalized','Position',[-0.32 0.5])
 
 x = SI;
 hl=xline(nanmean(x)); hl.Color='r';
@@ -471,7 +471,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.1;
 % ha.YScale = 'linear';
 ha.YScale = 'log';
 xlabel('Sparsity', 'Units','normalized','Position',[0.5 -0.17])
-ylabel('No. of cells', 'Units','normalized','Position',[-0.28 0.5])
+ylabel('No. of cells', 'Units','normalized','Position',[-0.32 0.5])
 
 x = sparsity;
 hl=xline(nanmean(x)); hl.Color='r';
@@ -508,7 +508,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.1;
 % ha.YScale = 'linear';
 ha.YScale = 'log';
 xlabel('Coverage (m)', 'Units','normalized','Position',[0.5 -0.17])
-ylabel('No. of cells', 'Units','normalized','Position',[-0.28 0.5])
+ylabel('No. of cells', 'Units','normalized','Position',[-0.32 0.5])
 ha.XLim(1) = 0;
 ha.YLim(2) = 2e2;
 
@@ -626,7 +626,7 @@ h.FaceColor = 0.5*[1 1 1];
 h.BinEdges = 0.5+[0:20];
 h.Data(h.Data > h.BinLimits(2)) = h.BinLimits(2);
 xlabel({'No. of fields per direction'},'Units','normalized','Position',[0.5 -0.18]);
-ylabel('No. of cells','Units','normalized','Position',[-0.28 0.5])
+ylabel('No. of cells','Units','normalized','Position',[-0.32 0.5])
 ha = gca;
 ha.YScale = 'log';
 ha.YLim = [0.7e0 1.4e2];
@@ -675,7 +675,7 @@ h.BinWidth = 1;
 ha=gca;
 ha.YScale = 'log';
 xlabel('Field size (m)')
-ylabel('No. of fields','Units','normalized','Position',[-0.22 0.5])
+ylabel('No. of fields','Units','normalized','Position',[-0.25 0.5])
 ha = gca;
 % ha.XLim = [0 35];
 ha.YLim = [0.8 350];
@@ -734,7 +734,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 text([1 2],repelem(ylimits(1)-0.04*diff(ylimits),2),{{'Smallest';'field'},{'Largest';'field'}},...
     'HorizontalAlignment','center','VerticalAlignment','top','FontSize',7);
 % xlabel('')
-ylabel('Field size (m)','Units','normalized','Position',[-0.21 0.5])
+ylabel('Field size (m)','Units','normalized','Position',[-0.25 0.5])
 
 
 
