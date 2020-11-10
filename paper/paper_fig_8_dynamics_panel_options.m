@@ -1,6 +1,6 @@
 %% Fig. 8 - Dynamics panel - perturbation analysis options suammry
 %%
-clear 
+clear
 clc
 rng(0);
 
@@ -24,7 +24,7 @@ dir_IN = 'L:\Shir\20201001__dynamics_p1_p2';
 % disp('Log file');
 % disp(['created: ', datestr(clock)]);
 % disp('======================================================');
-% disp([fig_name_str ':' fig_caption_str]);   
+% disp([fig_name_str ':' fig_caption_str]);
 % disp('======================================================');
 % disp('');
 
@@ -64,20 +64,20 @@ load(fullfile(dir_IN,'Data_Perturbation_FieldSegmentNumbers.mat'));
 % load('D:\LargeScale_master\Code\dynamic_analysis\Data_Perturbation_FieldSegmentNumbers.mat');
 % nFieldD_0 : number of fields in original (entire session) maps, real data
 % nFieldD_sSeg : number of appeared/disappeared segments (1st, 2nd column), real data
-    
+
 p1_square_data = zeros(n_field_max,1);
 p2_data = zeros(n_field_max,1);
-n_samples = 100; % number of random curves for error bars computation
+n_samples = 10000; % number of random curves for error bars computation
 p1_square_data_rnd = zeros(n_field_max, n_samples);
 p2_data_rnd = zeros(n_field_max, n_samples);
 for k = 1:n_field_max
     ik = find(nFieldD_0==k) ;
     p1 = mean(mean(nFieldD_sSeg(ik,:)==1)) ;
     p2 = mean(mean(nFieldD_sSeg(ik,:)==2)) ;
-    
+
     p1_square_data(k) = p1^2;
     p2_data(k) = p2;
-    
+
     p1_square_error_lim = 2*p1*sqrt(p1*(1-p1))/sqrt(2*length(ik));
     p2_error_lim = sqrt(p2*(1-p2))/sqrt(2*length(ik));
     p1_square_data_rnd(k,:) = p1^2 + ((rand(n_samples,1)-0.5)*2*p1_square_error_lim);
@@ -95,117 +95,92 @@ for ii_prc = 1:5
     % nFieldM_sSeg : number of appeared/disappeared segments (1st, 2nd column), multi  field CA3
     % nFieldS_sSeg : number of appeared/disappeared segments (1st, 2nd column), single field CA3
     % nFieldP_sSeg : number of appeared/disappeared segments (1st, 2nd column),  periodic MEC
-    
-    
+
     p1_square_S = zeros(n_field_max,1);
     p2_S = zeros(n_field_max,1);
-    p1_square_S_rnd = zeros(n_field_max, n_samples);
-    p2_S_rnd = zeros(n_field_max, n_samples);
     for k = 1:n_field_max
         ik = find(nFieldS_0==k) ;
         p1 = mean(mean(nFieldS_sSeg(ik,:)==1)) ;
         p2 = mean(mean(nFieldS_sSeg(ik,:)==2)) ;
-        
+
         p1_square_S(k) = p1^2;
         p2_S(k) = p2;
-        
-        p1_square_error_lim = 2*p1*sqrt(p1*(1-p1))/sqrt(2*length(ik));
-        p2_error_lim = sqrt(p2*(1-p2))/sqrt(2*length(ik));
-        p1_square_S_rnd(k,:) = p1^2 + ((rand(n_samples,1)-0.5)*2*p1_square_error_lim);
-        p2_S_rnd(k,:) = p2 + ( ( rand(n_samples,1)-0.5 )*2*p2_error_lim );
     end
-    
+
     p1_square_M = zeros(n_field_max,1);
     p2_M = zeros(n_field_max,1);
-    p1_square_M_rnd = zeros(n_field_max, n_samples);
-    p2_M_rnd = zeros(n_field_max, n_samples);
     for k = 1:n_field_max
         ik = find(nFieldM_0==k) ;
         p1 = mean(mean(nFieldM_sSeg(ik,:)==1)) ;
         p2 = mean(mean(nFieldM_sSeg(ik,:)==2)) ;
-        
+
         p1_square_M(k) = p1^2;
         p2_M(k) = p2;
-        
-        p1_square_error_lim = 2*p1*sqrt(p1*(1-p1))/sqrt(2*length(ik));
-        p2_error_lim = sqrt(p2*(1-p2))/sqrt(2*length(ik));
-        p1_square_M_rnd(k,:) = p1^2 + ((rand(n_samples,1)-0.5)*2*p1_square_error_lim);
-        p2_M_rnd(k,:) = p2 + ( ( rand(n_samples,1)-0.5 )*2*p2_error_lim );
     end
-    
+
     p1_square_P = zeros(n_field_max,1);
     p2_P = zeros(n_field_max,1);
-    p1_square_P_rnd = zeros(n_field_max, n_samples);
-    p2_P_rnd = zeros(n_field_max, n_samples);
     for k = 1:n_field_max
         ik = find(nFieldP_0==k) ;
         p1 = mean(mean(nFieldP_sSeg(ik,:)==1)) ;
         p2 = mean(mean(nFieldP_sSeg(ik,:)==2)) ;
-        
+
         p1_square_P(k) = p1^2;
         p2_P(k) = p2;
-        
-        p1_square_error_lim = 2*p1*sqrt(p1*(1-p1))/sqrt(2*length(ik));
-        p2_error_lim = sqrt(p2*(1-p2))/sqrt(2*length(ik));
-        p1_square_P_rnd(k,:) = p1^2 + ((rand(n_samples,1)-0.5)*2*p1_square_error_lim);
-        p2_P_rnd(k,:) = p2 + ( ( rand(n_samples,1)-0.5 )*2*p2_error_lim );
     end
-    
+
     corr_p1_square_S = corr(p1_square_data, p1_square_S,'type', 'spearman');
     corr_p1_square_M = corr(p1_square_data, p1_square_M,'type', 'spearman');
     corr_p1_square_P = corr(p1_square_data, p1_square_P,'type', 'spearman');
     corr_p2_S = corr(p2_data, p2_S,'type', 'spearman');
     corr_p2_M = corr(p2_data, p2_M,'type', 'spearman');
     corr_p2_P = corr(p2_data, p2_P,'type', 'spearman');
-    
-    corr_p1_square_S_rnd = corr(p1_square_data_rnd, p1_square_S_rnd,'type', 'spearman');
-    corr_p1_square_M_rnd = corr(p1_square_data_rnd, p1_square_M_rnd,'type', 'spearman');
-    corr_p1_square_P_rnd = corr(p1_square_data_rnd, p1_square_P_rnd,'type', 'spearman');
-    corr_p2_S_rnd = corr(p2_data_rnd, p2_S_rnd,'type', 'spearman');
-    corr_p2_M_rnd = corr(p2_data_rnd, p2_M_rnd,'type', 'spearman');
-    corr_p2_P_rnd = corr(p2_data_rnd, p2_P_rnd,'type', 'spearman');
-    
-    % the next 6 lines were the original code from shir using SEM (but why
-    % sqrt(n^2) and not sqrt(n)?
-%     ste_corr_p1_square_S = std(corr_p1_square_S_rnd(:))/sqrt(n_samples^2);
-%     ste_corr_p1_square_M = std(corr_p1_square_M_rnd(:))/sqrt(n_samples^2);
-%     ste_corr_p1_square_P = std(corr_p1_square_P_rnd(:))/sqrt(n_samples^2);
-%     ste_corr_p2_S = std(corr_p2_S_rnd(:))/sqrt(n_samples^2);
-%     ste_corr_p2_M = std(corr_p2_M_rnd(:))/sqrt(n_samples^2);
-%     ste_corr_p2_P = std(corr_p2_P_rnd(:))/sqrt(n_samples^2);
-    
-    ste_corr_p1_square_S = std(corr_p1_square_S_rnd(:));
-    ste_corr_p1_square_M = std(corr_p1_square_M_rnd(:));
-    ste_corr_p1_square_P = std(corr_p1_square_P_rnd(:));
-    ste_corr_p2_S = std(corr_p2_S_rnd(:));
-    ste_corr_p2_M = std(corr_p2_M_rnd(:));
-    ste_corr_p2_P = std(corr_p2_P_rnd(:));
-    
+
+
+    corr_p1_square_S_rnd = corr(p1_square_data_rnd, p1_square_S,'type', 'spearman');
+    corr_p1_square_M_rnd = corr(p1_square_data_rnd, p1_square_M,'type', 'spearman');
+    corr_p1_square_P_rnd = corr(p1_square_data_rnd, p1_square_P,'type', 'spearman');
+    corr_p2_S_rnd = corr(p2_data_rnd, p2_S,'type', 'spearman');
+    corr_p2_M_rnd = corr(p2_data_rnd, p2_M,'type', 'spearman');
+    corr_p2_P_rnd = corr(p2_data_rnd, p2_P,'type', 'spearman');
+
+    std_corr_p1_square_S = std(corr_p1_square_S_rnd);
+    std_corr_p1_square_M = std(corr_p1_square_M_rnd);
+    std_corr_p1_square_P = std(corr_p1_square_P_rnd);
+    std_corr_p2_S = std(corr_p2_S_rnd);
+    std_corr_p2_M = std(corr_p2_M_rnd);
+    std_corr_p2_P = std(corr_p2_P_rnd);
+
+    %% plot
     axes(panel_PRC(ii_prc));
     cla;
     hold on;
-    
+
     x = [1,2, 4,5, 7,8 ];
     y = [corr_p1_square_P, corr_p2_P, ...
         corr_p1_square_M, corr_p2_M, ...
-        corr_p1_square_S, corr_p2_S]; 
-    err = [ ste_corr_p1_square_P ste_corr_p2_P ...
-            ste_corr_p1_square_M ste_corr_p2_M...
-            ste_corr_p1_square_S ste_corr_p2_S];
+        corr_p1_square_S, corr_p2_S];
+    err = [ std_corr_p1_square_P std_corr_p2_P ...
+            std_corr_p1_square_M std_corr_p2_M...
+            std_corr_p1_square_S std_corr_p2_S];
     fig_8_dynamics_panel_data = struct();
     fig_8_dynamics_panel_data.x = x;
     fig_8_dynamics_panel_data.y = y;
     fig_8_dynamics_panel_data.err = err;
     filename = "fig_8_dynamics_panel_data_PRC_" + ii_prc;
     save(fullfile(res_dir,filename),'fig_8_dynamics_panel_data');
+    
     hb = bar(x,y);
     hb.FaceColor = 'flat';
     hb.CData = [[0 0 0]; [0.6 0.6 0.6]; [0 0 0]; [0.6 0.6 0.6]; [0 0 0]; [0.6 0.6 0.6]];
     he=errorbar(x,y,err);
+
+    he.Color = 'k';
     he.CapSize = 2;
     he.LineWidth = 1;
     he.LineStyle = 'none';
-    he.Color = 'k';
+    he.Clipping='off';
+    
     h=gca;
     h.XTick = x;
     h.XTickLabels = {'MEC','model', 'Multi-field','CA3 model', 'Single-field','CA3 model'};
@@ -221,6 +196,19 @@ for ii_prc = 1:5
     h.XRuler.TickLabelGapMultiplier = -0.3;
     h.YRuler.TickLabelGapMultiplier = 0.001;
     title([num2str(perturbation_prc) '% perturbation']);
+    
+    %% stats
+    fprintf('p_1^2\n')
+    [pval zval] = my_ztest(y(5), y(1), err(5), err(1));
+    fprintf('Single-field CA3 vs. MEC:              p=%.f z=%.f\n',pval,zval);
+    [pval zval] = my_ztest(y(5), y(3), err(5), err(3));
+    fprintf('Single-field CA3 vs. Multi-field CA3:  p=%.f z=%.f\n',pval,zval);
+    fprintf('p_2\n')
+    [pval zval] = my_ztest(y(6), y(2), err(6), err(2));
+    fprintf('Single-field CA3 vs. MEC:              p=%.f z=%.f\n',pval,zval);
+    [pval zval] = my_ztest(y(6), y(4), err(6), err(4));
+    fprintf('Single-field CA3 vs. Multi-field CA3:  p=%.f z=%.f\n',pval,zval);
+    
 end
 
 hax = gca;
@@ -233,6 +221,14 @@ text(1.55,0.5,'P_2', 'HorizontalAlignment','left','FontSize',8);
 
 
 %% save figure
-fig_name_out = fullfile(res_dir, sprintf('%s_bar_version',fig_name_str));
+fig_name_out = fullfile(res_dir, sprintf('%s_bar_SD_version',fig_name_str));
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 disp('figure was successfully saved to pdf/tiff/fig formats');
+
+
+
+%%
+function [pval zval] = my_ztest(mu1, mu2, sigma1, sigma2)
+    zval = (mu1-mu2) / sqrt(sigma1^2+sigma2^2);
+    pval = 1-normcdf(zval,0,1);
+end

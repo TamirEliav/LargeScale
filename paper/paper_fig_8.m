@@ -438,8 +438,8 @@ plot(xtick([1 1]), [0.5 1.50], '-k', 'LineWidth',lw, 'Clipping','off');
 plot(xtick([2 2]), [0.5 1.25], '-k', 'LineWidth',lw, 'Clipping','off');
 plot(xtick([3 3])+0.15, [1.1 1.50], '-k', 'LineWidth',lw, 'Clipping','off');
 plot(xtick([3 3])-0.15, [1.1 1.25], '-k', 'LineWidth',lw, 'Clipping','off');
-text([1 1]*mean(xtick([1 3])),[1 1]*1.58, '***','fontSize',11,'HorizontalAlignment','center');
-text([1 1]*mean(xtick([2 3])),[1 1]*1.32, '***','fontSize',11,'HorizontalAlignment','center');
+text([1 1]*mean(xtick([1 3])),[1 1]*1.58, '*****','fontSize',11,'HorizontalAlignment','center');
+text([1 1]*mean(xtick([2 3])),[1 1]*1.32, '*****','fontSize',11,'HorizontalAlignment','center');
 
 h.YLim = ylimits;
 h.XTick = xtick;
