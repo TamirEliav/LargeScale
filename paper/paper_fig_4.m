@@ -11,6 +11,10 @@ alpha = 0.05; % TODO: decide if one or two sided test
 % CV_err_bar = 'SEM';
 CV_err_bar = 'SD';
 use_large_bins_results = 0;
+norm_speed_ratio = 0;
+norm_dist_from_center = 0;
+use_only_center = 0;
+center_part_len = [nan 6 300];
 
 %% define output files
 res_dir = 'L:\paper_figures';
@@ -32,6 +36,18 @@ disp('======================================================');
 disp([fig_name_str ':' fig_caption_str]);
 disp('======================================================');
 disp('');
+
+%% report figure params
+fprintf('nboot = %d\n',nboot);
+fprintf('CV_err_bar = %s\n',CV_err_bar);
+fprintf('normalize speed ratio = %d\n',norm_speed_ratio);
+fprintf('Use only the center part of the small environment = %d\n',use_only_center);
+if use_only_center
+    fprintf('\tBat small no change\n');
+    fprintf('\tBat small center part length = %dm\n',center_part_len(2));
+    fprintf('\tRat small center part length = %dm\n',center_part_len(3)/100);
+end
+
 
 %% create figure
 % =========================================================================
@@ -98,6 +114,12 @@ for r=1:4
     end
 end
 panel_FGHI = flipdim(panel_FGHI,1);
+
+if norm_dist_from_center
+%     norm_dist_from_center_panels(1) = axes('position', [3  2.5 3 3]);
+    norm_dist_from_center_panels(2) = axes('position', [3 2 3 3]);
+    norm_dist_from_center_panels(3) = axes('position', [9 2 3 3]);
+end
 
 %% load data ==============================================================
 clear datasets
@@ -196,6 +218,13 @@ rat_examples_options = [
     842
     ];
 
+% report cell examples ID
+fprintf('========= Panels A+B examples =========\n')
+fprintf('Bat examples:\n')
+fprintf('\t%s\n',bat_examples_options{panel_A_opt})
+fprintf('Rat examples:\n')
+fprintf('\t%d\n',rat_examples_options(panel_B_opt))
+
 %% FR map + rasters - examples ============================================
 cells2 = datasets(2).cells;
 cells3 = datasets(3).cells;
@@ -219,7 +248,7 @@ for ii_dataset = 1:size(cell_examples,1)
 %                 rescale_gain_offset = [1 6];
                 rescale_gain_offset = [1 mean(cell.stats.all.valid_speed_pos)-3];
                 cell_str = cell.details.cell_ID;
-                
+                m_or_cm = 'm';
             case 2
                 xlimits = [0 3];
 %                 area_limits = [-150 150];
@@ -227,6 +256,7 @@ for ii_dataset = 1:size(cell_examples,1)
 %                 rescale_gain_offset = [1/100 -150];
                 rescale_gain_offset = [1/100 mean(cell.stats.all.valid_speed_pos)-150];
                 cell_str = "cell "+cell.details.id;
+                m_or_cm = 'cm';
         end
 
         % map+fields
@@ -260,6 +290,8 @@ for ii_dataset = 1:size(cell_examples,1)
                 plot(fields(ii_field).edges_prc, ...
                      repelem(dir_offsets(ii_dir)*range(ylimits),2),...
                     'Linewidth', 2, 'Color', c{ii_dir},'Clipping','off');
+                fprintf('dataset %d cell %d direction %d field %d size = %.2f%s\n',...
+                    ii_dataset, ii_cell, ii_dir, ii_field, fields(ii_field).width_prc, m_or_cm);
             end
         end
         rescale_plot_data('x',rescale_gain_offset);
@@ -384,6 +416,7 @@ end % if plot examples ====================================================
 
 
 %% ================ plot datasets histograms ========================
+fprintf('======= panels CDE: plot datasets distributions ======= \n');
 field_num_val = [];
 field_num_grp = [];
 field_size_val = [];
@@ -393,9 +426,9 @@ ratio_LS_grp = [];
 ratio_LS_with_1s_val = [];
 ratio_LS_with_1s_grp = [];
 n_str_pos_x = [1 1 1.1; 1 1 1.1; 1 1 1.1];
-n_str_pos_y = [1 1 1; 0.9 0.9 0.9; 0.9 0.9 0.9];
+n_str_pos_y = [1 1 1; 0.9 1 0.9; 0.9 1 0.9];
 for ii_dataset = 1:length(datasets)
-    %%
+    %% arrange dataset struct
     name = datasets(ii_dataset).name;
     cells = datasets(ii_dataset).cells;
     signif = cat(1,cells.signif);
@@ -418,17 +451,85 @@ for ii_dataset = 1:length(datasets)
 % % %         fields([fields.in_low_speed_area])=[];
 % % %     end
     
-    %%
+    %% arrange relevant data to plot
     field_num = [stats_dir(signif).field_num];
     field_size = [fields.width_prc];
     ratio_LS = [stats_all.field_ratio_LS];
-%     ratio_LS(isnan(ratio_LS))=[];
     ratio_LS_with_1s = [stats_all.field_ratio_LS];
     ratio_LS_with_1s(isnan(ratio_LS_with_1s))=1;
-    
-    if ii_dataset==3
-        field_size = field_size / 100;
+    ratio_LS_vel = abs([stats_all.field_ratio_LS_vel]);
+    ratio_LS_vel(isnan(ratio_LS_vel)) = 1;
+        
+    % Here we try two options to overcome the parabolic speed trajectories:
+    % test 1: take only the very central part of the track
+    if use_only_center & ~isnan(center_part_len(ii_dataset)) % only for small env.
+        % remove fields far from the center        
+        % and recalculate field num/size/ratio
+        field_num = [];
+        field_size = [];
+        ratio_LS = [];
+        ratio_LS_with_1s = [];
+        ratio_LS_vel = [];
+        dist2center_LS = [];
+        for ii_cell = 1:length(cells)
+            cell_fields = [];
+            for ii_dir=1:2
+                cell = cells(ii_cell);
+                if ~cell.signif(ii_dir).TF
+                    continue;
+                end
+                cell_fields_dir = cell.fields{ii_dir};
+                cell_fields_dir( [cell_fields_dir.in_low_speed_area] ) = [];
+                center_loc = mean(cell.stats.all.valid_speed_pos);
+                cell_fields_dir( abs([cell_fields_dir.loc]-center_loc) > center_part_len(ii_dataset)/2 ) = [];
+                cell_fields = [cell_fields cell_fields_dir];
+                field_num = [field_num length(cell_fields_dir)];
+            end
+            cell_fields_sizes = [cell_fields.width_prc];
+            cell_fields_vel = [cell_fields.vel];
+            cell_fields_loc = [cell_fields.loc];
+            field_size = [field_size cell_fields_sizes];
+            switch length(cell_fields_sizes)
+                case 0 % do nothing (disregard this cell)
+                case 1 % add 1 only to 'with_1s' array and nan to the regular array (for code comatibility)
+                    ratio_LS         = [ratio_LS            nan];
+                    ratio_LS_with_1s = [ratio_LS_with_1s      1];
+                    ratio_LS_vel     = [ratio_LS_vel          1];
+                    dist2center_LS   = [dist2center_LS; [1 1].*abs(cell_fields_loc-center_loc)];
+                otherwise
+                    [field_L,IX_L] = max(cell_fields_sizes);
+                    [field_S,IX_S] = min(cell_fields_sizes);
+                    ratio_LS         = [ratio_LS            field_L/field_S ];
+                    ratio_LS_with_1s = [ratio_LS_with_1s    field_L/field_S ];
+                    ratio_LS_vel     = [ratio_LS_vel        cell_fields_vel(IX_L) / cell_fields_vel(IX_L) ];
+                    dist2center_LS   = [dist2center_LS;     abs(cell_fields_loc(IX_L)-center_loc) ...
+                                                            abs(cell_fields_loc(IX_S)-center_loc)    ];
+                    
+            end
+        end
+        field_num(field_num==0)=[];
     end
+    % test 2: normalize by the speed ratio
+    if norm_speed_ratio
+        ratio_LS = ratio_LS ./ ratio_LS_vel;
+        ratio_LS_with_1s = ratio_LS_with_1s ./ ratio_LS_vel;
+    end
+    % test 3: normalize by the distance from center ratio
+    if norm_dist_from_center & ~isnan(center_part_len(ii_dataset)) % only for small env.
+        ratio_LS_dist2center = dist2center_LS(:,1)' ./ dist2center_LS(:,2)';
+        % here we multiply by ratio_dist2center, in contrast to normalizing
+        % by the speed ratio, because the further the field from the center
+        % we expect it to be smaller, so we expect ratio_LS_dist2center to
+        % be values < 1
+        ratio_LS = ratio_LS .* ratio_LS_dist2center;
+        ratio_LS_with_1s = ratio_LS_with_1s .* ratio_LS_dist2center;
+    end
+    % convert cm to m
+    if ii_dataset==3
+        field_size = field_size / 100; % convert cm to m
+    end
+    
+    %% store data from all datasets together
     field_num_val  = [field_num_val   field_num];
     field_size_val = [field_size_val  field_size];
     ratio_LS_val   = [ratio_LS_val    ratio_LS];
@@ -446,6 +547,9 @@ for ii_dataset = 1:length(datasets)
     datasets(ii_dataset).stats_all = stats_all;
     datasets(ii_dataset).stats_dir = stats_dir;
     
+    %% report dataset
+    fprintf('Dataset %d: %s\n', ii_dataset, datasets(ii_dataset).name{1})
+    
     %% no. of fields
     x = field_num;
     axes(panel_CDE(ii_dataset,1));
@@ -455,8 +559,10 @@ for ii_dataset = 1:length(datasets)
     hh.FaceColor = 0.5*[1 1 1];
     hh.BinEdges = 0.5+[0:20];
     hh.Data(hh.Data > hh.BinLimits(2)) = hh.BinLimits(2);
+    if hh.Values(end)
+        fprintf('\tLast bin includes all cells with > %d fields\n', floor(hh.BinEdges(end)));
+    end
     
-%     text(0.5,1.1, name, 'Units','normalized', 'FontSize', 12, 'FontWeight', 'bold','HorizontalAlignment','center');
     hax=gca;
     hax.YScale = 'log';
     hax.YLim(1) = 0.7;
@@ -478,10 +584,10 @@ for ii_dataset = 1:length(datasets)
         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     
     hl=xline(nanmean(x)); hl.Color='r';
-%     hl=xline(nanmedian(x)); hl.Color='r'; hl.LineStyle = '--';
     m = hax.YLim(2) + 0.15*range(hax.YLim);
     plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
     plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
+    fprintf('\tNo. of fields: mean=%.1f median=%.1f IQR=%.1f-%.1f\n', nanmean(x), prctile(x,[50]), prctile(x,[25 75]) );
     
     %% Field Size
     x = field_size;
@@ -514,30 +620,29 @@ for ii_dataset = 1:length(datasets)
         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
     
     hl=xline(nanmean(x)); hl.Color='r';
-%     hl=xline(nanmedian(x)); hl.Color='r'; hl.LineStyle = '--';
     m = hax.YLim(2) + 0.15*range(hax.YLim);
     plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
     plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
+    fprintf('\t Fields sizes: mean=%.1fm median=%.1fm IQR=%.1f-%.1fm\n', nanmean(x), prctile(x,[50]), prctile(x,[25 75]) );
+    [fields_size_gamma_fit] = gamfit(field_size);
+    fprintf('\t smallest fields gamma distribution fit:\n')
+    fprintf('\t\t Shape parameter kappa = %.2f\n', fields_size_gamma_fit(1));
+    fprintf('\t\t Scale parameter theta = %.2fm\n', fields_size_gamma_fit(2));
+            
+    % inset - zoom in on x-axis
+    if ismember(ii_dataset,[2 3])
+        hax = copyobj(gca,gcf);
+        axes(hax);
+        hax.Position([1 2]) = hax.Position([1 2]) + [1 0.5];
+        hax.Position([3 4]) = [1.2 1.3];
+        delete(findobj(gca,'Type','Text'));
+        hh = findobj(gca,'Type','Histogram');
+        hh.BinEdges = linspace(0,max(hh.Data)*1.1,6);
+        hax.FontSize=6;
+        hax.XLabel.String = '';
+        hax.YLabel.String = '';
+    end
     
-%     %% add arrowhead for mean/median
-%     m1 = nanmean(x);
-%     m2 = nanmedian(x);
-%     [Xf, Yf] = ds2nfu([m1 m2],hax.YLim);
-%     harr = annotation('arrow');
-%     harr.X = Xf([1 1]);
-%     harr.Y = Yf(2)+[0.10 0.05].*diff(Yf);
-%     harr.LineStyle = 'none';
-%     harr.HeadLength = 6;
-%     harr.HeadWidth = 3;
-%     harr.Color = 'r';
-%     harr = annotation('arrow');
-%     harr.X = Xf([2 2]);
-%     harr.Y = Yf(2)+[0.10 0.05].*diff(Yf);
-%     harr.LineStyle = 'none';
-%     harr.HeadLength = 6;
-%     harr.HeadWidth = 3;
-%     harr.Color = 'g';
-        
     %% ratio L/S
     x = ratio_LS;
     x2 = ratio_LS_with_1s;
@@ -553,15 +658,7 @@ for ii_dataset = 1:length(datasets)
     h=histogram(x);
     h.BinEdges = edges;
     h.FaceColor = 0.5*[1 1 1];
-    h.FaceAlpha = 1;    
-% % % % %     h=histogram(x);
-% % % % %     h.BinEdges = edges;
-% % % % %     h.FaceColor = 0.5*[1 1 1];
-% % % % %     h.FaceAlpha = 1;
-% % % % %     h=bar([mean(h.BinEdges([1 2])) nan], [h.Values(1) sum(isnan(x));nan nan], diff(h.BinEdges([1 2])),'stacked');
-% % % % %     h(1).FaceAlpha = 0;
-% % % % %     h(2).FaceAlpha = 1;
-% % % % %     h(2).FaceColor = 'k';
+    h.FaceAlpha = 1;
     
     hax=gca;
     hax.XScale = 'log';
@@ -582,13 +679,32 @@ for ii_dataset = 1:length(datasets)
     ylabel('No. of cells','Units','normalized','Position',[-0.28 0.5])
     text(n_str_pos_x(ii_dataset,3),n_str_pos_y(ii_dataset,3), "n = "+length(x),...
         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+    fprintf('\tnumber of cells with single field overall (both directions): %d/%d (%.1f%%)\n',sum(isnan(x)), length(x), 100*sum(isnan(x))/length(x));
     
     hl=xline(nanmean(x2)); hl.Color='r';
-%     hl=xline(nanmedian(x2)); hl.Color='r'; hl.LineStyle = '--';
     m = hax.YLim(2) + 0.15*range(hax.YLim);
     plot(prctile(x2,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
     plot(prctile(x2,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
+    fprintf('\tFields size ratio (L/S): mean=%.1f median=%.1f IQR=%.1f-%.1f\n', nanmean(x2), prctile(x2,[50]), prctile(x2,[25 75]) );
     
+    %% ratio L/S vs ratio dist2center
+    if norm_dist_from_center & ~isnan(center_part_len(ii_dataset)) % only for small env.
+        x = ratio_LS_dist2center;
+        y = ratio_LS ./ ratio_LS_dist2center;
+        axes(norm_dist_from_center_panels(ii_dataset));
+        cla('reset');
+        hold on
+        plot(x,y,'k.','MarkerSize',7);
+        xlabel({'Distance to center ratio';'largest/smallest'});
+        ylabel({'Field size ratio';'largest/smallest'});
+        title(datasets(ii_dataset).name);
+        hax=gca;
+        hax.XScale = 'log';
+        hax.YScale = 'log';
+        [rho,rho_pval] = corr(x',y','rows','pairwise','type','Spearman')
+        text(1,.95,sprintf('rho = %.2f',rho),'Units','normalized','FontSize',8);
+        text(1,.85,sprintf('P = %.2f',rho_pval),'Units','normalized','FontSize',8);
+    end
 end
 
 % add panel letter
@@ -610,6 +726,7 @@ text(-0.9,0.5, {'Rat';'small';'environment'}, 'Units','normalized','FontWeight',
 %%  ============ compare datasets distributions ============ 
 FGHI_xlimits = [0.25 3.75];
 asterisk_font_size = 11;
+fprintf('======= panels FGHI: compare datasets distributions ======= \n');
 
 %%  No. of fields
 axes(panel_FGHI(1)); cla; hold on
@@ -780,12 +897,23 @@ file_out = fig_name_str;
 if use_large_bins_results
     file_out = [file_out '_larger_bins'];
 end
-file_out = sprintf('%s_A_%d_%d_%d_%d_%d_B_%d_%d_%d_%d_%d',file_out,panel_A_opt,panel_B_opt);
+if norm_speed_ratio
+    file_out = [file_out '_norm_speed_ratio'];
+end
+if norm_dist_from_center
+    file_out = [file_out '_norm_dist2center'];
+end
+if use_only_center
+    file_out = [file_out '_use_only_center' sprintf('_bat_%.2f_rat_%.2f',center_part_len(2),center_part_len(3)/100)];
+    file_out = strrep(file_out, '.','_');
+end
+
+% file_out = sprintf('%s_A_%d_%d_%d_%d_%d_B_%d_%d_%d_%d_%d',file_out,panel_A_opt,panel_B_opt);
 file_out = fullfile(res_dir, file_out);
 print(gcf, file_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
-disp('figure was successfully saved to pdf/tiff/fig formats');
+fprintf('Figure was successfully saved to pdf format, file name:\n\t%s\n',file_out);
 
 %%
 function [CV,CI,SD,SEM] = CV_BS(X,nboot,alpha)

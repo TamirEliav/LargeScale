@@ -648,7 +648,7 @@ hl=xline(nanmean(x)); hl.Color='r';
 m = ha.YLim(2) + 0.15*range(ha.YLim);
 plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
 plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
-
+fprintf('\tNo. of fields: mean=%.1f median=%.1f IQR=%.1f-%.1f\n', nanmean(x), prctile(x,[50]), prctile(x,[25 75]) );
 
 %% panel G - field size histogram
 % figure
@@ -657,6 +657,8 @@ cla
 hold on
 text(-0.34,1.15, 'G', 'Units','normalized','FontWeight','bold');
 fields_size = [];
+fields_size_smallest1 = [];                     % per-direction
+fields_size_smallest2 = nan(length(cells),2);   % per-cell
 for ii_dir = 1:2
     for ii_cell = 1:length(cells)
         cell = cells(ii_cell);
@@ -666,6 +668,8 @@ for ii_dir = 1:2
         fields = cell.fields{ii_dir};
         fields([fields.in_low_speed_area]) = []; % remove fields in low speed area
         fields_size = [fields_size fields.width_prc];
+        fields_size_smallest1 = [fields_size_smallest1 min([fields.width_prc])];
+        fields_size_smallest2(ii_cell,ii_dir) = min([fields.width_prc]);
     end
 end
 h = histogram(fields_size);
@@ -692,10 +696,40 @@ hl=xline(nanmean(x)); hl.Color='r';
 m = ha.YLim(2) + 0.15*range(ha.YLim);
 plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
 plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
+fprintf('\t Fields sizes: mean=%.1fm median=%.1fm IQR=%.1f-%.1fm\n', nanmean(x), prctile(x,[50]), prctile(x,[25 75]) );
 
 save( fullfile(res_dir,'pop_dist_fields_size'), 'fields_size');
 
-%% panel H - smallest / largest field size
+% report smallest field distribution (including single-field cells)
+fields_size_smallest2 = min(fields_size_smallest2,[],2);
+fields_size_smallest2(isnan(fields_size_smallest2))=[];
+[fields_size_smallest_gamma_fit1] = gamfit(fields_size_smallest1);
+[fields_size_smallest_gamma_fit2] = gamfit(fields_size_smallest2);
+mu1 = prod(fields_size_smallest_gamma_fit1);
+mu2 = prod(fields_size_smallest_gamma_fit2);
+CV1 = 1/sqrt(fields_size_smallest_gamma_fit1(1));
+CV2 = 1/sqrt(fields_size_smallest_gamma_fit2(1));
+fprintf('smallest fields gamma distribution fit (per-direction):\n')
+fprintf('\t Shape parameter kappa = %.2f\n', fields_size_smallest_gamma_fit1(1));
+fprintf('\t Scale parameter theta = %.2fm\n', fields_size_smallest_gamma_fit1(2));
+fprintf('\t mu = %.2f\n', mu1);
+fprintf('\t CV = %.2f\n', CV1);
+fprintf('smallest fields gamma distribution fit (per-cell):\n')
+fprintf('\t Shape parameter kappa = %.2f\n', fields_size_smallest_gamma_fit2(1));
+fprintf('\t Scale parameter theta = %.2fm\n', fields_size_smallest_gamma_fit2(2));
+fprintf('\t mu = %.2f\n', mu2);
+fprintf('\t CV = %.2f\n', CV2);
+
+% figure
+% hold on
+% xxx = linspace(0,15,100);
+% plot(xxx,gampdf(xxx,fields_size_smallest_gamma_fit1(1),fields_size_smallest_gamma_fit1(2)))
+% plot(xxx,gampdf(xxx,fields_size_smallest_gamma_fit2(1),fields_size_smallest_gamma_fit2(2)))
+% legend({sprintf('per-direction (CV=%.2f)',CV1);...
+%         sprintf('per-cell      (CV=%.2f)',CV2)});
+
+
+%% panel H - smallest & largest field size
 % figure
 axes(panel_H);
 cla
@@ -735,8 +769,6 @@ text([1 2],repelem(ylimits(1)-0.04*diff(ylimits),2),{{'Smallest';'field'},{'Larg
     'HorizontalAlignment','center','VerticalAlignment','top','FontSize',7);
 % xlabel('')
 ylabel('Field size (m)','Units','normalized','Position',[-0.25 0.5])
-
-
 
 %% panel I - field ratio (largest/smallest)
 axes(panel_I);
@@ -779,7 +811,7 @@ h(2).FaceColor = 0.5*[1 1 1];
 ha=gca;
 ha.YScale = 'log';
 ha.XScale = 'log';
-ha.XLim = [0 27];
+ha.XLim = [1 27];
 % ha.YLim = [0 10];
 % ha.YLim = [7e-1 120];
 ha.YLim = [0.7 max(h(2).Values)*1.1];
@@ -799,7 +831,7 @@ hl=xline(nanmean(x)); hl.Color='r';
 m = ha.YLim(2) + 0.15*range(ha.YLim);
 plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
 plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
-
+fprintf('\tFields size ratio (L/S): mean=%.1f median=%.1f IQR=%.1f-%.1f\n', nanmean(x), prctile(x,[50]), prctile(x,[25 75]) );
 
 %% panel J - prepare data
 distances_all = [];
@@ -882,7 +914,11 @@ fig_name_out = fullfile(res_dir, sprintf('%s__corr_%s_%d',fig_name_str,corr_type
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
-disp('figure was successfully saved to pdf/tiff/fig formats');
+disp('======================================================');
+disp('figure was successfully saved to pdf format');
+disp('======================================================');
+
+
 
 
 

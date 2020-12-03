@@ -2316,9 +2316,31 @@ dir_IN = 'L:\Analysis\Results\cells_paramset_0\figures';
 dir_OUT = '';
 util_copy_files_by_template(dir_IN, dir_OUT, cells2copy_ID, 'tif')
 
+%% 29/11/2020 - debugging the gamma fit for compartmentalization model
+figure
+hold on
+xxx = linspace(0,30,100);
+plot(xxx, gampdf(xxx, 3.84, 0.85) ); % smallest
+% plot(xxx, gampdf(xxx, 3.56, 1.3 ) ); % 6m - Yonatan's truncation @ 60cm (also maybe 3.56 should be 3.16 as in 200m)
+% plot(xxx, gampdf(xxx, 3.75, 0.39 ) ); % 6m - normal gamfit
+plot(xxx, gampdf(xxx, 3.56, 0.37 ) ); % 6m - Yonatan correction
+plot(xxx, gampdf(xxx, 3.16, 1.8 ) ); % 200m
+legend({'Smallest per cell in 200m','6m','200m'})
+xlabel('Field size (m)')
+ylabel('pdf')
+
+
 %%
-
-
+figure
+hold on
+h=histogram(x);
+h.Normalization = 'pdf';
+xxx=1:10;
+plot(xxx,poisspdf(xxx,poissfit(x)),'.-r')
+% plot(xxx,poisspdf(xxx,1.5),'.-c')
+xlabel('no. of fields')
+ylabel('pdf')
+legend('data','fit')
 
 
 
