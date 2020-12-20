@@ -4,10 +4,19 @@ function [PSTH,spike_density_filtered,time_spent_filtered] = computePSTH(pos,pos
 %                       spike_pos  1xM
 %                       bin_edges 1xL
 
+
+
 %% default params
 if nargin == 4 %so no input of minimum time spent and kernel s.d.
     min_time_spent = default_min_time_spent;
     ker_SD = 0.5;
+end
+%% workaround : global variable to remove min timespent criteria
+global ignore_min_timespent_thr_12357111317_abc; % weird name to make it unique (avoid variable overide)
+if ~isempty(ignore_min_timespent_thr_12357111317_abc)
+    if ignore_min_timespent_thr_12357111317_abc
+        min_time_spent=0;
+    end
 end
 
 %% binning

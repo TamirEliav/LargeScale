@@ -153,7 +153,7 @@ f(2).name_long = '2: Single large field';
 f(3).name_long = '3: Single field, dorso-ventral gradient';
 f(4).name_long = '4: Multiple small fields (Rich et al. 2014)';
 f(5).name_long = '5: Multi-scale (population)';
-f(6).name_long = '6: Multi-scale (single-cell)';
+f(6).name_long = '6: Multi-scale (single-cell), matching bat data in 200 meters';
 f(7).name_long = '5v: Multi-scale (population) - variable coverage';
 f(8).name_long = '6v: Multi-scale (single-cell) - variable coverage';
 

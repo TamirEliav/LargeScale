@@ -104,6 +104,9 @@ for ii_dir = 1:2
             stats_per_dir(ii_dir).field_CV          = nanstd([fields_valid_speed.width_prc]) / nanmean([fields_valid_speed.width_prc]);
             stats_per_dir(ii_dir).field_size_mean   = nanmean([fields_valid_speed.width_prc]);
             stats_per_dir(ii_dir).field_size_median = nanmedian([fields_valid_speed.width_prc]);
+            % TODO: the next lines are wrong! we need to calculate the
+            % ratio of the velocity for the L/S FIELDS (!), not the max/min
+            % of the velocity over all fields....
             stats_per_dir(ii_dir).field_largest_vel   = max([fields_valid_speed.vel]);
             stats_per_dir(ii_dir).field_largest_vel2  = max([fields_valid_speed.vel2]);
             stats_per_dir(ii_dir).field_largest_vel3  = max([fields_valid_speed.vel3]);

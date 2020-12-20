@@ -1,4 +1,4 @@
-%% Large Scale - fig. S15- Theoretical analysis (decoding) - including schemes 5v,6v
+%% Large Scale - fig. S16- Theoretical analysis (decoding) - including schemes 5v,6v
 
 %%
 % clear
@@ -11,7 +11,7 @@ use_absolute_error = 1;
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S15';
+fig_name_str = 'fig_S16';
 fig_caption_str = 'Theoretical analysis_decoding';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -68,6 +68,7 @@ panel_E(1)   = axes('position', [14.4    8.7  panel_BCDE_size]);
 % panel_F      = axes('position', [   2    3.0  panel_BCDE_size]);
 panel_F      = axes('position', [   2    3.8  3 3]);
 panel_G      = axes('position', [   7    3.8  3 3]);
+panel_H      = axes('position', [  14.4  3.2  panel_BCDE_size]);
 panel_legend = axes('position', [9.8 16.6 0.4 2]);
 panel_F_legend = axes('position', [3.2 6  0.2 0.4]);
 panel_G_legend = axes('position', [9.5 6  0.2 0.75]);
@@ -638,11 +639,13 @@ plot([1 2],      2*[1 1], 'Color',clr(6,:), 'LineWidth',2);
 plot(dashed_line,      3*ones(length(dashed_line)), 'Color',clr(6,:), 'LineWidth',2);
 text(2.6, 1, 'Data','FontSize',7,'HorizontalAlignment','left');
 text(2.6, 2, 'Model (Scheme 6)','FontSize',7,'HorizontalAlignment','left');
-text(2.6, 3, 'Model (Scheme 6v - variable coverage)','FontSize',7,'HorizontalAlignment','left');
+text(2.6, 2.5, {'Model (Scheme 6v -';'            variable coverage)'},'FontSize',7,'HorizontalAlignment','left','VerticalAlignment','top');
 hax=gca;
 hax.Visible='off';
 hax.YDir='reverse';
 
+%% panel H
+plot_panel_different_scaling_delta(panel_H);
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, sprintf('%s_dt_%s', ...
@@ -652,6 +655,99 @@ print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
 disp('figure was successfully saved to pdf/tiff/fig formats');
+
+
+%%
+function plot_panel_different_scaling_delta(panel_axes)
+
+load('L:\Yonatan_theory\20200630__new_simulations_data+script\SummaryDecoderResults_EnvironmentSizeScaling.mat')
+nalp = length(alp) ;
+L = Lv*ds/100 ; % environment size variable in meters
+jN = 2 ; % chooses N = 50
+
+% color variable for S6 advantage (blue/red gradient)
+nclr = 50 ;  % number of colors 
+cmin = -1.5 ;
+cbi  = -1   ;
+c0   = 0 ;
+cri  = 1 ;
+cmax = 1.5 ;
+cx   = linspace(cmin,cmax,nclr) ;
+clrf = zeros(nclr,3) ;
+iclr1 = find(cx<=cbi) ;
+iclr2 = intersect(find(cx<=c0),find(cx>=cbi)) ;
+iclr3 = intersect(find(cx<=cri),find(cx>=c0)) ;
+iclr4 = find(cx>=cri) ;
+
+clrf(iclr1,3) = linspace(0.5,1,length(iclr1)) ;
+clrf(iclr2,1) = linspace(0  ,1,length(iclr2)) ;
+clrf(iclr2,2) = linspace(0  ,1,length(iclr2)) ;
+clrf(iclr2,3) = 1 ; 
+
+clrf(iclr3,1) = 1 ; 
+clrf(iclr3,2) = linspace(1,0  ,length(iclr3)) ;
+clrf(iclr3,3) = linspace(1,0  ,length(iclr3)) ;
+clrf(iclr4,1) = linspace(1,0.5,length(iclr4)) ;
+
+Lint = logspace(log10(20),3,100) ; % interpolation of environment size variable
+alpint = 0.1:0.01:0.9 ;            % interpolation of scaling exponent variable
+[Lm,alpm] = meshgrid(L,alp) ;
+[Lmint,alpmint] = meshgrid(Lint,alpint) ;
+merr_ML_S1i = interp2(Lm,alpm,ones(nalp,1)*merr_ML_S1(jN,:),Lmint,alpmint) ;
+merr_ML_S2i = interp2(Lm,alpm,squeeze(merr_ML_S2(jN,:,:))',Lmint,alpmint) ;
+merr_ML_S3i = interp2(Lm,alpm,squeeze(merr_ML_S3(jN,:,:))',Lmint,alpmint) ;
+merr_ML_S4i = interp2(Lm,alpm,squeeze(merr_ML_S4(jN,:,:))',Lmint,alpmint) ;
+merr_ML_S5i = interp2(Lm,alpm,squeeze(merr_ML_S5(jN,:,:))',Lmint,alpmint) ;
+merr_ML_S6i = interp2(Lm,alpm,squeeze(merr_ML_S6(jN,:,:))',Lmint,alpmint) ;
+
+plerr_ML_S1i = interp2(Lm,alpm,ones(nalp,1)*plerr_ML_S1(jN,:),Lmint,alpmint) ;
+plerr_ML_S2i = interp2(Lm,alpm,squeeze(plerr_ML_S2(jN,:,:))',Lmint,alpmint) ;
+plerr_ML_S3i = interp2(Lm,alpm,squeeze(plerr_ML_S3(jN,:,:))',Lmint,alpmint) ;
+plerr_ML_S4i = interp2(Lm,alpm,squeeze(plerr_ML_S4(jN,:,:))',Lmint,alpmint) ;
+plerr_ML_S5i = interp2(Lm,alpm,squeeze(plerr_ML_S5(jN,:,:))',Lmint,alpmint) ;
+plerr_ML_S6i = interp2(Lm,alpm,squeeze(plerr_ML_S6(jN,:,:))',Lmint,alpmint) ;
+
+min_merr_ML_S12345i = min(merr_ML_S1i,merr_ML_S2i) ;
+min_merr_ML_S12345i = min(min_merr_ML_S12345i,merr_ML_S3i) ;
+min_merr_ML_S12345i = min(min_merr_ML_S12345i,merr_ML_S4i) ;
+min_merr_ML_S12345i = min(min_merr_ML_S12345i,merr_ML_S5i) ;
+
+min_plerr_ML_S12345i = min(plerr_ML_S1i,plerr_ML_S2i) ;
+min_plerr_ML_S12345i = min(min_plerr_ML_S12345i,plerr_ML_S3i) ;
+min_plerr_ML_S12345i = min(min_plerr_ML_S12345i,plerr_ML_S4i) ;
+min_plerr_ML_S12345i = min(min_plerr_ML_S12345i,plerr_ML_S5i) ;
+
+axes(panel_axes);
+cla
+imagesc(Lint,alpint,log10(plerr_ML_S6i./min_plerr_ML_S12345i),[cmin cmax]);
+set(gca,'xscale','log') ;
+axis square xy;
+hcb = colorbar ;
+hcb.Ruler.TickLabelGapOffset = 0.5;
+colormap(gca,clrf)
+hl = yline(0.3);
+hl.Color = 'r';
+hl.LineStyle = '--';
+hl.LineWidth = 1.2;
+hax = gca;
+hax.XScale = 'log';
+hax.XLim = [20 1000];
+% hax.YLim = [20 1000];
+hax.XTick = [100 1000];
+hax.YTick = [0.1:0.1:0.9];
+% hax.XTickLabel = {};
+hax.YRuler.TickLabelGapOffset = -0.1;
+hax.XRuler.TickLabelGapOffset = -1;
+hax.XRuler.TickLength = [0.03 0.03];
+hax.YRuler.TickLength = [0.024 0.03];
+xlabel('Environment size (m)', 'Units','normalized','Position',[0.5 -0.16]);
+ylabel('Scaling factor', 'Units','normalized','Position',[ -0.25 0.5]);
+text(-0.35,1.15, 'H', 'Units','normalized','FontWeight','bold');
+text(1.52,0.5, {'Log ratio prob. error';'(scheme 6 / other schemes)'}, 'Units','normalized','Rotation',-90,'FontSize',7,'HorizontalAlignment','center');
+
+end
+
+
 
 %% signif astricks string
 function str = signif_astricks(pval)

@@ -30,7 +30,10 @@ ratio_LS_with_1s(isnan(ratio_LS_with_1s))=1;
 
 
 %% spatail periodicity (fft) ==============================================
-track_edges = [10 187.5]; % valid speed pos
+
+%% define locations
+entire_tunnel_edges = [10 187.5]; % valid speed pos
+long_arm_edges     = [10 139.5]; % valid speed pos, but only the long arm part
 
 %% get valid maps
 signif = cat(1,cells.signif);
@@ -43,6 +46,7 @@ maps = cat(1,cells.FR_map);
 maps = maps(signif);
 maps = [maps.all];
 maps = cat(1,maps.PSTH);
+maps_long = maps;
 % binarized maps
 maps01 = nan([size(signif),length(x)]);
 for ii_cell = 1:length(cells)
@@ -60,11 +64,12 @@ TF=repmat(signif,1,1,length(x));
 maps01 = maps01(TF);
 maps01 = reshape(maps01,[],length(x));
 
-% remove invalid locations
-edges = track_edges;
-valid_IX = x>edges(1) & x<edges(2);
-maps(:,~valid_IX)=[];
-maps01(:,~valid_IX)=[];
+% select locations
+entire_tunnel_IX = x>entire_tunnel_edges(1) & x<entire_tunnel_edges(2);
+long_arm_IX = x>long_arm_edges(1) & x<long_arm_edges(2);
+maps(:,~entire_tunnel_IX)=[];
+maps01(:,~entire_tunnel_IX)=[];
+maps_long(:,~long_arm_IX)=[];
 % get bat identity per map
 details = [cells.details];
 bats = [details.bat];
@@ -73,6 +78,7 @@ maps_bat = bats(signif);
 
 %% calc maps fft
 n = size(maps,2);
+n_long = size(maps_long,2);
 maps_spec = fft(maps,[],2);
 maps_spec = fftshift(maps_spec);
 maps_spec = abs(maps_spec).^2/n;
@@ -81,7 +87,12 @@ maps01_spec = fft(maps01,[],2);
 maps01_spec = fftshift(maps01_spec);
 maps01_spec = abs(maps01_spec).^2/n;
 maps01_spec = maps01_spec ./ mean(maps01_spec,2);
+maps_long_spec = fft(maps_long,[],2);
+maps_long_spec = fftshift(maps_long_spec);
+maps_long_spec = abs(maps_long_spec).^2/n;
+maps_long_spec = maps_long_spec ./ mean(maps_long_spec,2);
 freq = (-n/2:n/2-1)*(fs/n); % zero-centered frequency range
+freq_long = (-n_long/2:n_long/2-1)*(fs/n_long); % zero-centered frequency range
 
 %% arrange ouput struct
 
@@ -93,8 +104,10 @@ data.ratio_LS_with_1s = ratio_LS_with_1s;
 
 % fft related 
 data.freq = freq;
+data.freq_long = freq_long;
 data.maps_spec = maps_spec;
 data.maps01_spec = maps01_spec;
+data.maps_long_spec = maps_long_spec;
 data.maps_bat = maps_bat;
 
 

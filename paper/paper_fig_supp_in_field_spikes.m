@@ -58,7 +58,8 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 % create panels
 panel_A = axes('position', [ 3 20 3 3]);
 panel_B = axes('position', [ 8 20 2.9 3]);
-panel_C = axes('position', [ 3 15 3 3]);
+panel_C(1) = axes('position', [ 3 15 3 3]);
+panel_C(2) = axes('position', [ 4.2 16.2 1.8 1.8]);
 panel_D(1) = axes('position', [ 8 15 2.9 3]);
 % panel_D(2) = axes('position', [ 13 15 2.9 3]);
 panel_E = axes('position', [ 3 10 3 3]);
@@ -257,7 +258,7 @@ switch plot_style
 end
 
 %% within-field ISI hist
-axes(panel_C);
+axes(panel_C(1));
 cla('reset')
 hold on
 text(-0.35,1.15, 'C', 'Units','normalized','FontWeight','bold');
@@ -266,9 +267,6 @@ hh=histogram(ISI_all,[0:1:1000]);
 hh.EdgeColor='k';
 hh.FaceColor='k';
 hh.Normalization='pdf';
-% hl=xline(burst_ISI_thr);
-% hl.Color='r';
-% hl.LineWidth=1;
 
 ha=gca;
 ha.XLim = [0 300];
@@ -283,6 +281,35 @@ ha.YRuler.TickLabelGapOffset = -1;
 ha.YScale = 'linear';
 xlabel({'In-field inter-spike interval (ms)'}, 'Units','normalized','Position',[0.5 -0.13]);
 ylabel({'Probability';'density function'},'Units','normalized','Position',[-0.13 0.5]);
+
+%% within-field ISI hist (inset, log-scale)
+axes(panel_C(2));
+cla('reset')
+hold on
+
+% bins = [0:1:1e5];
+% bins = logspace(0,5,50);
+bins = [0:9 logspace(1,5,50)];
+hh=histogram(ISI_all,bins);
+hh.EdgeColor='k';
+hh.FaceColor='k';
+hh.Normalization='pdf';
+% hh.Normalization='probability';
+
+ha=gca;
+ha.XLim = [0 1e5];
+ha.YLim = [0 0.025];
+ha.XTick = 10.^[1 2 3 4 5];
+% ha.XTickLabel = [1:5];
+ha.YTick = ha.YLim;
+ha.TickDir='out';
+ha.TickLength = [0.03 0.03];
+ha.XRuler.TickLabelGapMultiplier = -0.35;
+ha.YRuler.TickLabelGapMultiplier = 0.5;
+ha.YRuler.TickLabelGapOffset = -1;
+ha.XScale = 'log';
+ha.XRuler.FontSize=6;
+ha.YRuler.FontSize=6;
 
 %% percentage of bursty spikes (per field)
 axes(panel_D(1));
@@ -364,10 +391,10 @@ plot(x,y,'.k');
 [rho, pval] = corr(x',y','type','spearman');
 text(0.75,1.05, ['{\rho}' sprintf(' = %.2f',rho)] ,'units','normalized','FontSize',8);
 if pval == 0
-    text(0.75,0.9, 'P < 10^{ -300}' ,'units','normalized','FontSize',8);
-else
-    text(0.75,0.9, sprintf('P = %.2f',pval) ,'units','normalized','FontSize',8);
+%     text(0.75,0.9, 'P < 10^{ -300}' ,'units','normalized','FontSize',8);
+    pval = realmin;
 end
+text(0.75,0.9, sprintf('P = %.2g',pval) ,'units','normalized','FontSize',8);
 
 ha=gca;
 ha.XLim = [0 35];

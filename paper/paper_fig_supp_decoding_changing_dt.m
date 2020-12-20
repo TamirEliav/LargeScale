@@ -1,4 +1,4 @@
-%% Large Scale - fig. S17 - decoder with shorter dt (200ms) + error vs. dt
+%% Large Scale - fig. S18 - decoder with shorter dt (200ms) + error vs. dt
 
 %%
 % clear
@@ -11,7 +11,7 @@ use_absolute_error = 1;     % 0 - 5% of env. error; 1 - 2m error
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S17';
+fig_name_str = 'fig_S18';
 fig_caption_str = 'Theoretical analysis - error vs. integration time (dt)';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');

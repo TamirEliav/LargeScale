@@ -16,12 +16,23 @@ for ii_dir = 1:2
     FE_begin = FE(1 : round(length(FE)/2)        );
     FE_end   = FE(    round(length(FE)/2)+1 : end);
 
+    global ignore_min_timespent_thr_12357111317_abc;
+    ignore_min_timespent_thr_12357111317_abc = 0;
     FR_map(ii_dir).all   = FE_PSTH_compute_AC(FE_compute_PSTH(FE));
 %     FR_map(ii_dir).full  = FE_PSTH_compute_AC(FE_compute_PSTH(FE_full));
+    % work-around: for partial flight based maps, remove the minimum
+    % timespent threshold to 0 (then bring it back!). We do that using a
+    % global variable, in order to avoid changes of the code structure at
+    % this late point in the project...
+    global ignore_min_timespent_thr_12357111317_abc;
+    ignore_min_timespent_thr_12357111317_abc = 1;
     FR_map(ii_dir).odd   = FE_PSTH_compute_AC(FE_compute_PSTH(FE_odd));
     FR_map(ii_dir).even  = FE_PSTH_compute_AC(FE_compute_PSTH(FE_even));
     FR_map(ii_dir).begin = FE_PSTH_compute_AC(FE_compute_PSTH(FE_begin));
     FR_map(ii_dir).end   = FE_PSTH_compute_AC(FE_compute_PSTH(FE_end));
+    % now remove the global variable
+    ignore_min_timespent_thr_12357111317_abc = 0;
+    clear ignore_min_timespent_thr_12357111317_abc;
     
     % calc correlations between partial subsets
 %     FR_map(ii_dir).corr_all_full  = FE_PSTH_compute_corr(FR_map(ii_dir).all,   FR_map(ii_dir).full);

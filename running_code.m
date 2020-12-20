@@ -2329,8 +2329,7 @@ legend({'Smallest per cell in 200m','6m','200m'})
 xlabel('Field size (m)')
 ylabel('pdf')
 
-
-%%
+%% fitting fields counts distribution with a poisson
 figure
 hold on
 h=histogram(x);
@@ -2342,7 +2341,66 @@ xlabel('no. of fields')
 ylabel('pdf')
 legend('data','fit')
 
+%%
+ccc = [];
+for ii_cell=1:length(cells)
+    cell = cells(ii_cell);
+    for ii_dir = 1:2
+        if ~cell.signif(ii_dir).TF
+            continue;
+        end
+        sdf = cell.FR_map(ii_dir).corr_odd_even;
+        ccc=[ccc sdf.rho];
+    end
+end
+figure
+h=histogram(ccc);
+h.BinEdges = linspace(-1,1,10000);
+h.Normalization='cumcount'
+xlim([-0.2 1])
+ylim([0 25])
+xlim([-1 1])
+ylim([0 350])
+xlabel('correlation')
+ylabel('Cummulative number of cells')
 
+%%
+details=[cells.details];
+IX1=r([stats_dir.corr_odd_even] < 0.2);
+IX2=c([stats_dir.corr_odd_even] < 0.2);
+cell2plot = sort({details(IX1).cell_ID}')
+[details(IX1).cell_num]
+IX2
+
+%%
+for ii_cell = 1:length(cell2plot)
+    cell_ID = cell2plot{ii_cell};
+    cell_plot_map_fields(cell_ID)
+end
+
+%% debug the low correlations in good maps!
+cell_num = 473;
+ii_dir = 1;
+ii_cell = find([details.cell_num] == cell_num );
+figure
+hold on
+cell = cells(ii_cell);
+xxx = cell.FR_map(ii_dir).odd.bin_centers;
+PSTH1 = cell.FR_map(ii_dir).odd.PSTH;
+PSTH2 = cell.FR_map(ii_dir).even.PSTH;
+ker = fspecial('gaussian',[1 10],4);
+corr(PSTH1',PSTH2','rows','complete')
+PSTH1 = imfilter(PSTH1,ker);
+PSTH2 = imfilter(PSTH2,ker);
+corr(PSTH1',PSTH2','rows','complete')
+plot(xxx, PSTH1)
+plot(xxx, PSTH2)
+
+
+
+
+
+%%
 
 
 

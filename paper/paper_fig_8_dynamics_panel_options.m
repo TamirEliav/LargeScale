@@ -157,16 +157,22 @@ for ii_prc = 1:5
     hold on;
 
     x = [1,2, 4,5, 7,8 ];
-    y = [corr_p1_square_P, corr_p2_P, ...
-        corr_p1_square_M, corr_p2_M, ...
-        corr_p1_square_S, corr_p2_S];
-    err = [ std_corr_p1_square_P std_corr_p2_P ...
-            std_corr_p1_square_M std_corr_p2_M...
-            std_corr_p1_square_S std_corr_p2_S];
+    y = [corr_p1_square_S, corr_p2_S, ...
+        corr_p1_square_M, corr_p2_M,  ...
+        corr_p1_square_P, corr_p2_P];
+    err = [ std_corr_p1_square_S std_corr_p2_S ...
+            std_corr_p1_square_M std_corr_p2_M ...
+            std_corr_p1_square_P std_corr_p2_P];
     fig_8_dynamics_panel_data = struct();
     fig_8_dynamics_panel_data.x = x;
     fig_8_dynamics_panel_data.y = y;
     fig_8_dynamics_panel_data.err = err;
+    fig_8_dynamics_panel_data.name{1} = "CA3_single_p1";
+    fig_8_dynamics_panel_data.name{2} = "CA3_single_p2";
+    fig_8_dynamics_panel_data.name{3} = "CA3_multi_p1";
+    fig_8_dynamics_panel_data.name{4} = "CA3_multi_p2";
+    fig_8_dynamics_panel_data.name{5} = "MEC_periodic_p1";
+    fig_8_dynamics_panel_data.name{6} = "MEC_periodic_p2";
     filename = "fig_8_dynamics_panel_data_PRC_" + ii_prc;
     save(fullfile(res_dir,filename),'fig_8_dynamics_panel_data');
     
@@ -183,7 +189,7 @@ for ii_prc = 1:5
     
     h=gca;
     h.XTick = x;
-    h.XTickLabels = {'MEC','model', 'Multi-field','CA3 model', 'Single-field','CA3 model'};
+    h.XTickLabels = {'Single-field','CA3 model', 'Multi-field','CA3 model', 'MEC','model'};
     h.XTickLabelRotation = 45;
     ylimits = [-1,1];
     h.YLim = ylimits;
@@ -199,26 +205,34 @@ for ii_prc = 1:5
     
     %% stats
     fprintf('p_1^2\n')
-    [pval zval] = my_ztest(y(5), y(1), err(5), err(1));
-    fprintf('Single-field CA3 vs. MEC:              p=%.f z=%.f\n',pval,zval);
-    [pval zval] = my_ztest(y(5), y(3), err(5), err(3));
+    [pval zval] = my_ztest(y(1), y(3), err(1), err(3));
     fprintf('Single-field CA3 vs. Multi-field CA3:  p=%.f z=%.f\n',pval,zval);
+    [pval zval] = my_ztest(y(1), y(5), err(1), err(5));
+    fprintf('Single-field CA3 vs. MEC:              p=%.f z=%.f\n',pval,zval);
     fprintf('p_2\n')
-    [pval zval] = my_ztest(y(6), y(2), err(6), err(2));
-    fprintf('Single-field CA3 vs. MEC:              p=%.f z=%.f\n',pval,zval);
-    [pval zval] = my_ztest(y(6), y(4), err(6), err(4));
+    [pval zval] = my_ztest(y(2), y(4), err(2), err(4));
     fprintf('Single-field CA3 vs. Multi-field CA3:  p=%.f z=%.f\n',pval,zval);
+    [pval zval] = my_ztest(y(2), y(6), err(2), err(6));
+    fprintf('Single-field CA3 vs. MEC:              p=%.f z=%.f\n',pval,zval);
     
 end
 
+%%
+axes(panel_PRC(end));
 hax = gca;
-h_app = annotation('rectangle',[0.2 0.7 1 0.2],'FaceColor','k');
+h_app = annotation('rectangle',[0 0 0 0],'FaceColor','k');
 h_app.Parent = hax;
-h_dis = annotation('rectangle',[0.2 0.4 1 0.2],'FaceColor',[0.6 0.6 0.6]);
+h_app.Position = [6 0.7 0.8 0.15];
+h_dis = annotation('rectangle',[0 0 0 0],'FaceColor',[0.6 0.6 0.6]);
 h_dis.Parent = hax;
-text(1.55,0.8,'P_1^2', 'HorizontalAlignment','left','FontSize',8);
-text(1.55,0.5,'P_2', 'HorizontalAlignment','left','FontSize',8);
+h_dis.Position = [6 0.4 0.8 0.15];
+text(7,0.75,'P_1^2', 'HorizontalAlignment','left','FontSize',8);
+text(7,0.45,'P_2', 'HorizontalAlignment','left','FontSize',8);
 
+%%
+hh = annotation('rectangle',[0 0 0 0],'FaceColor','k');
+hh.Parent = panel_PRC(1);
+hh.Position = [7 0.5 0.1 0.1]
 
 %% save figure
 fig_name_out = fullfile(res_dir, sprintf('%s_bar_SD_version',fig_name_str));

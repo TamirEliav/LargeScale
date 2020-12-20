@@ -11,7 +11,7 @@ load('L:\Misha_attractor\20200902__new_simulations\sim_res.mat');
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S18';
+fig_name_str = 'fig_S19';
 fig_caption_str = 'attractor_model';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');

@@ -1,17 +1,17 @@
-%% Large Scale - Fig. S19 - Theoretical analysis (mechanism)
+%% Large Scale - Fig. S20 - Theoretical analysis (mechanism)
 
 %%
-% clear 
+clear 
 clc
 
 %%
-% paper_fig_8_arrange_sim_data
+paper_fig_8_arrange_sim_data
 data = paper_fig_8_arrange_real_data();
 
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S19';
+fig_name_str = 'fig_S20';
 fig_caption_str = 'Theoretical analysis - Mechanism';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -70,15 +70,21 @@ panel_F(1) = axes('position', [ 7.0 7+4 4 3]);
 panel_G(1) = axes('position', [ 7.0 1.7 5 3]);
 for ii_bat = 1:5
     panel_size = [5 2.5];
-    panel_size_inset = [2.5 1.25];
-    inset_offset = [2.6 1.5];
+%     panel_size_inset = [2.5 1.25];
+    panel_size_inset = [1.4 1.25];
+%     inset_offset = [2.6 1.5];
+    inset_offset1 = [2.00 1.55];
+    inset_offset2 = [3.60 1.55];
     spacing = 1;
     panel_pos_x = 14.2;
     panel_pos_y = 2.35 + (ii_bat-1)*(panel_size(2)+spacing);
     panel_pos = [panel_pos_x panel_pos_y];
-    panel_pos_inset = panel_pos + inset_offset;
+%     panel_pos_inset = panel_pos + inset_offset;
+    panel_pos_inset1 = panel_pos + inset_offset1;
+    panel_pos_inset2 = panel_pos + inset_offset2;
     panel_H(ii_bat,1) = axes('position', [panel_pos         panel_size]);
-    panel_H(ii_bat,2) = axes('position', [panel_pos_inset   panel_size_inset]);
+    panel_H(ii_bat,2) = axes('position', [panel_pos_inset1   panel_size_inset]);
+    panel_H(ii_bat,3) = axes('position', [panel_pos_inset2   panel_size_inset]);
 end
 panel_H = flipud(panel_H);
 
@@ -299,15 +305,20 @@ axes(panel_F(1)); cla; hold on;
 text(-0.2,1.2, 'F', 'Units','normalized','FontWeight','bold');
 i3 = 11 ; % color plot of spectrum at all slice angels shown for half/half MEC/CA3 input
 xlimits = [0 0.2];
-IX = kPow < xlimits(2);
+% IX = kPow < xlimits(2);
+IX = kPow > xlimits(1) & kPow < xlimits(2);
 M = squeeze(powOutXs(IX,i3,:))';
+% M(:,1) =  nan;
+% M(:,1) =  M(:,2);
 % M = log10(M);
 % imagesc(kPow,0:29, M, [-1 3.6]) ; axis xy ;  hold on ;
 imagesc(kPow(IX),0:29, M) ; axis xy ;  hold on ;
 plot(1./(aMEC/2.5),0,'^r','MarkerFaceColor','r','MarkerSize',5) ; hold on ;
 hax=gca;
 hax.ColorScale='log';
-hax.XLim = xlimits;
+% hax.XLim = xlimits;
+% hax.XLim = [min(kPow(IX)) max(kPow(IX))];
+hax.XLim = [min(kPow(IX))/2 xlimits(2)];
 xlabel('Spatial frequency (1/m)') ;
 ylabel('Slice angle (\circ)') ;
 title({'CA1 spectra for';'equal CA3 and MEC input'},'FontWeight','bold') ;
@@ -349,6 +360,7 @@ hax.XRuler.TickLabelGapOffset = -1;
 hax.TickLength(1) = 0.025;
 
 %% Spectrum of real data maps (pooled over bats)
+long_arm_clr = [0.4 0.5 0.6];
 bats=unique(data.maps_bat);
 for ii_bat = 1:length(bats)
     
@@ -366,22 +378,38 @@ for ii_bat = 1:length(bats)
     hax.XLim = [0 0.25];
     hax.YTick = 10.^[-5:5];
     hax.TickLength(1) = 0.02;
+    hax.XRuler.TickLabelGapOffset = -0;
     if ii_bat==length(bats)
         xlabel('Spatial frequency (1/m)') ;
     end
     ylabel('Power (norm.)')
     text(0.05,0.9, "Bat "+ii_bat, 'Units','normalized','FontSize',8,'FontWeight','bold',...
         'HorizontalAlignment','left','VerticalAlignment','middle');
+    text(0.05,0.2, "n = "+sum(maps_IX), 'Units','normalized','FontSize',8,'FontWeight','normal',...
+        'HorizontalAlignment','left','VerticalAlignment','middle');
 
-    % inset - binarized maps
+    % inset1 - binarized maps
     axes(panel_H(ii_bat,2)); cla; hold on;
     shadedErrorBar(data.freq, data.maps01_spec(maps_IX,:), {@mean,@nansem});
     hax=gca;
     hax.YScale = 'log';
     hax.XLim = [0 0.25];
     hax.YTick = 10.^[-5:5];
-    hax.TickLength(1) = 0.015;
-    hax.XRuler.TickLabelGapOffset = -1;
+    hax.YTickLabel = [];
+    hax.TickLength(1) = 0.015 * 2;
+    hax.XRuler.TickLabelGapOffset = -3;
+    hax.YRuler.TickLabelGapOffset = -0.5;
+    
+    % inset2 - only long arm
+    axes(panel_H(ii_bat,3)); cla; hold on;
+    shadedErrorBar(data.freq_long, data.maps_long_spec(maps_IX,:), {@mean,@nansem});
+    hax=gca;
+    hax.YScale = 'log';
+    hax.XLim = [0 0.25];
+    hax.YTick = 10.^[-5:5];
+    hax.YTickLabel = [];
+    hax.TickLength(1) = 0.015 * 2;
+    hax.XRuler.TickLabelGapOffset = -3;
     hax.YRuler.TickLabelGapOffset = -0.5;
 end
 

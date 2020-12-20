@@ -14,7 +14,7 @@ use_large_bins_results = 0;
 norm_speed_ratio = 0;
 norm_dist_from_center = 0;
 use_only_center = 0;
-center_part_len = [nan 6 300];
+center_part_len = [nan 4 100];
 
 %% define output files
 res_dir = 'L:\paper_figures';
@@ -45,7 +45,7 @@ fprintf('Use only the center part of the small environment = %d\n',use_only_cent
 if use_only_center
     fprintf('\tBat small no change\n');
     fprintf('\tBat small center part length = %dm\n',center_part_len(2));
-    fprintf('\tRat small center part length = %dm\n',center_part_len(3)/100);
+%     fprintf('\tRat small center part length = %dm\n',center_part_len(3)/100);
 end
 
 
@@ -70,55 +70,55 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
 % create panels
-panel_AB_size_raster = [3 1];
-panel_AB_size_FR_map = [3 1];
-panel_AB_pos = [2 16.6];
-panel_AB = [];
+panel_A_size_raster = [3 1];
+panel_A_size_FR_map = [3 1];
+panel_A_pos = [2 16.6];
+panel_A = [];
 for ii_dataset =1:2
     for ii_example=1:5
         offset_x = (ii_example-1)*3.6;
         offset_y = (ii_dataset-1)*5.1;
-        offset = panel_AB_pos + [offset_x offset_y];
-        panel_AB(ii_dataset,ii_example,1) = axes('position', [offset+[0 2.25] panel_AB_size_FR_map]);
-        panel_AB(ii_dataset,ii_example,2) = axes('position', [offset+[0 1   ] panel_AB_size_raster]);
-        panel_AB(ii_dataset,ii_example,3) = axes('position', [offset+[0 0   ] panel_AB_size_raster]);
+        offset = panel_A_pos + [offset_x offset_y];
+        panel_A(ii_dataset,ii_example,1) = axes('position', [offset+[0 2.25] panel_A_size_FR_map]);
+        panel_A(ii_dataset,ii_example,2) = axes('position', [offset+[0 1   ] panel_A_size_raster]);
+        panel_A(ii_dataset,ii_example,3) = axes('position', [offset+[0 0   ] panel_A_size_raster]);
     end
 end
-panel_AB = flipdim(panel_AB,1);
-% now panel_AB is 2X5X3 = dataset X example X raster/FR_map
+panel_A = flipdim(panel_A,1);
+delete([panel_A(2,:,:)]);
+% now panel_AB is 1X5X3 = dataset X example X raster/FR_map
 
-panel_CDE_size = [2.3 2.3];
-panel_CDE_pos = [4 6.7];
-panel_CDE = [];
-for ii_dataset=1:3
+panel_BCD_size = [2.3 2.3];
+panel_BCD_pos = [4 6.7+8];
+panel_BCD = [];
+for ii_dataset=1:2
     for ii_feature=1:3
         offset_x = (ii_feature-1)*4;
         offset_y = (ii_dataset-1)*3;
-        offset = panel_CDE_pos + [offset_x offset_y];
-        panel_CDE(ii_dataset,ii_feature) = axes('position', [offset panel_CDE_size]);
+        offset = panel_BCD_pos + [offset_x offset_y];
+        panel_BCD(ii_dataset,ii_feature) = axes('position', [offset panel_BCD_size]);
     end
 end
-panel_CDE = flipdim(panel_CDE,1);
-% panel_B = permute(panel_B,[2 1]);
-% now panel_B is 3X3 = dataset X feature
+panel_BCD = flipdim(panel_BCD,1);
+% now panel_B is 2X3 = dataset X feature
 
-panel_FGHI_size = [2.5 2.8];
-panel_FGHI_pos = [17 2.3];
-panel_FGHI = [];
-for r=1:4
+panel_EFG_size = [2 2.8];
+panel_EFG_pos = [17 2.3+8];
+panel_EFG = [];
+for r=1:3
     for c=1:1
         offset_x = (c-1)*3.3;
         offset_y = (r-1)*3.3;
-        offset = panel_FGHI_pos + [offset_x offset_y];
-        panel_FGHI(r,c) = axes('position', [offset panel_FGHI_size]);
+        offset = panel_EFG_pos + [offset_x offset_y];
+        panel_EFG(r,c) = axes('position', [offset panel_EFG_size]);
     end
 end
-panel_FGHI = flipdim(panel_FGHI,1);
+panel_EFG = flipdim(panel_EFG,1);
 
 if norm_dist_from_center
 %     norm_dist_from_center_panels(1) = axes('position', [3  2.5 3 3]);
     norm_dist_from_center_panels(2) = axes('position', [3 2 3 3]);
-    norm_dist_from_center_panels(3) = axes('position', [9 2 3 3]);
+%     norm_dist_from_center_panels(3) = axes('position', [9 2 3 3]);
 end
 
 %% load data ==============================================================
@@ -128,16 +128,16 @@ if use_large_bins_results
     % supp fig
     datasets(1)=load(fullfile(data_dir,'cells_bat_200m.mat'));
     datasets(2)=load(fullfile(data_dir,'cells_bat_6m_binning_option3.mat'));
-    datasets(3)=load(fullfile(data_dir,'cells_rat_3m_signif+FE_bin_5cm_ker_10cm.mat'));
+%     datasets(3)=load(fullfile(data_dir,'cells_rat_3m_signif+FE_bin_5cm_ker_10cm.mat'));
 else
     % main fig 
     datasets(1)=load(fullfile(data_dir,'cells_bat_200m.mat'));
     datasets(2)=load(fullfile(data_dir,'cells_bat_6m.mat'));
-    datasets(3)=load(fullfile(data_dir,'cells_rat_3m_signif+FE.mat'));
+%     datasets(3)=load(fullfile(data_dir,'cells_rat_3m_signif+FE.mat'));
 end
-datasets(1).name = {'Bat large env.'};
-datasets(2).name = {'Bat small env.'};
-datasets(3).name = {'Rat small env.'};
+datasets(1).name = {'Large env.'};
+datasets(2).name = {'Small env.'};
+% datasets(3).name = {'Rat small env.'};
 
 % fix struct names for 6m dataset
 [datasets(2).cells.stats]  = disperse([datasets(2).cells.stats_6m]);
@@ -227,12 +227,13 @@ fprintf('\t%d\n',rat_examples_options(panel_B_opt))
 
 %% FR map + rasters - examples ============================================
 cells2 = datasets(2).cells;
-cells3 = datasets(3).cells;
+% cells3 = datasets(3).cells;
 details2=[cells2.details];
-details3=[cells3.details];
+% details3=[cells3.details];
 IX2 = cellfun(@(cell_ID)find(contains({details2.cell_ID},cell_ID)), bat_examples_options(panel_A_opt))';
-IX3 = arrayfun(@(id)find(ismember([details3.id],id)), rat_examples_options(panel_B_opt))';
-cell_examples = [cells2(IX2);cells3(IX3)];
+% IX3 = arrayfun(@(id)find(ismember([details3.id],id)), rat_examples_options(panel_B_opt))';
+% cell_examples = [cells2(IX2);cells3(IX3)];
+cell_examples = [cells2(IX2)];
 if 1
 for ii_dataset = 1:size(cell_examples,1)
     for ii_cell = 1:size(cell_examples,2)
@@ -260,7 +261,7 @@ for ii_dataset = 1:size(cell_examples,1)
         end
 
         % map+fields
-        axes(panel_AB(ii_dataset, ii_cell, 1));
+        axes(panel_A(ii_dataset, ii_cell, 1));
         cla
         hold on
         maps=[cell.FR_map.all];
@@ -303,37 +304,11 @@ for ii_dataset = 1:size(cell_examples,1)
         h.YLim = ylimits;
         h.XLim = xlimits;
         h.YRuler.TickLabelGapOffset = -1;
-%         title(cell_str,'FontSize',7,'FontWeight','normal','Interpreter','none');
-
-% % %         % cell details
-% % %         cell_num_str_pos_x   = [0.50 0.50 0.50 0.50 0.50 0.45 0.50 0.50 0.50];
-% % %         cell_num_str_pos_y   = [1.05 1.05 1.05 0.85 0.90 0.90 0.90 0.90 0.90];
-% % %         cell_stats_str_pos_x = [0.80 0.95 0.80 0.80 0.80 0.80 0.12 0.50 0.85];
-% % %         cell_stats_str_pos_y = [1.20 1.05 1.15 0.90 1.10 1.10 1.10 0.90 0.90]+0.05;
-% % %         text(cell_num_str_pos_x(ii_cell), cell_num_str_pos_y(ii_cell), "cell "+ ii_cell,...
-% % %             'Units','normalized','HorizontalAlignment','center','VerticalAlignment','bottom','FontSize',8);
-% % %         switch ii_cell
-% % %             case {1,2,3,4,5,6,7,8}
-% % %                 cell_stats_str = {  sprintf('max=%.1fm', cell.stats.all.field_largest);...
-% % %                                     sprintf('min=%.1fm', cell.stats.all.field_smallest);...
-% % %                                     sprintf('ratio=%.1f', cell.stats.all.field_ratio_LS);...
-% % %                                  };
-% % %                 text(cell_stats_str_pos_x(ii_cell), cell_stats_str_pos_y(ii_cell)-0*0.23, cell_stats_str{1},...
-% % %                     'Units','normalized','HorizontalAlignment','center','VerticalAlignment','Top','FontSize',6);
-% % %                 text(cell_stats_str_pos_x(ii_cell), cell_stats_str_pos_y(ii_cell)-1*0.23, cell_stats_str{2},...
-% % %                     'Units','normalized','HorizontalAlignment','center','VerticalAlignment','Top','FontSize',6);
-% % %                 text(cell_stats_str_pos_x(ii_cell), cell_stats_str_pos_y(ii_cell)-2*0.23, cell_stats_str{3},...
-% % %                     'Units','normalized','HorizontalAlignment','center','VerticalAlignment','Top','FontSize',6);
-% % %             case 9
-% % %                 cell_stats_str = {  sprintf('single field=%.1fm', cell.fields{1}.width_prc) };
-% % %                 text(cell_stats_str_pos_x(ii_cell), cell_stats_str_pos_y(ii_cell)-0*0.23, cell_stats_str{1},...
-% % %                     'Units','normalized','HorizontalAlignment','center','VerticalAlignment','Top','FontSize',6);
-% % %         end
 
         % rasters
         FEs = [cell.FE];
         for ii_dir=1:2
-            axes(panel_AB(ii_dataset, ii_cell, ii_dir+1));
+            axes(panel_A(ii_dataset, ii_cell, ii_dir+1));
             cla
             FE = FEs{ii_dir};
             x = [FE.spikes_pos];
@@ -391,32 +366,32 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y      ,  'Color', prm.graphics.colo
 [h.HeadLength] = disperse([5 5]);
 
 %% add x/y labels for specific panels
-for ii_dataset = 1:2
+for ii_dataset = 1:1
     for ii_cell = 1:5
-        axes(panel_AB(ii_dataset,ii_cell, 3));
+        axes(panel_A(ii_dataset,ii_cell, 3));
         xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.35]);
     end
 end
-for ii_dataset = 1:2
+for ii_dataset = 1:1
     ii_cell = 1;
-    axes(panel_AB(ii_dataset,ii_cell, 3));
-    ylabel('Lap no.',   'Units','normalized','Position',[-0.2 1]);
-    axes(panel_AB(ii_dataset,ii_cell, 1));
+    axes(panel_A(ii_dataset,ii_cell, 3));
+    ylabel('Flight no.',   'Units','normalized','Position',[-0.2 1]);
+    axes(panel_A(ii_dataset,ii_cell, 1));
     ylabel({'Firing rate';'(Hz)'},   'Units','normalized','Position',[-0.15 0.42]);
 end
-axes(panel_AB(1,1,1));
+axes(panel_A(1,1,1));
 text(-0.4,1.6, 'A', 'Units','normalized','FontWeight','bold');
-text(0.1,1.6, 'Bats - Small environment', 'Units','normalized','FontWeight','bold');
-axes(panel_AB(2,1,1));
-text(-0.4,1.6, 'B', 'Units','normalized','FontWeight','bold');
-text(0.1,1.6, 'Rats - Small environment', 'Units','normalized','FontWeight','bold');
+text(0.1,1.6, 'Small environment (6 m)', 'Units','normalized','FontWeight','bold');
+% axes(panel_A(2,1,1));
+% text(-0.4,1.6, 'B', 'Units','normalized','FontWeight','bold');
+% text(0.1,1.6, 'Rats - Small environment', 'Units','normalized','FontWeight','bold');
 
 end % if plot examples ====================================================
 
 
 
 %% ================ plot datasets histograms ========================
-fprintf('======= panels CDE: plot datasets distributions ======= \n');
+fprintf('======= panels BCD: plot datasets distributions ======= \n');
 field_num_val = [];
 field_num_grp = [];
 field_size_val = [];
@@ -552,7 +527,7 @@ for ii_dataset = 1:length(datasets)
     
     %% no. of fields
     x = field_num;
-    axes(panel_CDE(ii_dataset,1));
+    axes(panel_BCD(ii_dataset,1));
     cla('reset');
     hold on
     hh=histogram(x);
@@ -576,7 +551,7 @@ for ii_dataset = 1:length(datasets)
     hax.TickLength = [0.03 0.03];
     hax.XRuler.TickLabelGapMultiplier = -0.3;
     hax.YRuler.TickLabelGapMultiplier = 0.001;
-    if ii_dataset == 3
+    if ii_dataset == length(datasets)
         xlabel({'No. of fields per direction'},'Units','normalized','Position',[0.5 -0.18]);
     end
     ylabel('No. of cells','Units','normalized','Position',[-0.28 0.5])
@@ -591,7 +566,7 @@ for ii_dataset = 1:length(datasets)
     
     %% Field Size
     x = field_size;
-    axes(panel_CDE(ii_dataset,2));
+    axes(panel_BCD(ii_dataset,2));
     cla('reset');
     hold on
     h=histogram(x);
@@ -612,7 +587,7 @@ for ii_dataset = 1:length(datasets)
     hax.TickLength = [0.03 0.03];
     hax.XRuler.TickLabelGapMultiplier = -0.3;
     hax.YRuler.TickLabelGapMultiplier = 0.001;
-    if ii_dataset == 3
+    if ii_dataset == length(datasets)
         xlabel('Field size (m)')
     end
     ylabel('No. of fields','Units','normalized','Position',[-0.28 0.5])
@@ -637,7 +612,7 @@ for ii_dataset = 1:length(datasets)
         hax.Position([3 4]) = [1.2 1.3];
         delete(findobj(gca,'Type','Text'));
         hh = findobj(gca,'Type','Histogram');
-        hh.BinEdges = linspace(0,max(hh.Data)*1.1,6);
+        hh.BinEdges = 0:0.25:max(hh.Data)*1.1;
         hax.FontSize=6;
         hax.XLabel.String = '';
         hax.YLabel.String = '';
@@ -646,7 +621,7 @@ for ii_dataset = 1:length(datasets)
     %% ratio L/S
     x = ratio_LS;
     x2 = ratio_LS_with_1s;
-    axes(panel_CDE(ii_dataset,3));
+    axes(panel_BCD(ii_dataset,3));
     cla('reset');
     hold on
     nBinEdges = 9;
@@ -673,7 +648,7 @@ for ii_dataset = 1:length(datasets)
     hax.TickLength = [0.03 0.03];
     hax.XRuler.TickLabelGapMultiplier = -0.35;
     hax.YRuler.TickLabelGapMultiplier = 0.001;
-    if ii_dataset == 3
+    if ii_dataset == length(datasets)
         xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
     end
     ylabel('No. of cells','Units','normalized','Position',[-0.28 0.5])
@@ -708,29 +683,29 @@ for ii_dataset = 1:length(datasets)
 end
 
 % add panel letter
-axes(panel_CDE(1,1));
+axes(panel_BCD(1,1));
+text(-0.45,1.1, 'B', 'Units','normalized','FontWeight','bold');
+axes(panel_BCD(1,2));
 text(-0.45,1.1, 'C', 'Units','normalized','FontWeight','bold');
-axes(panel_CDE(1,2));
+axes(panel_BCD(1,3));
 text(-0.45,1.1, 'D', 'Units','normalized','FontWeight','bold');
-axes(panel_CDE(1,3));
-text(-0.45,1.1, 'E', 'Units','normalized','FontWeight','bold');
 
 %% add dataset title
-axes(panel_CDE(1,1));
-text(-0.9,0.5, {'Bat';'large';'environment'}, 'Units','normalized','FontWeight','bold','FontSize',9,'HorizontalAlignment','center');
-axes(panel_CDE(2,1));
-text(-0.9,0.5, {'Bat';'small';'environment'}, 'Units','normalized','FontWeight','bold','FontSize',9,'HorizontalAlignment','center');
-axes(panel_CDE(3,1));
-text(-0.9,0.5, {'Rat';'small';'environment'}, 'Units','normalized','FontWeight','bold','FontSize',9,'HorizontalAlignment','center');
+axes(panel_BCD(1,1));
+text(-0.9,0.5, {'Large';'environment';'(200 m)'}, 'Units','normalized','FontWeight','bold','FontSize',9,'HorizontalAlignment','center');
+axes(panel_BCD(2,1));
+text(-0.9,0.5, {'Small';'environment';'(6 m)'}, 'Units','normalized','FontWeight','bold','FontSize',9,'HorizontalAlignment','center');
+% axes(panel_BCD(3,1));
+% text(-0.9,0.5, {'Rat';'small';'environment'}, 'Units','normalized','FontWeight','bold','FontSize',9,'HorizontalAlignment','center');
 
 %%  ============ compare datasets distributions ============ 
-FGHI_xlimits = [0.25 3.75];
+EFG_xlimits = [0.25 2.75];
 asterisk_font_size = 11;
-fprintf('======= panels FGHI: compare datasets distributions ======= \n');
+fprintf('======= panels EFG: compare datasets distributions ======= \n');
 
 %%  No. of fields
-axes(panel_FGHI(1)); cla; hold on
-text(-0.55,1., 'F', 'Units','normalized','FontWeight','bold');
+axes(panel_EFG(1)); cla; hold on
+text(-0.55,1., 'E', 'Units','normalized','FontWeight','bold');
 n=accumarray(field_num_grp',field_num_val',[],@(x)(sum(~isnan(x))));
 x=unique(field_num_grp);
 y=accumarray(field_num_grp',field_num_val',[],@mean);
@@ -740,7 +715,8 @@ h = errorbar(x,y,err);
 h.Color = [0 0 0];                            
 h.LineStyle = 'none';  
 hax=gca;
-hax.XLim = FGHI_xlimits;
+hax.XLim = EFG_xlimits;
+hax.YLim = [0 6];
 hax.XTick=1:length(datasets);
 hax.XTickLabel=[];
 hax.YRuler.TickLabelGapOffset = 1;
@@ -752,23 +728,23 @@ ylabel('No. of fields per direction');
 % signif test
 X1 = field_num_val(field_num_grp==1);
 X2 = field_num_val(field_num_grp==2);
-X3 = field_num_val(field_num_grp==3);
+% X3 = field_num_val(field_num_grp==3);
 [~,pval12,~,tstat12] = ttest2(X1,X2,'tail','right');
-[~,pval13,~,tstat13] = ttest2(X1,X3,'tail','right');
+% [~,pval13,~,tstat13] = ttest2(X1,X3,'tail','right');
 pval12_rank = ranksum(X1,X2,'tail','right');
-pval13_rank = ranksum(X1,X3,'tail','right');
+% pval13_rank = ranksum(X1,X3,'tail','right');
 fprintf('Field num 1 vs. 2: ttest p=%.4g df=%d, ranksum p=%.4g\n',pval12, tstat12.df, pval12_rank);
-fprintf('Field num 1 vs. 3: ttest p=%.4g df=%d, ranksum p=%.4g\n',pval13, tstat13.df, pval13_rank);
+% fprintf('Field num 1 vs. 3: ttest p=%.4g df=%d, ranksum p=%.4g\n',pval13, tstat13.df, pval13_rank);
 str12 = signif_astricks(pval12);
-str13 = signif_astricks(pval13);
-plot([1 2],5.7*[1 1],'k-')
-plot([1 3],6.5*[1 1],'k-')
+% str13 = signif_astricks(pval13);
+plot([1 2],5.7*[1 1],'k-','Clipping','off')
+% plot([1 3],6.5*[1 1],'k-','Clipping','off')
 text(1.5,  5.9,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
-text(2,    6.7,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
+% text(2,    6.7,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
 
 %%  fields size
-axes(panel_FGHI(2)); cla; hold on
-text(-0.55,1., 'G', 'Units','normalized','FontWeight','bold');
+axes(panel_EFG(2)); cla; hold on
+text(-0.55,1., 'F', 'Units','normalized','FontWeight','bold');
 n=accumarray(field_size_grp',field_size_val',[],@(x)(sum(~isnan(x))));
 x=unique(field_size_grp);
 y=accumarray(field_size_grp',field_size_val',[],@mean);
@@ -778,7 +754,8 @@ h = errorbar(x,y,err);
 h.Color = [0 0 0];                            
 h.LineStyle = 'none';  
 hax=gca;
-hax.XLim = FGHI_xlimits;
+hax.XLim = EFG_xlimits;
+hax.YLim = [0 6.5];
 hax.XTick=1:length(datasets);
 hax.XTickLabel=[];
 hax.YRuler.TickLabelGapOffset = 1;
@@ -790,64 +767,64 @@ ylabel('Field size (m)');
 % signif test
 X1 = field_size_val(field_size_grp==1);
 X2 = field_size_val(field_size_grp==2);
-X3 = field_size_val(field_size_grp==3);
+% X3 = field_size_val(field_size_grp==3);
 [~,pval12,~,tstat12] = ttest2(X1,X2,'tail','right');
-[~,pval13,~,tstat13] = ttest2(X1,X3,'tail','right');
+% [~,pval13,~,tstat13] = ttest2(X1,X3,'tail','right');
 pval12_rank = ranksum(X1,X2,'tail','right');
-pval13_rank = ranksum(X1,X3,'tail','right');
+% pval13_rank = ranksum(X1,X3,'tail','right');
 fprintf('Field size 1 vs. 2: ttest p=%.4g df=%d, ranksum p=%.4g\n',pval12, tstat12.df, pval12_rank);
-fprintf('Field size 1 vs. 3: ttest p=%.4g df=%d, ranksum p=%.4g\n',pval13, tstat13.df, pval13_rank);
+% fprintf('Field size 1 vs. 3: ttest p=%.4g df=%d, ranksum p=%.4g\n',pval13, tstat13.df, pval13_rank);
 str12 = signif_astricks(pval12);
-str13 = signif_astricks(pval13);
-plot([1 2],6.3*[1 1],'k-')
-plot([1 3],7.1*[1 1],'k-')
+% str13 = signif_astricks(pval13);
+plot([1 2],6.3*[1 1],'k-','Clipping','off')
+% plot([1 3],7.1*[1 1],'k-','Clipping','off')
 text(1.5,  6.5,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
-text(2,    7.3,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
+% text(2,    7.3,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
 
 %%  field size CV
-axes(panel_FGHI(3)); cla; hold on
-text(-0.55,1., 'H', 'Units','normalized','FontWeight','bold');
-[CV,CI,SD,SEM] = splitapply(@(X)CV_BS(X,nboot,alpha), field_size_val', field_size_grp');
-x = unique(field_size_grp);
-y = CV;
-switch CV_err_bar
-    case 'CI'
-        err1 = CV-CI(:,1);
-        err2 = CI(:,2)-CV;
-    case 'SEM'
-        err1 = SEM;
-        err2 = SEM;
-    case 'SD'
-        err1 = SD;
-        err2 = SD;
-end
-bar(x,y,'FaceColor',0.5*[1 1 1]);
-h = errorbar(x,y,err1,err2);
-h.Color = [0 0 0];                            
-h.LineStyle = 'none';  
-hax=gca;
-hax.XLim = FGHI_xlimits;
-hax.XTick=1:length(datasets);
-hax.XTickLabel=[];
-hax.YRuler.TickLabelGapOffset = 1;
-ylabel({'Field size';'coefficient of variation'});
-% signif test
-z12 = (y(1)-y(2)) / sqrt(SD(1)^2+SD(2)^2);
-z13 = (y(1)-y(3)) / sqrt(SD(1)^2+SD(3)^2);
-pval12 = 1-normcdf(z12,0,1);
-pval13 = 1-normcdf(z13,0,1);
-str12 = signif_astricks(pval12);
-str13 = signif_astricks(pval13);
-fprintf('Field size CV 1 vs. 2 (bootstrap): z-test p=%.4g z=%.4g\n',pval12,z12);
-fprintf('Field size CV 1 vs. 3 (bootstrap): z-test p=%.4g z=%.4g\n',pval13,z13);
-plot([1 2],0.75*[1 1],'k-')
-plot([1 3],0.85*[1 1],'k-')
-text(1.5,0.77,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
-text(2,0.87,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
+% % % % % % % % axes(panel_EFG(3)); cla; hold on
+% % % % % % % % text(-0.55,1., 'G', 'Units','normalized','FontWeight','bold');
+% % % % % % % % [CV,CI,SD,SEM] = splitapply(@(X)CV_BS(X,nboot,alpha), field_size_val', field_size_grp');
+% % % % % % % % x = unique(field_size_grp);
+% % % % % % % % y = CV;
+% % % % % % % % switch CV_err_bar
+% % % % % % % %     case 'CI'
+% % % % % % % %         err1 = CV-CI(:,1);
+% % % % % % % %         err2 = CI(:,2)-CV;
+% % % % % % % %     case 'SEM'
+% % % % % % % %         err1 = SEM;
+% % % % % % % %         err2 = SEM;
+% % % % % % % %     case 'SD'
+% % % % % % % %         err1 = SD;
+% % % % % % % %         err2 = SD;
+% % % % % % % % end
+% % % % % % % % bar(x,y,'FaceColor',0.5*[1 1 1]);
+% % % % % % % % h = errorbar(x,y,err1,err2);
+% % % % % % % % h.Color = [0 0 0];                            
+% % % % % % % % h.LineStyle = 'none';  
+% % % % % % % % hax=gca;
+% % % % % % % % hax.XLim = EFG_xlimits;
+% % % % % % % % hax.XTick=1:length(datasets);
+% % % % % % % % hax.XTickLabel=[];
+% % % % % % % % hax.YRuler.TickLabelGapOffset = 1;
+% % % % % % % % ylabel({'Field size';'coefficient of variation'});
+% % % % % % % % % signif test
+% % % % % % % % z12 = (y(1)-y(2)) / sqrt(SD(1)^2+SD(2)^2);
+% % % % % % % % % z13 = (y(1)-y(3)) / sqrt(SD(1)^2+SD(3)^2);
+% % % % % % % % pval12 = 1-normcdf(z12,0,1);
+% % % % % % % % pval13 = 1-normcdf(z13,0,1);
+% % % % % % % % str12 = signif_astricks(pval12);
+% % % % % % % % str13 = signif_astricks(pval13);
+% % % % % % % % fprintf('Field size CV 1 vs. 2 (bootstrap): z-test p=%.4g z=%.4g\n',pval12,z12);
+% % % % % % % % % fprintf('Field size CV 1 vs. 3 (bootstrap): z-test p=%.4g z=%.4g\n',pval13,z13);
+% % % % % % % % plot([1 2],0.75*[1 1],'k-','Clipping','off')
+% % % % % % % % % plot([1 3],0.85*[1 1],'k-','Clipping','off')
+% % % % % % % % text(1.5,0.77,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
+% % % % % % % % % text(2,0.87,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
 
 %%  L/S ratio
-axes(panel_FGHI(4)); cla; hold on
-text(-0.55,1., 'I', 'Units','normalized','FontWeight','bold');
+axes(panel_EFG(3)); cla; hold on
+text(-0.55,1., 'G', 'Units','normalized','FontWeight','bold');
 n=accumarray(ratio_LS_with_1s_grp',ratio_LS_with_1s_val',[],@(x)(sum(~isnan(x))));
 x=unique(ratio_LS_with_1s_grp);
 y=accumarray(ratio_LS_with_1s_grp',ratio_LS_with_1s_val',[],@mean);
@@ -857,7 +834,10 @@ h = errorbar(x,y,err);
 h.Color = [0 0 0];                            
 h.LineStyle = 'none';  
 hax=gca;
-hax.XLim = FGHI_xlimits;
+hax.YLim(1) = 1; % ratio cannot be < 1
+hax.YLim(2) = 4.5;
+hax.YTick = 0:10;
+hax.XLim = EFG_xlimits;
 hax.XTick=1:length(datasets);
 hax.XTickLabel=string({datasets.name});
 hax.XTickLabelRotation = 45;
@@ -878,19 +858,19 @@ ylabel({'Field size ratio';'largest/smallest'});
 % signif test
 X1 = ratio_LS_with_1s_val(ratio_LS_with_1s_grp==1);
 X2 = ratio_LS_with_1s_val(ratio_LS_with_1s_grp==2);
-X3 = ratio_LS_with_1s_val(ratio_LS_with_1s_grp==3);
+% X3 = ratio_LS_with_1s_val(ratio_LS_with_1s_grp==3);
 [~,pval12,~,tstat12] = ttest2(X1,X2,'tail','right');
-[~,pval13,~,tstat13] = ttest2(X1,X3,'tail','right');
+% [~,pval13,~,tstat13] = ttest2(X1,X3,'tail','right');
 pval12_rank = ranksum(X1,X2,'tail','right');
-pval13_rank = ranksum(X1,X3,'tail','right');
+% pval13_rank = ranksum(X1,X3,'tail','right');
 fprintf('L/S ratio 1 vs. 2: ttest p=%.4g df=%d, ranksum p=%.4g\n',pval12, tstat12.df, pval12_rank);
-fprintf('L/S ratio 1 vs. 3: ttest p=%.4g df=%d, ranksum p=%.4g\n',pval13, tstat13.df, pval13_rank);
+% fprintf('L/S ratio 1 vs. 3: ttest p=%.4g df=%d, ranksum p=%.4g\n',pval13, tstat13.df, pval13_rank);
 str12 = signif_astricks(pval12);
-str13 = signif_astricks(pval13);
-plot([1 2],4.5*[1 1],'k-')
-plot([1 3],5.1*[1 1],'k-')
-text(1.5,4.7,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
-text(2,5.3,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
+% str13 = signif_astricks(pval13);
+plot([1 2],4.5*[1 1],'k-','Clipping','off')
+% plot([1 3],5.1*[1 1],'k-','Clipping','off')
+text(1.5,4.6,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
+% text(2,5.3,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
 
 %% print/save the figure
 file_out = fig_name_str;

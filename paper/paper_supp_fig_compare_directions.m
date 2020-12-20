@@ -4,10 +4,17 @@
 clear 
 clc
 
+%% params
+color_by_bat = 0;
+panel_C_avg = 'median';
+% panel_C_avg = 'mean';
+% panel_D_scale = 'linear';
+panel_D_scale = 'log';
+
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_supp_compare_directions';
+fig_name_str = 'fig_S9';
 fig_caption_str = 'compare firing patterns between flight directions';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -45,13 +52,12 @@ set(groot,  'defaultAxesTickDirMode', 'manual');
 annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
-color_by_bat = 0;
-
 % create panels
 panels_size = [4 4];
-panel_A = axes('position', [ 2   20 panels_size]);
-panel_B = axes('position', [ 7.5 20 panels_size]);
-panel_C = axes('position', [13   20 panels_size]);
+panel_A = axes('position', [ 5  20 panels_size]);
+panel_B = axes('position', [11  20 panels_size]);
+panel_C = axes('position', [ 5  14 panels_size]);
+panel_D = axes('position', [11  14 panels_size]);
 if color_by_bat
     panel_legend_bat_colors = axes('position', [17 20 3 4]);
 end
@@ -67,17 +73,16 @@ cells = [cells{:}];
 cells = [cells.details];
 cells(~contains({cells.brain_area}, 'CA1')) = [];
 cells(~ismember([cells.ClusterQuality], [2])) = [];
-cells = cellfun(@(c)(cell_load_data(c,'details','stats')), {cells.cell_ID}, 'UniformOutput',0);
+cells = cellfun(@(c)(cell_load_data(c,'details','meanFR')), {cells.cell_ID}, 'UniformOutput',0);
 cells = [cells{:}];
 cells_details = [cells.details];
 cells_ID = {cells_details.cell_ID};
-stats = [cells.stats];
-stats = [stats.all];
-cells_ID([stats.meanFR_all]>prm.inclusion.interneuron_FR_thr)=[];
-clear cells stats cells_details cells_t
-cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','inclusion','signif','fields','FR_map')), cells_ID, 'UniformOutput',0);
+meanFR = [cells.meanFR];
+cells_ID([meanFR.all]>prm.inclusion.interneuron_FR_thr)=[];
+clear cells stats cells_details cells_t meanFR
+cells = cellfun(@(c)(cell_load_data(c,'details','stats','meanFR','stats','signif','fields')), cells_ID, 'UniformOutput',0);
+% cells = cellfun(@(c)(cell_load_data(c,'details')), cells_ID, 'UniformOutput',0);
 cells = [cells{:}];
-whos cells
 
 %% get population stats
 pop_stats = cat(1,cells.stats);
@@ -111,11 +116,49 @@ if color_by_bat
     set(gca,'Visible','off')
 end 
 
-%% panel A - number of fields
+
+%% panel A - spatial info
 axes(panel_A);
 cla
 hold on
 text(-0.2,1.13, 'A', 'Units','normalized','FontWeight','bold');
+
+x = [pop_stats_dir(signif_both_dir_IX,1).SI_bits_spike];
+y = [pop_stats_dir(signif_both_dir_IX,2).SI_bits_spike];
+c = cat(1,pop_bat_color{signif_both_dir_IX});
+h=scatter(x,y,5,c,'filled');
+
+[r,rpval] = corr(x',y','type','Pearson');
+[rho,rhopval] = corr(x',y','type','Spearman');
+if rhopval==0
+    rhopval = realmin;
+end
+[~,P_ttest] = ttest(x,y);
+[P_ranksum,~,STATS_ranksum] = ranksum(x,y);
+[P_signtest,~,STATS_signtest] = signtest(x,y);
+stats_str = {[sprintf('%s = %.2g','\rho',rho), ',  ' sprintf('P_{%s} = %.2g','\rho',rhopval)];...
+              sprintf('P_{wilc} = %.3g',P_ranksum);};
+text(0.06,1, stats_str, 'units',...
+    'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+text(0.95,0.2, "n = "+sum(~any(isnan([x;y]))), 'units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1});
+ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2});
+title('Spatial information','units','normalized','Position',[0.5 1.05])
+axis equal
+hax=gca;
+hax.XLim = ([0 max([x y])+1]);
+hax.YLim = ([0 max([x y])+1]);
+hax.XTick = 1:6;
+hax.YTick = hax.XTick;
+hax.TickLength = [0.02 0.02];
+h=refline(1,0);
+h.Color = 0.5*[1 1 1];
+
+%% panel B - number of fields
+axes(panel_B);
+cla
+hold on
+text(-0.2,1.13, 'B', 'Units','normalized','FontWeight','bold');
 
 x = [pop_stats_dir(signif_both_dir_IX,1).field_num];
 y = [pop_stats_dir(signif_both_dir_IX,2).field_num];
@@ -126,13 +169,18 @@ h=scatter(  x+plot_jitter_sigma*randn(size(x)),...
             y+plot_jitter_sigma*randn(size(y)),5,c,'filled');
 
 [r,rpval] = corr(x',y','type','Pearson');
-% [rho,rhopval] = corr(x',y','type','Spearman');
-% signtest_pval = signtest(x,y);
-% stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
-%                 sprintf('rho=%.2f,P=%g',rho,rhopval);
-%                 sprintf('sign test: P=%g',signtest_pval)};
-stats_str = {sprintf('r=%.2g',r); sprintf('P=%.2g',rpval)};
-text(0.1,0.95, stats_str, 'units','normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+[rho,rhopval] = corr(x',y','type','Spearman');
+if rhopval==0
+    rhopval = realmin;
+end
+[~,P_ttest] = ttest(x,y);
+[P_ranksum,~,STATS_ranksum] = ranksum(x,y);
+[P_signtest,~,STATS_signtest] = signtest(x,y);
+stats_str = {[sprintf('%s = %.2g','\rho',rho), ',  ' sprintf('P_{%s} = %.2g','\rho',rhopval)];...
+              sprintf('P_{wilc} = %.2g',P_ranksum);};
+text(0.06,1, stats_str, 'units',...
+    'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+text(0.95,0.2, "n = "+sum(~any(isnan([x;y]))), 'units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 
 xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1});
 ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2});
@@ -140,73 +188,108 @@ title('No. of fields','units','normalized','Position',[0.5 1.05])
 axis equal
 xlim([0 20])
 ylim([0 20])
+hax=gca;
+hax.XScale = 'linear';
+hax.YScale = 'linear';
+% hax.XScale = 'log';
+% hax.YScale = 'log';
+hax.XTick = [0:5:20];
+hax.YTick = [0:5:20];
+hax.TickLength = [0.02 0.02];
+
 h=refline(1,0);
 h.Color = 0.5*[1 1 1];
 
-%% panel B - Fields Size (median)
-axes(panel_B);
-cla
-hold on
-text(-0.2,1.13, 'B', 'Units','normalized','FontWeight','bold');
-
-x = [pop_stats_dir(signif_both_dir_IX,1).field_size_median];
-y = [pop_stats_dir(signif_both_dir_IX,2).field_size_median];
-c = cat(1,pop_bat_color{signif_both_dir_IX});
-h=scatter(x,y,5,c,'filled');
-
-[r,rpval] = corr(x',y','type','Pearson','rows','complete');
-% [rho,rhopval] = corr(x',y','type','Spearman','rows','complete');
-% signtest_pval = signtest(x,y);
-% stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
-%                 sprintf('rho=%.2f,P=%g',rho,rhopval);
-%                 sprintf('sign test: P=%g',signtest_pval)};
-stats_str = {sprintf('r=%.2g',r); sprintf('P=%.2g',rpval)};
-text(0.1,0.95, stats_str, 'units',...
-    'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
-
-
-xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1});
-ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2});
-title('Field size (median per neuron)','units','normalized','Position',[0.5 1.05])
-axis equal
-xlim([0 max([x y])+1])
-ylim([0 max([x y])+1])
-h=refline(1,0);
-h.Color = 0.5*[1 1 1];
-
-%% panel C - spatial info
+%% panel C - Fields Size (median)
 axes(panel_C);
 cla
 hold on
 text(-0.2,1.13, 'C', 'Units','normalized','FontWeight','bold');
 
-x = [pop_stats_dir(signif_both_dir_IX,1).SI_bits_spike];
-y = [pop_stats_dir(signif_both_dir_IX,2).SI_bits_spike];
+switch panel_C_avg
+    case 'mean'
+        x = [pop_stats_dir(signif_both_dir_IX,1).field_size_mean];
+        y = [pop_stats_dir(signif_both_dir_IX,2).field_size_mean];
+        title_str = 'Mean field size';
+    case 'median'
+        x = [pop_stats_dir(signif_both_dir_IX,1).field_size_median];
+        y = [pop_stats_dir(signif_both_dir_IX,2).field_size_median];
+        title_str = 'Median field size';
+end
 c = cat(1,pop_bat_color{signif_both_dir_IX});
 h=scatter(x,y,5,c,'filled');
 
 [r,rpval] = corr(x',y','type','Pearson');
-% [rho,rhopval] = corr(x',y','type','Spearman');
-% signtest_pval = signtest(x,y);
-% stats_str = {   sprintf('r=%.2f,P=%g',r,rpval);
-%                 sprintf('rho=%.2f,P=%g',rho,rhopval);
-%                 sprintf('sign test: P=%g',signtest_pval)};
-stats_str = {sprintf('r=%.2g',r); sprintf('P=%.2g',rpval)};
-text(0.1,0.95, stats_str, 'units',...
+[rho,rhopval] = corr(x',y','type','Spearman');
+if rhopval==0
+    rhopval = realmin;
+end
+[~,P_ttest] = ttest(x,y);
+[P_ranksum,~,STATS_ranksum] = ranksum(x,y);
+[P_signtest,~,STATS_signtest] = signtest(x,y);
+stats_str = {[sprintf('%s = %.2g','\rho',rho), ',  ' sprintf('P_{%s} = %.2g','\rho',rhopval)];...
+              sprintf('P_{wilc} = %.3g',P_ranksum);};
+text(0.06,1, stats_str, 'units',...
     'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+text(0.95,0.2, "n = "+sum(~any(isnan([x;y]))), 'units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 
 xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1});
 ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2});
-title('Spatial information','units','normalized','Position',[0.5 1.05])
+title(title_str,'units','normalized','Position',[0.5 1.05])
 axis equal
 xlim([0 max([x y])+1])
 ylim([0 max([x y])+1])
+h=refline(1,0);
+h.Color = 0.5*[1 1 1];
+
+%% panel D - Field size ratio (per direction)
+axes(panel_D);
+cla
+hold on
+text(-0.2,1.13, 'D', 'Units','normalized','FontWeight','bold');
+
+x = [pop_stats_dir(signif_both_dir_IX,1).field_ratio_LS];
+y = [pop_stats_dir(signif_both_dir_IX,2).field_ratio_LS];
+c = cat(1,pop_bat_color{signif_both_dir_IX});
+h=scatter(x,y,5,c,'filled');
+
+[r,rpval] = corr(x',y','type','Pearson','rows','complete');
+[rho,rhopval] = corr(x',y','type','Spearman','rows','complete');
+if rhopval==0
+    rhopval = realmin;
+end
+[~,P_ttest] = ttest(x,y);
+[P_ranksum,~,STATS_ranksum] = ranksum(x,y);
+[P_signtest,~,STATS_signtest] = signtest(x,y);
+stats_str = {[sprintf('%s = %.2g','\rho',rho), ',  ' sprintf('P_{%s} = %.2g','\rho',rhopval)];...
+              sprintf('P_{wilc} = %.2g',P_ranksum);};
+text(0.06,1, stats_str, 'units',...
+    'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
+text(1.05,0.28, "n = "+sum(~any(isnan([x;y]))), 'units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+
+xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1});
+ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2});
+title('Field size ratio','units','normalized','Position',[0.5 1.05])
+axis equal
+xlim([1 max([x y])+1])
+ylim([1 max([x y])+1])
+hax=gca;
+hax.XScale = panel_D_scale;
+hax.YScale = panel_D_scale;
+hax.XTick = [1 10];
+hax.YTick = [1 10];
+hax.TickLength = [0.02 0.02];
 h=refline(1,0);
 h.Color = 0.5*[1 1 1];
 
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, fig_name_str);
+fig_name_out = [fig_name_out '_panel_C_' panel_C_avg];
+fig_name_out = [fig_name_out '_panel_D_' panel_D_scale];
+if color_by_bat
+    fig_name_out = [fig_name_out '_color_by_bat'];
+end
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');

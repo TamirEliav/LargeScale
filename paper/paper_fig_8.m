@@ -1,11 +1,11 @@
 %% Large Scale - Fig. 8 - Theoretical analysis (mechanism)
 
 %%
-% clear 
+clear 
 clc
 
 %%
-% paper_fig_8_arrange_sim_data
+paper_fig_8_arrange_sim_data
 data = paper_fig_8_arrange_real_data;
 
 
@@ -301,11 +301,13 @@ plot(xnField,pnFieldM,'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
 plot(xnField,squeeze(pnFieldXs(1,1,:))','-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
 h=histogram(data.field_num);
 h.DisplayStyle = 'stairs';
-h.BinEdges = xnField;
+% h.BinEdges = xnField;
+h.BinWidth = 1;
 % h.Data(h.Data > xlimits(2)) = xlimits(2);
 h.Normalization = 'pdf';
 h.EdgeColor = 'k';
 hax=gca;
+hax.XScale = 'linear';
 hax.YScale = 'log';
 hax.XLim = xlimits+[0 1];
 hax.YLim = [2e-3 0.23];
@@ -315,6 +317,7 @@ hax.XAxis.TickLength(1) = 0.025;
 hax.YAxis.TickLength(1) = 0.025;
 hax.YMinorTick = 'on';
 hax.XRuler.TickLabelGapOffset = -1;
+hax.YRuler.TickLabelGapOffset = 1;
 xlabel({'No. of fields';'per direction'},'Units','normalized','Position',[0.5 -0.18]);
 ylabel({'Probability';'density function'},'Units','normalized','Position',[-0.45 0.5]);
 
@@ -325,7 +328,8 @@ plot(xField,pFieldSizeM,'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
 plot(xField,squeeze(pFieldSizeXs(1,1,:))','-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
 h=histogram(data.field_size);
 h.DisplayStyle = 'stairs';
-h.BinEdges = xnField;
+% h.BinEdges = xField;
+h.BinWidth = 1;
 h.Data(h.Data > xlimits(2)) = xlimits(2);
 h.Normalization = 'pdf';
 h.EdgeColor = 'k';
@@ -339,30 +343,39 @@ hax.XAxis.TickLength(1) = 0.025;
 hax.YAxis.TickLength(1) = 0.025;
 hax.YMinorTick = 'on';
 hax.XRuler.TickLabelGapOffset = -1;
+hax.YRuler.TickLabelGapOffset = 1;
 xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.18]);
 % ylabel('PDF','Units','normalized','Position',[-0.3 0.5]);
 
 axes(panel_F(3)); cla; hold on;
-xlimits = [0 30];
+xlimits = [1 27];
 plot(xMaxMinRatio,pMaxMinRatioS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 plot(xMaxMinRatio,pMaxMinRatioM,'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
 plot(xMaxMinRatio,squeeze(pMaxMinRatioXs(1,1,:))','-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
+nBinEdges = 9;
+edges = logspace(0,log10(25),nBinEdges);
 h=histogram(data.ratio_LS);
 h.DisplayStyle = 'stairs';
-h.BinEdges = xnField;
+% h.DisplayStyle = 'bar';
+% h.BinEdges = xnField;
+h.BinEdges = edges;
 h.Data(h.Data > xlimits(2)) = xlimits(2);
 h.Normalization = 'pdf';
 h.EdgeColor = 'k';
+% h.FaceColor = 0.5*[1 1 1];
 hax=gca;
+hax.XScale = 'log';
 hax.YScale = 'log';
 hax.XLim = xlimits;
-hax.YLim = [3e-3 0.22];
-hax.XTick = [0:10:40];
+hax.YLim = [5e-4 0.22];
+% hax.XTick = [0:10:40];
+hax.XTick = [1 2 5 10 20];
 hax.YTick = 10.^[-4 -3 -2 -1];
 hax.XAxis.TickLength(1) = 0.025;
 hax.YAxis.TickLength(1) = 0.025;
 hax.YMinorTick = 'on';
 hax.XRuler.TickLabelGapOffset = -1;
+hax.YRuler.TickLabelGapOffset = 1;
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
 % ylabel('PDF','Units','normalized','Position',[-0.3 0.5]);
 
@@ -420,26 +433,26 @@ xtick = mean(reshape(x,2,[]));
 %     {{'model'}, {'CA3 model'}, {'CA3 model'}},...
 %     'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
 
-text(1.5,-1.3, 'MEC', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
-text(2.1,-1.43, 'model', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+text(1.1,-1.45, 'Single-field', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+text(1.8,-1.6, 'CA3 model', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
 text(4.1,-1.45, 'Multi-field', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
 text(4.8,-1.6, 'CA3 model', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
-text(7.1,-1.45, 'Single-field', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
-text(7.8,-1.6, 'CA3 model', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+text(7.5,-1.3, 'MEC', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
+text(8.1,-1.43, 'model', 'Rotation',45, 'Fontsize',7,'HorizontalAlignment','Center');
 
 % add signif lines and aestricks
 lw=1;
-plot(xtick(1)+[-0.6 0.6], [1 1 ]*0.5, '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick(1)+[-0.6 0.6], [1 1 ]*1.1, '-k', 'LineWidth',lw, 'Clipping','off');
 plot(xtick(2)+[-0.6 0.6], [1 1 ]*0.5, '-k', 'LineWidth',lw, 'Clipping','off');
-plot(xtick(3)+[-0.6 0.6], [1 1 ]*1.1, '-k', 'LineWidth',lw, 'Clipping','off');
-plot(xtick([3 1])+[0.15 0], [1 1]*1.50, '-k', 'LineWidth',lw, 'Clipping','off');
-plot(xtick([3 2])-[0.15 0], [1 1]*1.25, '-k', 'LineWidth',lw, 'Clipping','off');
-plot(xtick([1 1]), [0.5 1.50], '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick(3)+[-0.6 0.6], [1 1 ]*0.5, '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick([1 2])+[0.15 0], [1 1]*1.25, '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick([1 3])-[0.15 0], [1 1]*1.50, '-k', 'LineWidth',lw, 'Clipping','off');
 plot(xtick([2 2]), [0.5 1.25], '-k', 'LineWidth',lw, 'Clipping','off');
-plot(xtick([3 3])+0.15, [1.1 1.50], '-k', 'LineWidth',lw, 'Clipping','off');
-plot(xtick([3 3])-0.15, [1.1 1.25], '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick([3 3]), [0.5 1.50], '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick([1 1])-0.15, [1.1 1.50], '-k', 'LineWidth',lw, 'Clipping','off');
+plot(xtick([1 1])+0.15, [1.1 1.25], '-k', 'LineWidth',lw, 'Clipping','off');
+text([1 1]*mean(xtick([1 2])),[1 1]*1.32, '*****','fontSize',11,'HorizontalAlignment','center');
 text([1 1]*mean(xtick([1 3])),[1 1]*1.58, '*****','fontSize',11,'HorizontalAlignment','center');
-text([1 1]*mean(xtick([2 3])),[1 1]*1.32, '*****','fontSize',11,'HorizontalAlignment','center');
 
 h.YLim = ylimits;
 h.XTick = xtick;
@@ -452,7 +465,7 @@ h.XRuler.TickLabelGapMultiplier = -0.3;
 h.YRuler.TickLabelGapMultiplier = 0.001;
 
 % legend
-offset_x = 6;
+offset_x = 0;
 offset_y = -1.4;
 patch([1 1 1.5 1.5]+offset_x, [0 .1 .1 0]+1.0+offset_y, 0.0*[1 1 1], 'Clipping','off');
 patch([1 1 1.5 1.5]+offset_x, [0 .1 .1 0]+0.7+offset_y, 0.6*[1 1 1], 'Clipping','off');
@@ -612,13 +625,18 @@ for ii_seg=1:size(seg,1)
 end
 % cell locations on the attractors
 smb = '^*dov<>phx+s';
-for ii_cell = 1:length(cell_examples_IX)
+% I flipped the order so cell 2 (green) will be on top of cell 4 (magenta)
+for ii_cell = flip(1:length(cell_examples_IX))
     cell_num = cell_examples_IX(ii_cell);
     [r,c]=find(ind==cell_num);
     for ii_net = 1:length(c)
         net = c(ii_net);
         bn = th(r(ii_net),net);
         loc = bn * bin_size;
+        % graphical manual jitter to avoid occlusion between cells 2 and 4:
+        if ii_cell==2 && net==8
+            loc = loc+1;
+        end
         h=plot(loc,levels(net),smb(ii_cell),'Color',clr(ii_cell,:),'MarkerSize',4);
         h.MarkerFaceColor = clr(ii_cell,:);
     end
@@ -673,13 +691,14 @@ hax.Visible = 'off';
 
 %% cell examples 
 locs = linspace(0,200,size(m,1));
+run = size(m,3);
 if multiple_panels
 
     for ii_cell = 1:length(panel_B)
         axes(panel_B(ii_cell));
         cla('reset')
         hold on
-        run=10;
+        
         plot(locs, m(:,cell_examples_IX(ii_cell),run),'LineWidth',1.5,'Color', clr(ii_cell,:));
         text(0.01,0.85,"Cell "+ii_cell,'Units','normalized','FontSize',8);
 %         text(0.01,0.85,"Cell "+cell_examples_IX(ii_cell),'Units','normalized','FontSize',8);
@@ -703,7 +722,6 @@ else % single panel
     cla('reset')
     hold on
     text(-0.1,1.05, 'H', 'Units','normalized','FontWeight','bold');
-    run=10;
     hl=plot(locs,m(:,cell_examples_IX,run),'LineWidth',2);
     for ii_hl = 1:length(hl)
         hl(ii_hl).Color = clr(ii_hl,:);
@@ -718,6 +736,9 @@ else % single panel
     
 end
 
+%%
+CANN_hist_clr = [0.55 0.5 0.45];
+
 %% field num
 axes(panel_C(1));
 cla('reset')
@@ -726,7 +747,7 @@ text(-0.45,1.2, 'C', 'Units','normalized','FontWeight','bold');
 h=histogram(res.fnumber);
 h.Normalization = 'probability';
 h.BinEdges = 0.5+[0:5];
-h.FaceColor = 0.5*[1 1 1];
+h.FaceColor = CANN_hist_clr;
 xlabel({'No. of fields per direction'},'Units','normalized','Position',[0.5 -0.18]);
 ylabel('Fraction of cells','Units','normalized','Position',[-0.3 0.5])
 hax=gca;
@@ -745,13 +766,10 @@ hold on
 
 h=histogram(res.fsizes_all.*bin_size);
 h.Normalization = 'probability';
-h.FaceColor = 0.5*[1 1 1];
-h.EdgeColor = 'none';
+h.FaceColor = CANN_hist_clr;
+h.BinWidth = 1;
+% text(0.5,1,sprintf('bin=%.1fm',h.BinWidth),'Units','normalized','FontSize',8);
 
-h=histogram(res.fsizes_all.*bin_size);
-h.Normalization = 'probability';
-h.DisplayStyle = 'stairs';
-h.EdgeColor = 'k';
 xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.18]);
 ylabel('Fraction of fields','Units','normalized','Position',[-0.3 0.5]);
 hax=gca;
@@ -768,18 +786,23 @@ axes(panel_C(3));
 cla('reset')
 hold on
 h=histogram(res.sratio);
+nbins = 40;
+h.BinEdges = logspace(0,2,nbins);
 h.Normalization = 'pdf';
-h.FaceColor = 0.5*[1 1 1];
+h.FaceColor = CANN_hist_clr;
+% text(0.5,1,sprintf('nbins=%d',nbins),'Units','normalized','FontSize',8);
+
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
 ylabel('Fraction of cells','Units','normalized','Position',[-0.3 0.5]);
-xlim([0 20])
 hax=gca;
 hax.XScale = 'log';
 hax.YScale = 'log';
 % hax.XTick=[];
 % hax.YTick=[];
 hax.XLim = [0 20];
-hax.YLim = [1e-3 3e-1];
+hax.XLim(2) = h.BinEdges(find(h.BinEdges>hax.XLim(2),1,'first'));
+hax.YLim = [1e-3 3e0];
+% hax.XTick = [1 2 5 10 20];
 hax.YTick = 10.^[-3 -2 -1 0];
 hax.TickLength = [0.03 0.03];
 hax.XRuler.TickLabelGapOffset = -.5;

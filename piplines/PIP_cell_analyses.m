@@ -41,7 +41,7 @@ cells(~ismember([cells.ClusterQuality], [2])) = [];
 cells_t = cells_t({cells.cell_ID},:);
 end
 
-%% filter cells - mean FR
+%% filter cells - mean FR (=interneurons)
 if 1
 cells = cellfun(@(c)(cell_load_data(c,'meanFR')), cells_t.cell_ID, 'UniformOutput',0);
 cells = [cells{:}];
@@ -76,7 +76,7 @@ for ii_cell = 1:length(cells_list)
     %%
 try
     tic
-    cell_create_details(cell_ID);
+%     cell_create_details(cell_ID);
 %     cell_create_spikes_data(cell_ID);
 %     
 %     cell_calc_mean_FR(cell_ID);
@@ -88,14 +88,14 @@ try
 %     cell_calc_fields(cell_ID);
 % %     cell_calc_fields_properties(cell_ID);
 %     cell_calc_significant(cell_ID);
-% %     cell_calc_stats(cell_ID);
+%     cell_calc_stats(cell_ID);
 %     cell_calc_inclusion(cell_ID);
 %     cell_calc_time_AC(cell_ID);
 
 %     cell_calc_cluster_control(cell_ID);
 %     cell_calc_cluster_quality2(cell_ID);
 
-%     cell_plot_map_fields(cell_ID);
+    cell_plot_map_fields(cell_ID);
 %     cell_plot_time_AC(cell_ID);
 
 %     cell_plot_figure_choose_examples(cell_ID)

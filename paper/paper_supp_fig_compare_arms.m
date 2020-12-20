@@ -7,6 +7,10 @@ clc
 %% plotting options
 % yscale_opt = 'linear';
 yscale_opt = 'log';
+long_arm_lw      = 2;
+long_arm_lc      = 0.3*[1 1 1];
+entire_tunnel_lw = 1;
+entire_tunnel_lc = 0.0*[1 1 1];
 
 %% define output files
 res_dir = 'L:\paper_figures';
@@ -198,25 +202,28 @@ x1 = [fields_size{:,:,1}];
 x2 = [fields_size{:,:,:}];
 x1(isnan(x1))=[];
 x2(isnan(x2))=[];
-c = [0 0 0];
+
 nBins = 15;
+% long arm
 h1 = histogram( x1 );
 h1.NumBins = nBins;
 h1.Normalization = 'pdf';
 h1.DisplayStyle = 'stairs';
-h1.EdgeColor = c;
-h1.LineWidth = 2;
+h1.EdgeColor = long_arm_lc;
+h1.LineWidth = long_arm_lw;
+% entire tunnel
 h2 = histogram( x2 );
 h2.NumBins = nBins;
 h2.Normalization = 'pdf';
 h2.DisplayStyle = 'stairs';
-h2.EdgeColor = c;
-h2.LineWidth = 1;
+h2.EdgeColor = entire_tunnel_lc;
+h2.LineWidth = entire_tunnel_lw;
 [H,P_KS,KSSTAT] = kstest2(x1,x2,'Tail','unequal');
 fprintf('field size long vs. all\t\t\t\t\t P_KS=%.2f D=%.2f n=%d m=%d\n',P_KS, KSSTAT, length(x1), length(x2));
 text(1,1.05,sprintf('P_{KS} = %.2f',P_KS),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 % P_ranksum = ranksum(x1,x2);
 % text(1,0.85,sprintf('P_{Wilc}=%.3f',P_ranksum),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
+
 ha=gca;
 ha.YLim = [0.6e-3 0.2];
 ha.YScale = yscale_opt;
@@ -231,8 +238,8 @@ ylabel('Fraction of fields', 'Units','normalized','Position',[-0.23 0.5]);
 axes(panel_A_legend);
 cla
 hold on
-plot([1 2], [2 2], 'Color', 'k', 'LineWidth', 2, 'Clipping', 'off'); % long arm
-plot([1 2], [1 1], 'Color', 'k', 'LineWidth', 1, 'Clipping', 'off'); % shorty arm
+plot([1 2], [2 2], 'Color', long_arm_lc,      'LineWidth', long_arm_lw,      'Clipping', 'off'); % long arm
+plot([1 2], [1 1], 'Color', entire_tunnel_lc, 'LineWidth', entire_tunnel_lw, 'Clipping', 'off'); % entire tunnel
 xlim([0.5 2.5])
 text(2.5, 2, 'Long arm',  'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
 text(2.5, 1, 'Entire tunnel', 'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
@@ -377,19 +384,20 @@ x2(isnan(x2))=[];
 
 nBinEdges = 9;
 edges = logspace(0,log10(25),nBinEdges);
-c = [0 0 0];
+ % long arm
 h1=histogram(x1);
 h1.BinEdges = edges;
 h1.Normalization = 'pdf';
 h1.DisplayStyle = 'stairs';
-h1.EdgeColor = c;
-h1.LineWidth = 2; % long arm
+h1.EdgeColor = long_arm_lc;
+h1.LineWidth = long_arm_lw;
+% entire_tunnel
 h2=histogram(x2);
 h2.BinEdges = edges;
 h2.Normalization = 'pdf';
 h2.DisplayStyle = 'stairs';
-h2.EdgeColor = c;
-h2.LineWidth = 1; % short arm
+h2.EdgeColor = entire_tunnel_lc;
+h2.LineWidth = entire_tunnel_lw;
 
 [H,P_KS,KSSTAT] = kstest2(x1, x2, 'Tail','unequal');
 fprintf('field size ratio long vs. all\t\t\t P_KS=%.2f D=%.2f n=%d m=%d\n',P_KS, KSSTAT, length(x1), length(x2));
@@ -416,8 +424,8 @@ ylabel('Fraction of cells','Units','normalized','Position',[-0.23 0.5]);
 axes(panel_B_legend);
 cla
 hold on
-plot([1 2], [2 2], 'Color', 'k', 'LineWidth', 2,'Clipping','off'); % long arm
-plot([1 2], [1 1], 'Color', 'k', 'LineWidth', 1,'Clipping','off'); % shorty arm
+plot([1 2], [2 2], 'Color', long_arm_lc,      'LineWidth', long_arm_lw,      'Clipping', 'off'); % long arm
+plot([1 2], [1 1], 'Color', entire_tunnel_lc, 'LineWidth', entire_tunnel_lw, 'Clipping', 'off'); % entire tunnel
 xlim([0.5 2.5])
 text(2.5, 2, 'Long arm',  'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
 text(2.5, 1, 'Entire tunnel', 'HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);

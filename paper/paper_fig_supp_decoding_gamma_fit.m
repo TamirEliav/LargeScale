@@ -46,8 +46,8 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
 % create panels
-panel_A(1) = axes('position', [ 3.0 21 4 3]);
-panel_A(2) = axes('position', [ 9.5 21 4 3]);
+panel_A(1) = axes('position', [ 3  21 4 3]);
+panel_A(2) = axes('position', [ 10 21 4 3]);
 
 %% load data
 load('L:\paper_figures\pop_dist_fields_size.mat');
@@ -94,11 +94,11 @@ ha.YScale = 'linear';
 plot([12 16],[0.20 0.20], 'r', 'LineWidth', 2)
 plot([12 16],[0.12 0.12], 'g', 'LineWidth', 2)
 text(0.5,1.0, 'Log-Normal distribution',              'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
-text(0.55,0.9, ['\mu = ' num2str(logn_phat(1),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
-text(0.55,0.8, ['\sigma = '   num2str(logn_phat(2),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+text(0.55,0.9, ['\mu = ' num2str(logn_phat(1),3) ' m'], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+text(0.55,0.8, ['\sigma = '   num2str(logn_phat(2),3) ' m'], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
 text(0.5,0.6, 'Gamma distribution',                   'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
-text(0.55,0.5, ['\alpha = ' num2str(gamma_phat(1),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
-text(0.55,0.4, ['\beta = '   num2str(gamma_phat(2),3)], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+text(0.55,0.5, ['Shape parameter: \alpha = ' num2str(gamma_phat(1),3)],     'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
+text(0.55,0.4, ['Scale parameter:   \theta = ' num2str(gamma_phat(2),3) ' m'], 'Units','normalized','FontSize',7, 'HorizontalAlignment','left');
 
 
 %% panel A - field size distribution gamma fit (log scale)
@@ -108,10 +108,12 @@ hold on
 
 h = histogram(fields_size);
 h.FaceColor = 0.7*[1 1 1];
-h.BinWidth = 1;
+% h.BinWidth = 1;
+h.BinEdges = [logspace(0,2,30)]./2;
 h.Normalization = 'pdf';
 
-X = linspace(1,50,100);
+% X = linspace(1,50,100);
+X = [logspace(0,2,50)]./2;
 Y = gampdf(X, gamma_phat(1), gamma_phat(2));
 plot(X,Y,'-g', 'LineWidth', 1.5);
 Y = lognpdf(X, logn_phat(1), logn_phat(2));

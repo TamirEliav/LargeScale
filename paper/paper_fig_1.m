@@ -798,7 +798,6 @@ for ii_dir = 1:2
 %     h.NumBins = 10;
     h.BinEdges = linspace(12,58,11);
     h.BinEdges = h.BinEdges + (ii_dir-1)*0.26*h.BinWidth;
-    h.BinEdges
     h.FaceColor = [1 1 1];
     h.EdgeColor = dir_colors{ii_dir};
     h.Normalization = 'Count';
