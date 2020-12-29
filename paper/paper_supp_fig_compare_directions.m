@@ -121,7 +121,7 @@ end
 axes(panel_A);
 cla
 hold on
-text(-0.2,1.13, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.23,1.13, 'A', 'Units','normalized','FontWeight','bold');
 
 x = [pop_stats_dir(signif_both_dir_IX,1).SI_bits_spike];
 y = [pop_stats_dir(signif_both_dir_IX,2).SI_bits_spike];
@@ -141,9 +141,9 @@ stats_str = {[sprintf('%s = %.2g','\rho',rho), ',  ' sprintf('P_{%s} = %.2g','\r
 text(0.06,1, stats_str, 'units',...
     'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
 text(0.95,0.2, "n = "+sum(~any(isnan([x;y]))), 'units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
-xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1});
-ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2});
-title('Spatial information','units','normalized','Position',[0.5 1.05])
+xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1},'units','normalized','Position',[0.5 -0.14]);
+ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2},'units','normalized','Position',[-0.14 0.5]);
+title('Spatial information (bits/spike)','units','normalized','Position',[0.5 1.05])
 axis equal
 hax=gca;
 hax.XLim = ([0 max([x y])+1]);
@@ -158,7 +158,7 @@ h.Color = 0.5*[1 1 1];
 axes(panel_B);
 cla
 hold on
-text(-0.2,1.13, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.23,1.13, 'B', 'Units','normalized','FontWeight','bold');
 
 x = [pop_stats_dir(signif_both_dir_IX,1).field_num];
 y = [pop_stats_dir(signif_both_dir_IX,2).field_num];
@@ -182,8 +182,8 @@ text(0.06,1, stats_str, 'units',...
     'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
 text(0.95,0.2, "n = "+sum(~any(isnan([x;y]))), 'units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 
-xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1});
-ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2});
+xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1},'units','normalized','Position',[0.5 -0.14]);
+ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2},'units','normalized','Position',[-0.14 0.5]);
 title('No. of fields','units','normalized','Position',[0.5 1.05])
 axis equal
 xlim([0 20])
@@ -196,6 +196,7 @@ hax.YScale = 'linear';
 hax.XTick = [0:5:20];
 hax.YTick = [0:5:20];
 hax.TickLength = [0.02 0.02];
+hax.YRuler.TickLabelGapOffset = 1;
 
 h=refline(1,0);
 h.Color = 0.5*[1 1 1];
@@ -204,17 +205,17 @@ h.Color = 0.5*[1 1 1];
 axes(panel_C);
 cla
 hold on
-text(-0.2,1.13, 'C', 'Units','normalized','FontWeight','bold');
+text(-0.23,1.13, 'C', 'Units','normalized','FontWeight','bold');
 
 switch panel_C_avg
     case 'mean'
         x = [pop_stats_dir(signif_both_dir_IX,1).field_size_mean];
         y = [pop_stats_dir(signif_both_dir_IX,2).field_size_mean];
-        title_str = 'Mean field size';
+        title_str = 'Mean field size (m)';
     case 'median'
         x = [pop_stats_dir(signif_both_dir_IX,1).field_size_median];
         y = [pop_stats_dir(signif_both_dir_IX,2).field_size_median];
-        title_str = 'Median field size';
+        title_str = 'Median field size (m)';
 end
 c = cat(1,pop_bat_color{signif_both_dir_IX});
 h=scatter(x,y,5,c,'filled');
@@ -233,8 +234,8 @@ text(0.06,1, stats_str, 'units',...
     'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
 text(0.95,0.2, "n = "+sum(~any(isnan([x;y]))), 'units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 
-xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1});
-ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2});
+xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1},'units','normalized','Position',[0.5 -0.14]);
+ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2},'units','normalized','Position',[-0.14 0.5]);
 title(title_str,'units','normalized','Position',[0.5 1.05])
 axis equal
 xlim([0 max([x y])+1])
@@ -246,7 +247,7 @@ h.Color = 0.5*[1 1 1];
 axes(panel_D);
 cla
 hold on
-text(-0.2,1.13, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.23,1.13, 'D', 'Units','normalized','FontWeight','bold');
 
 x = [pop_stats_dir(signif_both_dir_IX,1).field_ratio_LS];
 y = [pop_stats_dir(signif_both_dir_IX,2).field_ratio_LS];
@@ -267,9 +268,9 @@ text(0.06,1, stats_str, 'units',...
     'normalized','HorizontalAlignment','left','VerticalAlignment','top','FontSize',7);
 text(1.05,0.28, "n = "+sum(~any(isnan([x;y]))), 'units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
 
-xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1});
-ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2});
-title('Field size ratio','units','normalized','Position',[0.5 1.05])
+xlabel('Direction 1','Color',prm.graphics.colors.flight_directions{1},'units','normalized','Position',[0.5 -0.14]);
+ylabel('Direction 2','Color',prm.graphics.colors.flight_directions{2},'units','normalized','Position',[-0.14 0.5]);
+title('Field size ratio, largest/smallest','units','normalized','Position',[0.5 1.05])
 axis equal
 xlim([1 max([x y])+1])
 ylim([1 max([x y])+1])

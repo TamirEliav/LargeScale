@@ -183,8 +183,11 @@ bGap = 0:1:100 ;
 xGap = bGap(1:end-1)+(bGap(2)-bGap(1))/2 ;
 bnField = 0:1:50 ;
 xnField = bnField(1:end-1)+(bnField(2)-bnField(1))/2 ;
-bMaxMinRatio = 1:4:100 ;
-xMaxMinRatio = bMaxMinRatio(1:end-1)+(bMaxMinRatio(2)-bMaxMinRatio(1))/2 ;
+bMaxMinRatio1 = logspace(log10(1),log10(25),  9); % this is the bins used in fig 2J
+% next, we expend them logarothmically
+bins_jumps = bMaxMinRatio1(2) / bMaxMinRatio1(1);
+bMaxMinRatio = cumprod(bins_jumps.*ones(1,16))./bins_jumps;
+xMaxMinRatio = (bMaxMinRatio(1:end-1) + bMaxMinRatio(2:end)) / 2;
 
 powInS  = mean(abs(fft(fS,[],1)).^2,2)/L ;
 powInM  = mean(abs(fft(fM,[],1)).^2,2)/L ;
@@ -221,47 +224,49 @@ for iang = 1:repangle
     rMaxdpowOutXs(:,iang) = rMaxdpowOutXs(:,iang)/max(rMaxdpowOutXs(:,iang)) ;
 end
 %%
-pFieldSizeS  = histcounts(FieldSizeS*ds/100,bField,'Normalization','pdf') ;
-pFieldSizeM  = histcounts(FieldSizeM*ds/100,bField,'Normalization','pdf') ;
+% norm_methods = 'pdf';
+norm_method = 'probability';
+pFieldSizeS  = histcounts(FieldSizeS*ds/100,bField,'Normalization',norm_method) ;
+pFieldSizeM  = histcounts(FieldSizeM*ds/100,bField,'Normalization',norm_method) ;
 pFieldSizeXw = zeros(nrCA3,repangle,length(xField)) ;
 pFieldSizeXs = zeros(nrCA3,repangle,length(xField)) ;
 for iang = 1:repangle
     for i3 = 1:nrCA3
-        pFieldSizeXw(i3,iang,:)  = histcounts(FieldSizeXw{i3,iang}*ds/100,bField,'Normalization','pdf') ;
-        pFieldSizeXs(i3,iang,:)  = histcounts(FieldSizeXs{i3,iang}*ds/100,bField,'Normalization','pdf') ;
+        pFieldSizeXw(i3,iang,:)  = histcounts(FieldSizeXw{i3,iang}*ds/100,bField,'Normalization',norm_method) ;
+        pFieldSizeXs(i3,iang,:)  = histcounts(FieldSizeXs{i3,iang}*ds/100,bField,'Normalization',norm_method) ;
     end
 end
 
-pGapSizeS  = histcounts(GapSizeS*ds/100,bGap,'Normalization','pdf') ;
-pGapSizeM  = histcounts(GapSizeM*ds/100,bGap,'Normalization','pdf') ;
+pGapSizeS  = histcounts(GapSizeS*ds/100,bGap,'Normalization',norm_method) ;
+pGapSizeM  = histcounts(GapSizeM*ds/100,bGap,'Normalization',norm_method) ;
 pGapSizeXw = zeros(nrCA3,repangle,length(xGap)) ;
 pGapSizeXs = zeros(nrCA3,repangle,length(xGap)) ;
 for iang = 1:repangle
     for i3 = 1:nrCA3
-        pGapSizeXw(i3,iang,:)  = histcounts(GapSizeXw{i3,iang}*ds/100,bGap,'Normalization','pdf') ;
-        pGapSizeXs(i3,iang,:)  = histcounts(GapSizeXs{i3,iang}*ds/100,bGap,'Normalization','pdf') ;
+        pGapSizeXw(i3,iang,:)  = histcounts(GapSizeXw{i3,iang}*ds/100,bGap,'Normalization',norm_method) ;
+        pGapSizeXs(i3,iang,:)  = histcounts(GapSizeXs{i3,iang}*ds/100,bGap,'Normalization',norm_method) ;
     end
 end
 
-pnFieldS  = histcounts(nFieldS,bnField,'Normalization','pdf') ;
-pnFieldM  = histcounts(nFieldM,bnField,'Normalization','pdf') ;
+pnFieldS  = histcounts(nFieldS,bnField,'Normalization',norm_method) ;
+pnFieldM  = histcounts(nFieldM,bnField,'Normalization',norm_method) ;
 pnFieldXw = zeros(nrCA3,repangle,length(xnField)) ;
 pnFieldXs = zeros(nrCA3,repangle,length(xnField)) ;
 for iang = 1:repangle
     for i3 = 1:nrCA3
-        pnFieldXw(i3,iang,:)  = histcounts(nFieldXw(:,i3,iang),bnField,'Normalization','pdf') ;
-        pnFieldXs(i3,iang,:)  = histcounts(nFieldXs(:,i3,iang),bnField,'Normalization','pdf') ;
+        pnFieldXw(i3,iang,:)  = histcounts(nFieldXw(:,i3,iang),bnField,'Normalization',norm_method) ;
+        pnFieldXs(i3,iang,:)  = histcounts(nFieldXs(:,i3,iang),bnField,'Normalization',norm_method) ;
     end
 end
 
-pMaxMinRatioS  = histcounts(MaxMinRatioS,bMaxMinRatio,'Normalization','pdf') ;
-pMaxMinRatioM  = histcounts(MaxMinRatioM,bMaxMinRatio,'Normalization','pdf') ;
+pMaxMinRatioS  = histcounts(MaxMinRatioS(nFieldS>1),bMaxMinRatio,'Normalization',norm_method) ;
+pMaxMinRatioM  = histcounts(MaxMinRatioM(nFieldM>1),bMaxMinRatio,'Normalization',norm_method) ;
 pMaxMinRatioXw = zeros(nrCA3,repangle,length(xMaxMinRatio)) ;
 pMaxMinRatioXs = zeros(nrCA3,repangle,length(xMaxMinRatio)) ;
 for iang = 1:repangle
     for i3 = 1:nrCA3
-        pMaxMinRatioXw(i3,iang,:)  = histcounts(MaxMinRatioXw(:,i3,iang),bMaxMinRatio,'Normalization','pdf') ;
-        pMaxMinRatioXs(i3,iang,:)  = histcounts(MaxMinRatioXs(:,i3,iang),bMaxMinRatio,'Normalization','pdf') ;
+        pMaxMinRatioXw(i3,iang,:)  = histcounts(MaxMinRatioXw((nFieldXw(:,i3,iang)>1),i3,iang),bMaxMinRatio,'Normalization',norm_method) ;
+        pMaxMinRatioXs(i3,iang,:)  = histcounts(MaxMinRatioXs((nFieldXs(:,i3,iang)>1),i3,iang),bMaxMinRatio,'Normalization',norm_method) ;
     end
 end
 %%

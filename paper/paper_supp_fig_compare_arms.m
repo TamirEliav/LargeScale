@@ -197,7 +197,7 @@ end
 axes(panel_A);
 cla
 hold on
-text(-0.3,1.15, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.33,1.15, 'A', 'Units','normalized','FontWeight','bold');
 x1 = [fields_size{:,:,1}];
 x2 = [fields_size{:,:,:}];
 x1(isnan(x1))=[];
@@ -375,7 +375,7 @@ end
 axes(panel_B);
 cla
 hold on
-text(-0.28,1.15, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.34,1.15, 'B', 'Units','normalized','FontWeight','bold');
 
 x1=LS_field_ratio_all_long;
 x2=LS_field_ratio_all;

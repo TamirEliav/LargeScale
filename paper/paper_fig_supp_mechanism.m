@@ -51,7 +51,7 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 
 % create panels
 panel_A_size = [2.5 2.5];
-panel_D_size = [2.5 3];
+panel_D_size = [2.5 2.5];
 panel_BC_size = [3 3];
 panel_A(1) = axes('position', [ 2.0 22 panel_A_size]);
 panel_A(2) = axes('position', [ 5.5 22 panel_A_size]);
@@ -61,9 +61,9 @@ panel_A(5) = axes('position', [16.0 22 panel_A_size]);
 panel_BC(1) = axes('position', [ 2.0 11.8+4.5 panel_BC_size]);
 panel_BC(2) = axes('position', [ 2.0  7.0+4.5 panel_BC_size]);
 panel_D(1) = axes('position', [ 2.0 17.5-11 panel_D_size]);
-panel_D(2) = axes('position', [ 5.7 17.5-11 panel_D_size]);
+panel_D(2) = axes('position', [ 5.6 17.5-11 panel_D_size]);
 panel_D(3) = axes('position', [ 9.0 17.5-11 panel_D_size]);
-panel_D(4) = axes('position', [ 12 19.5-11 0.5 0.65]);
+panel_D(4) = axes('position', [ 12 19.5-11+0.5 0.5 0.65]);
 panel_E(1) = axes('position', [ 7.0 11.8+4.5 5 3]);
 panel_E(2) = axes('position', [ 9.2 13.1+4.5 2.5 1.7]);
 panel_F(1) = axes('position', [ 7.0 7+4 4 3]);
@@ -135,46 +135,60 @@ text(-0.4,1.25, 'A', 'Units','normalized','FontWeight','bold');
 lw=2;
 
 axes(panel_D(1)); cla; hold on;
-text(-0.55,1.15, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.5,1.25, 'D', 'Units','normalized','FontWeight','bold');
 plot(xnField,squeeze(pnFieldXs(i3,:,:))','-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
 pnFieldS(pnFieldS==0)=eps;
 % pnFieldS(pnFieldS==eps)=0;
 plot(xnField,pnFieldS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 plot(xnField,pnFieldM,'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
-xlabel({'No. of fields per direction'},'Units','normalized','Position',[0.5 -0.18]);
-ylabel({'Probability';'density function'},'Units','normalized','Position',[-0.3 0.5]);
+xlabel({'No. of fields per direction'},'Units','normalized','Position',[0.5 -0.15]);
+% ylabel({'Probability';'density function'},'Units','normalized','Position',[-0.3 0.5]);
+ylabel('Probability','Units','normalized','Position',[-0.3 0.5]);
 hax=gca;
 hax.YScale='log';
 hax.XLim = [0 25];
 hax.YLim = [1e-3 1.5e-1];
 hax.XTick = 0:10:40;
 hax.YTick = 10.^[-4:0];
+hax.XRuler.TickLabelGapOffset = -1;
+hax.YRuler.TickLabelGapOffset = 0.5;
+hax.XAxis.TickLength(1) = 0.035;
+hax.YAxis.TickLength(1) = 0.015;
 
 axes(panel_D(2)); cla; hold on;
 plot(xField,squeeze(pFieldSizeXs(i3,:,:))','-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
 plot(xField,pFieldSizeS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 plot(xField,pFieldSizeM,'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
-xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.18]);
-% ylabel('PDF','Units','normalized','Position',[-0.3 0.5]);
+xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.15]);
 hax=gca;
 hax.YScale='log';
 hax.XLim = [0 30];
 hax.YLim = [2e-4 0.2];
 hax.XTick = 0:10:40;
 hax.YTick = 10.^[-4:0];
+hax.XRuler.TickLabelGapOffset = -1;
+hax.YRuler.TickLabelGapOffset = 0.5;
+hax.XAxis.TickLength(1) = 0.035;
+hax.YAxis.TickLength(1) = 0.015;
 
 axes(panel_D(3)); cla; hold on;
 plot(xMaxMinRatio,squeeze(pMaxMinRatioXs(i3,:,:))','-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
 plot(xMaxMinRatio,pMaxMinRatioS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 plot(xMaxMinRatio,pMaxMinRatioM,'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
-xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
-% ylabel('PDF','Units','normalized','Position',[-0.25 0.5]);
+xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.165]);
 hax=gca;
+hax.XScale='log';
 hax.YScale='log';
-hax.XLim = [0 30];
-hax.YLim = [5e-3 0.12];
-hax.XTick = 0:10:40;
+% hax.XLim = [1 27];
+hax.XLim = [1 100];
+hax.YLim = [1e-2 0.22];
+% hax.XTick = [1 2 5 10 20];
+hax.XTick = [1 10 100];
 hax.YTick = 10.^[-4:0];
+hax.XRuler.TickLabelGapOffset = -2.5;
+hax.YRuler.TickLabelGapOffset = 0.5;
+hax.XAxis.TickLength(1) = 0.035;
+hax.YAxis.TickLength(1) = 0.015;
 
 % legend
 axes(panel_D(4)); cla; hold on;
@@ -182,9 +196,6 @@ axis off
 plot([0 1],[1 1],'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
 plot([0 1],[2 2],'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 plot([0 1],[3 3],'-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
-% text(1.2, 2, 'Single-field CA3', 'FontSize',7);
-% text(1.2, 1, 'Multi-field CA3', 'FontSize',7);
-% text(1.2, 3, 'MEC, all slice angles', 'FontSize',7);
 text(-0.2, 2, 'Single-field CA3', 'FontSize',7,'HorizontalAlignment','right');
 text(-0.2, 1, 'Multi-field CA3', 'FontSize',7,'HorizontalAlignment','right');
 text(-0.2, 3, 'MEC, all slice angles', 'FontSize',7,'HorizontalAlignment','right');
@@ -212,6 +223,7 @@ h.YTick=[1 5 10 15 20];
 h.XLim = [0 200];
 h.YLim = [0.5 20.5];
 h.XAxis.TickLength(1) = 0.03;
+h.XRuler.TickLabelGapOffset = 0.5;
 h.YRuler.TickLabelGapOffset = 0.5;
 
 axes(panel_BC(2)); cla; hold on;
@@ -235,6 +247,7 @@ h.YTick=[1 5 10];
 h.XLim = [0 200];
 h.YLim = [0.5 10.5];
 h.XAxis.TickLength(1) = 0.03;
+h.XRuler.TickLabelGapOffset = 0.5;
 h.YRuler.TickLabelGapOffset = 0.5;
 
 %% add arrow from input -> output
@@ -260,6 +273,7 @@ hax.XLim = [0 0.25];
 hax.YTick = 10.^[-1 0 1 2];
 hax.YScale = 'log';
 hax.TickLength(1)=0.02;
+hax.XRuler.TickLabelGapOffset = 0.5;
 xlabel('Spatial frequency (1/m)') ;
 ylabel('Power (norm.)') ;
 title('Model: Predicted spectrum of CA1 neurons','FontWeight','bold','Units','normalized','Position',[0.5 1.15]) ;
@@ -319,6 +333,7 @@ hax.ColorScale='log';
 % hax.XLim = xlimits;
 % hax.XLim = [min(kPow(IX)) max(kPow(IX))];
 hax.XLim = [min(kPow(IX))/2 xlimits(2)];
+hax.XRuler.TickLabelGapOffset = 0.5;
 xlabel('Spatial frequency (1/m)') ;
 ylabel('Slice angle (\circ)') ;
 title({'CA1 spectra for';'equal CA3 and MEC input'},'FontWeight','bold') ;
@@ -343,7 +358,7 @@ hc.Ticks = 10.^[-5:5];
 hc.TickLabels = [];
 text(1.1,0.2, 'min', 'Units','normalized','FontSize',6,'HorizontalAlignment','center');
 text(1.1,0.808, 'max', 'Units','normalized','FontSize',6,'HorizontalAlignment','center');
-text(1.24,0.5, 'Power', 'Units','normalized','FontSize',7,'HorizontalAlignment','center','Rotation',-90);
+text(1.23,0.5, 'Power', 'Units','normalized','FontSize',7,'HorizontalAlignment','center','Rotation',-90);
 colormap(panel_F(1),gray);
 
 %% Relative MEC/CA3 input sparsity - Spectrum peakedness

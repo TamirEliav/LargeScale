@@ -719,7 +719,7 @@ fprintf('\tNo. of fields: mean=%.1f median=%.1f IQR=%.1f-%.1f\n', nanmean(x), pr
 axes(panel_H);
 cla
 hold on
-text(-0.34,1.15, 'H', 'Units','normalized','FontWeight','bold');
+text(-0.36,1.15, 'H', 'Units','normalized','FontWeight','bold');
 fields_size = [];
 fields_size_smallest1 = [];                     % per-direction
 fields_size_smallest2 = nan(length(cells),2);   % per-cell
@@ -743,7 +743,7 @@ h.BinWidth = 1;
 ha=gca;
 ha.YScale = 'log';
 xlabel('Field size (m)')
-ylabel('No. of fields','Units','normalized','Position',[-0.25 0.5])
+ylabel('No. of fields','Units','normalized','Position',[-0.23 0.5])
 ha = gca;
 % ha.XLim = [0 35];
 ha.YLim = [0.8 350];

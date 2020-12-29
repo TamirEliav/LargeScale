@@ -3,7 +3,7 @@ clear
 clc
 
 %%
-delay_start = 30;
+delay_start = 1;
 delay_between_figs = 1;
 
 %% list of scripts

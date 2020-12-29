@@ -23,10 +23,9 @@ fields([fields.in_low_speed_area])=[];
 field_num = [stats_dir(signif).field_num];
 field_size = [fields.width_prc];
 ratio_LS = [stats_all.field_ratio_LS];
-%     ratio_LS(isnan(ratio_LS))=[];
 ratio_LS_with_1s = [stats_all.field_ratio_LS];
 ratio_LS_with_1s(isnan(ratio_LS_with_1s))=1;
-
+ratio_LS(isnan(ratio_LS))=[];
 
 
 %% spatail periodicity (fft) ==============================================

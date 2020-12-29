@@ -103,12 +103,12 @@ panel_BCD = flipdim(panel_BCD,1);
 % now panel_B is 2X3 = dataset X feature
 
 panel_EFG_size = [2 2.8];
-panel_EFG_pos = [17 2.3+8];
+panel_EFG_pos = [17 10.35];
 panel_EFG = [];
 for r=1:3
     for c=1:1
         offset_x = (c-1)*3.3;
-        offset_y = (r-1)*3.3;
+        offset_y = (r-1)*3.4;
         offset = panel_EFG_pos + [offset_x offset_y];
         panel_EFG(r,c) = axes('position', [offset panel_EFG_size]);
     end
@@ -705,7 +705,7 @@ fprintf('======= panels EFG: compare datasets distributions ======= \n');
 
 %%  No. of fields
 axes(panel_EFG(1)); cla; hold on
-text(-0.55,1., 'E', 'Units','normalized','FontWeight','bold');
+text(-0.55,1.1, 'E', 'Units','normalized','FontWeight','bold');
 n=accumarray(field_num_grp',field_num_val',[],@(x)(sum(~isnan(x))));
 x=unique(field_num_grp);
 y=accumarray(field_num_grp',field_num_val',[],@mean);
