@@ -644,7 +644,7 @@ ha.YTick = ha.YLim;
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
-ha.YRuler.TickLabelGapMultiplier = 0.25;
+ha.YRuler.TickLabelGapOffset = 0;
 
 %% load population data
 % get list of significant cells (at least in one direction)
@@ -763,9 +763,10 @@ for ii_dir = 1:2
 end
 ha=gca;
 ha.XTick = [0 0.04 0.08];
-ha.TickLength = [0.04 0.04];
-ha.XRuler.TickLabelGapMultiplier = -0.1;
-ha.YRuler.TickLabelGapMultiplier = 0;
+ha.XAxis.TickLength(1) = 0.04;
+ha.YAxis.TickLength(1) = 0.025;
+ha.XRuler.TickLabelGapOffset = 0;
+ha.YRuler.TickLabelGapOffset = -1;
 xlabel('CV of speed','Units','normalized','Position',[0.5 -0.25]);
 ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
@@ -808,9 +809,10 @@ ha=gca;
 ha.XLim(1) = 0;
 ha.XLim(2) = 65;
 ha.XTick = [0 30 60];
-ha.TickLength = [0.04 0.04];
-ha.XRuler.TickLabelGapMultiplier = -0.1;
-ha.YRuler.TickLabelGapMultiplier = 0;
+ha.XAxis.TickLength(1) = 0.04;
+ha.YAxis.TickLength(1) = 0.025;
+ha.XRuler.TickLabelGapOffset = 0;
+ha.YRuler.TickLabelGapOffset = -1;
 xlabel('No. of flights','Units','normalized','Position',[0.5 -0.25]);
 ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
@@ -872,9 +874,10 @@ else
     ha.XTick = [0:5:25];
 end
 ha=gca;
-ha.TickLength = [0.04 0.035];
-ha.XRuler.TickLabelGapMultiplier = -0.1;
-ha.YRuler.TickLabelGapMultiplier = 0;
+ha.XAxis.TickLength(1) = 0.04;
+ha.YAxis.TickLength(1) = 0.025;
+ha.XRuler.TickLabelGapOffset = 0;
+ha.YRuler.TickLabelGapOffset = -1;
 xlabel('Distance flown (km)','Units','normalized','Position',[0.5 -0.25]);
 ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 

@@ -297,7 +297,7 @@ hh.Normalization='pdf';
 % hh.Normalization='probability';
 
 ha=gca;
-ha.XLim = [0 1e5];
+ha.XLim = [0 1e4];
 ha.YLim = [0 0.025];
 ha.XTick = 10.^[1 2 3 4 5];
 % ha.XTickLabel = [1:5];
@@ -310,6 +310,7 @@ ha.YRuler.TickLabelGapOffset = -1;
 ha.XScale = 'log';
 ha.XRuler.FontSize=6;
 ha.YRuler.FontSize=6;
+xlabel('(ms)','Units','normalized','Position',[0.5 -0.2]);
 
 %% percentage of bursty spikes (per field)
 axes(panel_D(1));
@@ -324,14 +325,16 @@ hh.Normalization='count';
 hh.FaceColor = 0.5*[1 1 1];
 ha=gca;
 ha.XLim = [0 100];
+ha.YLim = [8e-1 1e3];
 ha.XTick = [0:25:100];
+ha.YTick = 10.^[-1:4];
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.1;
 ha.YScale = 'log';
 xlabel('In-field bursty spikes (%)', 'Units','normalized','Position',[0.5 -0.13]);
-ylabel('No. of fields');
+ylabel('No. of fields','Units','normalized','Position',[-0.24 0.5]);
 % text(0.5,0.85,"n="+length(spikes_in_burst_prc_all_fields),'Units','normalized');
 
 %% percentage of bursty spikes (per cell)
@@ -375,7 +378,7 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.35;
 ha.YRuler.TickLabelGapMultiplier = 0.1;
 ha.YScale = 'linear';
-xlabel('Mean firing rate (Hz)', 'Units','normalized','Position',[0.5 -0.13]);
+xlabel('Mean firing rate in-flight (Hz)', 'Units','normalized','Position',[0.5 -0.13]);
 ylabel('No. of cells');
 
 %% field peak rate vs field size

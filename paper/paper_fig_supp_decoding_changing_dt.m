@@ -152,7 +152,7 @@ axes(panel_B(1));
 cla
 hold on
 text(-0.24,1.13, 'B', 'Units','normalized','FontWeight','bold');
-text(0.5,1.13, {'Minimal no. of neurons';'required for decoding'}, 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
+text(0.5,1.13, {'Minimal no. of neurons (N)';'required for decoding'}, 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
 
 if use_absolute_error
     plot(L,Nerr_ML_S1(:,jdt),'Color',clr(1,:),'LineWidth',2) ;

@@ -7,6 +7,7 @@ clc
 
 %% params
 use_absolute_error = 1;
+panels_FG_gray = 0.65*[1 1 1];
 
 %% define output files
 res_dir = 'L:\paper_figures';
@@ -155,7 +156,7 @@ axes(panel_B(1));
 cla
 hold on
 text(-0.24,1.13, 'B', 'Units','normalized','FontWeight','bold');
-text(0.5,1.13, {'Minimal no. of neurons';'required for decoding'}, 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
+text(0.5,1.13, {'Minimal no. of neurons (N)';'required for decoding'}, 'Units','normalized','FontWeight','bold','HorizontalAlignment','center','FontSize',9);
 
 if use_absolute_error
     plot(L,Nerr_ML_S1(:,jdt),'Color',clr(1,:),'LineWidth',2) ;
@@ -525,7 +526,7 @@ hold on
 load('L:\processed_data_structs\total_area.mat');
 h=histogram(total_area,'Normalization','pdf');
 h.Normalization = 'pdf';
-h.FaceColor = 0.5*[1 1 1];
+h.FaceColor = panels_FG_gray;
 h.FaceAlpha = 1;
 cvrg=expfit(total_area);
 plot(h.BinEdges,exppdf(h.BinEdges,cvrg),'LineWidth',2,'Color','k');
@@ -545,7 +546,7 @@ text(-0.35,1.15, 'F', 'Units','normalized','FontWeight','bold');
 axes(panel_F_legend);
 cla('reset');
 hold on
-patch([1 1 2 2], 2*[1 1 1 1]+.3*[-1 1 1 -1], 0.5*[1 1 1],'EdgeColor','k');
+patch([1 1 2 2], 2*[1 1 1 1]+.3*[-1 1 1 -1], panels_FG_gray, 'EdgeColor','k');
 plot([1 2],      1*[1 1], 'k','LineWidth',2);
 text(2.6, 2, 'Data','FontSize',7,'HorizontalAlignment','left');
 text(2.6, 1, 'Exponential fit','FontSize',7,'HorizontalAlignment','left');
@@ -590,7 +591,7 @@ edges = logspace(0,log10(25),nBinEdges);
 h=histogram(ratio_LS);
 h.Normalization = 'probability';
 h.BinEdges = edges;
-h.FaceColor = 0.5*[1 1 1];
+h.FaceColor = panels_FG_gray;
 h.FaceAlpha = 1;
 % plot model (S6)
 h=histogram(rLS);
@@ -633,7 +634,7 @@ cla('reset');
 hold on
 dashed_line = linspace(1,2,11);
 dashed_line([ 5 6 7]) = nan;
-patch([1 1 2 2], 1*[1 1 1 1]+.3*[-1 1 1 -1], 0.5*[1 1 1],'EdgeColor','k');
+patch([1 1 2 2], 1*[1 1 1 1]+.3*[-1 1 1 -1], panels_FG_gray,'EdgeColor','k');
 plot([1 2],      2*[1 1], 'Color',clr(6,:), 'LineWidth',2);
 % plot([1 2],      3*[1 1], 'Color',clr(6,:), 'LineWidth',.2);
 plot(dashed_line,      3*ones(length(dashed_line)), 'Color',clr(6,:), 'LineWidth',2);

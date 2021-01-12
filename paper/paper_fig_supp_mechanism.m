@@ -139,8 +139,8 @@ text(-0.5,1.25, 'D', 'Units','normalized','FontWeight','bold');
 plot(xnField,squeeze(pnFieldXs(i3,:,:))','-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
 pnFieldS(pnFieldS==0)=eps;
 % pnFieldS(pnFieldS==eps)=0;
-plot(xnField,pnFieldS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 plot(xnField,pnFieldM,'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
+plot(xnField,pnFieldS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 xlabel({'No. of fields per direction'},'Units','normalized','Position',[0.5 -0.15]);
 % ylabel({'Probability';'density function'},'Units','normalized','Position',[-0.3 0.5]);
 ylabel('Probability','Units','normalized','Position',[-0.3 0.5]);
@@ -157,8 +157,8 @@ hax.YAxis.TickLength(1) = 0.015;
 
 axes(panel_D(2)); cla; hold on;
 plot(xField,squeeze(pFieldSizeXs(i3,:,:))','-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
-plot(xField,pFieldSizeS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 plot(xField,pFieldSizeM,'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
+plot(xField,pFieldSizeS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 xlabel('Field size (m)','Units','normalized','Position',[0.5 -0.15]);
 hax=gca;
 hax.YScale='log';
@@ -173,8 +173,8 @@ hax.YAxis.TickLength(1) = 0.015;
 
 axes(panel_D(3)); cla; hold on;
 plot(xMaxMinRatio,squeeze(pMaxMinRatioXs(i3,:,:))','-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
-plot(xMaxMinRatio,pMaxMinRatioS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 plot(xMaxMinRatio,pMaxMinRatioM,'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
+plot(xMaxMinRatio,pMaxMinRatioS,'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
 xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.165]);
 hax=gca;
 hax.XScale='log';
@@ -193,12 +193,12 @@ hax.YAxis.TickLength(1) = 0.015;
 % legend
 axes(panel_D(4)); cla; hold on;
 axis off
-plot([0 1],[1 1],'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ;
-plot([0 1],[2 2],'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ;
-plot([0 1],[3 3],'-','Color',clrM(3,:),'lineWidth',lw) ; hold on ;
-text(-0.2, 2, 'Single-field CA3', 'FontSize',7,'HorizontalAlignment','right');
-text(-0.2, 1, 'Multi-field CA3', 'FontSize',7,'HorizontalAlignment','right');
-text(-0.2, 3, 'MEC, all slice angles', 'FontSize',7,'HorizontalAlignment','right');
+plot([0 1],[3 3],'-','Color',clrM(1,:),'lineWidth',lw) ; hold on ; % single CA3
+plot([0 1],[2 2],'-','Color',clrM(2,:),'lineWidth',lw) ; hold on ; % multi CA3
+plot([0 1],[1 1],'-','Color',clrM(3,:),'lineWidth',lw) ; hold on ; % periodic MEC% multi CA3
+text(-0.2, 3, 'Single-field CA3', 'FontSize',7,'HorizontalAlignment','right');
+text(-0.2, 2, 'Multi-field CA3', 'FontSize',7,'HorizontalAlignment','right');
+text(-0.2, 1, 'MEC, all slice angles', 'FontSize',7,'HorizontalAlignment','right');
 
 %% MEC input/output cell examples
 axes(panel_BC(1)); cla; hold on;
@@ -334,7 +334,7 @@ hax.ColorScale='log';
 % hax.XLim = [min(kPow(IX)) max(kPow(IX))];
 hax.XLim = [min(kPow(IX))/2 xlimits(2)];
 hax.XRuler.TickLabelGapOffset = 0.5;
-xlabel('Spatial frequency (1/m)') ;
+xlabel('Spatial frequency (1/m)','Units','normalized','Position',[0.5 -0.13]) ;
 ylabel('Slice angle (\circ)') ;
 title({'CA1 spectra for';'equal CA3 and MEC input'},'FontWeight','bold') ;
 

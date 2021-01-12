@@ -645,12 +645,14 @@ histogram(data,    'Normalization','pdf','BinEdges',edges,'FaceColor', 0.5*[1 1 
 histogram(shuffle, 'Normalization','pdf','BinEdges',edges,'DisplayStyle','stairs','EdgeColor','k','LineWidth',1.5);
 [~,P_KS] = kstest2(data, shuffle);
 P_RankSum = ranksum(data, shuffle);
-text(1,0.9, sprintf('P_{KS} = %.02f',P_KS),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
+text(1.1,0.8, sprintf('P_{KS} = %.02f',P_KS),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
 % text(1,0.9, sprintf('P=%.02f',P_RankSum),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
 
 ha= gca;
 ha.XLim = [-1 1];
+ha.YLim = [0 5.2];
 ha.XTick = -1:0.5:1;
+ha.YTick = [0 2 4];
 ha.TickDir = 'out';
 ha.TickLength = [0.03 0.03];
 ha=gca;

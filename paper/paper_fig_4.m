@@ -15,6 +15,7 @@ norm_speed_ratio = 0;
 norm_dist_from_center = 0;
 use_only_center = 0;
 center_part_len = [nan 4 100];
+ratio_stats_include_1s = 0;
 
 %% define output files
 res_dir = 'L:\paper_figures';
@@ -619,7 +620,7 @@ for ii_dataset = 1:length(datasets)
     end
     
     %% ratio L/S
-    x = ratio_LS;
+    x1 = ratio_LS;
     x2 = ratio_LS_with_1s;
     axes(panel_BCD(ii_dataset,3));
     cla('reset');
@@ -630,7 +631,7 @@ for ii_dataset = 1:length(datasets)
     h.BinEdges = edges;
     h.FaceColor = 'k';
     h.FaceAlpha = 1;
-    h=histogram(x);
+    h=histogram(x1);
     h.BinEdges = edges;
     h.FaceColor = 0.5*[1 1 1];
     h.FaceAlpha = 1;
@@ -652,15 +653,21 @@ for ii_dataset = 1:length(datasets)
         xlabel({'Field size ratio';'largest/smallest'},'Units','normalized','Position',[0.5 -0.17]);
     end
     ylabel('No. of cells','Units','normalized','Position',[-0.28 0.5])
-    text(n_str_pos_x(ii_dataset,3),n_str_pos_y(ii_dataset,3), "n = "+length(x),...
+    text(n_str_pos_x(ii_dataset,3),n_str_pos_y(ii_dataset,3), "n = "+length(x1),...
         'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',7);
-    fprintf('\tnumber of cells with single field overall (both directions): %d/%d (%.1f%%)\n',sum(isnan(x)), length(x), 100*sum(isnan(x))/length(x));
+    fprintf('\tnumber of cells with single field overall (both directions): %d/%d (%.1f%%)\n',sum(isnan(x1)), length(x1), 100*sum(isnan(x1))/length(x1));
     
-    hl=xline(nanmean(x2)); hl.Color='r';
+    if ratio_stats_include_1s
+        x = x2;
+    else
+        x = x1;
+    end
+    
+    hl=xline(nanmean(x)); hl.Color='r';
     m = hax.YLim(2) + 0.15*range(hax.YLim);
-    plot(prctile(x2,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
-    plot(prctile(x2,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
-    fprintf('\tFields size ratio (L/S): mean=%.1f median=%.1f IQR=%.1f-%.1f\n', nanmean(x2), prctile(x2,[50]), prctile(x2,[25 75]) );
+    plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
+    plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
+    fprintf('\tFields size ratio (L/S): mean=%.1f median=%.1f IQR=%.1f-%.1f\n', nanmean(x), prctile(x,[50]), prctile(x,[25 75]) );
     
     %% ratio L/S vs ratio dist2center
     if norm_dist_from_center & ~isnan(center_part_len(ii_dataset)) % only for small env.
@@ -729,7 +736,7 @@ ylabel('No. of fields per direction');
 X1 = field_num_val(field_num_grp==1);
 X2 = field_num_val(field_num_grp==2);
 % X3 = field_num_val(field_num_grp==3);
-[~,pval12,~,tstat12] = ttest2(X1,X2,'tail','right');
+[~,pval12,~,tstat12] = ttest2(X1,X2,'tail','right','vartype','unequal');
 % [~,pval13,~,tstat13] = ttest2(X1,X3,'tail','right');
 pval12_rank = ranksum(X1,X2,'tail','right');
 % pval13_rank = ranksum(X1,X3,'tail','right');
@@ -768,7 +775,7 @@ ylabel('Field size (m)');
 X1 = field_size_val(field_size_grp==1);
 X2 = field_size_val(field_size_grp==2);
 % X3 = field_size_val(field_size_grp==3);
-[~,pval12,~,tstat12] = ttest2(X1,X2,'tail','right');
+[~,pval12,~,tstat12] = ttest2(X1,X2,'tail','right','vartype','unequal');
 % [~,pval13,~,tstat13] = ttest2(X1,X3,'tail','right');
 pval12_rank = ranksum(X1,X2,'tail','right');
 % pval13_rank = ranksum(X1,X3,'tail','right');
@@ -825,17 +832,28 @@ text(1.5,  6.5,str12,'HorizontalAlignment','center','VerticalAlignment','middle'
 %%  L/S ratio
 axes(panel_EFG(3)); cla; hold on
 text(-0.55,1., 'G', 'Units','normalized','FontWeight','bold');
-n=accumarray(ratio_LS_with_1s_grp',ratio_LS_with_1s_val',[],@(x)(sum(~isnan(x))));
-x=unique(ratio_LS_with_1s_grp);
-y=accumarray(ratio_LS_with_1s_grp',ratio_LS_with_1s_val',[],@mean);
-err=accumarray(ratio_LS_with_1s_grp',ratio_LS_with_1s_val',[],@nansem);
+if ratio_stats_include_1s
+    n=accumarray(ratio_LS_with_1s_grp',ratio_LS_with_1s_val',[],@(x)(sum(~isnan(x))));
+    x=unique(ratio_LS_with_1s_grp);
+    y=accumarray(ratio_LS_with_1s_grp',ratio_LS_with_1s_val',[],@nanmean);
+    err=accumarray(ratio_LS_with_1s_grp',ratio_LS_with_1s_val',[],@nansem);
+else
+    n=accumarray(ratio_LS_grp',ratio_LS_val',[],@(x)(sum(~isnan(x))));
+    x=unique(ratio_LS_grp);
+    y=accumarray(ratio_LS_grp',ratio_LS_val',[],@nanmean);
+    err=accumarray(ratio_LS_grp',ratio_LS_val',[],@nansem);
+end
 bar(x,y,'FaceColor',0.5*[1 1 1]);
 h = errorbar(x,y,err);    
 h.Color = [0 0 0];                            
 h.LineStyle = 'none';  
 hax=gca;
 hax.YLim(1) = 1; % ratio cannot be < 1
-hax.YLim(2) = 4.5;
+if ratio_stats_include_1s
+    hax.YLim(2) = 4.5;
+else
+    hax.YLim(2) = 5;
+end
 hax.YTick = 0:10;
 hax.XLim = EFG_xlimits;
 hax.XTick=1:length(datasets);
@@ -856,10 +874,16 @@ ylabel({'Field size ratio';'largest/smallest'});
 % text(x, repelem(hax.YLim(2),length(x)), "n = "+n,...
 %     'HorizontalAlignment','center','VerticalAlignment','bottom');
 % signif test
-X1 = ratio_LS_with_1s_val(ratio_LS_with_1s_grp==1);
-X2 = ratio_LS_with_1s_val(ratio_LS_with_1s_grp==2);
-% X3 = ratio_LS_with_1s_val(ratio_LS_with_1s_grp==3);
-[~,pval12,~,tstat12] = ttest2(X1,X2,'tail','right');
+if ratio_stats_include_1s
+    X1 = ratio_LS_with_1s_val(ratio_LS_with_1s_grp==1);
+    X2 = ratio_LS_with_1s_val(ratio_LS_with_1s_grp==2);
+    % X3 = ratio_LS_with_1s_val(ratio_LS_with_1s_grp==3);
+else
+    X1 = ratio_LS_val(ratio_LS_grp==1);
+    X2 = ratio_LS_val(ratio_LS_grp==2);
+    % X3 = ratio_LS_val(ratio_LS_grp==3);
+end
+[~,pval12,~,tstat12] = ttest2(X1,X2,'tail','right','vartype','unequal');
 % [~,pval13,~,tstat13] = ttest2(X1,X3,'tail','right');
 pval12_rank = ranksum(X1,X2,'tail','right');
 % pval13_rank = ranksum(X1,X3,'tail','right');
@@ -867,9 +891,9 @@ fprintf('L/S ratio 1 vs. 2: ttest p=%.4g df=%d, ranksum p=%.4g\n',pval12, tstat1
 % fprintf('L/S ratio 1 vs. 3: ttest p=%.4g df=%d, ranksum p=%.4g\n',pval13, tstat13.df, pval13_rank);
 str12 = signif_astricks(pval12);
 % str13 = signif_astricks(pval13);
-plot([1 2],4.5*[1 1],'k-','Clipping','off')
+plot([1 2],hax.YLim(2)*[1 1],'k-','Clipping','off')
 % plot([1 3],5.1*[1 1],'k-','Clipping','off')
-text(1.5,4.6,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
+text(1.5,hax.YLim(2)+0.1,str12,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
 % text(2,5.3,str13,'HorizontalAlignment','center','VerticalAlignment','middle','FontSize',asterisk_font_size);
 
 %% print/save the figure
