@@ -262,6 +262,10 @@ for ii_dir = 1:2
     [H,P,KSSTAT] = kstest2(x1,x2);
     text(1.07,1.03,sprintf('P_{KS} = %.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',8);
     xline(0,'-','LineWidth',2);
+
+    fprintf('panel B (direction %d)\n',ii_dir);
+    fprintf('two-sample KS test comparing data vs shuffle\n');
+    fprintf('P = %.2f, KS_stat=%.2f (n_data=%d,n_shuffle=%d)\n',P,KSSTAT,length(x1),length(x2));
     
     % labels & graphics
     ha= gca;
@@ -427,6 +431,10 @@ for ii_dir = 1:2
     h2.LineWidth = 2;
     [H,P,KSSTAT] = kstest2(y1,y2);
     text(0.85,0.96,sprintf('P_{KS} = %.2f',P),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top','FontSize',8);
+    
+    fprintf('panel E (direction %d)\n',ii_dir);
+    fprintf('two-sample KS test comparing field size in field close to LM (<5m) vs far from LM (>5m)\n');
+    fprintf('P = %.2f, KS_stat=%.2f (n_nearby=%d,n_far=%d)\n',P,KSSTAT,length(y1),length(y2));
     
     % labels & graphics
     ha= gca;

@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S13';
+fig_name_str = 'fig_S14';
 fig_caption_str = 'Over representation at landing balls';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -59,6 +59,8 @@ panel_C(2) = axes('position', [ 2 17.5 panel_C_size]);
 % panel_D(1) = axes('position', [11 13.5 panel_D_size]);
 % panel_D(2) = axes('position', [11  9.5 panel_D_size]);
 panel_legend = axes('position', [6.5 25.45 0.5 0.4]);
+panel_zoom(1) = axes('position', [ 2 12 3 3]);
+panel_zoom(2) = axes('position', [ 6 12 3 3]);
 
 %% legend panel
 axes(panel_legend);
@@ -301,6 +303,7 @@ end
 %% panel C - field size vs. pos
 % =========================================================================
 % figure
+fields_all = [];
 for ii_dir = 1:2
 %     subplot(1,2,ii_dir)
     axes(panel_C(ii_dir));
@@ -311,7 +314,8 @@ for ii_dir = 1:2
     signif = cat(1,cells.signif);
     cells_dir = cells([signif(:,ii_dir).TF]);
     fields = cellfun(@(x)(x{ii_dir}), {cells_dir.fields},'UniformOutput',0);
-    fields =[fields{:}];
+    fields = [fields{:}];
+    fields_all = [fields_all fields];
 %     fields( [fields.in_low_speed_area] ) = [];
 
     % graphical options 
@@ -351,8 +355,8 @@ for ii_dir = 1:2
     ha.YRuler.TickLabelGapMultiplier = 0.1;
 end
 
-% axes(panel_C(1));
-% text(-0.13,1.1, 'B', 'Units','normalized','FontWeight','bold');
+axes(panel_C(1));
+text(-0.18,1.1, 'A', 'Units','normalized','FontWeight','bold');
 
 
 %% panel D - field size - near vs. far from LM
@@ -468,6 +472,98 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y      ,  'Color', prm.graphics.colo
 [h.HeadWidth] = disperse([5 5]);
 [h.HeadLength] = disperse([5 5]);
 
+%% some extra panels/stats for revision
+fields = fields_all;
+dist_thr = 4; % as for our low-speed exclusion criteria ("gray areas")
+bin_size = 0.5;
+density_edges = 0:bin_size:50;
+% nbins = dist_thr*2;
+balls_LM = LM(contains({LM.name},'ball'));
+dist2ball = min(abs([fields.loc] - [balls_LM.pos_proj]'));
+[fields.dist2ball] = disperse(dist2ball);
+% fields([fields.dist2ball] > dist_thr) = [];
+
+% --- left panel: field size vs distance to ball --- 
+% figure
+% subplot(121)
+axes(panel_zoom(1));
+cla
+hold on
+text(-0.4,1.2, 'B', 'Units','normalized','FontWeight','bold');
+x = [fields.dist2ball]';
+y = [fields.width_prc]';
+exclusion_IX = x > dist_thr;
+x(exclusion_IX) = [];
+y(exclusion_IX) = [];
+plot(x, y,'.k');
+xlim([0 dist_thr])
+xlabel('Distance from ball (m)');
+ylabel('Field size (m)');
+% stats
+[rho,rho_pval] = corr(x,y,'type','Spearman');
+% text(0.1,0.9,sprintf('dist thr = %dm',dist_thr),'Units','normalized', 'FontSize',7);
+text(0.05,1.15,['{\rho}' sprintf(' = %.2f',rho)],'Units','normalized', 'FontSize',7);
+text(0.05,1.05,sprintf('P = %.g',rho_pval),'Units','normalized', 'FontSize',7);
+hax=gca;
+hax.XAxis.TickLength(1) = 0.03;
+hax.YAxis.TickLength(1) = 0.02;
+hax.XRuler.TickLabelGapOffset = -1;
+hax.YRuler.TickLabelGapOffset = 0;
+
+% --- right panel: field size vs distance to ball --- 
+axes(panel_zoom(2));
+cla
+hold on
+switch 3
+    case 1
+        x = linspace(0,dist_thr,nbins)';
+        % x(1) = [];
+        % y = ksdensity([fields.dist2ball],x);
+    case 2
+        x = linspace(0,dist_thr,nbins)';
+        x([1 end]) = [];
+        y = ksdensity([fields.dist2ball],x,'Kernel','box','Support',[0 dist_thr]);
+    case 3
+%         EDGES = 0:bin_size:dist_thr;
+        EDGES = density_edges;
+        x = (EDGES(1:end-1) + EDGES(2:end)) / 2;
+        y = histcounts([fields.dist2ball],EDGES);
+        x = x';
+        y = y';
+end
+hb = bar(x, y);
+hb.BarWidth = 0.7;
+hb.FaceColor = 0.5*[1 1 1];
+hl = xline(mean(x([1 2])));
+hl.LineStyle='--';
+hl.LineWidth = 1.5;
+xlim([0 dist_thr])
+ylim([0 1.1*max(y)])
+xlabel('Distance from ball (m)');
+ylabel('Field density (counts)');
+% stats
+% compare first bin to all others
+zval = (y(1) - mean(y(2:end))) / std(y(2:end));
+pval = 2*(1-normcdf(zval));
+if pval == 0
+    pval_str = sprintf('P < %.1g',realmin);
+else
+    pval_str = sprintf('P = %.1g',pval);
+end
+% % text(x(1), y(1), '*****', 'FontSize',10,'HorizontalAlignment','center');
+% text(x(1), y(1)+10, sprintf('Z = %.2f',zval), 'FontSize',7);
+% text(x(1), y(1)+4, pval_str, 'FontSize',7);
+text(0.05,1.15, sprintf('Z = %.2f',zval), 'Units','normalized', 'FontSize',7);
+text(0.05,1.05, pval_str,                 'Units','normalized', 'FontSize',7);
+hax=gca;
+hax.XAxis.TickLength(1) = 0.03;
+hax.YAxis.TickLength(1) = 0.01;
+hax.XRuler.TickLabelGapOffset = -1;
+hax.YRuler.TickLabelGapOffset = 0;
+
+% file_name = sprintf('%s_%dm_bin_%.1f','L:\paper_figures\balls_over_representations_corr',dist_thr,bin_size);
+% file_name = strrep(file_name ,'.','_')
+% saveas(gcf, file_name, 'jpg');
 
 
 %% print/save the figure

@@ -352,6 +352,33 @@ bin_edges = (0:day_bin_size:max(day_num_perCell)+day_bin_size) + 0.5;
 
 Daylimits = [0, max(day_num_perCell)+1]; 
 
+%% revision edit - test directionality vs. days
+signif = arrayfun(@(x)(x.TF), cat(1,cells_130m.signif));
+signif = all(signif,2);
+cells = cells_130m(signif);
+FR_maps_all = cat(1,cells.FR_map);
+FR_maps_all = reshape([FR_maps_all.all],size(FR_maps_all,1),size(FR_maps_all,2),[]);
+M = cat(1,FR_maps_all.PSTH);
+M = reshape(M,size(FR_maps_all,1),size(FR_maps_all,2),[]);
+ccc = corr(squeeze(M(:,1,:))', squeeze(M(:,2,:))' ,'rows', 'pairwise');
+ccc = diag(ccc);
+x = day_num_perCell(signif);
+y = ccc;
+[rho,rho_pval] = corr(x,y,'type','Spearman');
+
+fprintf('Directionality vs. days:\n')
+fprintf('rho = %.2f\n',rho);
+fprintf('p = %.2f\n',rho_pval);
+
+% figure
+% plot(x, y,'o');
+% xlabel('Days');
+% ylabel('directionality (maps corr)');
+% text(0.1,0.85,sprintf('rho = %.2f',rho),'Units','normalized');
+% text(0.1,0.8,sprintf('P = %.g',rho_pval),'Units','normalized');
+% title('Directionality vs. days of exposure')
+
+
 %% panel B - field count vs days
 % figure
 axes(panel_B);
@@ -400,6 +427,8 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 [rho,p_val] = corr(n_fields,day_num_perCell_perDir_tmp,'type',corr_type);
 text(0.96,1.05, ['\rho' sprintf(' = %.02f',rho)],'Units','normalized','FontSize',7,'HorizontalAlignment','right');
 text(0.96,0.92, sprintf('P = %.02f',p_val),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
+text(0.05,0.95, sprintf('n = %d',length(n_fields)),'Units','normalized','FontSize',7,'HorizontalAlignment','left');
+
 %% panel B - compare field count
 axes(panel_B_cmp);
 cla
@@ -513,6 +542,7 @@ ha.YRuler.TickLabelGapMultiplier = 0.001;
 [rho,p_val] = corr(fields_size',day_num_fields','type',corr_type);
 text(0.96,1.05, ['\rho' sprintf(' = %.02f',rho)],'Units','normalized','FontSize',7,'HorizontalAlignment','right');
 text(0.96,0.92, sprintf('P = %.02f',p_val),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
+text(0.05,0.95, sprintf('n = %d',length(fields_size)),'Units','normalized','FontSize',7,'HorizontalAlignment','left');
 
 % save( fullfile(res_dir,'pop_dist_fields_size'), 'fields_size');
 
@@ -636,6 +666,7 @@ xlabel('Day','Units','normalized','Position',[0.5 -0.18]);
 [rho,p_val] = corr(LS_field_ratio_all',day_num_perCell_tmp,'type',corr_type);
 text(0.96,1.05, ['\rho' sprintf(' = %.02f',rho)],'Units','normalized','FontSize',7,'HorizontalAlignment','right');
 text(0.96,0.92, sprintf('P = %.02f',p_val),'Units','normalized','FontSize',7,'HorizontalAlignment','right');
+text(0.05,0.95, sprintf('n = %d',length(LS_field_ratio_all)),'Units','normalized','FontSize',7,'HorizontalAlignment','left');
 
 %% panel D - field ratio compare setups
 axes(panel_D_cmp);
