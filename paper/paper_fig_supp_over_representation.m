@@ -60,7 +60,7 @@ panel_C(2) = axes('position', [ 2 17.5 panel_C_size]);
 % panel_D(2) = axes('position', [11  9.5 panel_D_size]);
 panel_legend = axes('position', [6.5 25.45 0.5 0.4]);
 panel_zoom(1) = axes('position', [ 2 12 3 3]);
-panel_zoom(2) = axes('position', [ 6 12 3 3]);
+panel_zoom(2) = axes('position', [ 6.4 12 3 3]);
 
 %% legend panel
 axes(panel_legend);
@@ -546,9 +546,9 @@ ylabel('Field density (counts)');
 zval = (y(1) - mean(y(2:end))) / std(y(2:end));
 pval = 2*(1-normcdf(zval));
 if pval == 0
-    pval_str = sprintf('P < %.1g',realmin);
+    pval_str = sprintf('P = %.2g',realmin);
 else
-    pval_str = sprintf('P = %.1g',pval);
+    pval_str = sprintf('P = %.2g',pval);
 end
 % % text(x(1), y(1), '*****', 'FontSize',10,'HorizontalAlignment','center');
 % text(x(1), y(1)+10, sprintf('Z = %.2f',zval), 'FontSize',7);

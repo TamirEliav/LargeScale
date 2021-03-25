@@ -316,7 +316,7 @@ for ii_dataset = 1:size(cell_examples,1)
             [FE.number2] = disperse(1:length(FE));
             y = arrayfun(@(FE)(FE.number2*ones(1,FE.num_spikes)),FE,'UniformOutput',0);
             y = [y{:}];
-            plot(x,y,'.','Color',c{ii_dir},'MarkerSize',0.05);
+            plot(x,y,'.','Color',c{ii_dir},'MarkerSize',3);
             
             rescale_plot_data('x',rescale_gain_offset);
             
@@ -547,7 +547,7 @@ for ii_dataset = 1:length(datasets)
     hax.XLim = [0 hh.BinLimits(2)];
     hax.XTick = [0:5:30];
     hax.YTick = [1 10 100];
-    hax.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
+    hax.YTickLabel = {'10^0';'10^1';'10^2'};
     hax.TickDir='out';
     hax.TickLength = [0.03 0.03];
     hax.XRuler.TickLabelGapMultiplier = -0.3;
@@ -583,7 +583,7 @@ for ii_dataset = 1:length(datasets)
         hax.YLim(2) = 1.15 * hax.YLim(2);
     end
     hax.YTick = [1 10 100];
-    hax.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
+    hax.YTickLabel = {'10^0';'10^1';'10^2'};
     hax.TickDir='out';
     hax.TickLength = [0.03 0.03];
     hax.XRuler.TickLabelGapMultiplier = -0.3;
@@ -644,7 +644,7 @@ for ii_dataset = 1:length(datasets)
     hax.XLim = [0 27];
     hax.YTick = [1 10 100];
     hax.XTick = [1 2 5 10 20];
-    hax.YTickLabel = {'10 ^0';'10 ^1';'10 ^2'};
+    hax.YTickLabel = {'10^0';'10^1';'10^2'};
     hax.TickDir='out';
     hax.TickLength = [0.03 0.03];
     hax.XRuler.TickLabelGapMultiplier = -0.35;

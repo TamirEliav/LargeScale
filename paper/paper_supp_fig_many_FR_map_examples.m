@@ -5,7 +5,8 @@ clear
 clc
 
 %% params
-grp = 0;
+grp = -1;
+lw = 0.8;
 
 %% define output files
 res_dir = 'L:\paper_figures';
@@ -49,15 +50,25 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
 % create panels
-n_cols = 3;
-n_rows = 6;
+switch 3
+    case 2
+        n_cols = 2;
+        n_rows = 9;
+        panel_size = [7.5 1.3];
+        x_positions = linspace(0,9,n_cols)+2;
+        y_positions = linspace(0,14,n_rows);
+        panels_AB_y_offset = [10 2.5];
+    case 3
+        n_cols = 3;
+        n_rows = 6;
+        panel_size = [5 1.3];
+        x_positions = linspace(0,12,n_cols)+2;
+        y_positions = linspace(0,9,n_rows);
+        panels_AB_y_offset = [14.5 2.5];
+end
 n_examples = n_cols * n_rows;
-panel_size = [5 1.3];
-x_positions = linspace(0,12,n_cols)+2;
-y_positions = linspace(0,9,n_rows);
-panels_AB_y_offset = [14.5 2.5];
 clear panels 
-for ii_dataset = 1:2
+for ii_dataset = 1
    for r = 1:n_rows
        for c = 1:n_cols
             x = x_positions(c);
@@ -67,18 +78,21 @@ for ii_dataset = 1:2
        end
     end
 end
-panels = panels(:,end:-1:1,:)
+panels = panels(:,end:-1:1,:);
+% panels = panels(:,:,end:-1:1);
+panels = permute(panels, [1 3 2]);
 
 %% load data
 cells_wild = load('L:\processed_data_structs\cells_bat_200m.mat');
-cells_lab = load('L:\processed_data_structs\cells_lab.mat');
+% cells_lab = load('L:\processed_data_structs\cells_lab.mat');
 cells_wild = cells_wild.cells;
-cells_lab = cells_lab.cells;
-data = {cells_wild;cells_lab};
+% cells_lab = cells_lab.cells;
+% data = {cells_wild;cells_lab};
+data = {cells_wild};
 
 %% arrange data
 cells_all = {};
-for ii_dataset = 1:2
+for ii_dataset = 1:length(data)
     cells = data{ii_dataset};
     cells1 = cells;
     cells2 = cells;
@@ -114,11 +128,28 @@ for ii_dataset = 1:2
     clear cells1 cells2 cells12 signif
 end
 
+%%
+% wild_cells_IX = [327 320 301 272 256 243 210 193 182 165 143 118 103 82 66 56 25 19];
+% wild_cells_IX = [327 312 301 272 256 243 210 193 182 165 143 118 103 82 66 56 25 19];
+wild_cells_IX = [327 305 301 272 256 243 210 193 182 165 143 118 103 82 66 56 25 19]; % final choice
+[cells_all{ii_dataset}(wild_cells_IX).grp] = disperse(repelem(-1,length(wild_cells_IX)));
+
+%% make sure non of the examples are from fig 2
+fig_2_cell_examples = [433;  56;  51; 609; 419; 477;  57; 628; 337];
+fig_supp_cell_examples = arrayfun(@(x)(x.details.cell_num), cells_all{ii_dataset}(wild_cells_IX));
+is_duplicate = ismember(fig_supp_cell_examples,fig_2_cell_examples );
+if any(is_duplicate)
+    duplicate_cell_num = fig_supp_cell_examples(is_duplicate)
+    error('Same neuron as in Fig 2!!!!');
+end
+fig_supp_cell_examples
+
 %% plot 
 x_ticks = [0:50:200];
-for ii_dataset = 1:2
+for ii_dataset = 1:length(data)
     cells = cells_all{ii_dataset};
     cells_IX = find([cells.grp] == grp);
+    cells_IX = flip(cells_IX);
     for ii_panel = 1:length(cells_IX)
         ii_cell = cells_IX(ii_panel);
         %% choose axis
@@ -128,9 +159,11 @@ for ii_dataset = 1:2
         %% arrange data
         cell = cells(ii_cell);
         %% plot
-        plot(cell.FR_map.all.bin_centers,cell.FR_map.all.PSTH,'k','LineWidth',1.2);
-        text(0.01,1.1,sprintf('%.2fm',cell.largest),'FontSize',6,'Units','normalized','HorizontalAlignment','left');
-        text(0.99,1.1,sprintf('%d / %d (%.0f%%)',cell.ID,length(cells),100*cell.ID/length(cells)),'FontSize',6,'Units','normalized','HorizontalAlignment','right');
+        plot(cell.FR_map.all.bin_centers,cell.FR_map.all.PSTH,'k','LineWidth',lw);
+        text(1,1.1,sprintf('%.1fm (%.0f%%)',cell.largest,100*cell.ID/length(cells)),'FontSize',6,'Units','normalized','HorizontalAlignment','Right');
+%         text(0.01,1.1,sprintf('%.1f',cell.stats.dir.field_ratio_LS),'FontSize',6,'Units','normalized','HorizontalAlignment','left');
+%         text(0.01,1.1,sprintf('%.2fm',cell.largest),'FontSize',6,'Units','normalized','HorizontalAlignment','left');
+%         text(0.99,1.1,sprintf('%d / %d (%.0f%%)',cell.ID,length(cells),100*cell.ID/length(cells)),'FontSize',6,'Units','normalized','HorizontalAlignment','right');
 %         title(ii_panel)
         hax=gca;
         hax.XTick = [x_ticks];
@@ -141,14 +174,14 @@ for ii_dataset = 1:2
 end
 
 % labels
-axes(panels(1,1));
-text(-0.2,1.2, 'A', 'Units','normalized','FontWeight','bold');
-axes(panels(2,1));
-text(-0.2,1.2, 'B', 'Units','normalized','FontWeight','bold');
+% axes(panels(1,1));
+% text(-0.2,1.2, 'A', 'Units','normalized','FontWeight','bold');
+% axes(panels(2,1));
+% text(-0.2,1.2, 'B', 'Units','normalized','FontWeight','bold');
 
 for ii_dataset = 1:size(panels,1)
-    for c = 1:size(panels,3)
-        axes(panels(ii_dataset,end,c));
+    for c = 1:size(panels,2)
+        axes(panels(ii_dataset,c,end));
         hax=gca;
         hax.XTick = x_ticks;
         hax.XTickLabel = x_ticks;
@@ -157,11 +190,18 @@ for ii_dataset = 1:size(panels,1)
     end
 end
 
-axes(panels(1,4,1));
-ylabel('Firing rate (Hz)', 'Units','normalized','Position',[-0.12 1.3]);
-axes(panels(2,4,1));
-ylabel('Firing rate (Hz)', 'Units','normalized','Position',[-0.12 1.3]);
-
+switch n_cols
+    case 2
+        axes(panels(1,1,5));
+        ylabel('Firing rate (Hz)', 'Units','normalized','Position',[-0.12 0.5]);
+        % axes(panels(2,1,5));
+        % ylabel('Firing rate (Hz)', 'Units','normalized','Position',[-0.12 0.5]);
+    case 3
+        axes(panels(1,1,4));
+        ylabel('Firing rate (Hz)', 'Units','normalized','Position',[-0.12 1.3]);
+        % axes(panels(2,1,4));
+        % ylabel('Firing rate (Hz)', 'Units','normalized','Position',[-0.12 1.3]);
+end
 % for ii_dataset = 1:size(panels,1)
 %     for r = 1:size(panels,2)
 %         axes(panels(ii_dataset,r,1));
@@ -178,7 +218,9 @@ ylabel('Firing rate (Hz)', 'Units','normalized','Position',[-0.12 1.3]);
 
 
 %% print/save the figure
-fig_name_out = fullfile(res_dir, sprintf('%s_grp_%d',fig_name_str,grp));
+lw_str = sprintf('lw=%.1f',lw);
+lw_str = strrep(lw_str,'.','_');
+fig_name_out = fullfile(res_dir, sprintf('%s_grp_%d_ex2_%d_ncol_%d',fig_name_str,grp,wild_cells_IX(2),n_cols));
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');

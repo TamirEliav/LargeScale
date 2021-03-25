@@ -317,7 +317,7 @@ for ii = [1]
 end
 axes(panel_A(1, 1));
 text(-0.33,1.8, 'A', 'Units','normalized','FontWeight','bold');
-text(0,1.8, 'Examples of multiscale coding in the first days of exposure to the tunnel',...
+text(0,1.8, 'Examples of multi-scale coding in the first days of exposure to the tunnel',...
     'Units','normalized','FontWeight','bold');
 
 %% add direction arrows
@@ -385,7 +385,7 @@ axes(panel_B);
 cla
 hold on
 text(-0.3125,1.1, 'B', 'Units','normalized','FontWeight','bold');
-text(0,1.35, 'Population: Stability of multiscale coding across weeks, starting from day 1 in the tunnel',...
+text(0,1.35, 'Population: Stability of multi-scale coding across weeks, starting from day 1 in the tunnel',...
     'Units','normalized','FontWeight','bold');
 
 signif = arrayfun(@(x)(x.TF), cat(1,cells_130m.signif));
