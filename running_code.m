@@ -2397,7 +2397,18 @@ plot(xxx, PSTH1)
 plot(xxx, PSTH2)
 
 
-
+%%
+sdf=arrayfun(@(cell)([cell.signif.has_min_spikes]), cells , 'UniformOutput', false);
+sdf = cat(1,sdf{:});
+active_cells = any(sdf');
+sdf=arrayfun(@(cell)([cell.signif.TF]), cells , 'UniformOutput', false);
+sdf = cat(1,sdf{:});
+signif_cells = any(sdf');
+active_non_signif_cells = active_cells & ~signif_cells;
+fprintf('num active cells = %d\n',sum(active_cells))
+fprintf('num signif cells = %d\n',sum(signif_cells))
+active_non_signif_cells_ID = arrayfun(@(cell)([cell.details.cell_ID]), cells(active_non_signif_cells), 'UniformOutput', false);
+fprintf('%s\n',active_non_signif_cells_ID{:})
 
 
 %%

@@ -313,7 +313,7 @@ histology_slice_example_file = 'L:\resources\Histology\processed\Tamir_bat148_Se
 axes(panel_A);
 image = imread(logger_image_filename);
 imshow(image);
-text(-0.24,1.15, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.18,1.15, 'A', 'Units','normalized','FontWeight','bold');
 % add scale bar
 scale_mm = 10;
 pixel_mm_ratio = 720/11; % 720 pixels is measured manually using ginput amd sd card width is 11mm
@@ -334,7 +334,7 @@ h=annotation('textbox', [mean(xaf)-0.0005 mean(yaf)-0.008 0 0], 'String', sprint
 axes(panel_D);
 cla
 hold on
-text(-0.16,1.1, 'D', 'Units','normalized','FontWeight','bold');
+text(-0.12,1.1, 'D', 'Units','normalized','FontWeight','bold');
 image = imread(histology_slice_example_file);
 imshow(image);
 % add arrow to indicate the track/lesion
@@ -406,7 +406,7 @@ annotation('line', xaf(1)+[0 0], [yaf(1) 0.767], 'Linewidth',1);
 annotation('line', xaf(2)+[0 0], [yaf(2) 0.767], 'Linewidth',1);
 annotation('line', xaf(1)+[0 0.265], 0.767+[0 0.04], 'Linewidth',1);
 annotation('line', xaf(2)+[0 -0.17], 0.767+[0 0.04], 'Linewidth',1);
-text(-0.05,1.22, 'E', 'Units','normalized','FontWeight','bold');
+text(-0.043,1.22, 'E', 'Units','normalized','FontWeight','bold');
 
 %% panel H - tunnel section behavior (ZY)
 axes(panel_H)
@@ -513,7 +513,7 @@ ha.YRuler.TickLabelGapMultiplier = 0;
 %% bespoon localization (anchors+tag+tunnel)
 axes(panel_F);
 cla
-text(-0.11, 1, 'F', 'Units','normalized','FontWeight','bold');
+text(-0.12, 1, 'F', 'Units','normalized','FontWeight','bold');
 axis equal
 % axis normal
 pause(eps)

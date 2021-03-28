@@ -11,7 +11,7 @@ load('L:\Misha_attractor\20200902__new_simulations\sim_res.mat');
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S19';
+fig_name_str = 'fig_S21';
 fig_caption_str = 'attractor_model';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -67,6 +67,10 @@ pnls(2,5) = axes('Units','normalized', 'position', [0.77 0.85-0.33 0.17 0.07]);
 pnls(2,6) = axes('Units','normalized', 'position', [0.05 0.75-0.33 0.44 0.07]);
 pnls(2,7) = axes('Units','normalized', 'position', [0.50 0.75-0.33 0.44 0.07]);
 pnls(2,8) = axes('Units','normalized', 'position', [0.05 0.65-0.33 0.89 0.07]);
+
+for ii_pnl = 1:numel(pnls)
+    pnls(ii_pnl).Position(1) = pnls(ii_pnl).Position(1) + 0.015;
+end
 
 panel_C(1) = axes('position', [ 3  3 2.5 3]);
 panel_C(2) = axes('position', [ 7  3 2.5 3]);

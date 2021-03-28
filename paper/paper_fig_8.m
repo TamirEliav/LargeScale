@@ -34,7 +34,7 @@ cell_examples_IX = [29 3988 74 391 54]; % chosen examples
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_8';
+fig_name_str = 'fig_S20';
 fig_caption_str = 'Theoretical analysis - Mechanism';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -110,6 +110,7 @@ panel_C(3) = axes('position', [ 14.5 3.5 2.5 2.5]);
 
 FF_offset = -10.5;
 CANN_offset = +14.3;
+CANN_offset = CANN_offset - 0.5;
 FF_panels = [panel_D(:);panel_E(:);panel_F(:);panel_J(:);panel_G(:);panel_H(:);panel_I(:)];
 CANN_panels = [panel_A(:);panel_B(:);panel_C(:)];
 for ii_panel = 1:length(FF_panels)
@@ -123,8 +124,14 @@ colormap gray
 lw = 2;
 
 %%
+grand_title_pos = 0.96;
 FF_title_pos = 0.56;
-CANN_title_pos = 0.95;
+CANN_title_pos = 0.93;
+ht=annotation('textbox', [0.2 grand_title_pos .6 0], 'String','Overall summary of neural network modeling', ...
+    'HorizontalAlignment','center','VerticalAlignment','middle','Interpreter','none', 'FitBoxToText','off');
+ht.LineStyle='none';
+ht.FontSize = 12;
+ht.FontWeight = 'bold';
 ht=annotation('textbox', [0.3 FF_title_pos .4 0], 'String','Feedforward model', ...
     'HorizontalAlignment','center','VerticalAlignment','middle','Interpreter','none', 'FitBoxToText','off');
 ht.LineStyle='none';
@@ -623,7 +630,7 @@ for ii_seg=1:size(seg,1)
     x = seg(ii_seg,:)+seg_margins(ii_seg,:);
     y = [levels([ii_seg ii_seg])];
     plot(x,y,'k','linewidth',2,'Color','k');
-    text(x(1),y(1),"A"+ii_seg, 'HorizontalAlignment','left','VerticalAlignment','bottom','FontSize',8);
+    text(x(1),y(1)+0.07,"A"+ii_seg, 'HorizontalAlignment','left','VerticalAlignment','bottom','FontSize',8);
 %     sigma = 0.05;
 %     x = linspace(seg(ii,1),seg(ii,2),1000);
 %     y = 0.65.*gaussmf(x,[sigma*range(seg(ii,:)) mean(seg(ii,:))])+levels(ii);
@@ -718,6 +725,8 @@ if multiple_panels
     xlabel('Position (m)');
     xlim([0 200]);
     xticks([0:50:200]);
+    hax=gca;
+    hax.XRuler.TickLabelGapOffset = -1;
     axes(panel_B(3));
     ylabel('Firing rate (a.u.)');
 

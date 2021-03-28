@@ -361,12 +361,12 @@ axes(lab_wild_legend);
 cla
 box off
 hax = gca;
-h_app = annotation('rectangle',[0 0.3 0.25 0.25],'color', 'k', 'FaceColor',color_Lab, 'FaceAlpha',Lab_alpha, 'LineWidth', 0.01);
+h_app = annotation('rectangle',[0 0.7 0.25 0.25],'color', 'k', 'FaceColor',color_Lab, 'FaceAlpha',Lab_alpha, 'LineWidth', 0.01);
 h_app.Parent = hax;
-h_dis = annotation('rectangle',[0 0.7 0.25 0.25],'color','k', 'FaceColor',0.5*[1 1 1], 'LineWidth', 0.01);
+h_dis = annotation('rectangle',[0 0.3 0.25 0.25],'color','k', 'FaceColor',0.5*[1 1 1], 'LineWidth', 0.01);
 h_dis.Parent = hax;
-text(0.32,0.45,'Lab', 'HorizontalAlignment','left','FontSize',7);
-text(0.32,0.85,'Wild', 'HorizontalAlignment','left','FontSize',7);
+text(0.32,0.45,'Wild', 'HorizontalAlignment','left','FontSize',7);
+text(0.32,0.85,'Lab', 'HorizontalAlignment','left','FontSize',7);
 hax.Visible = 'off';
 
 %% panel C - field count histogram
@@ -868,10 +868,10 @@ axes(panel_I_legend);
 cla
 hold on
 prm = PARAMS_GetAll();
-scatter(0,2,10,[0.5 0.5 0.5]);
-scatter(0,1,10,color_Lab);
-text(0+0.2, 2, 'Wild', 'FontSize',7,'HorizontalAlignment','Left');
-text(0+0.2, 1, 'Lab', 'FontSize',7,'HorizontalAlignment','Left');
+scatter(0,1,10, [0.5 0.5 0.5]);
+scatter(0,2,10, color_Lab);
+text(0+0.2, 1, 'Wild', 'FontSize',7,'HorizontalAlignment','Left');
+text(0+0.2, 2, 'Lab', 'FontSize',7,'HorizontalAlignment','Left');
 xlim([0 1]);
 ylim([0 3]);
 set(gca,'Visible','off');

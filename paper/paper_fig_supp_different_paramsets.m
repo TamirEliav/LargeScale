@@ -7,7 +7,7 @@ clc
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S11';
+fig_name_str = 'fig_S12';
 fig_caption_str = 'robustness of results with different paramsets';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -49,6 +49,7 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 panels_size = [3.5 2];
 paramsets = [0 1 2 3 4 8 6 7 9];
 x_positions =      linspace(2,16.4,4);
+x_positions = x_positions + 2;
 x_positions(end)=[];
 y_positions = flip(linspace(1.5,23.5,length(paramsets)));
 for ii_paramset = 1:length(paramsets)

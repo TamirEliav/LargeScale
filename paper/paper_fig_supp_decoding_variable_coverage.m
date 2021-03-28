@@ -12,7 +12,7 @@ panels_FG_gray = 0.65*[1 1 1];
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S16';
+fig_name_str = 'fig_S17';
 fig_caption_str = 'Theoretical analysis_decoding';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');

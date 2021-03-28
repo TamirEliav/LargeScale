@@ -14,7 +14,7 @@ panel_D_scale = 'log';
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S9';
+fig_name_str = 'fig_S10';
 fig_caption_str = 'compare firing patterns between flight directions';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');

@@ -11,7 +11,7 @@ data = paper_fig_8_arrange_real_data();
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S20';
+fig_name_str = 'fig_S22';
 fig_caption_str = 'Theoretical analysis - Mechanism';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -275,7 +275,7 @@ hax.YScale = 'log';
 hax.TickLength(1)=0.02;
 hax.XRuler.TickLabelGapOffset = 0.5;
 xlabel('Spatial frequency (1/m)') ;
-ylabel('Power (norm.)') ;
+ylabel('Power (norm.)','Units','normalized','Position',[-0.155 0.5]);
 title('Model: Predicted spectrum of CA1 neurons','FontWeight','bold','Units','normalized','Position',[0.5 1.15]) ;
 % zoom box
 zoom_x = [0.03 0.09];
@@ -409,6 +409,8 @@ for ii_bat = 1:length(bats)
     hax=gca;
     hax.YScale = 'log';
     hax.XLim = [0 0.25];
+%     hax.XTick = [0 0.25];
+    hax.XTick = [0 0.1 0.2];
     hax.YTick = 10.^[-5:5];
     hax.YTickLabel = [];
     hax.TickLength(1) = 0.015 * 2;
@@ -421,6 +423,8 @@ for ii_bat = 1:length(bats)
     hax=gca;
     hax.YScale = 'log';
     hax.XLim = [0 0.25];
+%     hax.XTick = [0 0.25];
+    hax.XTick = [0 0.1 0.2];
     hax.YTick = 10.^[-5:5];
     hax.YTickLabel = [];
     hax.TickLength(1) = 0.015 * 2;

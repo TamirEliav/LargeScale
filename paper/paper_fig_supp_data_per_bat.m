@@ -11,7 +11,7 @@ bat_ID_num_map = containers.Map([34 79 148 2289 9861],...
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S8';
+fig_name_str = 'fig_S9';
 fig_caption_str = 'Data per bat';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');

@@ -50,14 +50,14 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 pause(0.2); % workaround to solve matlab automatically changing the axes positions...
 
 % create panels
-switch 3
+switch 2
     case 2
         n_cols = 2;
         n_rows = 9;
         panel_size = [7.5 1.3];
-        x_positions = linspace(0,9,n_cols)+2;
-        y_positions = linspace(0,14,n_rows);
-        panels_AB_y_offset = [10 2.5];
+        x_positions = linspace(0,9,n_cols)+2.7;
+        y_positions = linspace(0,16,n_rows);
+        panels_AB_y_offset = [8 2.5];
     case 3
         n_cols = 3;
         n_rows = 6;
@@ -160,7 +160,8 @@ for ii_dataset = 1:length(data)
         cell = cells(ii_cell);
         %% plot
         plot(cell.FR_map.all.bin_centers,cell.FR_map.all.PSTH,'k','LineWidth',lw);
-        text(1,1.1,sprintf('%.1fm (%.0f%%)',cell.largest,100*cell.ID/length(cells)),'FontSize',6,'Units','normalized','HorizontalAlignment','Right');
+        text(1,1.2,sprintf('%.1fm (%.0f%%)',cell.largest,100*cell.ID/length(cells)),'FontSize',6,'Units','normalized','HorizontalAlignment','Right');
+%         text(0,1.1,sprintf('%.1fm (%.0f%%)',cell.largest,100*cell.ID/length(cells)),'FontSize',6,'Units','normalized','HorizontalAlignment','Left');
 %         text(0.01,1.1,sprintf('%.1f',cell.stats.dir.field_ratio_LS),'FontSize',6,'Units','normalized','HorizontalAlignment','left');
 %         text(0.01,1.1,sprintf('%.2fm',cell.largest),'FontSize',6,'Units','normalized','HorizontalAlignment','left');
 %         text(0.99,1.1,sprintf('%d / %d (%.0f%%)',cell.ID,length(cells),100*cell.ID/length(cells)),'FontSize',6,'Units','normalized','HorizontalAlignment','right');
@@ -193,7 +194,7 @@ end
 switch n_cols
     case 2
         axes(panels(1,1,5));
-        ylabel('Firing rate (Hz)', 'Units','normalized','Position',[-0.12 0.5]);
+        ylabel('Firing rate (Hz)', 'Units','normalized','Position',[-0.10 0.5]);
         % axes(panels(2,1,5));
         % ylabel('Firing rate (Hz)', 'Units','normalized','Position',[-0.12 0.5]);
     case 3
