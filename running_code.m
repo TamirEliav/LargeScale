@@ -2411,6 +2411,19 @@ active_non_signif_cells_ID = arrayfun(@(cell)([cell.details.cell_ID]), cells(act
 fprintf('%s\n',active_non_signif_cells_ID{:})
 
 
+%% fig S6 batch
+clear
+clc
+for grp=1:19
+    fprintf('grp %d\n',grp);
+    paper_supp_fig_many_FR_map_examples
+end
+
+
+
+
+
+
 %%
 
 

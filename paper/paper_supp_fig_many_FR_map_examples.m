@@ -1,11 +1,22 @@
 %% Large Scale - Fig. S6 - many FR maps examples
 
 %%
-clear 
-clc
+% clear 
+% clc
+close all
+clearvars -except grp
 
 %% params
-grp = -1;
+
+% order_feature = 'largest';
+% order_feature = 'mean';
+order_feature = 'median';
+
+% grp_type = 'mod';
+grp_type = 'div';
+
+% grp = 1;
+
 lw = 0.8;
 
 %% define output files
@@ -110,17 +121,27 @@ for ii_dataset = 1:length(data)
         cells(ii_cell).fields = cells(ii_cell).fields{dir};
 %         cells(ii_cell).FE = cells(ii_cell).FE{dir};
         cells(ii_cell).largest = max([cells(ii_cell).fields.width_prc]);
+        cells(ii_cell).smallest = min([cells(ii_cell).fields.width_prc]);
+        cells(ii_cell).mean = mean([cells(ii_cell).fields.width_prc]);
+        cells(ii_cell).median = median([cells(ii_cell).fields.width_prc]);
     end
-%     stats=[cells.stats];
-%     stats_dir = [stats.dir];
-    [~,sort_IX] = sort([cells.largest]);
+    switch order_feature
+        case 'largest'
+            [~,sort_IX] = sort([cells.largest]);
+        case 'mean'
+            [~,sort_IX] = sort([cells.mean]);
+        case 'median'
+            [~,sort_IX] = sort([cells.median]);
+    end
     cells = cells(sort_IX);
-%     hold on
-%     histogram([cells.largest],'Normalization','pdf','NumBins',25);
-%     plot([cells.largest],'o-');
     IDs = 1:length(cells);
     n_grps = ceil(length(cells) / n_examples);
-    grps = mod(IDs,n_grps);
+    switch grp_type
+        case 'mod'
+            grps = mod(IDs,n_grps);
+        case 'div'
+            grps = ceil(IDs./n_examples);
+    end
     [cells.ID] = disperse(IDs);
     [cells.grp] = disperse(grps);
 
@@ -128,28 +149,35 @@ for ii_dataset = 1:length(data)
     clear cells1 cells2 cells12 signif
 end
 
-%%
-% wild_cells_IX = [327 320 301 272 256 243 210 193 182 165 143 118 103 82 66 56 25 19];
-% wild_cells_IX = [327 312 301 272 256 243 210 193 182 165 143 118 103 82 66 56 25 19];
-wild_cells_IX = [327 305 301 272 256 243 210 193 182 165 143 118 103 82 66 56 25 19]; % final choice
-[cells_all{ii_dataset}(wild_cells_IX).grp] = disperse(repelem(-1,length(wild_cells_IX)));
-
-%% make sure non of the examples are from fig 2
-fig_2_cell_examples = [433;  56;  51; 609; 419; 477;  57; 628; 337];
-fig_supp_cell_examples = arrayfun(@(x)(x.details.cell_num), cells_all{ii_dataset}(wild_cells_IX));
-is_duplicate = ismember(fig_supp_cell_examples,fig_2_cell_examples );
-if any(is_duplicate)
-    duplicate_cell_num = fig_supp_cell_examples(is_duplicate)
-    error('Same neuron as in Fig 2!!!!');
+%% choose 
+switch grp
+    case -1
+        % grouped by largrst field
+        % final choice
+        % order by largest field
+        wild_cells_IX = [327 305 301 272 256 243 210 193 182 165 143 118 103 82 66 56 25 19]; % sorted index 
+        [cells_all{ii_dataset}(wild_cells_IX).grp] = disperse(repelem(-1,length(wild_cells_IX)));
+    case -2
 end
-fig_supp_cell_examples
+
+%% make sure none of the chosen examples are from fig 2
+fig_2_cell_examples = [433;  56;  51; 609; 419; 477;  57; 628; 337];
+if grp<0
+    fig_supp_cell_examples = arrayfun(@(x)(x.details.cell_num), cells_all{ii_dataset}(wild_cells_IX));
+    is_duplicate = ismember(fig_supp_cell_examples,fig_2_cell_examples );
+    if any(is_duplicate)
+        duplicate_cell_num = fig_supp_cell_examples(is_duplicate)
+        error('Same neuron as in Fig 2!!!!');
+    end
+    fig_supp_cell_examples
+end
 
 %% plot 
 x_ticks = [0:50:200];
 for ii_dataset = 1:length(data)
     cells = cells_all{ii_dataset};
     cells_IX = find([cells.grp] == grp);
-    cells_IX = flip(cells_IX);
+%     cells_IX = flip(cells_IX);
     for ii_panel = 1:length(cells_IX)
         ii_cell = cells_IX(ii_panel);
         %% choose axis
@@ -160,7 +188,11 @@ for ii_dataset = 1:length(data)
         cell = cells(ii_cell);
         %% plot
         plot(cell.FR_map.all.bin_centers,cell.FR_map.all.PSTH,'k','LineWidth',lw);
-        text(1,1.2,sprintf('%.1fm (%.0f%%)',cell.largest,100*cell.ID/length(cells)),'FontSize',6,'Units','normalized','HorizontalAlignment','Right');
+        text(0,1.2,sprintf('cell %d    (%s)',cell.details.cell_num,cell.details.cell_ID),'FontSize',6,'Units','normalized','HorizontalAlignment','left','Interpreter','none');
+%         text(.5,1.0,strrep(sprintf('%s',cell.details.cell_ID),'_',' '),'FontSize',6,'Units','normalized','HorizontalAlignment','center');
+        text(1,1.30,sprintf('max/min/mean/median/ratio'),'FontSize',6,'Units','normalized','HorizontalAlignment','Right');
+        text(1,1.15,sprintf('%.1f / %.1f / %.1f / %.1f / %.1f',cell.largest,cell.smallest,cell.mean,cell.median, cell.stats.all.field_ratio_LS),'FontSize',6,'Units','normalized','HorizontalAlignment','Right');
+        text(1,1.0,sprintf('%d/%d=%.0f%%',cell.ID,length(cells),100*cell.ID/length(cells)),'FontSize',6,'Units','normalized','HorizontalAlignment','Right');
 %         text(0,1.1,sprintf('%.1fm (%.0f%%)',cell.largest,100*cell.ID/length(cells)),'FontSize',6,'Units','normalized','HorizontalAlignment','Left');
 %         text(0.01,1.1,sprintf('%.1f',cell.stats.dir.field_ratio_LS),'FontSize',6,'Units','normalized','HorizontalAlignment','left');
 %         text(0.01,1.1,sprintf('%.2fm',cell.largest),'FontSize',6,'Units','normalized','HorizontalAlignment','left');
@@ -213,15 +245,29 @@ end
 % end
 
 %%
+fig_details_str = {
+    sprintf('order_feature: %s',order_feature)
+    sprintf('grp_type: %s',grp_type)
+    sprintf('grp: %d',grp)
+    };
+annotation('textbox', [0.2 0.25 0 0], 'String',fig_details_str, 'HorizontalAlignment','left','Interpreter','none', 'FitBoxToText','on');
 
-
-
-
+fig_S6_cells_by_largest = [405 323 176 178 67 113 684 298 462 478 486 723 578 67 658 635 645 623];
+fig_2_cell_examples_str = ...
+    {'fig 2 cells:';...
+    sprintf('%d, ',fig_2_cell_examples);...
+    '';...
+    'fig S6 chosen by largest:';...
+    sprintf('%d, ',fig_S6_cells_by_largest(1:9));...
+    sprintf('%d, ',fig_S6_cells_by_largest(10:18))};
+annotation('textbox', [0.55 0.25 0 0], 'String',fig_2_cell_examples_str, 'HorizontalAlignment','left','Interpreter','none', 'FitBoxToText','on');
 
 %% print/save the figure
-lw_str = sprintf('lw=%.1f',lw);
-lw_str = strrep(lw_str,'.','_');
-fig_name_out = fullfile(res_dir, sprintf('%s_grp_%d_ex2_%d_ncol_%d',fig_name_str,grp,wild_cells_IX(2),n_cols));
+fig_name_out = fullfile(res_dir, sprintf('%s_order_by_%s_grp_type_%s_grp_%d',...
+    fig_name_str,...
+    order_feature,...
+    grp_type,...
+    grp));
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
