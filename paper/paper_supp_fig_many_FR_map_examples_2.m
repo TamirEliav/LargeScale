@@ -1,27 +1,27 @@
 %% Large Scale - Fig. S6 - many FR maps examples
 
 %%
-% clear 
-% clc
+clear 
+clc
 close all
 clearvars -except grp data
 
 %% params
 
-% order_feature = 'largest';
+order_feature = 'largest'; % our choice
 % order_feature = 'mean';
 % order_feature = 'median';
-order_feature = 'ratio';
+% order_feature = 'ratio';
 
 % grp_type = 'mod';
 grp_type = 'div';
 
-% grp = -1;
+grp = -13;
 
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
-fig_name_str = 'fig_S6b';
+fig_name_str = 'fig_S5';
 fig_caption_str = 'many FR map examples';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -63,10 +63,10 @@ pause(0.2); % workaround to solve matlab automatically changing the axes positio
 % create panels
 panel_size_raster = [5 1];
 panel_size_FR_map = [5 1];
-panel_pos = [2 12];
+panel_pos = [2 8];
 clear panels
 for ii=1:3
-    for jj=1:3
+    for jj=1:4
         offset_x = (ii-1)*6;
         offset_y = (jj-1)*4.3;
         offset = panel_pos + [offset_x offset_y];
@@ -75,9 +75,9 @@ for ii=1:3
         panels(ii,jj,3) = axes('position', [offset+[0 0   ] panel_size_raster]);
     end
 end
-panels = panels(:,3:-1:1,:);
-panels = reshape(panels,[9 3]);
-n_examples = 9;
+panels = panels(:,end:-1:1,:);
+panels = reshape(panels,[12 3]);
+n_examples = 12;
 
 %% load data
 if ~exist('data','var')
@@ -132,9 +132,18 @@ end
 [cells.order_feature_value] = disperse(order_feature_values);
 [cells.order_feature_prc] = disperse(100 * order_feature_IX / length(cells));
 
+%% choices with nachum
+% Cells selected together with Tamir (order according to mean field size: large  small):
+% YES:  67, 85, 631, 582, 684, 162, 486, 58, 645, 
+% YES-MAYBE: 72, 335, 658
+% MAYBE:  323 (zoom on 1-m field), 578
+
+
 %% choose 
 Tamir_options = [478 52 85 527 578 514 623 684 66 645 298 178 113 486 447 285 462 274 67 231 694 582 72 682 631 658 188 176 474 323];
 Tamir_options = sort(Tamir_options);
+Nachum_Tamir_options_1 = [67, 85, 631, 582, 684, 162, 486, 58, 645, 72, 335, 658]; % 1 
+Nachum_Tamir_options_2 = [67, 85, 631, 582, 684, 162, 486, 58, 645, 323, 578, 658]; % 2 - after Liora saw the examples
 switch grp
     case -1
         IX = ismember([cells.cell_num], Tamir_options(1:9) );
@@ -148,9 +157,19 @@ switch grp
     case -4
         IX = ismember([cells.cell_num], Tamir_options(28:30) );
         [cells(IX).grp] = disperse(repelem(grp,sum(IX)));
+    case -11
+        IX = ismember([cells.cell_num], Nachum_Tamir_options_1(1:9) );
+        [cells(IX).grp] = disperse(repelem(grp,sum(IX)));
+    case -12
+        IX = ismember([cells.cell_num], Nachum_Tamir_options_1(1:12) );
+        [cells(IX).grp] = disperse(repelem(grp,sum(IX)));
+    case -13
+        IX = ismember([cells.cell_num], Nachum_Tamir_options_2(1:12) );
+        [cells(IX).grp] = disperse(repelem(grp,sum(IX)));
 end
 
 cell_examples = cells([cells.grp] == grp);
+cell_examples = flip(cell_examples);
 
 %% make sure none of the chosen examples are from fig 2
 fig_2_cell_examples = [433;  56;  51; 609; 419; 477;  57; 628; 337];
@@ -188,12 +207,13 @@ for ii_cell = 1:length(cell_examples)
     h=plot(x,y);
     [h.Color] = disperse(c);
     box off
-    h=gca;
-    h.TickDir = 'out';
-    h.XTick = [];
-    h.YTick = [0 m];
-    h.YLim = ylimits;
-    h.XLim = [0 200];
+    hax=gca;
+    hax.TickDir = 'out';
+    hax.XTick = [];
+    hax.YTick = [0 m];
+    hax.YLim = ylimits;
+    hax.XLim = [0 200];
+    hax.YRuler.TickLabelGapOffset = -1;
     
     % fields (same axis)
     dir_offsets = [-0.1 -0.17]+0.015;
@@ -204,22 +224,43 @@ for ii_cell = 1:length(cell_examples)
         end
         for ii_field = 1:length(fields)
             
-            [xaf,yaf] = ds2nfu(fields(ii_field).edges_prc, repelem(dir_offsets(ii_dir)*range(h.YLim),2));
+            [xaf,yaf] = ds2nfu(fields(ii_field).edges_prc, repelem(dir_offsets(ii_dir)*range(hax.YLim),2));
             annotation('line',xaf,yaf,'Linewidth', 2, 'Color', c{ii_dir});
         end
     end
-    
+
     % cell details
-    text(0,1.5,sprintf('cell %d',cell.details.cell_num),'FontSize',6,'Units','normalized','HorizontalAlignment','left');
-    text(0,1.2,cell.details.cell_ID,'FontSize',5,'Units','normalized','HorizontalAlignment','left','Interpreter','none','Interpreter','none');
-    text(1,1.5,sprintf('max/min/mean/median/ratio'),'FontSize',6,'Units','normalized','HorizontalAlignment','Right');
-    text(1,1.2,sprintf('%.1f / %.1f / %.1f / %.1f / %.1f',...
-                        cell.largest,...
-                        cell.smallest,...
-                        cell.mean,...
-                        cell.median,...
-                        cell.ratio),'FontSize',6,'Units','normalized','HorizontalAlignment','Right');
-    text(1,1.0,sprintf('%d/%d=%.0f%%',cell.order_feature_IX, length(cells), cell.order_feature_prc),'FontSize',6,'Units','normalized','HorizontalAlignment','Right');
+    switch grp
+        case -12
+            cell_stats_str_pos_x = [0.63 0.45 0.20 0.59 0.40 0.38 0.35 0.45 0.35 0.65 0.20 0.55];
+            cell_stats_str_pos_y = [1.28 1.15 1.15 1.35 1.15 1.15 1.15 1.15 1.15 1.15 1.15 1.15];
+        case -13
+            cell_stats_str_pos_x = [0.65    0.63 0.24 0.40 0.85 0.88 0.45 0.35 0.65   0.85   0.75 0.55];
+            cell_stats_str_pos_y = [1.30    1.28 1.10 1.15 1.15 1.15 1.15 1.15 1.15   1.15   1.30 1.15];
+    end
+    cell_stats_str = {  sprintf('max=%.1fm', cell.stats.all.field_largest);...
+                        sprintf('min=%.1fm', cell.stats.all.field_smallest);...
+                        sprintf('ratio=%.1f', cell.stats.all.field_ratio_LS);...
+                     };
+    text(cell_stats_str_pos_x(ii_cell), cell_stats_str_pos_y(ii_cell)-0*0.23, cell_stats_str{1},...
+        'Units','normalized','HorizontalAlignment','center','VerticalAlignment','Top','FontSize',6);
+    text(cell_stats_str_pos_x(ii_cell), cell_stats_str_pos_y(ii_cell)-1*0.23, cell_stats_str{2},...
+        'Units','normalized','HorizontalAlignment','center','VerticalAlignment','Top','FontSize',6);
+    text(cell_stats_str_pos_x(ii_cell), cell_stats_str_pos_y(ii_cell)-2*0.23, cell_stats_str{3},...
+        'Units','normalized','HorizontalAlignment','center','VerticalAlignment','Top','FontSize',6);
+    text(0,1.25,sprintf('Cell %d',9+ii_cell),'FontSize',8,'Units','normalized','HorizontalAlignment','left');
+    
+% % % %     % cell details
+% % % %     text(0,1.5,sprintf('cell %d',cell.details.cell_num),'FontSize',6,'Units','normalized','HorizontalAlignment','left');
+% % % %     text(0,1.2,cell.details.cell_ID,'FontSize',5,'Units','normalized','HorizontalAlignment','left','Interpreter','none','Interpreter','none');
+% % % %     text(1,1.5,sprintf('max/min/mean/median/ratio'),'FontSize',6,'Units','normalized','HorizontalAlignment','Right');
+% % % %     text(1,1.2,sprintf('%.1f / %.1f / %.1f / %.1f / %.1f',...
+% % % %                         cell.largest,...
+% % % %                         cell.smallest,...
+% % % %                         cell.mean,...
+% % % %                         cell.median,...
+% % % %                         cell.ratio),'FontSize',6,'Units','normalized','HorizontalAlignment','Right');
+% % % %     text(1,1.0,sprintf('%d/%d=%.0f%%',cell.order_feature_IX, length(cells), cell.order_feature_prc),'FontSize',6,'Units','normalized','HorizontalAlignment','Right');
     
     % rasters
     FEs = [cell.FE];
@@ -233,20 +274,21 @@ for ii_cell = 1:length(cell_examples)
         y = [y{:}];
         plot(x,y,'.','Color',c{ii_dir},'MarkerSize',0.05);
         box off
-        h=gca;
+        hax=gca;
         m = length(FE);
-        h.YTick = [1 m];
-        h.XLim = [0 200];
-        h.YLim = [0 m+1];
+        hax.YTick = [1 m];
+        hax.XLim = [0 200];
+        hax.YLim = [0 m+1];
+        hax.YRuler.TickLabelGapOffset = -1;
         switch ii_dir
             case 1
-                h.XTick = [];
-                h.YTickLabel = {'',num2str(m)};
+                hax.XTick = [];
+                hax.YTickLabel = {'',num2str(m)};
             case 2
-                h.XTick = 0:50:200;
-                h.XRuler.TickLabelGapOffset = -2;
-                h.YTickLabel = {'1',num2str(m)};
-                h.TickDir = 'out';
+                hax.XTick = 0:50:200;
+                hax.XRuler.TickLabelGapOffset = -2;
+                hax.YTickLabel = {'1',num2str(m)};
+                hax.TickDir = 'out';
         end
     end
     % fields num (here to be above the 
@@ -263,11 +305,11 @@ end
 
 
 %% add x/y labels for specific panels
-for ii = [7 8 9]
+for ii = [10 11 12]
     axes(panels(ii, 3));
     xlabel('Position (m)', 'Units','normalized','Position',[0.5 -0.35]);
 end
-for ii = [1 4 7]
+for ii = [1 4 7 10]
     axes(panels(ii, 3));
 %     ylabel('Time (min)',   'Units','normalized','Position',[-0.1 1]);
     ylabel('Flight no.',   'Units','normalized','Position',[-0.1 1]);
@@ -277,7 +319,7 @@ end
 
 %% add direction arrows
 arrow_x = 0.1 +[0 0.05];
-arrow_y = repelem(0.93,2);
+arrow_y = repelem(0.94,2);
 clear h
 h(1)=annotation('arrow',arrow_x,      arrow_y+0.008,  'Color', prm.graphics.colors.flight_directions{1});
 h(2)=annotation('arrow',flip(arrow_x),arrow_y      ,  'Color', prm.graphics.colors.flight_directions{2});
@@ -299,6 +341,7 @@ h(2)=annotation('arrow',flip(arrow_x),arrow_y      ,  'Color', prm.graphics.colo
 
 
 %%
+if 0
 fig_details_str = {
     sprintf('order_feature: %s',order_feature)
     sprintf('grp_type: %s',grp_type)
@@ -315,6 +358,7 @@ fig_2_cell_examples_str = ...
     sprintf('%d, ',fig_S6_cells_by_largest(1:9));...
     sprintf('%d, ',fig_S6_cells_by_largest(10:18))};
 annotation('textbox', [0.55 0.4 0 0], 'String',fig_2_cell_examples_str, 'HorizontalAlignment','left','Interpreter','none', 'FitBoxToText','on');
+end
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, sprintf('%s_order_by_%s_grp_type_%s_grp_%d',...

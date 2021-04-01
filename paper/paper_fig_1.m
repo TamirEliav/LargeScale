@@ -406,7 +406,7 @@ annotation('line', xaf(1)+[0 0], [yaf(1) 0.767], 'Linewidth',1);
 annotation('line', xaf(2)+[0 0], [yaf(2) 0.767], 'Linewidth',1);
 annotation('line', xaf(1)+[0 0.265], 0.767+[0 0.04], 'Linewidth',1);
 annotation('line', xaf(2)+[0 -0.17], 0.767+[0 0.04], 'Linewidth',1);
-text(-0.043,1.22, 'E', 'Units','normalized','FontWeight','bold');
+text(-0.04,1.22, 'E', 'Units','normalized','FontWeight','bold');
 
 %% panel H - tunnel section behavior (ZY)
 axes(panel_H)
@@ -513,7 +513,7 @@ ha.YRuler.TickLabelGapMultiplier = 0;
 %% bespoon localization (anchors+tag+tunnel)
 axes(panel_F);
 cla
-text(-0.12, 1, 'F', 'Units','normalized','FontWeight','bold');
+text(-0.095, 1, 'F', 'Units','normalized','FontWeight','bold');
 axis equal
 % axis normal
 pause(eps)

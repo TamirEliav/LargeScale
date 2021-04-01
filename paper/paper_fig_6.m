@@ -467,7 +467,7 @@ ha.XLim = [0 h.BinLimits(2)];
 ha.XTick = [0 10 20];
 ha.TickDir='out';
 ha.TickLength = [0.03 0.03];
-ylim([0 0.2])
+ylim([0 0.22])
 ha.YTick = [0 0.1 0.2];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapMultiplier = 0.001;

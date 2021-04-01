@@ -504,13 +504,14 @@ ylabel('Field size (m)');
 % text(0.1,0.9,sprintf('dist thr = %dm',dist_thr),'Units','normalized', 'FontSize',7);
 text(0.05,1.15,['{\rho}' sprintf(' = %.2f',rho)],'Units','normalized', 'FontSize',7);
 text(0.05,1.05,sprintf('P = %.g',rho_pval),'Units','normalized', 'FontSize',7);
+text(0.05,0.95,sprintf('n = %d',length(x)),'Units','normalized', 'FontSize',7);
 hax=gca;
 hax.XAxis.TickLength(1) = 0.03;
 hax.YAxis.TickLength(1) = 0.02;
 hax.XRuler.TickLabelGapOffset = -1;
 hax.YRuler.TickLabelGapOffset = 0;
 
-% --- right panel: field size vs distance to ball --- 
+%% --- right panel: field size vs distance to ball --- 
 axes(panel_zoom(2));
 cla
 hold on
