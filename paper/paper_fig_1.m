@@ -4,6 +4,9 @@
 clear 
 clc
 
+%%
+fig_data = struct();
+
 %% choose data options
 panel_C_opt = 2;
 panel_G_opt = 1;
@@ -646,6 +649,8 @@ ha.TickLength = [0.03 0.03];
 ha.XRuler.TickLabelGapMultiplier = -0.3;
 ha.YRuler.TickLabelGapOffset = 0;
 
+fig_data.panel_G.error = err;
+
 %% load population data
 % get list of significant cells (at least in one direction)
 % ---------------------------------------------------------
@@ -739,6 +744,8 @@ ylim(ylimits);
 xlabel('Position (m)','Units','normalized','Position',[0.5 -0.2]);
 ylabel('Flight speed (m/s)','Units','normalized','Position',[-0.07 0.41]);
 
+fig_data.panel_I.position = x;
+fig_data.panel_I.speed = y;
 
 %% panel J - speed trajectory very constant along the flight - population
 axes(panel_J);
@@ -760,6 +767,7 @@ for ii_dir = 1:2
     h.Normalization = 'Count';
     h.FaceAlpha = 0;
     h.LineWidth = 1;
+    fig_data.panel_J.CV{ii_dir} = cv;
 end
 ha=gca;
 ha.XTick = [0 0.04 0.08];
@@ -804,6 +812,7 @@ for ii_dir = 1:2
     h.Normalization = 'Count';
     h.FaceAlpha = 0;
     h.LineWidth = 1;
+    fig_data.panel_K.nFlights{ii_dir} = nFlights;
 end
 ha=gca;
 ha.XLim(1) = 0;
@@ -881,6 +890,8 @@ ha.YRuler.TickLabelGapOffset = -1;
 xlabel('Distance flown (km)','Units','normalized','Position',[0.5 -0.25]);
 ylabel('No. of sessions','Units','normalized','Position',[-0.2 0.5]);
 
+fig_data.panel_L.total_distance = total_distance;
+
 %%
 data_opt_str = {
     'data options:'
@@ -902,6 +913,9 @@ print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
 disp('figure was successfully saved to pdf/tiff/fig formats');
+
+%% save fig_data
+save(fig_name_out,'fig_data')
 
 
 %%

@@ -3,6 +3,9 @@
 clear 
 clc
 
+%%
+fig_data = struct();
+
 %% plotting options
 field_speed_opt = 1;
 % corr_type = 'pearson';
@@ -235,12 +238,22 @@ for ii_cell = 1:length(cell_examples)
     h.YLim = ylimits;
     h.XLim = [0 200];
     
+    fig_data.panel_B.cells(ii_cell).maps(1).position = x;
+    fig_data.panel_B.cells(ii_cell).maps(2).position = x;
+    fig_data.panel_B.cells(ii_cell).maps(1).FR = y(1,:);
+    fig_data.panel_B.cells(ii_cell).maps(2).FR = y(2,:);
+    
     % fields
     dir_offsets = [-0.1 -0.17]+0.015;
     for ii_dir=1:2
         fields = cell.fields{ii_dir};
         if isfield(fields,'in_low_speed_area')
             fields([fields.in_low_speed_area])=[];
+        end
+        if isempty(fields)
+            fig_data.panel_B.cells(ii_cell).fields_edges{ii_dir} = [];
+        else 
+            fig_data.panel_B.cells(ii_cell).fields_edges{ii_dir} = cat(1,fields.edges_prc);
         end
         for ii_field = 1:length(fields)
             
@@ -308,6 +321,8 @@ for ii_cell = 1:length(cell_examples)
                 h.YTickLabel = {'1',num2str(m)};
                 h.TickDir = 'out';
         end
+        fig_data.panel_B.cells(ii_cell).rasters(ii_dir).position = x;
+        fig_data.panel_B.cells(ii_cell).rasters(ii_dir).flight_num = y;
     end
     % fields num (here to be above the 
     for ii_dir=1:2
@@ -401,6 +416,9 @@ for ii_dir = 1:2
 end
 nFields_wild = nFields_wild(:);
 nFields_wild(isnan(nFields_wild)) = [];
+
+fig_data.panel_C.number_of_fields_per_direction_lab = nFields_lab(:);
+fig_data.panel_C.number_of_fields_per_direction_wild = nFields_wild(:);
 
 h = histogram(nFields_wild(:));
 h.FaceColor = 0.5*[1 1 1];
@@ -548,6 +566,10 @@ for ii_dir = 1:2
         fields_size_wild = [fields_size_wild fields.width_prc];
     end
 end
+
+fig_data.panel_D.fields_size_lab = fields_size_lab;
+fig_data.panel_D.fields_size_wild = fields_size_wild;
+
 h = histogram(fields_size_wild);
 h.FaceColor = 0.5*[1 1 1];
 % h.NumBins = 33;
@@ -700,6 +722,9 @@ for ii_cell = 1:length(cells_wild)
     end
 end
 LS_field_ratio_all_wild(isnan(LS_field_ratio_all_wild)) = [];
+
+fig_data.panel_E.fields_size_ratio_lab = LS_field_ratio_all_lab;
+fig_data.panel_E.fields_size_ratio_wild = LS_field_ratio_all_wild;
 
 nBinEdges = 9;
 edges = logspace(0,log10(25),nBinEdges);
@@ -892,4 +917,7 @@ print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
 disp('figure was successfully saved to pdf/tiff/fig formats');
+
+%% save fig_data
+save(fig_name_out,'fig_data');
 

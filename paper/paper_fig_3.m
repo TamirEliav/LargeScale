@@ -4,6 +4,9 @@
 clear 
 clc
 
+%%
+fig_data = struct();
+
 %% define output files
 res_dir = 'L:\paper_figures';
 mkdir(res_dir)
@@ -277,6 +280,12 @@ for ii_dir = 1:2
     ha.YRuler.TickLabelGapOffset = 2.2;
     xlabel({'Distance of fields';'to nearest landmark (m)'}, 'Units','normalized','Position',[0.5 -0.13])
     ylabel({'Probability';'density function'}, 'Units','normalized','Position',[-0.08 0.5])
+    
+    if sum(isnan(x1))
+        error('nans!')
+    end
+    fig_data.panel_B.dist_to_nearest_landmark{ii_dir} = x1;
+    
 end
 
 axes(panel_B(1));
@@ -466,6 +475,15 @@ for ii_dir = 1:2
 %     text(3,1, "Distance$<$"   +thr+"m",'FontSize',7,'Interpreter','latex')
 %     text(3,2, "Distance$\geq$"+thr+"m",'FontSize',7,'Interpreter','latex')
     set(gca,'Visible','off');
+    
+    if sum(isnan(y1))
+        error('nans!')
+    end
+    if sum(isnan(y2))
+        error('nans!')
+    end
+    fig_data.panel_E.field_size{ii_dir}.nearby_landmarks = y1;
+    fig_data.panel_E.field_size{ii_dir}.far_from_landmarks = y2;
 end
 
 
@@ -533,6 +551,7 @@ text(2.6, 1, 'Exponential fit','FontSize',7,'HorizontalAlignment','left');
 hax=gca;
 hax.Visible='off';
 
+fig_data.panel_C.gaps_between_fields = gaps;
 
 %% add direction arrows
 arrow_x = 0.1 +[0 0.05];
@@ -555,6 +574,8 @@ print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
 disp('figure was successfully saved to pdf/tiff/fig formats');
 
+%% save fig_data
+save(fig_name_out,'fig_data')
 
 
 

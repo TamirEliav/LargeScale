@@ -4,6 +4,9 @@
 clear 
 clc
 
+%%
+fig_data = struct();
+
 %% params
 nboot = 10000;
 alpha = 0.05; % TODO: decide if one or two sided test
@@ -281,12 +284,23 @@ for ii_dataset = 1:size(cell_examples,1)
         area(cell.stats.all.valid_speed_pos(2) + [0 area_size], repelem(area_upperval,2), area_lowerval, 'FaceColor',0.7*[1 1 1],'EdgeColor','none','ShowBaseLine','off','Clipping','off');
         h=plot(x,y,'LineWidth',1.2);
         [h.Color] = disperse(c);
+        
+        fig_data.panel_A.cells(ii_cell).maps(1).position = x-rescale_gain_offset(2);
+        fig_data.panel_A.cells(ii_cell).maps(2).position = x-rescale_gain_offset(2);
+        fig_data.panel_A.cells(ii_cell).maps(1).FR = y(1,:);
+        fig_data.panel_A.cells(ii_cell).maps(2).FR = y(2,:);
+
         % fields
         dir_offsets = [-0.1 -0.17]+0.015;
         for ii_dir=1:2
             fields = cell.fields{ii_dir};
             if isfield(fields,'in_low_speed_area')
                 fields([fields.in_low_speed_area])=[];
+            end
+            if isempty(fields)
+                fig_data.panel_A.cells(ii_cell).fields_edges{ii_dir} = [];
+            else 
+                fig_data.panel_A.cells(ii_cell).fields_edges{ii_dir} = cat(1,fields.edges_prc) - rescale_gain_offset(2);
             end
             for ii_field = 1:length(fields)
                 plot(fields(ii_field).edges_prc, ...
@@ -342,6 +356,8 @@ for ii_dataset = 1:size(cell_examples,1)
                     h.YTickLabel = {'1',num2str(m)};
                     h.TickDir = 'out';
             end
+            fig_data.panel_A.cells(ii_cell).rasters(ii_dir).position = x - rescale_gain_offset(2);
+            fig_data.panel_A.cells(ii_cell).rasters(ii_dir).flight_num = y;
         end
         
         % fields num (here to be above the - TODO: Move up where I plot fields
@@ -565,6 +581,8 @@ for ii_dataset = 1:length(datasets)
     plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
     fprintf('\tNo. of fields: mean=%.1f median=%.1f IQR=%.1f-%.1f\n', nanmean(x), prctile(x,[50]), prctile(x,[25 75]) );
     
+    fig_data.panel_B.number_of_fields_per_direction{ii_dataset} = x;
+    
     %% Field Size
     x = field_size;
     axes(panel_BCD(ii_dataset,2));
@@ -619,6 +637,8 @@ for ii_dataset = 1:length(datasets)
         hax.YLabel.String = '';
     end
     
+    fig_data.panel_C.fields_size{ii_dataset} = x;
+    
     %% ratio L/S
     x1 = ratio_LS;
     x2 = ratio_LS_with_1s;
@@ -668,6 +688,9 @@ for ii_dataset = 1:length(datasets)
     plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
     plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
     fprintf('\tFields size ratio (L/S): mean=%.1f median=%.1f IQR=%.1f-%.1f\n', nanmean(x), prctile(x,[50]), prctile(x,[25 75]) );
+    
+    fig_data.panel_D.fields_size_ratio{ii_dataset} = x1(~isnan(x1));
+    fig_data.panel_D.fields_size_ratio_including_single_fields{ii_dataset} = x2;
     
     %% ratio L/S vs ratio dist2center
     if norm_dist_from_center & ~isnan(center_part_len(ii_dataset)) % only for small env.
@@ -918,6 +941,9 @@ print(gcf, file_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
 fprintf('Figure was successfully saved to pdf format, file name:\n\t%s\n',file_out);
+
+%% save fig_data
+save(file_out,'fig_data')
 
 %%
 function [CV,CI,SD,SEM] = CV_BS(X,nboot,alpha)

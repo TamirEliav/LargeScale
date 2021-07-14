@@ -4,6 +4,9 @@
 clear 
 clc
 
+%%
+fig_data = struct();
+
 %% plotting options
 field_speed_opt = 1;
 % corr_type = 'pearson';
@@ -210,6 +213,11 @@ for ii_cell = 1:length(cell_examples)
     h.XLim = [0 130];
     h.YRuler.TickLabelGapOffset = 1;
     h.Clipping = 'off';
+        
+    fig_data.panel_A.cells(ii_cell).maps(1).position = x;
+    fig_data.panel_A.cells(ii_cell).maps(2).position = x;
+    fig_data.panel_A.cells(ii_cell).maps(1).FR = y(1,:);
+    fig_data.panel_A.cells(ii_cell).maps(2).FR = y(2,:);
     
     % fields
     dir_offsets = [-0.1 -0.17]+0.015;
@@ -217,6 +225,11 @@ for ii_cell = 1:length(cell_examples)
         fields = cell.fields{ii_dir};
         if isfield(fields,'in_low_speed_area')
             fields([fields.in_low_speed_area])=[];
+        end
+        if isempty(fields)
+            fig_data.panel_A.cells(ii_cell).fields_edges{ii_dir} = [];
+        else 
+            fig_data.panel_A.cells(ii_cell).fields_edges{ii_dir} = cat(1,fields.edges_prc);
         end
         for ii_field = 1:length(fields)
             
@@ -290,6 +303,8 @@ for ii_cell = 1:length(cell_examples)
                 h.YTickLabel = {'1',num2str(m)};
                 h.TickDir = 'out';
         end
+        fig_data.panel_A.cells(ii_cell).rasters(ii_dir).position = x;
+        fig_data.panel_A.cells(ii_cell).rasters(ii_dir).flight_num = y;
     end
     % fields num (here to be above the 
     for ii_dir=1:2
@@ -400,6 +415,10 @@ n_fields_jitter = n_fields + jitter_value_y*(2*rand([length(n_fields),1])-1);
 day_num_perCell_perDir_jitter = day_num_perCell_perDir + jitter_value_x*(2*rand([length(day_num_perCell_perDir),1])-1);
 p = plot(day_num_perCell_perDir_jitter, n_fields_jitter, '.');
 p.Color = 0.65*[1 1 1];
+
+nan_IX = isnan(n_fields);
+fig_data.panel_B.day = day_num_perCell_perDir(~nan_IX)';
+fig_data.panel_B.number_of_fields_per_direction = n_fields(~nan_IX)';
 
 day_bins = day_bin_perCell_perDir;
 day_num_perCell_perDir_tmp = day_num_perCell_perDir;
@@ -521,6 +540,9 @@ day_num_fields_jitter = day_num_fields + jitter_value_x*(2*rand([1,length(day_nu
 p = plot(day_num_fields_jitter, fields_size, '.');
 p.Color = 0.65*[1 1 1];
 
+fig_data.panel_C.day = day_num_fields;
+fig_data.panel_C.fields_size = fields_size;
+
 [~,~,day_bin_perField] = histcounts(day_num_fields,bin_edges);
 [day_groups, day_bins] = findgroups(day_bin_perField);
 day_groups_stat = splitapply(@(x) [mean(x) std(x)],fields_size', day_groups');
@@ -640,6 +662,9 @@ jitter_value_x = 0.5;
 day_num_perCell_jitter = day_num_perCell + jitter_value_x*(2*rand([length(day_num_perCell),1])-1);
 p = plot(day_num_perCell_jitter, LS_field_ratio_all,'.');
 p.Color = 0.65*[1 1 1];
+
+fig_data.panel_D.day = day_num_perCell';
+fig_data.panel_D.fields_size_ratio = LS_field_ratio_all;
 
 day_bins = day_bin_perCell;
 day_num_perCell_tmp = day_num_perCell;
@@ -810,6 +835,8 @@ for ii_cell = 1:length(cell_examples)
                 h.YTickLabel = {'1',num2str(m)};
                 h.TickDir = 'out';
         end
+        fig_data.panel_E.cells(ii_cell).rasters(ii_dir).position = x;
+        fig_data.panel_E.cells(ii_cell).rasters(ii_dir).flight_num = y;
     end
     % cell details
     cell_num_str_pos_x   = [0.50 0.50 0.50 0.50];
@@ -1251,6 +1278,9 @@ print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
 disp('figure was successfully saved to pdf/tiff/fig formats');
+
+%% save fig_data
+save(fig_name_out,'fig_data');
 
 
 %%

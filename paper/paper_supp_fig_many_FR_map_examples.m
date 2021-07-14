@@ -4,18 +4,18 @@
 % clear 
 % clc
 close all
-clearvars -except grp
+clearvars -except grp data
 
 %% params
 
 % order_feature = 'largest';
-% order_feature = 'mean';
-order_feature = 'median';
+order_feature = 'mean';
+% order_feature = 'median';
 
 % grp_type = 'mod';
 grp_type = 'div';
 
-% grp = 1;
+grp = 1;
 
 lw = 0.8;
 
@@ -77,7 +77,9 @@ switch 2
         y_positions = linspace(0,9,n_rows);
         panels_AB_y_offset = [14.5 2.5];
 end
+y_positions = flip(y_positions);
 n_examples = n_cols * n_rows;
+n_examples = n_examples / 2; % add resters
 clear panels 
 for ii_dataset = 1
    for r = 1:n_rows
@@ -86,20 +88,29 @@ for ii_dataset = 1
             y = y_positions(r);
             y = y + panels_AB_y_offset(ii_dataset);
             panels(ii_dataset,r,c) = axes('position', [x y panel_size]);
+            title(sprintf('r=%d c=%d',r,c))
        end
     end
 end
-panels = panels(:,end:-1:1,:);
-% panels = panels(:,:,end:-1:1);
-panels = permute(panels, [1 3 2]);
+
+% panels = panels(:,end:-1:1,:);
+% panels = permute(panels, [1 3 2]);
+% panels = reshape(panels, 1,[])
+% for ii = 1:length(panels)
+%     axes(panels(1,ii))
+%     title(ii)
+% end
 
 %% load data
-cells_wild = load('L:\processed_data_structs\cells_bat_200m.mat');
-% cells_lab = load('L:\processed_data_structs\cells_lab.mat');
-cells_wild = cells_wild.cells;
-% cells_lab = cells_lab.cells;
-% data = {cells_wild;cells_lab};
-data = {cells_wild};
+if ~exist('data','var')
+%     cells_wild = load('L:\processed_data_structs\cells_bat_200m.mat');
+    cells_wild = load('L:\processed_data_structs\cells_with_FE.mat')
+    % cells_lab = load('L:\processed_data_structs\cells_lab.mat');
+    cells_wild = cells_wild.cells;
+    % cells_lab = cells_lab.cells;
+    % data = {cells_wild;cells_lab};
+    data = {cells_wild};
+end
 
 %% arrange data
 cells_all = {};
@@ -119,11 +130,13 @@ for ii_dataset = 1:length(data)
         cells(ii_cell).signif = cells(ii_cell).signif(dir);
         cells(ii_cell).FR_map = cells(ii_cell).FR_map(dir);
         cells(ii_cell).fields = cells(ii_cell).fields{dir};
-%         cells(ii_cell).FE = cells(ii_cell).FE{dir};
-        cells(ii_cell).largest = max([cells(ii_cell).fields.width_prc]);
-        cells(ii_cell).smallest = min([cells(ii_cell).fields.width_prc]);
-        cells(ii_cell).mean = mean([cells(ii_cell).fields.width_prc]);
-        cells(ii_cell).median = median([cells(ii_cell).fields.width_prc]);
+        cells(ii_cell).FE = cells(ii_cell).FE{dir};
+        fields_valid_speed = [cells(ii_cell).fields];
+        fields_valid_speed(fields_valid_speed.in_low_speed_area) = [];
+        cells(ii_cell).largest = max([fields_valid_speed.width_prc]);
+        cells(ii_cell).smallest = min([fields_valid_speed.width_prc]);
+        cells(ii_cell).mean = mean([fields_valid_speed.width_prc]);
+        cells(ii_cell).median = median([fields_valid_speed.width_prc]);
     end
     switch order_feature
         case 'largest'
@@ -206,7 +219,7 @@ for ii_dataset = 1:length(data)
     end
 end
 
-% labels
+%% labels
 % axes(panels(1,1));
 % text(-0.2,1.2, 'A', 'Units','normalized','FontWeight','bold');
 % axes(panels(2,1));

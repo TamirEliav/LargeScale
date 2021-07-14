@@ -4,6 +4,9 @@
 clear 
 clc
 
+%%
+fig_data = struct();
+
 %% plotting options (panel B)
 plot_style = 'errorbars';
 % plot_style = 'boxplot';
@@ -197,6 +200,10 @@ ha.YScale = 'linear';
 xlabel('In-field spikes (%)', 'Units','normalized','Position',[0.5 -0.13]);
 ylabel('No. of cells')
 
+x = in_field_spikes_prc(:);
+x(isnan(x)) = [];
+fig_data.panel_A.in_field_spikes_prc = x;
+
 %% Panel B - percentage of out-of-field spikes
 axes(panel_B);
 % cla RESET
@@ -257,6 +264,9 @@ switch plot_style
         ylabel('No. of cells')
 end
 
+fig_data.panel_B.in_field_firing_rate = x1;
+fig_data.panel_B.out_field_firing_rate = x2;
+
 %% within-field ISI hist
 axes(panel_C(1));
 cla('reset')
@@ -281,6 +291,8 @@ ha.YRuler.TickLabelGapOffset = -1;
 ha.YScale = 'linear';
 xlabel({'In-field inter-spike interval (ms)'}, 'Units','normalized','Position',[0.5 -0.13]);
 ylabel({'Probability';'density function'},'Units','normalized','Position',[-0.13 0.5]);
+
+fig_data.panel_C.in_field_inter_spike_interval = ISI_all;
 
 %% within-field ISI hist (inset, log-scale)
 axes(panel_C(2));
@@ -337,6 +349,8 @@ xlabel('In-field bursty spikes (%)', 'Units','normalized','Position',[0.5 -0.13]
 ylabel('No. of fields','Units','normalized','Position',[-0.24 0.5]);
 % text(0.5,0.85,"n="+length(spikes_in_burst_prc_all_fields),'Units','normalized');
 
+fig_data.panel_D.in_field_bursty_spikes_prc = spikes_in_burst_prc_all_fields.*100;
+
 %% percentage of bursty spikes (per cell)
 % % % % % % % % % % axes(panel_D(2));
 % % % % % % % % % % cla('reset')
@@ -381,6 +395,8 @@ ha.YScale = 'linear';
 xlabel('Mean firing rate in-flight (Hz)', 'Units','normalized','Position',[0.5 -0.13]);
 ylabel('No. of cells');
 
+fig_data.panel_E.mean_firing_rate_in_flight= [stats_all.meanFR_flight];
+
 %% field peak rate vs field size
 axes(panel_F);
 cla('reset')
@@ -410,7 +426,8 @@ ha.YScale = 'linear';
 xlabel('Field size (m)', 'Units','normalized','Position',[0.5 -0.13]);
 ylabel('Field peak rate (Hz)');
 
-
+fig_data.panel_F.field_size = x;
+fig_data.panel_F.field_peak_rate = y;
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, fig_name_str+"_style_"+plot_style+"_burst_thr_"+burst_ISI_thr);
@@ -418,6 +435,10 @@ print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 % print(gcf, fig_name_out, '-dtiff', '-cmyk', '-painters');
 % saveas(gcf , fig_name_out, 'fig');
 disp('figure was successfully saved to pdf/tiff/fig formats');
+
+
+%% save fig_data
+save(fig_name_out,'fig_data')
 
 
 

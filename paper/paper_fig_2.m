@@ -4,6 +4,9 @@
 clear 
 clc
 
+%%
+fig_data = struct();
+
 %% plotting options
 field_speed_opt = 1;
 % corr_type = 'pearson';
@@ -142,12 +145,22 @@ for ii_cell = 1:length(cell_examples)
     h.YLim = ylimits;
     h.XLim = [0 200];
     
+    fig_data.panel_A.cells(ii_cell).maps(1).position = x;
+    fig_data.panel_A.cells(ii_cell).maps(2).position = x;
+    fig_data.panel_A.cells(ii_cell).maps(1).FR = y(1,:);
+    fig_data.panel_A.cells(ii_cell).maps(2).FR = y(2,:);
+    
     % fields
     dir_offsets = [-0.1 -0.17]+0.015;
     for ii_dir=1:2
         fields = cell.fields{ii_dir};
         if isfield(fields,'in_low_speed_area')
             fields([fields.in_low_speed_area])=[];
+        end
+        if isempty(fields)
+            fig_data.panel_A.cells(ii_cell).fields_edges{ii_dir} = [];
+        else 
+            fig_data.panel_A.cells(ii_cell).fields_edges{ii_dir} = cat(1,fields.edges_prc);
         end
         for ii_field = 1:length(fields)
             
@@ -211,6 +224,8 @@ for ii_cell = 1:length(cell_examples)
                 h.YTickLabel = {'1',num2str(m)};
                 h.TickDir = 'out';
         end
+        fig_data.panel_A.cells(ii_cell).rasters(ii_dir).position = x;
+        fig_data.panel_A.cells(ii_cell).rasters(ii_dir).flight_num = y;
     end
     % fields num (here to be above the 
     for ii_dir=1:2
@@ -452,6 +467,8 @@ m = ha.YLim(2) + 0.15*range(ha.YLim);
 plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
 plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
 
+fig_data.panel_B.spatial_info = x;
+
 %% panel C - sparsity histogram
 axes(panel_C);
 cla
@@ -479,6 +496,8 @@ hl=xline(nanmean(x)); hl.Color='r';
 m = ha.YLim(2) + 0.15*range(ha.YLim);
 plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
 plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
+
+fig_data.panel_C.sparsity = x;
 
 %% panel D - Total area histogram
 axes(panel_D(1));
@@ -541,6 +560,11 @@ hax.XRuler.TickLabelGapMultiplier = -0.35;
 hax.TickLength = panel_D(1).TickLength;
 xlabel('Coverage (%)', 'Units','normalized','Position',[0.45 1.2]);
 
+x = total_area(:);
+x(isnan(x)) = [];
+fig_data.panel_D.coverage_in_meters = x;
+fig_data.panel_D.coverage_in_prc = x ./ total_area_L;
+
 %% panel E - stability
 axes(panel_E);
 cla
@@ -586,6 +610,8 @@ m = ha.YLim(2) + 0.05*range(ha.YLim);
 plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
 plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
 fprintf('\tMap correlations odd vs. even flights: mean=%.2f median=%.2f IQR=%.2f-%.2f\n', nanmean(x), prctile(x,[50]), prctile(x,[25 75]) );
+
+fig_data.panel_E.stability = x;
 
 %%
 % figure
@@ -668,6 +694,8 @@ xlabel('Map correlation', 'Units','normalized','Position',[0.5 -0.17])
 ylabel({'Probability';'density function'}, 'Units','normalized','Position',[-0.17 0.5])
 title('Directionality');
 
+fig_data.panel_F.directionality = data;
+
 %% panel G - field count histogram
 % figure
 axes(panel_G);
@@ -720,6 +748,9 @@ plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
 plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
 fprintf('\tNo. of fields: mean=%.1f median=%.1f IQR=%.1f-%.1f\n', nanmean(x), prctile(x,[50]), prctile(x,[25 75]) );
 
+x(isnan(x)) = [];
+fig_data.panel_G.number_of_fields_per_direction = x;
+
 %% panel H - field size histogram
 % figure
 axes(panel_H);
@@ -767,6 +798,8 @@ m = ha.YLim(2) + 0.15*range(ha.YLim);
 plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
 plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
 fprintf('\t Fields sizes: mean=%.1fm median=%.1fm IQR=%.1f-%.1fm\n', nanmean(x), prctile(x,[50]), prctile(x,[25 75]) );
+
+fig_data.panel_H.fields_size = x;
 
 save( fullfile(res_dir,'pop_dist_fields_size'), 'fields_size');
 
@@ -903,6 +936,9 @@ plot(prctile(x,[25 75]), [m m], 'r-','LineWidth',1   ,'Clipping','off');
 plot(prctile(x,[50]),    m    , 'r.','MarkerSize',10 ,'Clipping','off');
 fprintf('\tFields size ratio (L/S): mean=%.1f median=%.1f IQR=%.1f-%.1f\n', nanmean(x), prctile(x,[50]), prctile(x,[25 75]) );
 
+x(isnan(x)) = [];
+fig_data.panel_J.fields_size_ratio_largest_to_smallest = x;
+
 %% panel K - prepare data
 distances_all = [];
 field_size_diff_all = [];
@@ -990,6 +1026,8 @@ disp('figure was successfully saved to pdf format');
 disp('======================================================');
 
 
+%% save fig_data
+save(fig_name_out,'fig_data')
 
 
 
