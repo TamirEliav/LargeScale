@@ -2421,11 +2421,44 @@ for grp=-1:-1:-4
 end
 
 
-
-
-
+%% check save fig data
+clear
+clc
+load('L:\paper_figures\Fig_6.mat')
+fn_structdisp(fig_data)
 
 %%
+ii_cell = 1; plot(fig_data.panel_A.cells(ii_cell).maps(1).position, cat(1,fig_data.panel_A.cells(ii_cell).maps.FR))
+
+%%
+ii_cell = 4;
+for ii_dir = 1:2
+    hold on
+    clrs = 'br';
+    c = clrs(ii_dir);
+    plot(fig_data.panel_E.cells(ii_cell).rasters(ii_dir).position,...
+         fig_data.panel_E.cells(ii_cell).rasters(ii_dir).flight_num, '.', 'Color',c);
+end
+%%
+for ii_cell = 1:6
+    field_L = max(range(cat(1,fig_data.panel_A.cells(ii_cell).fields_edges{:}),2));
+    field_S = min(range(cat(1,fig_data.panel_A.cells(ii_cell).fields_edges{:}),2));
+    field_ratio = field_L ./ field_S;
+    fprintf('cell %d \t min=%.1fm \t max=%.1fm \t ratio=%.1fm\n', ii_cell, field_L, field_S, field_ratio)
+end
+
+%%
+x1=zeros(1,10);
+x2=zeros(1,10);
+x1([2 5 8])=1;
+x2([2 5 8])=1;
+[ccc lags]=xcorr(x1,x2);
+plot(lags,ccc)
+
+%% 
+[S,t,f,Serr]=mtspecgramtrigc(LFP(TT_trigger,:)',ripples.peak_IX,chrnx_win,chrnx_movingwin);
+
+
 
 
 

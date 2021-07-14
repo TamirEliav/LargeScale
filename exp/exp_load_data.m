@@ -9,6 +9,9 @@ field_options = {
     'LM',           0
     'csc_raw_stats',1
     'wingbeat',     1
+    'ripples',      1
+    'MUA',          1
+    'PE',           1
     };
 
 %% parse input

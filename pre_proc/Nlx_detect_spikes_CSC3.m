@@ -192,7 +192,7 @@ for TT = params.TT_to_use
     time_measure.thr_crs(TT) = toc;
 	stats.detect_nEvents(act_ch,TT) = cellfun(@length,TT_ch_events_IX);
     
-    %% merge event from mall channels
+    %% merge event from all channels
     fprintf('\t Merge spikes from different channels \n')
     tic
     M = zeros(4,length(timestamps));

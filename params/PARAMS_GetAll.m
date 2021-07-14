@@ -51,12 +51,24 @@ prm.oscillations.time_AC.win_size = 2;
 % prm.oscillations.phase_hist.bin_size = 2*pi/20;
 % prm.oscillations.STA.win_size = 2;
 
-% prm.LFP.ripples.freq_band = [120 180];
-% prm.LFP.ripples.thr_std = 4;
-% prm.LFP.theta.band = [5 8];
-% prm.LFP.theta.resample_fs = 1000;
-% prm.LFP.flight_rhythm.band = [3 10];
-% prm.LFP.flight_rhythm.resample_fs = 1000;
+% prm.ripples.smooth_ker = 4; % ms
+% prm.ripples.high_thr_std = 3; % no minimum duration
+% prm.ripples.low_thr_std = 3; % for event edges
+% prm.ripples.merge_thr_msec = 25;
+% prm.ripples.min_width_msec = 30;
+% prm.ripples.ripple_gamma_power_ratio_thr = 0; % zero means technically not applied
+
+prm.ripples.smooth_ker = 4; % ms
+prm.ripples.high_thr_std = 2; % no minimum duration
+prm.ripples.low_thr_std = 1; % for event edges
+prm.ripples.merge_thr_msec = 25;
+prm.ripples.min_width_msec = 25;
+prm.ripples.ripple_gamma_power_ratio_thr = 0; % zero means technically not applied
+
+prm.MUA.bin_size = 1; % ms
+prm.MUA.smooth_ker = 15; % ms
+prm.MUA.high_thr_std = 2; % no minimum duration
+prm.MUA.low_thr_std = 1;  % for event edges
 
 prm.FR_map.bin_size = 0.2;
 prm.FR_map.bin_limits = [0 200];
@@ -69,7 +81,7 @@ prm.FR_map.shuffles_max_shift = 30;
 prm.fields.FR_thr = 1;
 prm.fields.overlap_href = 0.5; % href=horizontal reference
 prm.fields.width_href = 0.2;
-prm.fields.width_prc = [5 95]; % TODO: consider chaning to 2.5-97.5 %
+prm.fields.width_prc = [5 95];
 prm.fields.min_spikes = 10;
 prm.fields.min_flights_with_spikes = 5;
 prm.fields.min_flights_with_spikes_prc = 0.2;
