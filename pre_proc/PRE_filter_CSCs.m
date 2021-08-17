@@ -14,6 +14,7 @@ prm = PARAMS_GetAll();
 active_channels = exp.details.activeChannels;
 active_channels = active_channels';
 active_channels = active_channels(:);
+is_CSC_name_by_TT = ~isempty(dir(fullfile(exp.path.nlx,'CSC_TT*')));
 
 %% extract LFPs and save them
 run_LFP_filtering = 1;
@@ -41,7 +42,11 @@ if run_LFP_filtering
     parfor ii_ch = 1:length(active_channels)
         TT = ceil(ii_ch/4);
         ch_num = mod(ii_ch-1,4)+1;
-        file_IN = fullfile(exp.path.nlx,['CSC' num2str(ii_ch-1) '.ncs']);
+        if is_CSC_name_by_TT
+            file_IN = fullfile(exp.path.nlx,['CSC_TT' num2str(TT) '_' num2str(ch_num) '.ncs']);
+        else
+            file_IN = fullfile(exp.path.nlx,['CSC' num2str(ii_ch-1) '.ncs']);
+        end
         file_OUT = fullfile(exp.path.LFP, ['LFP_' exp_ID '_TT' num2str(TT) '_ch' num2str(ch_num) '.ncs'])
         
         Nlx_filter_CSC2(file_IN, file_OUT, t_start_end, filter_params)
@@ -90,7 +95,11 @@ if run_SPIKES_filtering
         end
         TT = ceil(ii_ch/4);
         ch_num = mod(ii_ch-1,4)+1;
-        file_IN = fullfile(exp.path.nlx,['CSC' num2str(ii_ch-1) '.ncs']);
+        if is_CSC_name_by_TT
+            file_IN = fullfile(exp.path.nlx,['CSC_TT' num2str(TT) '_' num2str(ch_num) '.ncs']);
+        else
+            file_IN = fullfile(exp.path.nlx,['CSC' num2str(ii_ch-1) '.ncs']);
+        end
         file_OUT = fullfile(exp.path.spikes_raw, ['spikes_' exp_ID '_TT' num2str(TT) '_ch' num2str(ch_num) '.ncs'])
         
         Nlx_filter_CSC2(file_IN, file_OUT, t_start_end, filter_params)
