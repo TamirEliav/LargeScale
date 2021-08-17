@@ -12,6 +12,7 @@ field_options = {
     'ripples',      1
     'MUA',          1
     'PE',           1
+    'rest',         1
     };
 
 %% parse input
