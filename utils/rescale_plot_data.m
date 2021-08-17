@@ -33,54 +33,54 @@ while ii_argin<nargin
     
     switch axes_str
         case 'X'
-            h.XLim = (h.XLim-offset).*gain;
+            h.XLim = my_rescale(h.XLim, offset, gain);
             for ii_child = 1:length(h.Children)
                 hchild = h.Children(ii_child);
                 switch class(hchild)
                     case {'matlab.graphics.chart.primitive.Line',...
                           'matlab.graphics.chart.primitive.Area',...
                           'matlab.graphics.chart.primitive.Bar'}
-                        hchild.XData = (hchild.XData-offset).*gain;
+                        hchild.XData = my_rescale(hchild.XData, offset, gain);
                     case 'matlab.graphics.primitive.Text'
-                        hchild.Position(1) = (hchild.Position(1)-offset).*gain;
+                        hchild.Position(1) = my_rescale(hchild.Position(1), offset, gain);
+                    case 'matlab.graphics.primitive.Patch'
+                        hchild.Vertices(:,1) = my_rescale(hchild.Vertices(:,1), offset, gain);
                 end
             end
         case 'Y'
-            h.YLim = (h.YLim-offset).*gain;
+            h.YLim = my_rescale(h.YLim, offset, gain);
             for ii_child = 1:length(h.Children)
                 hchild = h.Children(ii_child);
                 switch class(hchild)
                     case {'matlab.graphics.chart.primitive.Line',...
                           'matlab.graphics.chart.primitive.Area',...
                           'matlab.graphics.chart.primitive.Bar'}
-                        hchild.YData = (hchild.YData-offset).*gain;
+                        hchild.YData = my_rescale(hchild.YData, offset, gain);
                     case 'matlab.graphics.primitive.Text'
-                        hchild.Position(2) = (hchild.Position(2)-offset).*gain;
+                        hchild.Position(2) = my_rescale(hchild.Position(2), offset, gain);
+                    case 'matlab.graphics.primitive.Patch'
+                        hchild.Vertices(:,2) = my_rescale(hchild.Vertices(:,2), offset, gain);
                 end
             end
         case 'Z'
-            h.ZLim = (h.ZLim-offset).*gain;
+            h.ZLim = my_rescale(h.ZLim, offset, gain);
             for ii_child = 1:length(h.Children)
                 hchild = h.Children(ii_child);
                 switch class(hchild)
                     case {'matlab.graphics.chart.primitive.Line',...
                           'matlab.graphics.chart.primitive.Area',...
                           'matlab.graphics.chart.primitive.Bar'}
-                        hchild.ZData = (hchild.ZData-offset).*gain;
+                        hchild.ZData = my_rescale(hchild.ZData, offset, gain);
                     case 'matlab.graphics.primitive.Text'
-                        hchild.Position(3) = (hchild.Position(3)-offset).*gain;
+                        hchild.Position(3) = my_rescale(hchild.Position(3), offset, gain);
                 end
             end
     end
     ii_argin = ii_argin+2;
 end
 
-    
+end
 
-
-
-
-
-
-
+function data = my_rescale(data,offset, gain)
+    data = (data-offset).*gain;
 end

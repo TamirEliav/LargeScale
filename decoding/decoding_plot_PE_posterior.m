@@ -3,7 +3,7 @@ function decoding_plot_PE_posterior(exp_ID, win_s, replay_speed, pos_BW, pos_bin
 %%
 % win_s = 0.5;
 % exp_ID = 'b9861_d180527';
-% replay_speed = 20;
+% replay_speed = 200;
 % pos_BW = 2;
 % pos_binsize = 1;
 dir_IN = 'D:\sequences\seq_uri_eden\decoded';
