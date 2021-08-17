@@ -23,24 +23,30 @@ disp('-------------------------------------------------------------------')
 %     'b9861_d180706'
 %     'b9861_d180710'};
 
-exp_list = {...
-    'b9861_d180528'
-    'b9861_d180529'
-    'b9861_d180530'
-    'b9861_d180531'
-    'b9861_d180601'
-    'b9861_d180603'
-    'b9861_d180604'};
+% exp_list = {...
+%     'b9861_d180528'
+%     'b9861_d180529'
+%     'b9861_d180530'
+%     'b9861_d180531'
+%     'b9861_d180601'
+%     'b9861_d180603'
+%     'b9861_d180604'};
 
+exp_list = {...
+    'b0184_d191130'
+    'b0184_d191201'
+%     'b0184_d191202'
+    };
 
 %% load exp summary and choose exps
 exp_t = DS_get_exp_summary();
-exp_t(~contains(exp_t.recordingArena, '200m'),:) = [];
+% exp_t(~contains(exp_t.recordingArena, '200m'),:) = [];
 exp_t(exp_t.position_data_exist==0,:) = [];
 exp_t(exp_t.neural_data_exist==0,:) = [];
 % exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = [];
-exp_t(~ismember(exp_t.batNum, [9861] ),:) = [];
-exp_t(~contains(exp_t.TT_loc,{'CA1','CA3'}),:) = [];
+% exp_t(~ismember(exp_t.batNum, [9861] ),:) = [];
+exp_t(~ismember(exp_t.batNum, [184] ),:) = [];
+% exp_t(~contains(exp_t.TT_loc,{'CA1','CA3'}),:) = [];
 % exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
 % exp_t(exp_t.date > datetime('17/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
 % exp_t(contains(exp_t.exp_ID, exp_list),:) = [];
@@ -70,7 +76,6 @@ try
 %     PRE_calc_write_artifacts(exp_ID);
 
 %     decoding_detect_spikes(exp_ID,forcecalc)
-
 %     bsp_extract_data(exp.path.bsp);
 %     exp_create_details(exp_ID);    
 %     exp_sync_bsp2nlg(exp_ID);
@@ -92,12 +97,12 @@ try
 %     wingbeat_detect(exp_ID)
 %     wingbeat_plot_map(exp_ID)
 
-    ripples_detect(exp_ID);
-    MUA_detect(exp_ID);
+%     ripples_detect(exp_ID);
+%     MUA_detect(exp_ID);
 %     PE_detect(exp_ID);
-    PE_plot_ripples_vs_MUA(exp_ID); % I put the detection here...
+%     PE_plot_ripples_vs_MUA(exp_ID); % I put the detection here...
     
-    ripples_MUA_PE_save_to_nlx(exp_ID,forcecalc);
+%     ripples_MUA_PE_save_to_nlx(exp_ID,forcecalc);
 %     ripples_save_to_nlx(exp_ID,forcecalc);
 %     MUA_save_zFR_to_ncs(exp_ID,forcecalc);
     
@@ -106,6 +111,8 @@ try
 %     ripples_xcorr(exp_ID)
 %     MUA_plot(exp_ID);
 %     PE_plot(exp_ID);
+
+%     exp_detect_balls(exp_ID);
 
     decoding_prepare_exp_data(exp_ID);
 
