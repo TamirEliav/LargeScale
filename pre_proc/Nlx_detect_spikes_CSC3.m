@@ -57,10 +57,10 @@ TT_files_raw = {};
 TT_ch_exist = [];
 for ii_file = 1:length(files_raw)
     file_name = files_raw(ii_file).name;
-    TT_str = regexp(file_name, '_TT([\d+])','tokens','once');
+    TT_str = regexp(file_name, '_TT([\d]+)','tokens','once');
     TT_str = TT_str{1};
     TT_num = str2num(TT_str);
-    ch_str = regexp(file_name, '_ch([\d+])','tokens','once');
+    ch_str = regexp(file_name, '_ch([\d]+)','tokens','once');
     ch_str = ch_str{1};
     ch_num = str2num(ch_str);
     TT_files_raw{TT_num,ch_num} = file_name;
@@ -598,8 +598,9 @@ header{ADC_str_IX} = sprintf('-ADBitVolts %s %s %s %s', ADC_str, ADC_str, ADC_st
 header{InputRange_str_IX} = sprintf('-InputRange %s %s %s %s', InputRange_str, InputRange_str, InputRange_str, InputRange_str);
 header{contains(header, '-SamplingFrequency')} = sprintf('-SamplingFrequency %g',fs);
 
-Mat2NlxSpike(filename_out, 0, 1, [], [1 0 1 0 1 1], ...
-    Timestamps, CellNumbers, Samples, header);
+ScNumbers = zeros(1,length(Timestamps));
+Mat2NlxSpike(filename_out, 0, 1, [], [1 1 1 0 1 1], ...
+    Timestamps, ScNumbers, CellNumbers, Samples, header);
 
 end
 
