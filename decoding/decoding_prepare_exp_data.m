@@ -2,7 +2,7 @@ function decoding_prepare_exp_data(exp_ID)
 
 %% get exp info
 dir_out = "D:\sequences\seq_uri_eden\proc";
-exp = exp_load_data(exp_ID,'details','path','pos','flight','PE');
+exp = exp_load_data(exp_ID,'details','path','pos','flight','PE','rest');
 details = exp.details;
 
 %% get sleep ts
@@ -51,9 +51,16 @@ t = edges2centers(edges);
 position = interp1(exp.pos.proc_1D.ts, exp.pos.proc_1D.pos, t);
 direction = interp1(exp.pos.proc_1D.ts, sign(exp.pos.proc_1D.vel_csaps), t);
 
+% remove low speed from flight data
+thr_prc = 0.85;
+keep_takeoff_landing = 1;
+balls_loc = exp.rest.balls_loc;
+max_dist_from_ball = 1;
 FE = exp.flight.FE;
 FE = FE([FE.distance] > 100);
-FE = FE_remove_low_speed(FE,0.85);
+FE_before = FE;
+FE = FE_remove_low_speed(FE,thr_prc,keep_takeoff_landing,balls_loc,max_dist_from_ball);
+FE_after = FE;
 FE_ti = [[FE.start_ts];[FE.end_ts]]';
 FE_dist = [FE.distance];
 
@@ -89,6 +96,7 @@ data.FE_ti = FE_ti;
 data.sleep_ti = sleep_ti;
 data.PE_ts = [exp.PE.thr.peak_ts];
 data.PE_ti = [exp.PE.thr.start_ts;exp.PE.thr.end_ts]';
+data.rest_ti = exp.rest.ti;
 
 %% save data to mat file
 mkdir(dir_out);
@@ -128,13 +136,10 @@ end
 
 
 %% check what is removed when we remove low-speed
-FE = exp.flight.FE;
-FE = FE([FE.distance] > 100);
 figure
 hold on
-plot([FE.pos],[FE.vel],'.k');
-FE = FE_remove_low_speed(FE,0.85);
-plot([FE.pos],[FE.vel],'.r');
+plot([FE_before.pos],[FE_before.vel],'.k');
+plot([FE_after.pos],[FE_after.vel],'.r');
 xlabel('position (m)')
 ylabel('Speed (m/s)')
 legend('original','after removing low speed','Location','Best')
@@ -146,21 +151,30 @@ end
 
 
 %%
-function FE = FE_remove_low_speed(FE,thr_prc)
-for ii_FE = 1:length(FE)
-    fe = FE(ii_FE);
-    thr = abs(thr_prc * median([fe.vel]));
-    start_relative_IX = find(abs([fe.vel])>thr,1, 'first');
-    end_relative_IX = find(abs([fe.vel])>thr,1, 'last');
-    fe.ts = fe.ts(start_relative_IX:end_relative_IX);
-    fe.pos = fe.pos(start_relative_IX:end_relative_IX);
-    fe.vel = fe.vel(start_relative_IX:end_relative_IX);
-    fe.start_ts = fe.ts(1);
-    fe.end_ts = fe.ts(end);
-    fe.duration = range(fe.ts);
-    fe.distance = range(fe.pos);
-    FE(ii_FE) = fe;
-end
+function FE = FE_remove_low_speed(FE,thr_prc,keep_takeoff_landing,balls_loc,max_dist_from_ball)
+    keep_takeoff_landing = 1;
+    for ii_FE = 1:length(FE)
+        fe = FE(ii_FE);
+        thr = abs(thr_prc * median([fe.vel])); % median of the single flight vel
+        start_relative_IX = find(abs([fe.vel])>thr,1, 'first');
+        end_relative_IX = find(abs([fe.vel])>thr,1, 'last');
+        if keep_takeoff_landing
+            if min(abs(fe.pos(1) - balls_loc)) < max_dist_from_ball
+                start_relative_IX = 1;
+            end
+            if min(abs(fe.pos(end) - balls_loc)) < max_dist_from_ball
+                end_relative_IX = length(fe.vel);
+            end
+        end
+        fe.ts = fe.ts(start_relative_IX:end_relative_IX);
+        fe.pos = fe.pos(start_relative_IX:end_relative_IX);
+        fe.vel = fe.vel(start_relative_IX:end_relative_IX);
+        fe.start_ts = fe.ts(1);
+        fe.end_ts = fe.ts(end);
+        fe.duration = range(fe.ts);
+        fe.distance = range(fe.pos);
+        FE(ii_FE) = fe;
+    end
 end
 
 %%

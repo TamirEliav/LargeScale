@@ -8,6 +8,7 @@ data_proc_dir = "D:\sequences\seq_uri_eden\proc";
 % exp_ID = 'b9861_d180524';
 % exp_ID = 'b0034_d180313';
 exp_ID = 'b9861_d180526';
+% exp_ID = 'b9861_d180527';
 exp = exp_load_data(exp_ID);
 details = exp.details;
 
@@ -67,6 +68,8 @@ FE_dist = [FE.distance];
 is_FE = any(t>FE_ti(:,1)&t<FE_ti(:,2),1);
 is_sleep = any(t>sleep_ti(:,1)&t<sleep_ti(:,2),1);
 
+rest_ti = exp.rest.ti;
+
 % neural
 multiunits = nan(length(t),4,length(NTTs));
 multiunits_spikes = false(length(t),length(NTTs));
@@ -94,8 +97,9 @@ data.position = position;
 data.direction = direction;
 data.FE_ti = FE_ti;
 data.sleep_ti = sleep_ti;
-data.PE_ts = [exp.PE.peak_ts];
-data.PE_ti = [exp.PE.start_ts;exp.PE.end_ts]';
+data.PE_ts = [exp.PE.thr.peak_ts];
+data.PE_ti = [exp.PE.thr.start_ts; exp.PE.thr.end_ts]';
+data.rest_ti = rest_ti;
 
 %% save data to mat file
 mkdir(data_proc_dir);
