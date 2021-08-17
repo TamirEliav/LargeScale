@@ -11,8 +11,7 @@ if isempty(file_OUT)
     file_OUT = fullfile(dir_OUT, [NAME '_new_header' EXT] );
 end
 if exist(file_OUT,'file')
-    warning('File OUT already exist, make sure to delete it before running this function');
-    return 
+    error('File OUT already exist, make sure to delete it before running this function');
 end
 [dir_OUT,NAME,EXT] = fileparts(file_OUT);
 if ~exist(dir_OUT,'dir')
@@ -29,11 +28,11 @@ switch EXT
         disp('Old header:');
         disp(header_old);
         
-        %% update header
+        %% update header + data
         header_file = 'Nlx_header_NTT.txt';
         header_new = textread(header_file, '%s', 'delimiter', '\n', 'whitespace', '');
 
-        ADMaxValue = 32767;
+        ADMaxValue = double(intmax('int16'));
 %         InputRange = 3000;
         InputRange = max(Samples(:));
 %         InputRange = prctile(Samples(:),99.9) * 1.2;
@@ -55,7 +54,41 @@ switch EXT
             Timestamps, CellNumbers, Features, Samples, header_new);
               
     case {'.NCS','.ncs'}
-        header_file = 'Nlx_header_NCS.txt';
+        %% read old file
+        [Timestamps, Samples, header_old] = ...
+            Nlx2MatCSC( file_IN, [1 0 0 0 1], 1, 1, []);
+        disp('Old header:');
+        disp(header_old);
+        
+        %% parse and change data
+        fs               = sscanf(header_old{contains(header_old,'SamplingFrequency')}, '-SamplingFrequency %g');
+        InputInvertedStr = sscanf(header_old{contains(header_old,'InputInverted')},     '-InputInverted %s');
+
+        %% change data and build new header
+        ADMaxValue = double(intmax('int16'));
+        InputRange = 7000;
+        ADBitVolts = InputRange / ADMaxValue / 1e6;
+        % convert uVolt to nlx bit
+        Samples = Samples ./ ADBitVolts ./ 1e6;
+        [~,CSC_name]=fileparts(file_IN);
+        SampleFrequencies = repelem(fs,length(Timestamps));
+        
+        %% update header + data
+        header_file = 'Nlg2Nlx_header.txt';
+        % read header template
+        header_new = textread(header_file, '%s', 'delimiter', '\n', 'whitespace', '');
+        header_new{contains(header_new,'SamplingFrequency')}  = sprintf('-SamplingFrequency %g', fs);
+        header_new{contains(header_new,'ADMaxValue')}         = sprintf('-ADMaxValue %d', ADMaxValue);
+        header_new{contains(header_new,'InputRange')}         = sprintf('-InputRange %g', InputRange);
+        header_new{contains(header_new,'ADBitVolts')}         = sprintf('-ADBitVolts %.24f', ADBitVolts);
+        header_new{contains(header_new,'InputInverted')}      = sprintf('-InputInverted %s', InputInvertedStr);
+        header_new{contains(header_new,'AcqEntName')}         = sprintf('-AcqEntName %s', CSC_name);
+        
+        disp('New header:');
+        disp(header_new);
+        
+        %% write new file
+        Mat2NlxCSC(file_OUT, 0, 1, 1, [1 0 1 0 1 1], Timestamps, SampleFrequencies, Samples, header_new);
         
     otherwise
         disp(['File type ' EXT ' not supported'])
