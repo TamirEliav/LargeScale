@@ -1,121 +1,12 @@
-%%
-clear
-clc
-
-%% define days / paramsets
-exp_ID_list = {
-%     'b0184_d191130';
-%     'b0184_d191201';
-
-%     'b9861_d180519';
-%     'b9861_d180521';
-%     'b9861_d180522';
-%     'b9861_d180523';
-%     'b9861_d180524';
-%     'b9861_d180525';
-%     'b9861_d180526';
-%     'b9861_d180527';
-%     'b9861_d180529';
-%     'b9861_d180530';
-
-%     'b0034_d180305';
-%     'b0034_d180306';
-%     'b0034_d180308';
-%     'b0034_d180310';
-%     'b0034_d180311';
-%     'b0034_d180312';
-%     'b0034_d180313';
-%     'b0034_d180314';
-%     'b0034_d180315';
-
-    'b2289_d180518';
-    'b2289_d180520';
-    
-    'b0148_d170606'; 
-    'b0148_d170607'; 
-    'b0148_d170608';  
-    'b0148_d170625'; 
-    'b0148_d170626'; 
-    'b0148_d170627'; 
-    'b0148_d170703'; 
-    'b0148_d170718';  
-    'b0148_d170720'; 
-    'b0148_d170723'; 
-    'b0148_d170801'; 
-    'b0148_d170802'; 
-    'b0148_d170806'; 
-    'b0148_d170807';
-    };
-% params_opt_list = [1:6];
-params_opt_list = [4];
-
-%% plot decoding results per day/paramset
-for ii_exp = 1:length(exp_ID_list)
-    exp_ID = exp_ID_list{ii_exp}
-    for ii_opt = 1:length(params_opt_list)
-        params_opt = params_opt_list(ii_opt)
-        post_proc_flight_decoding(exp_ID, params_opt);
-    end
-end
-
-%% compare different days and paramsets
-res_dir = "L:\Analysis\Results\decoding\flight";
-clear res_all
-hf=figure;
-hf.WindowState='maximized';
-tiledlayout(2,2,'TileSpacing','compact')
-for ii_exp = 1:length(exp_ID_list)
-    exp_ID = exp_ID_list{ii_exp};
-    nexttile
-    hold on
-    params_str = {};
-    for ii_opt = 1:length(params_opt_list)
-        %% load results
-        params_opt = params_opt_list(ii_opt);
-        res_filename = fullfile(res_dir, sprintf('%s_flight_decoding_opt_%d.mat',exp_ID,params_opt));
-        load(res_filename);
-        res_all(ii_exp,ii_opt) = res;
-
-        params_str{ii_opt} = sprintf('pos_bin=%.1gm,pos_std=%.2gm,mark_std=%.2guV',...
-                                res.params.pos_bin_size,...
-                                res.params.pos_std,...
-                                res.params.mark_std);
-        
-        %% plot
-        ecdf(res.pos_err,'bounds','off')
-    end
-    xlabel('Position (m)')
-    ylabel('CDF')
-    title(exp_ID,'Interpreter','none');
-    legend("opt "+params_opt_list);
-    text(0.95,0.05,params_str, 'HorizontalAlignment','right','VerticalAlignment','bottom',...
-        'Units','normalized','Interpreter','none');
-end
-linkaxes(findall(hf,'type','axes'),'xy')
-
-% save cdf fig
-figname = "compare_all_cdf";
-filename = fullfile(res_dir, figname);
-% saveas(hf,filename,'fig');
-saveas(hf,filename,'jpg');
-xlim_opts = [50 20 10 5 2 1];
-for ii_xlim_opt = 1:length(xlim_opts)
-    xlimits = xlim_opts(ii_xlim_opt);
-    xlim([0 xlimits])
-    filename = fullfile(res_dir, figname+"_xlim_"+xlimits);
-    saveas(hf,filename,'jpg');
-end
-
-%%
-% TODO: Fix plot flight decoding (swap real with predicted)
-% TODO: move to a standalone function (new file in decoding folder)
-function post_proc_flight_decoding(exp_ID, params_opt)
+function decoding_plot_flight_conf_mat(exp_ID, params_opt)
 
 %% load data
-% params_opt = 1;
-% exp_ID = 'b9861_d180527';
-exp = exp_load_data(exp_ID, 'details','path','flight','pos');
 decode_dir_IN = 'F:\sequences\decoded\flight';
+out_dir = 'F:\sequences\decoded_figs\flight\conf_mat';
+mkdir(out_dir)
+
+%% load data
+exp = exp_load_data(exp_ID, 'details','path','flight','pos');
 decode_filename = fullfile(decode_dir_IN, exp_ID, sprintf('%s_flight_opt_%d.nc',exp_ID,params_opt) );
 decode = decoding_read_decoded_file(decode_filename);
 
@@ -168,7 +59,7 @@ for ii_dir_pooling_opt = 1:length(directions_to_use_opts)
     IX = any(direction_real == directions_to_use,1)';
     x = pos_real(IX);
     y = pos_predict(IX);
-    N = histcounts2(x,y,bin_edges,bin_edges);
+    N = histcounts2(x,y,bin_edges,bin_edges)';
     N_norm_by_real = N ./ sum(N,1);
     N_norm_by_predict = N ./ sum(N,2);
     
@@ -276,13 +167,11 @@ h.Interpreter='none';
 h.Position(2) = 1.04;
 h.FontSize=14;
 
-out_dir = "L:\Analysis\Results\decoding\flight";
-mkdir(out_dir)
 fig_filename = fullfile(out_dir, sprintf('%s_flight_decoding_opt_%d',exp_ID,params_opt));
 saveas(hf, fig_filename, 'jpg');
 close(hf);
 
-%% export flight decoding results to mat file
+%% save flight decoding results to mat file
 res = struct();
 res.params = decode.params;
 res.params_opt = params_opt;
@@ -296,7 +185,6 @@ res.direction_mean_acc = mean(diag(cm));
 res.pos_err = pos_err;
 res.pos_err_mean = mean(pos_err);
 res.pos_err_median = median(pos_err);
-out_dir = "L:\Analysis\Results\decoding\flight";
 res_filename = fullfile(out_dir, sprintf('%s_flight_decoding_opt_%d',exp_ID,params_opt));
 save(res_filename, 'res');
 
@@ -318,9 +206,3 @@ function set_pos_prediction_axis(bin_edges,pos_ticks)
     hax.YRuler.TickLabelGapOffset = -1;
 end
 
-
-
-
-
-
-%%

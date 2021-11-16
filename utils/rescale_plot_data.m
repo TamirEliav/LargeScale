@@ -42,9 +42,15 @@ while ii_argin<nargin
                           'matlab.graphics.chart.primitive.Bar'}
                         hchild.XData = my_rescale(hchild.XData, offset, gain);
                     case 'matlab.graphics.primitive.Text'
-                        hchild.Position(1) = my_rescale(hchild.Position(1), offset, gain);
+                        if ~strcmp(hchild.Units, 'normalized')
+                            hchild.Position(1) = my_rescale(hchild.Position(1), offset, gain);
+                        end
                     case 'matlab.graphics.primitive.Patch'
                         hchild.Vertices(:,1) = my_rescale(hchild.Vertices(:,1), offset, gain);
+                    case 'matlab.graphics.chart.decoration.ConstantLine'
+                        if strcmp(hchild.InterceptAxis, 'x')
+                            hchild.Value = my_rescale(hchild.Value, offset, gain);
+                        end
                 end
             end
         case 'Y'
@@ -54,12 +60,19 @@ while ii_argin<nargin
                 switch class(hchild)
                     case {'matlab.graphics.chart.primitive.Line',...
                           'matlab.graphics.chart.primitive.Area',...
-                          'matlab.graphics.chart.primitive.Bar'}
+                          'matlab.graphics.chart.primitive.Bar',}
                         hchild.YData = my_rescale(hchild.YData, offset, gain);
                     case 'matlab.graphics.primitive.Text'
-                        hchild.Position(2) = my_rescale(hchild.Position(2), offset, gain);
+                        if ~strcmp(hchild.Units, 'normalized')
+                            hchild.Position(2) = my_rescale(hchild.Position(2), offset, gain);
+                        end
                     case 'matlab.graphics.primitive.Patch'
                         hchild.Vertices(:,2) = my_rescale(hchild.Vertices(:,2), offset, gain);
+                    case 'matlab.graphics.chart.decoration.ConstantLine'
+                        hchild.Value = my_rescale(hchild.Value, offset, gain);
+                        if strcmp(hchild.InterceptAxis, 'y')
+                            hchild.Value = my_rescale(hchild.Value, offset, gain);
+                        end
                 end
             end
         case 'Z'
@@ -72,7 +85,9 @@ while ii_argin<nargin
                           'matlab.graphics.chart.primitive.Bar'}
                         hchild.ZData = my_rescale(hchild.ZData, offset, gain);
                     case 'matlab.graphics.primitive.Text'
-                        hchild.Position(3) = my_rescale(hchild.Position(3), offset, gain);
+                        if ~strcmp(hchild.Units, 'normalized')
+                            hchild.Position(3) = my_rescale(hchild.Position(3), offset, gain);
+                        end
                 end
             end
     end

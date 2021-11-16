@@ -54,7 +54,7 @@ if run_LFP_filtering
 end
 
 %% exctract high-pass for spike detection
-run_SPIKES_filtering = 1;
+run_SPIKES_filtering = 0;
 if exist(exp.path.spikes_raw,'dir')
     if forcecalc
         % delete existing output dir

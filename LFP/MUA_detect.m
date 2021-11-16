@@ -1,7 +1,7 @@
 function MUA_detect(exp_ID)
 
 %% get exp info
-exp = exp_load_data(exp_ID,'details','path');
+exp = exp_load_data(exp_ID,'details','path','rest');
 prm = PARAMS_GetAll();
 active_channels = exp.details.activeChannels;
 nTT = exp.details.numTT;
@@ -42,9 +42,13 @@ FR = fs.*smoothdata(nanmean(N),'gaussian',ker_win_n_samples);
 
 %% detect! (only during immobility)
 is_sleep = any(t>sleep_ti(:,1)&t<sleep_ti(:,2),1);
+immobility_ti = [sleep_ti; exp.rest.ti];
+is_immobility = any(t>immobility_ti(:,1)&t<immobility_ti(:,2),1);
+% my_zscore = @(x,IX)( (x-mean(x(IX)))./std(x(IX)) );
 zFR = FR;
-zFR(~is_sleep) = nan;
-zFR = nanzscore(zFR);
+zFR = my_zscore(zFR, is_sleep, is_immobility);
+% zFR(~is_sleep) = nan;
+% zFR = nanzscore(zFR);
 xthr1 = zFR > prm.MUA.high_thr_std;
 xthr2 = zFR > prm.MUA.low_thr_std;
 xthr12 = extend_intervals(xthr1,xthr2);
@@ -63,33 +67,6 @@ events.peak_IX = cellfun(@(IX,max_IX)(IX(max_IX)), cc.PixelIdxList, num2cell(max
 events.peak_ts = t(events.peak_IX);
 events.peak_FR = FR(events.peak_IX);
 events.peak_zFR = zFR(events.peak_IX);
-
-%% old code for extending the high to low thr
-% % % % % extend the high thr crossing to the low thr crossing
-% % % % cc1 = bwconncomp(xthr1);
-% % % % cc2 = bwconncomp(xthr2);
-% % % % thr2_ti =   [cellfun(@min, cc2.PixelIdxList)
-% % % %              cellfun(@max, cc2.PixelIdxList)]';
-% % % % [~, IX_per_ti] = get_data_in_ti(find(xthr1),thr2_ti);
-% % % % cc2_1_TF = cellfun(@length,IX_per_ti)~=0;
-% % % % xthr12 = zeros(size(t));
-% % % % xthr12_IX = cat(1,cc2.PixelIdxList{cc2_1_TF});
-% % % % xthr12(xthr12_IX) = 1;
-% % % % cc12 = bwconncomp(xthr12);
-% % % % % create MUA events struct
-% % % % events=struct();
-% % % % events.duration = 1e3/fs .* cellfun(@length,cc12.PixelIdxList); % in ms
-% % % % events.start_IX = cellfun(@min, cc12.PixelIdxList);
-% % % % events.end_IX = cellfun(@max, cc12.PixelIdxList);
-% % % % events.start_ts = t(events.start_IX);
-% % % % events.end_ts = t(events.end_IX);
-% % % % g = bwlabel(xthr12);
-% % % % g(g==0)=nan;
-% % % % [~,max_IX] = splitapply(@max,zFR,g); % index relative to event
-% % % % events.peak_IX = cellfun(@(IX,max_IX)(IX(max_IX)), cc12.PixelIdxList, num2cell(max_IX));
-% % % % events.peak_ts = t(events.peak_IX);
-% % % % events.peak_FR = FR(events.peak_IX);
-% % % % events.peak_zFR = zFR(events.peak_IX);
 
 %% MUA event triggered FR
 trig_win = 1e3;
@@ -119,26 +96,10 @@ save(file_name,'MUA');
 end
 
 %%
-function xthr_high_low = extend_intervals(xthr_high,xthr_low)
-
-%% testing
-% xthr_high = [0 0 1 0 0 0 1 0 0 0];
-% xthr_low  = [0 1 1 1 0 0 1 1 0 1];
-
-%%
-xthr_low_lbl = bwlabel(xthr_low);
-xthr_low_high_lbl_valid = xthr_low_lbl .* xthr_high;
-valid_lbl = unique(xthr_low_high_lbl_valid(xthr_low_high_lbl_valid>0));
-xthr_high_low = xthr_low;
-xthr_high_low(~ismember(xthr_low_lbl,valid_lbl))=0;
-
+function z = my_zscore(x,IX1,IX2)
+    z = (x-mean(x(IX1))) ./ std(x(IX1));
+    z(~IX2) = nan;
 end
-
-
-
-
-
-
 
 
 

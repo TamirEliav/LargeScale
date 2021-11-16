@@ -1,8 +1,9 @@
 function decoding_prepare_exp_data(exp_ID)
 
 %% get exp info
-dir_out = "D:\sequences\seq_uri_eden\proc";
-exp = exp_load_data(exp_ID,'details','path','pos','flight','PE','rest');
+dir_out = "F:\sequences\proc";
+% exp = exp_load_data(exp_ID,'details','path','pos','flight','PE','rest');
+exp = exp_load_data(exp_ID,'details','path','pos','flight','rest');
 details = exp.details;
 
 %% get sleep ts
@@ -12,7 +13,7 @@ sleep_ti(any(isnan(sleep_ti),2),:) = []; % remove nan in case of missing session
 %% prepare NTT file names
 NTT_files = {};
 tt_to_use = ones(1,exp.details.numTT);
-tt_to_use = tt_to_use & exp.details.TT_to_use;
+tt_to_use = tt_to_use & ismember(1:exp.details.numTT,exp.details.TT_to_use);
 tt_to_use = tt_to_use & contains(exp.details.TT_loc,{'CA1','CA3'});
 
 filenames = "spikes_"+exp_ID+"_TT"+find(tt_to_use)'+".ntt";
@@ -94,9 +95,9 @@ data.position = position;
 data.direction = direction;
 data.FE_ti = FE_ti;
 data.sleep_ti = sleep_ti;
-data.PE_ts = [exp.PE.thr.peak_ts];
-data.PE_ti = [exp.PE.thr.start_ts;exp.PE.thr.end_ts]';
 data.rest_ti = exp.rest.ti;
+% data.PE_ts = [exp.PE.thr.peak_ts];
+% data.PE_ti = [exp.PE.thr.start_ts;exp.PE.thr.end_ts]';
 
 %% save data to mat file
 mkdir(dir_out);
@@ -111,24 +112,26 @@ ch_pairs = [
     2 3;
     2 4;
     3 4];
-for TT=1:size(multiunits,2)
+for TT=1:size(multiunits,3)
     %%
     TF_FE = multiunits_spikes(:,TT) & is_FE';
     TF_sleep = multiunits_spikes(:,TT) & is_sleep';
+    % TODO: add also data points for rest on the balls
     figure('WindowState','maximized');
     tiledlayout(2,3,'TileSpacing','compact');
     for ii_pnl = 1:size(ch_pairs,1)
         ch_pair = ch_pairs(ii_pnl,:);
         nexttile
         hold on
-        plot(multiunits(TF_FE,TT,ch_pair(1)), ...
-             multiunits(TF_FE,TT,ch_pair(2)), '.r');
-         plot(multiunits(TF_sleep,TT,ch_pair(1)), ...
-             multiunits(TF_sleep,TT,ch_pair(2)), '.b');
+        plot(multiunits(TF_FE,ch_pair(1),TT), ...
+             multiunits(TF_FE,ch_pair(2),TT), '.r');
+         plot(multiunits(TF_sleep,ch_pair(1),TT), ...
+             multiunits(TF_sleep,ch_pair(2),TT), '.b');
          xlabel("Ch "+ch_pair(1))
          ylabel("Ch "+ch_pair(2))
          legend('flight','sleep')
     end
+    % TODO: TT is the INDEX of the tetorde! correct it!
     sgtitle({exp_ID;"TT "+TT},'interpreter','none')
     file_out = fullfile(dir_out, [exp_ID '_features_TT_' num2str(TT)]);
     saveas(gcf, file_out, 'jpeg');

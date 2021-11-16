@@ -1,7 +1,11 @@
 function ripples_detect(exp_ID)
 
+%% TODO: add somewhere here a section that selects the best tetrode i.e. with the strongest 
+% ripples and saves the average LFP across valid channel from this tetrode.
+% alternatievly, that the best SINGLE CHANNEL instead of TETRODE.
+
 %% get exp info
-exp = exp_load_data(exp_ID,'details','path');
+exp = exp_load_data(exp_ID,'details','path','rest');
 prm = PARAMS_GetAll();
 active_channels = exp.details.activeChannels;
 sleep_ti = exp_get_sessions_ti(exp_ID, 'Sleep1','Sleep2');
@@ -37,19 +41,34 @@ pgamma_all = smoothdata(pgamma_all, 'gaussian',5*round(fs*prm.ripples.smooth_ker
 pgamma_TT  = sqrt(pgamma_TT);
 pgamma_all = sqrt(pgamma_all);
 
-%% zscore (applied only during sleep)
-% TODO: add immobility on balls between flights
-is_sleep = any(ts>sleep_ti(:,1)&ts<sleep_ti(:,2),1);
-pripple_TT(~is_sleep,:) = nan;
-pripple_all(~is_sleep,:) = nan;
-pgamma_TT(~is_sleep,:) = nan;
-pgamma_all(~is_sleep,:) = nan;
+%% zscore
+switch 2
+    case 1
+        is_sleep = any(ts>sleep_ti(:,1)&ts<sleep_ti(:,2),1);
+        pripple_TT(~is_sleep,:) = nan;
+        pripple_all(~is_sleep,:) = nan;
+        pgamma_TT(~is_sleep,:) = nan;
+        pgamma_all(~is_sleep,:) = nan;
 
-zpripple_TT = nanzscore(pripple_TT,0,1);
-zpripple_all = nanzscore(pripple_all,0,1);
-zpgamma_TT = nanzscore(pgamma_TT,0,1);
-zpgamma_all = nanzscore(pgamma_all,0,1);
+        zpripple_TT = nanzscore(pripple_TT,0,1);
+        zpripple_all = nanzscore(pripple_all,0,1);
+        zpgamma_TT = nanzscore(pgamma_TT,0,1);
+        zpgamma_all = nanzscore(pgamma_all,0,1);
 
+    case 2
+        %% zscore (using mean and std from sleep only, but applied also to rest)
+        is_sleep = any(ts>sleep_ti(:,1)&ts<sleep_ti(:,2),1);
+        immobility_ti = [sleep_ti; exp.rest.ti];
+        is_immobility = any(ts>immobility_ti(:,1)&ts<immobility_ti(:,2),1);
+        is_rest = any(ts>exp.rest.ti(:,1)&ts<exp.rest.ti(:,2),1);
+%         my_zscore = @(x,IX)( (x-mean(x(IX)))./std(x(IX)) );
+        zpripple_TT = my_zscore(pripple_TT, is_sleep, is_immobility);
+        zpripple_all = my_zscore(pripple_all, is_sleep, is_immobility);
+        zpgamma_TT = my_zscore(pgamma_TT, is_sleep, is_immobility);
+        zpgamma_all = my_zscore(pgamma_all, is_sleep, is_immobility);
+end
+
+%% ripple/gamma power ratio
 ripple_gamma_ratio_TT = pripple_TT ./ pgamma_TT;
 ripple_gamma_ratio_all = pripple_all ./ pgamma_all;
 
@@ -128,49 +147,12 @@ end
 
 
 %%
+function z = my_zscore(x,IX1,IX2)
+    z = (x-mean(x(IX1))) ./ std(x(IX1));
+    z(~IX2) = nan;
+end
 
 
-
-
-
-%%
-% function [ripples, invalid_ripples] = detect_ripples(zpripple, ts, ripple_gamma_ratio, high_thr, low_thr, min_duration, merge_thr, ratio_thr)
-%     zpripple = zpripple(:)';
-%     ripple_gamma_ratio = ripple_gamma_ratio(:)';
-%     ripples  = struct();
-%     xthr_IX = find(zpripple > high_thr);
-%     xthr_ts = ts(xthr_IX);
-%     ripples.start_IX = [xthr_IX(1) xthr_IX(find(diff(xthr_ts) > merge_thr*1e3)+1 )              ];
-%     ripples.end_IX   = [           xthr_IX(find(diff(xthr_ts) > merge_thr*1e3)   )  xthr_IX(end)];
-%     ripples.start_ts = ts(ripples.start_IX);
-%     ripples.end_ts = ts(ripples.end_IX);
-%     ripples.duration = (ripples.end_ts - ripples.start_ts)*1e-3;
-%     ripples.ts = mean([ripples.start_ts;ripples.end_ts]);
-%     ripples_num = nan(size(ts));
-%     for ii_ripple = 1:length(ripples.start_ts)
-%         ripples_num( ripples.start_IX(ii_ripple) : ripples.end_IX(ii_ripple) ) = ii_ripple;
-%     end
-%     IX = find(~isnan(ripples_num));
-%     ripples.ripple_gamma_power_ratio_mean = accumarray(ripples_num(IX)', ripple_gamma_ratio(IX)', [], @mean)';
-% 
-%     % this for loop can be further optimized (maybe using split-apply)
-%     for ii_ripple = 1:max(ripples_num)
-%         IX = find(ripples_num == ii_ripple);
-%         [~, IX_max] = max(zpripple(IX));
-%         IX_max = IX(IX_max);
-%         ripples.peak_IX(ii_ripple) = IX_max;
-%         ripples.peak_ts(ii_ripple) = ts(IX_max);
-%         ripples.peak_zpripple(ii_ripple) = zpripple(IX_max);
-%         ripples.ripple_gamma_power_ratio_at_peak(ii_ripple) = ripple_gamma_ratio(IX_max);
-%     end
-%     
-%     ripples.valid = ripples.duration > min_duration &...
-%                     ripples.ripple_gamma_power_ratio_at_peak > ratio_thr;
-%     
-%     ripples = soa2aos(ripples);
-%     invalid_ripples = ripples(~[ripples.valid]);
-%     ripples(~[ripples.valid])=[];
-% end
 
 
 %%

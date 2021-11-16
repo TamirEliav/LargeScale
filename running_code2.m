@@ -64,13 +64,28 @@ T = sortrows(T,'nCells','descend');
 clc
 T
 
+%% creating replay examples
+decoding_plot_event('b9861_d180527', 'sleep', 11, 824, 0.5)
+decoding_plot_event('b9861_d180527', 'sleep', 11, 681, 0.5)
+decoding_plot_event('b9861_d180527', 'sleep', 11, 503, 0.5)
+decoding_plot_event('b9861_d180526', 'sleep', 11, 27,  0.5)
+decoding_plot_event('b9861_d180526', 'sleep', 11, 42,  0.5)
+decoding_plot_event('b9861_d180526', 'sleep', 11, 113, 0.5)
+decoding_plot_event('b9861_d180526', 'sleep', 11, 113, 1)
+decoding_plot_event('b9861_d180526', 'sleep', 11, 113, 1.5)
+decoding_plot_event('b9861_d180526', 'sleep', 11, 113, 2)
+decoding_plot_event('b9861_d180526', 'sleep', 13, 113, 1)
+decoding_plot_event('b9861_d180526', 'sleep', 11, 132, 0.5)
+decoding_plot_event('b9861_d180526', 'sleep', 11, 132, 1)
+decoding_plot_event('b0184_d191201', 'sleep', 11, 136, 0.5)
+decoding_plot_event('b0184_d191130', 'sleep', 11, 53,  0.5)
+decoding_plot_event('b0184_d191130', 'sleep', 11, 333,  0.5)
+decoding_plot_event('b0184_d191130', 'sleep', 11, 350,  0.5)
+
 %%
-
-
-
-
-
-
+decoding_plot_event('b9861_d180526', 'sleep', 14, 113, 1);
+decoding_plot_event('b9861_d180527', 'sleep', 11, 824, 0.42);
+decoding_plot_event('b0184_d191130', 'sleep', 11, 53,  [-.32 .11]);
 
 
 %%

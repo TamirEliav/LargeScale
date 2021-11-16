@@ -1,66 +1,38 @@
-function decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, event_type, win_s)
-    arguments
-        %% temp for development...
-%         exp_ID = 'b0184_d191201';
-        exp_ID = 'b9861_d180526'
-        % epoch_type = 'rest'
-        epoch_type = 'sleep';
-        params_opt = 11;
-        event_type (1,:) char {mustBeMember(event_type,{'PE','posterior','ripples','MUA'})} = 'posterior'
-        win_s = 0.5;
-    end
+function decoding_plot_flight_posterior(exp_ID, params_opt)
+
+%% temp for development...
+% exp_ID = 'b0184_d191201';
+% exp_ID = 'b9861_d180527';
+% params_opt = 4;
+epoch_type = 'flight';
 
 %% load data
-exp = exp_load_data(exp_ID, 'details','path','rest','ripples','MUA','PE','pos');
+exp = exp_load_data(exp_ID, 'details','path','rest','ripples','MUA','PE','pos','flight');
 dir_IN = 'F:\sequences\decoded';
 dir_OUT = 'F:\sequences\decoded_figs';
-figs_dir = fullfile(dir_OUT, epoch_type, event_type, exp_ID, "opt_"+params_opt);
+figs_dir = fullfile(dir_OUT, epoch_type, exp_ID, "opt_"+params_opt);
 decode_filename = fullfile(dir_IN, epoch_type, exp_ID, sprintf('%s_%s_opt_%d.nc',exp_ID,epoch_type,params_opt));
 decode = decoding_read_decoded_file(decode_filename);
 mkdir(figs_dir);
 
-%% load events to use
-switch event_type
-    case 'PE'
-        PE_to_use = exp.PE.thr;
-        PE_ti = [PE_to_use.start_ts; PE_to_use.end_ts]';
-        switch epoch_type
-            case 'rest'
-                rest_ti = exp.rest.ti;
-                IX = any(PE_ti>shiftdim(rest_ti(:,1),-2) & PE_ti<shiftdim(rest_ti(:,2),-2), [2 3]);
-                PE_to_use = PE_to_use(IX);
-            case 'sleep'
-                sleep_ti = exp_get_sessions_ti(exp_ID, 'Sleep1','Sleep2');
-                sleep_ti(any(isnan(sleep_ti),2),:) = []; % remove nan in case of missing sessions
-                IX = any(PE_ti>shiftdim(sleep_ti(:,1),-2) & PE_ti<shiftdim(sleep_ti(:,2),-2), [2 3]);
-                PE_to_use = PE_to_use(IX);
-            case 'flight'
-                error('Not supported!')
-        end
-        events_all = PE_to_use;
-    case 'posterior'
-        dir_IN = 'F:\sequences\posterior_events';
-        filename = fullfile(dir_IN, sprintf('%s_posterior_events_%s_dec_prm_%d',exp_ID,epoch_type,params_opt));
-        load(filename);
-        events_all = [events_all.events];
-        [~, sort_IX] = sort([events_all.peak_ts], 'ascend');
-        events_all = events_all(sort_IX);
-end
-[events_all.num] = disperse(1:length(events_all));
+%% FE to use
+FE_to_use = exp.flight.FE;
+FE_to_use([FE_to_use.distance]<100) = [];
+[FE_to_use.num] = disperse(1:length(FE_to_use));
 
 %%
 nRows = 5;
 nCols = 5;
 nPanels = nRows * nCols;
-nFigs = ceil(length(events_all) / nPanels);
+nFigs = ceil(length(FE_to_use) / nPanels);
 
 for ii_fig = 1:nFigs
     
     %%
-    events_IX_start = (ii_fig-1)*nPanels +1;
-    events_IX_end = min(length(events_all), events_IX_start+nPanels-1);
-    events_IX = events_IX_start : events_IX_end;
-    events = events_all(events_IX);
+    FE_IX_start = (ii_fig-1)*nPanels +1;
+    FE_IX_end = min(length(FE_to_use), FE_IX_start+nPanels-1);
+    FE_IX = FE_IX_start : FE_IX_end;
+    FE = FE_to_use(FE_IX);
     hf = figure;
     hf.Units = 'centimeters';
     hf.WindowState = 'maximized';
@@ -74,20 +46,21 @@ for ii_fig = 1:nFigs
             pnl(r,c).de.margin = 1;
         end
     end
-    for ii_events = 1:length(events)
-        r = ceil(ii_events/(nRows));
-        c = mod(ii_events-1, nCols)+1;
+    for ii_FE = 1:length(FE)
+        r = ceil(ii_FE/(nRows));
+        c = mod(ii_FE-1, nCols)+1;
 
         % time window to display
-        t0 = events(ii_events).peak_ts;
-        ti = t0 + [-1 1].*win_s*1e6;
+        t0 = FE(ii_FE).start_ts;
+        ti = [FE(ii_FE).start_ts FE(ii_FE).end_ts];
 
         % get ripples/MUA
-        IX = get_data_in_ti(exp.ripples.t, ti);
-        zpripple = exp.ripples.zpripple_all(IX);
-        zpripple_t = exp.ripples.t(IX);
+%         IX = get_data_in_ti(exp.ripples.t, ti);
+%         zpripple = exp.ripples.zpripple_all(IX);
+%         zpripple_t = exp.ripples.t(IX);
         IX = get_data_in_ti(exp.MUA.t, ti);
         zFR = exp.MUA.zFR(IX);
+        FR = exp.MUA.FR(IX);
         zFR_t = exp.MUA.t(IX);
 
         % get states/position prob
@@ -100,22 +73,22 @@ for ii_fig = 1:nFigs
             continue;
         end
 
-        % change time to ms aligned to event peak
-        zpripple_t = (zpripple_t-t0) * 1e-3;
-        zFR_t = (zFR_t-t0) * 1e-3;
-        prob_t = (prob_t-t0) * 1e-3;
+        % change time to ms aligned to flight peak
+%         zpripple_t = (zpripple_t-t0) * 1e-6;
+        zFR_t = (zFR_t-t0) * 1e-6;
+        prob_t = (prob_t-t0) * 1e-6;
 
         % plot ripple power / MUA
         pnl(r,c,1).select();
-        title("event #" + events(ii_events).num)
-        yyaxis left
-        plot(zpripple_t, zpripple,'LineWidth',1.5);
-%         yticks([0 ceil(max(zpripple))])
+        title("flight #" + FE(ii_FE).num)
+%         yyaxis left
+        plot(zFR_t, FR,'LineWidth',1.5);
+%         yticks([0 ceil(max(FR))])
         set(gca,'tickdir','out')
-        yyaxis right
-        plot(zFR_t, zFR,'LineWidth',1.5);
-%         yticks([0 floor(max(zFR))])
-        set(gca,'tickdir','out')
+%         yyaxis right
+%         plot(zFR_t, zFR,'LineWidth',1.5);
+%         yticks([0 ceil(max(zFR))])
+%         set(gca,'tickdir','out')
         xlim(prob_t([1 end]))
         box on
         hax=gca;
@@ -137,9 +110,7 @@ for ii_fig = 1:nFigs
         hold on
         imagesc(prob_t, decode.pos, prob_pos);
         axis tight
-        if strcmp(epoch_type,'rest')
-            plot(prob_t, real_pos, 'r', 'LineWidth',0.01)
-        end
+        plot(prob_t, real_pos, 'r', 'LineWidth',0.01)
         hax = gca;
         hax.TickDir = 'out';
         hax.TickLength(1) = 0.008;
@@ -162,7 +133,7 @@ for ii_fig = 1:nFigs
     %% add title/labels/legend/text
     pnl.margin = [15 22 12 12];
     
-    fig_name = sprintf('%s_%s_events_%d-%d', exp_ID, event_type, events_IX_start, events_IX_end );
+    fig_name = sprintf('%s_flights_%d-%d', exp_ID, FE_IX_start, FE_IX_end );
     h = pnl.title(fig_name);
     h.Interpreter = 'none';
     h.Position(2) = 1.02;
@@ -170,9 +141,9 @@ for ii_fig = 1:nFigs
 
     h=pnl.xlabel('Time (ms)');
     h.FontSize = 12;
-    pnl(1,1,1).select();
-    yyaxis left
-    h=pnl(1,1,1).ylabel('(z)');
+%     pnl(1,1,1).select();
+%     yyaxis left
+    h=pnl(1,1,1).ylabel('FR (Hz)');
     h.FontSize = 8;
     h=pnl(1,1,2).ylabel({'state';'prob.'});
     h.FontSize = 8;
@@ -180,13 +151,14 @@ for ii_fig = 1:nFigs
     h.FontSize = 8;
     
     pnl(1,1,1).select();
-    h=legend({'Ripple power (z)','MUA firing rate (z)'},'NumColumns',1,'Location','southoutside');
+%     h=legend({'MUA firing rate (Hz)','MUA firing rate (z)'},'NumColumns',1,'Location','southoutside');
+    h=legend({'MUA firing rate (Hz)'},'NumColumns',1,'Location','southoutside');
     h.Position([1 2]) = [0.25 0.01];
     h.Interpreter = 'none';
     h.Box = 'on';
     
     pnl(1,1,2).select();
-    h=legend(decode.state,'NumColumns',round(length(decode.state)/3),'Location','southoutside');
+    h=legend(decode.state,'NumColumns',round(length(decode.state)/2),'Location','southoutside');
     h.Position([1 2]) = [0.025 0.01];
     h.Interpreter = 'none';
     h.Box = 'on';

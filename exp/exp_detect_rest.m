@@ -1,4 +1,4 @@
-function exp_detect_balls(exp_ID)
+function exp_detect_rest(exp_ID)
 
 %% load exp data
 exp = exp_load_data(exp_ID,'pos','LM');

@@ -56,6 +56,8 @@ X(:,end+1) = [rpl.ripple_gamma_power_ratio_mean];
 X(:,end+1) = exp.MUA.zFR(rpl_t_IX);
 dist_metric = 'sqeuclidean';
 g = kmeans(X,2,'Distance',dist_metric,'Replicates',100);
+g(isnan(g)) = 0;
+g(g==0) = 3;
 [~,g_sort_IX] = sort(mean(splitapply(@mean,X,g),2),'descend'); % make sure cluster 1 contains high values
 g2 = zeros(size(g));
 for ii = 1:length(g_sort_IX)
@@ -63,6 +65,7 @@ for ii = 1:length(g_sort_IX)
 end
 g=g2;
 clear g2;
+g(g==3) = 2; % workaround for missing data points (nan)
 [~,sort_IX]=sort(g);
 grp_rpl = g;
 
@@ -158,6 +161,8 @@ dist_metric = 'sqeuclidean';
 % dist_metric = 'correlation';
 % dist_metric = 'cosine';
 g = kmeans(X,2,'Distance',dist_metric,'Replicates',100);
+g(isnan(g)) = 0;
+g(g==0) = 3;
 [~,g_sort_IX] = sort(mean(splitapply(@mean,X,g),2),'descend'); % make sure cluster 1 contains high values
 g2 = zeros(size(g));
 for ii = 1:length(g_sort_IX)
@@ -165,6 +170,7 @@ for ii = 1:length(g_sort_IX)
 end
 g=g2;
 clear g2;
+g(g==3) = 2; % workaround for missing data points (nan)
 [~,sort_IX]=sort(g);
 grp_mua = g;
 

@@ -1,3 +1,4 @@
+
 %% exp analysis pipline
 clear
 clc
@@ -32,10 +33,90 @@ disp('-------------------------------------------------------------------')
 %     'b9861_d180603'
 %     'b9861_d180604'};
 
+% exp_list = {...
+%     'b0184_d191130'
+%     'b0184_d191201'
+%     'b9861_d180526'
+%     'b9861_d180527'
+%     'b0034_d180313'
+%     };
+
+% list of days to run decoding analysis
 exp_list = {...
+    'b0184_d191126'
+    'b0184_d191127'
+    'b0184_d191128'
+    'b0184_d191129'
     'b0184_d191130'
     'b0184_d191201'
-%     'b0184_d191202'
+    'b0184_d191202'
+    'b0184_d191203'
+    'b0184_d191204'
+    'b0184_d191205'
+    'b0184_d191208'
+    'b0184_d191209'
+    
+%     'b9861_d180519'
+%     'b9861_d180521'
+%     'b9861_d180522'
+%     'b9861_d180523'
+%     'b9861_d180524'
+%     'b9861_d180525'
+%     'b9861_d180526'
+%     'b9861_d180527'
+%     'b9861_d180529'
+%     'b9861_d180530'
+%     
+%     'b0034_d180305'
+%     'b0034_d180306'
+%     'b0034_d180308'
+%     'b0034_d180310'
+%     'b0034_d180311'
+%     'b0034_d180312'
+%     'b0034_d180313'
+%     'b0034_d180314'
+%     'b0034_d180315'
+
+%     'b2289_d180518'
+%     'b2289_d180520'
+    
+%     'b0079_d161003'
+% TODO: run filtering for bat 79    
+% TODO: look for additional good days from bat 79    
+    
+%     'b0148_d170606'
+%     'b0148_d170607'
+%     'b0148_d170608'
+%     'b0148_d170625' % fig 1 sorting example from the paper
+%     'b0148_d170626'
+%     'b0148_d170627'
+% %     'b0148_d170628' % had error 
+%     'b0148_d170703'
+%     'b0148_d170718'
+%     'b0148_d170720'
+%     'b0148_d170723'
+%     'b0148_d170801'
+%     'b0148_d170802'
+% %     'b0148_d170803' % had error 
+%     'b0148_d170806'
+%     'b0148_d170807'
+    
+    };
+
+% list of days that had problems running the ripples/MUA/PE code
+% exp_list = {
+%     'b0034_d180305'
+%     'b0034_d180306'
+%     'b9861_d180521'
+%     'b9861_d180524'
+%     'b9861_d180526'
+% };
+
+exp_list = {...
+    'b9861_d180526'
+    'b9861_d180527'
+    'b0184_d191130'
+    'b0184_d191201'
     };
 
 %% load exp summary and choose exps
@@ -45,7 +126,7 @@ exp_t(exp_t.position_data_exist==0,:) = [];
 exp_t(exp_t.neural_data_exist==0,:) = [];
 % exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = [];
 % exp_t(~ismember(exp_t.batNum, [9861] ),:) = [];
-exp_t(~ismember(exp_t.batNum, [184] ),:) = [];
+% exp_t(~ismember(exp_t.batNum, [184] ),:) = [];
 % exp_t(~contains(exp_t.TT_loc,{'CA1','CA3'}),:) = [];
 % exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
 % exp_t(exp_t.date > datetime('17/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
@@ -56,7 +137,7 @@ exp_t
 whos exp_t 
 
 %%
-forcecalc = 1;
+forcecalc = 0;
 err_list = {};
 for ii_exp = 1:height(exp_t)
     %%
@@ -70,12 +151,11 @@ try
 %     exp=exp_load_data(exp_ID,'details','path');
 %     Nlg2Nlx(exp.path.raw,forcecalc);
 %     PRE_filter_CSCs(exp_ID, forcecalc);
-%     PRE_filter_LFP_bands(exp_ID, forcecalc)
+%     PRE_filter_LFP_bands(exp_ID, forcecalc);
 %     exp_calc_CSC_RAW_stats(exp_ID);
 %     PRE_detect_spikes(exp_ID,forcecalc);
 %     PRE_calc_write_artifacts(exp_ID);
 
-%     decoding_detect_spikes(exp_ID,forcecalc)
 %     bsp_extract_data(exp.path.bsp);
 %     exp_create_details(exp_ID);    
 %     exp_sync_bsp2nlg(exp_ID);
@@ -97,24 +177,7 @@ try
 %     wingbeat_detect(exp_ID)
 %     wingbeat_plot_map(exp_ID)
 
-%     ripples_detect(exp_ID);
-%     MUA_detect(exp_ID);
-%     PE_detect(exp_ID);
-%     PE_plot_ripples_vs_MUA(exp_ID); % I put the detection here...
-    
-%     ripples_MUA_PE_save_to_nlx(exp_ID,forcecalc);
-%     ripples_save_to_nlx(exp_ID,forcecalc);
-%     MUA_save_zFR_to_ncs(exp_ID,forcecalc);
-    
-%     ripples_trigger_LFP(exp_ID);
-%     ripples_trigger_MUA(exp_ID);
-%     ripples_xcorr(exp_ID)
-%     MUA_plot(exp_ID);
-%     PE_plot(exp_ID);
-
-%     exp_detect_balls(exp_ID);
-
-    decoding_prepare_exp_data(exp_ID);
+    run_decoding_funcs(exp_ID,forcecalc)
 
 catch err
     getReport(err)
@@ -146,6 +209,46 @@ end
 
 %% close diary!
 diary off
+
+
+%% decoding function
+function run_decoding_funcs(exp_ID,forcecalc)
+
+%     decoding_detect_spikes(exp_ID,forcecalc)
+
+%     exp_detect_rest(exp_ID);
+
+%     ripples_detect(exp_ID);
+%     MUA_detect(exp_ID);
+%     PE_plot_ripples_vs_MUA(exp_ID); % I put the detection here...
+% %     ripples_MUA_PE_save_to_nlx(exp_ID,forcecalc);
+
+%     ripples_trigger_LFP(exp_ID);
+%     ripples_trigger_MUA(exp_ID);
+%     ripples_xcorr(exp_ID)
+    
+%     decoding_prepare_exp_data(exp_ID);
+
+%     for params_opt = 1:6
+%         decoding_plot_flight_conf_mat(exp_ID, params_opt);
+%         decoding_plot_flight_posterior(exp_ID, params_opt)
+%     end
+    
+%     epoch_type = 'sleep';
+    epoch_type = 'rest';
+%     epoch_type = 'flight';
+    for params_opt = 8:14
+%         decoding_detect_posterior_events(exp_ID, epoch_type, params_opt);
+%         decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, 'PE');
+        decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, 'posterior');
+    end
+end
+
+
+
+
+
+%%
 
 
 
