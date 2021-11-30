@@ -8,6 +8,7 @@ decode.time = h5read(filename,'/time')';
 decode.state = h5read(filename,'/state')';
 decode.state = deblank(string(cell2mat(decode.state)))';
 decode.posterior = h5read(filename,'/acausal_posterior');
+% decode.likelihood = h5read(filename,'/likelihood');
 decode.params = attr2struct(h.Attributes);
 
 %% process decoded results

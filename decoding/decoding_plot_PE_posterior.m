@@ -6,47 +6,21 @@ function decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, event_type, 
         % epoch_type = 'rest'
         epoch_type = 'sleep';
         params_opt = 11;
-        event_type (1,:) char {mustBeMember(event_type,{'PE','posterior','ripples','MUA'})} = 'posterior'
+        event_type {mustBeMember(event_type,{'PE','posterior','ripples','MUA'})} = 'posterior'
         win_s = 0.5;
     end
 
-%% load data
-exp = exp_load_data(exp_ID, 'details','path','rest','ripples','MUA','PE','pos');
+%% IN/OUT folders
 dir_IN = 'F:\sequences\decoded';
 dir_OUT = 'F:\sequences\decoded_figs';
 figs_dir = fullfile(dir_OUT, epoch_type, event_type, exp_ID, "opt_"+params_opt);
-decode_filename = fullfile(dir_IN, epoch_type, exp_ID, sprintf('%s_%s_opt_%d.nc',exp_ID,epoch_type,params_opt));
-decode = decoding_read_decoded_file(decode_filename);
 mkdir(figs_dir);
 
-%% load events to use
-switch event_type
-    case 'PE'
-        PE_to_use = exp.PE.thr;
-        PE_ti = [PE_to_use.start_ts; PE_to_use.end_ts]';
-        switch epoch_type
-            case 'rest'
-                rest_ti = exp.rest.ti;
-                IX = any(PE_ti>shiftdim(rest_ti(:,1),-2) & PE_ti<shiftdim(rest_ti(:,2),-2), [2 3]);
-                PE_to_use = PE_to_use(IX);
-            case 'sleep'
-                sleep_ti = exp_get_sessions_ti(exp_ID, 'Sleep1','Sleep2');
-                sleep_ti(any(isnan(sleep_ti),2),:) = []; % remove nan in case of missing sessions
-                IX = any(PE_ti>shiftdim(sleep_ti(:,1),-2) & PE_ti<shiftdim(sleep_ti(:,2),-2), [2 3]);
-                PE_to_use = PE_to_use(IX);
-            case 'flight'
-                error('Not supported!')
-        end
-        events_all = PE_to_use;
-    case 'posterior'
-        dir_IN = 'F:\sequences\posterior_events';
-        filename = fullfile(dir_IN, sprintf('%s_posterior_events_%s_dec_prm_%d',exp_ID,epoch_type,params_opt));
-        load(filename);
-        events_all = [events_all.events];
-        [~, sort_IX] = sort([events_all.peak_ts], 'ascend');
-        events_all = events_all(sort_IX);
-end
-[events_all.num] = disperse(1:length(events_all));
+%% load data
+exp = exp_load_data(exp_ID, 'details','path','rest','ripples','MUA','PE','pos');
+events_all = decoding_load_events(exp_ID, epoch_type, params_opt, event_type);
+decode_filename = fullfile(dir_IN, epoch_type, exp_ID, sprintf('%s_%s_opt_%d.nc',exp_ID,epoch_type,params_opt));
+decode = decoding_read_decoded_file(decode_filename);
 
 %%
 nRows = 5;
@@ -195,7 +169,7 @@ for ii_fig = 1:nFigs
         sprintf('params opt: %d',params_opt),
         sprintf('bin size: %.2gm',decode.params.pos_bin_size),
         sprintf('replay speed: x%d',decode.params.replay_speed),
-        sprintf('state_decay_timescale: %.3g s',decode.params.state_decay_timescale),
+        sprintf('state decay timescale: %.3g s',decode.params.state_decay_timescale),
         };
     annotation('textbox', [0.65 0.01 0.2 0.05], 'String',params_str,'LineStyle','None')
     

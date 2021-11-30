@@ -177,7 +177,44 @@ try
 %     wingbeat_detect(exp_ID)
 %     wingbeat_plot_map(exp_ID)
 
-    run_decoding_funcs(exp_ID,forcecalc)
+    
+%     decoding_detect_spikes(exp_ID,forcecalc)
+
+%     exp_detect_rest(exp_ID);
+
+%     ripples_detect(exp_ID);
+%     MUA_detect(exp_ID);
+%     PE_plot_ripples_vs_MUA(exp_ID); % I put the detection here...
+% %     ripples_MUA_PE_save_to_nlx(exp_ID,forcecalc);
+
+%     ripples_trigger_LFP(exp_ID);
+%     ripples_trigger_MUA(exp_ID);
+%     ripples_xcorr(exp_ID)
+    
+%     decoding_prepare_exp_data(exp_ID);
+
+%     for params_opt = 1:6
+%         decoding_plot_flight_conf_mat(exp_ID, params_opt);
+%         decoding_plot_flight_posterior(exp_ID, params_opt)
+%     end
+    
+    epoch_type = 'sleep';
+%     epoch_type = 'rest';
+%     epoch_type = 'flight';
+    params_opts = [8:14];
+%     event_type = 'PE';
+    event_type = 'posterior';
+    for params_opt = params_opts
+        fprintf('params_opt: %d\n', params_opt);
+%         decoding_detect_posterior_events(exp_ID, epoch_type, params_opt);
+%         decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, event_type);
+%         decoding_plot_MAP(exp_ID, epoch_type, params_opt);
+%         decoding_seq_quantify(exp_ID, epoch_type, params_opt, event_type);
+        decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type);
+        close all
+    end
+%     decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
+%     close all
 
 catch err
     getReport(err)
@@ -209,40 +246,6 @@ end
 
 %% close diary!
 diary off
-
-
-%% decoding function
-function run_decoding_funcs(exp_ID,forcecalc)
-
-%     decoding_detect_spikes(exp_ID,forcecalc)
-
-%     exp_detect_rest(exp_ID);
-
-%     ripples_detect(exp_ID);
-%     MUA_detect(exp_ID);
-%     PE_plot_ripples_vs_MUA(exp_ID); % I put the detection here...
-% %     ripples_MUA_PE_save_to_nlx(exp_ID,forcecalc);
-
-%     ripples_trigger_LFP(exp_ID);
-%     ripples_trigger_MUA(exp_ID);
-%     ripples_xcorr(exp_ID)
-    
-%     decoding_prepare_exp_data(exp_ID);
-
-%     for params_opt = 1:6
-%         decoding_plot_flight_conf_mat(exp_ID, params_opt);
-%         decoding_plot_flight_posterior(exp_ID, params_opt)
-%     end
-    
-%     epoch_type = 'sleep';
-    epoch_type = 'rest';
-%     epoch_type = 'flight';
-    for params_opt = 8:14
-%         decoding_detect_posterior_events(exp_ID, epoch_type, params_opt);
-%         decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, 'PE');
-        decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, 'posterior');
-    end
-end
 
 
 
