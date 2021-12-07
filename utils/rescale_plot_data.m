@@ -51,6 +51,8 @@ while ii_argin<nargin
                         if strcmp(hchild.InterceptAxis, 'x')
                             hchild.Value = my_rescale(hchild.Value, offset, gain);
                         end
+                    case 'matlab.graphics.primitive.Image'
+                        hchild.XData = my_rescale(hchild.XData, offset, gain);
                 end
             end
         case 'Y'
@@ -73,6 +75,8 @@ while ii_argin<nargin
                         if strcmp(hchild.InterceptAxis, 'y')
                             hchild.Value = my_rescale(hchild.Value, offset, gain);
                         end
+                    case 'matlab.graphics.primitive.Image'
+                        hchild.YData = my_rescale(hchild.YData, offset, gain);
                 end
             end
         case 'Z'

@@ -87,5 +87,52 @@ decoding_plot_event('b9861_d180526', 'sleep', 14, 113, 1);
 decoding_plot_event('b9861_d180527', 'sleep', 11, 824, 0.42);
 decoding_plot_event('b0184_d191130', 'sleep', 11, 53,  [-.32 .11]);
 
+%%
+% decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',49);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',98);
+
+%%
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',15);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',22);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',23);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',25);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',44);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',49);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',50);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',51);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',52);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',55);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',57);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',60);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',70);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',75);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',84);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',90);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',98);
+decoding_seq_quantify_plot_event('b9861_d180526', 'sleep', 11, 'posterior',105);
+
+%%
+clc
+X1 = [3 1 10 8 16];
+u = [1 1 1 1 1];
+% X2 = conv(X1,u,'full');
+X2 = imfilter(X1,u,'symmetric','conv','same');
+% X2 = imfilter(X1,u,'replicate','conv','same');
+disp(X1)
+disp(X2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 %%

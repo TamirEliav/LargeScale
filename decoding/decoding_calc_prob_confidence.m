@@ -4,7 +4,6 @@ arguments
     HPD_prc = 0.95
 end
 %%
-HPD_prc = 0.95;
 nX = size(prob,1); % num position bins
 nT = size(prob,2); % num time bins
 prob2 = sort(prob,1,'descend');
@@ -25,10 +24,10 @@ end
 KS = max(abs(prob3'-test_cdf),[],2)'; % use this!
 
 % normalize
-HPD = interp1([1 nX], [1 0], HPD, 'linear');
+HPD = interp1([1 nX], [1 0], HPD, 'linear','extrap');
 KS_min = max(abs(test_cdf-test_cdf)); % simply zero...
 KS_max = max(abs(ones(1,nX)-test_cdf));
-KS = interp1(linspace(KS_min,KS_max,nX), linspace(0,1,nX), KS, 'linear');
+KS = interp1([KS_min KS_max], [0 1], KS, 'linear','extrap');
 sparsity = sparsity .* sum(prob,1); % weight according to the probability to be in the state
 
 % % average across time bins

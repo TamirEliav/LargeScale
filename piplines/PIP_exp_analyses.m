@@ -206,12 +206,12 @@ try
     event_type = 'posterior';
     for params_opt = params_opts
         fprintf('params_opt: %d\n', params_opt);
-%         decoding_detect_posterior_events(exp_ID, epoch_type, params_opt);
-%         decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, event_type);
 %         decoding_plot_MAP(exp_ID, epoch_type, params_opt);
+%         decoding_detect_posterior_events(exp_ID, epoch_type, params_opt);
 %         decoding_seq_quantify(exp_ID, epoch_type, params_opt, event_type);
         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type);
         close all
+%         decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, event_type);
     end
 %     decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
 %     close all

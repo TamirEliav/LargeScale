@@ -17,7 +17,7 @@ if length(events)==0
     fprintf('No event for %s %s dec param %d %s\n', exp_ID, epoch_type, params_opt, event_type);
     return;
 end
-seqs = [events.seq];
+seqs = [events.seq_model];
 
 %% plot
 close all
