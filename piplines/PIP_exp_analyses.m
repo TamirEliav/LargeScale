@@ -209,9 +209,10 @@ try
 %         decoding_plot_MAP(exp_ID, epoch_type, params_opt);
 %         decoding_detect_posterior_events(exp_ID, epoch_type, params_opt);
 %         decoding_seq_quantify(exp_ID, epoch_type, params_opt, event_type);
-        decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type);
-        close all
+%         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type);
+%         close all
 %         decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, event_type);
+        decoding_xcorr_ripples_MUA_PE_vs_posterior_events(exp_ID, epoch_type, params_opt);
     end
 %     decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
 %     close all
