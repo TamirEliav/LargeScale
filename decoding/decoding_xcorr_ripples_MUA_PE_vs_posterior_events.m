@@ -30,7 +30,7 @@ end
 
 %%
 win = .5;
-sort_features = {'score','compression','confidence_sparsity'};
+sort_features = {'score','compression','confidence_sparsity','distance'};
 
 fig=figure;
 fig.WindowState = 'maximized';
@@ -55,11 +55,30 @@ for ii_feature = 1:length(sort_features)
     ylabel(sprintf('events (sorted by %s)',feature_fn),'Interpreter','none')
     xlabel('Time from event (s)')
     nexttile
+    hold on
     center_IX = win_samples+1;
     x = [seqs.(feature_fn)];
     y = trig_signal(:,center_IX);
-    plot(x,y,'.');
+    plot(x,y,'.k');
     lsline
+    t1 = [events.peak_ts];
+    t2 = [exp.ripples.all.peak_ts];
+    tdiff = (t1-t2').*1e-6;
+    IX = any(abs(tdiff)<win);
+    plot(x(IX),y(IX),'.b');
+    t1 = [events.peak_ts];
+    t2 = [exp.MUA.events.peak_ts];
+    tdiff = (t1-t2').*1e-6;
+    IX = any(abs(tdiff)<win);
+    plot(x(IX),y(IX),'.g');
+    t1 = [events.peak_ts];
+    t2 = [exp.PE.thr.peak_ts];
+    tdiff = (t1-t2').*1e-6;
+    IX = any(abs(tdiff)<win);
+    plot(x(IX),y(IX),'.r');
+    h=plot(nan,nan,'.b',nan,nan,'.g',nan,nan,'.r',nan,nan,'.k');
+    h=legend(h,"near ripple","near MUA","near PE","other",'Location','bestoutside');
+    h.Position = [0.88 0.94 .05 .05];
     xlabel(feature_fn,'Interpreter','none')
     ylabel('Ripples power (z)')
 end
@@ -83,44 +102,63 @@ for ii_feature = 1:length(sort_features)
     ylabel(sprintf('events (sorted by %s)',feature_fn),'Interpreter','none')
     xlabel('Time from event (s)')
     nexttile
+    hold on
     center_IX = win_samples+1;
     x = [seqs.(feature_fn)];
     y = trig_signal(:,center_IX);
-    plot(x,y,'.');
+    plot(x,y,'.k');
     lsline
+    t1 = [events.peak_ts];
+    t2 = [exp.ripples.all.peak_ts];
+    tdiff = (t1-t2').*1e-6;
+    IX = any(abs(tdiff)<win);
+    plot(x(IX),y(IX),'.b');
+    t1 = [events.peak_ts];
+    t2 = [exp.MUA.events.peak_ts];
+    tdiff = (t1-t2').*1e-6;
+    IX = any(abs(tdiff)<win);
+    plot(x(IX),y(IX),'.g');
+    t1 = [events.peak_ts];
+    t2 = [exp.PE.thr.peak_ts];
+    tdiff = (t1-t2').*1e-6;
+    IX = any(abs(tdiff)<win);
+    plot(x(IX),y(IX),'.r');
+    h=plot(nan,nan,'.b',nan,nan,'.g',nan,nan,'.r',nan,nan,'.k');
+    h=legend(h,"near ripple","near MUA","near PE","other",'Location','bestoutside');
+    h.Position = [0.88 0.94 .05 .05];
     xlabel(feature_fn,'Interpreter','none')
     ylabel('MUA firing rate (z)')
 end
 
 nexttile
-x1 = [events.peak_ts];
-x2 = [exp.ripples.all.peak_ts];
-xdiff = (x1-x2').*1e-6;
-histogram(xdiff(:), 'BinLimits',[-1 1].*win, 'BinWidth',.050);
-text(.95,.95,sprintf('%.2g%%',100*sum(any(abs(xdiff)<win))/size(xdiff,2)),'Units','normalized','HorizontalAlignment','right');
+t1 = [events.peak_ts];
+t2 = [exp.ripples.all.peak_ts];
+tdiff = (t1-t2').*1e-6;
+histogram(tdiff(:), 'BinLimits',[-1 1].*win, 'BinWidth',.050);
+text(.95,.95,sprintf('%.2g%%',100*sum(any(abs(tdiff)<win))/size(tdiff,2)),'Units','normalized','HorizontalAlignment','right');
 title('posterior vs. ripples')
-xlabel('Time lag (s)')
-ylabel('Counts')
+xlabel('Time from posterior event (s)')
+ylabel('Ripple count')
 
 nexttile
-x1 = [events.peak_ts];
-x2 = [exp.MUA.events.peak_ts];
-xdiff = (x1-x2').*1e-6;
-histogram(xdiff(:), 'BinLimits',[-1 1].*win, 'BinWidth',.050);
-text(.95,.95,sprintf('%.2g%%',100*sum(any(abs(xdiff)<win))/size(xdiff,2)),'Units','normalized','HorizontalAlignment','right');
+t1 = [events.peak_ts];
+t2 = [exp.MUA.events.peak_ts];
+tdiff = (t1-t2').*1e-6;
+histogram(tdiff(:), 'BinLimits',[-1 1].*win, 'BinWidth',.050);
+text(.95,.95,sprintf('%.2g%%',100*sum(any(abs(tdiff)<win))/size(tdiff,2)),'Units','normalized','HorizontalAlignment','right');
 title('posterior vs. MUA')
-xlabel('Time lag (s)')
-ylabel('Counts')
+xlabel('Time from posterior event (s)')
+ylabel('MUA count')
 
 nexttile
-x1 = [events.peak_ts];
-x2 = [exp.PE.thr.peak_ts];
-xdiff = (x1-x2').*1e-6;
-histogram(xdiff(:), 'BinLimits',[-1 1].*win, 'BinWidth',.050);
-text(.95,.95,sprintf('%.2g%%',100*sum(any(abs(xdiff)<win))/size(xdiff,2)),'Units','normalized','HorizontalAlignment','right');
+t1 = [events.peak_ts];
+t2 = [exp.PE.thr.peak_ts];
+tdiff = (t1-t2').*1e-6;
+histogram(tdiff(:), 'BinLimits',[-1 1].*win, 'BinWidth',.050);
+text(.95,.95,sprintf('%.2g%%',100*sum(any(abs(tdiff)<win))/size(tdiff,2)),'Units','normalized','HorizontalAlignment','right');
 title('posterior vs. PE')
-xlabel('Time lag (s)')
-ylabel('Counts')
+xlabel('Time from posterior event (s)')
+ylabel('PE count')
 
 mvmnt_states_IX = contains(decode.state,'movement');
 mvmnt_prob = decode.posterior_state(mvmnt_states_IX,:);
