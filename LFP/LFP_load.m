@@ -1,4 +1,9 @@
-function [LFP, ts, fs, params, ch_valid] = LFP_load(exp_ID,band,TT_or_ch_to_use)
+function [LFP, ts, fs, params, ch_valid] = LFP_load(exp_ID,TT_or_ch_to_use,opts)
+arguments
+    exp_ID
+    TT_or_ch_to_use
+    opts.band
+end
 % band is optional (as one of the following):
 % delta
 % theta
@@ -16,10 +21,10 @@ prm = PARAMS_GetAll();
 active_channels = exp.details.activeChannels;
 
 %% get folder
-if ~exist('band','var')
+if ~isfield(opts,'band')
     dir_IN = exp.path.LFP;
 else
-    dir_IN = fullfile(exp.path.LFP_bands,band);
+    dir_IN = fullfile(exp.path.LFP_bands, opts.band);
 end
 
 %% option for specific TT/ch

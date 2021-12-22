@@ -30,8 +30,8 @@ run_bands_filtering = 1;
 if exist(exp.path.LFP_bands,'dir')
     if forcecalc
         % delete existing output dir
-        warning('LFP bands output dir already existing and you chose to override it, deleting old LFP dir!')
-        rmdir(exp.path.LFP,'s')
+        warning('LFP bands output dir already existing and you chose to override it, deleting old LFP bands dir!')
+        rmdir(exp.path.LFP_bands,'s');
     else
         warning('LFP bands output folder already exist, use forcecalc to override it!');
         run_bands_filtering = 0;

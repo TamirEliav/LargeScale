@@ -15,12 +15,11 @@ NTT_files = {};
 tt_to_use = ones(1,exp.details.numTT);
 tt_to_use = tt_to_use & ismember(1:exp.details.numTT,exp.details.TT_to_use);
 tt_to_use = tt_to_use & contains(exp.details.TT_loc,{'CA1','CA3'});
-
-filenames = "spikes_"+exp_ID+"_TT"+find(tt_to_use)'+".ntt";
+tt_to_use_numbers = find(tt_to_use);
+filenames = "spikes_"+exp_ID+"_TT"+tt_to_use_numbers'+".ntt";
 NTT_files = fullfile(exp.path.decoding_spikes_detection,filenames);
 
 %% load spikes data
-clear data;
 for ii_file = 1:length(NTT_files)
     %% read NTT file
     NTT_file = NTT_files{ii_file};
@@ -131,9 +130,8 @@ for TT=1:size(multiunits,3)
          ylabel("Ch "+ch_pair(2))
          legend('flight','sleep')
     end
-    % TODO: TT is the INDEX of the tetorde! correct it!
-    sgtitle({exp_ID;"TT "+TT},'interpreter','none')
-    file_out = fullfile(dir_out, [exp_ID '_features_TT_' num2str(TT)]);
+    sgtitle({exp_ID;"TT "+tt_to_use_numbers(TT)},'interpreter','none')
+    file_out = fullfile(dir_out, [exp_ID '_features_TT_' num2str(tt_to_use_numbers(TT))]);
     saveas(gcf, file_out, 'jpeg');
 end
 

@@ -22,7 +22,7 @@ for ii_file = 1:length(other_files)
 end
 
 %% fix ncs files
-for ii_file = 1:length(ncs_files)
+parfor ii_file = 1:length(ncs_files)
     file = ncs_files(ii_file);
     file_IN = fullfile(file.folder, file.name);
     file_OUT = fullfile(dir_OUT, file.name);

@@ -25,8 +25,8 @@ switch EXT
         %% read old file
         [Timestamps, ScNumbers, CellNumbers, Features, Samples, header_old] =...
             Nlx2MatSpike(file_IN, [1 1 1 1 1], 1, 1, [] );
-        disp('Old header:');
-        disp(header_old);
+%         disp('Old header:');
+%         disp(header_old);
         
         %% update header + data
         header_file = 'Nlx_header_NTT.txt';
@@ -46,8 +46,8 @@ switch EXT
         header_new{ADC_str_IX} = sprintf('-ADBitVolts %s %s %s %s', ADC_str, ADC_str, ADC_str, ADC_str);
         header_new{InputRange_str_IX} = sprintf('-InputRange %s %s %s %s', InputRange_str, InputRange_str, InputRange_str, InputRange_str);
 
-        disp('New header:');
-        disp(header_new);
+%         disp('New header:');
+%         disp(header_new);
         
         %% write new file
         Mat2NlxSpike(file_OUT, 0, 1, [], [1 0 1 1 1 1], ...
@@ -57,8 +57,8 @@ switch EXT
         %% read old file
         [Timestamps, Samples, header_old] = ...
             Nlx2MatCSC( file_IN, [1 0 0 0 1], 1, 1, []);
-        disp('Old header:');
-        disp(header_old);
+%         disp('Old header:');
+%         disp(header_old);
         
         %% parse and change data
         fs               = sscanf(header_old{contains(header_old,'SamplingFrequency')}, '-SamplingFrequency %g');
@@ -84,8 +84,8 @@ switch EXT
         header_new{contains(header_new,'InputInverted')}      = sprintf('-InputInverted %s', InputInvertedStr);
         header_new{contains(header_new,'AcqEntName')}         = sprintf('-AcqEntName %s', CSC_name);
         
-        disp('New header:');
-        disp(header_new);
+%         disp('New header:');
+%         disp(header_new);
         
         %% write new file
         Mat2NlxCSC(file_OUT, 0, 1, 1, [1 0 1 0 1 1], Timestamps, SampleFrequencies, Samples, header_new);

@@ -9,7 +9,7 @@ exp = exp_load_data(exp_ID,'details','path');
 %% set params
 dir_IN = exp.path.spikes_raw;
 dir_OUT = exp.path.decoding_spikes_detection;
-clear detect_params
+clear params
 params.ref_ch = exp.details.refCh;
 params.active_TT_channels = exp.details.activeChannels;
 params.TT_to_use = exp.details.TT_to_use;
@@ -28,10 +28,11 @@ params.CD_thr = 6;
 % params.CD_detect_win_len = 32;
 params.CD_detect_win_len = 4;
 params.CD_invalid_win_len = 32*2;
-params.CD_n_TT_thr = length(exp.details.TT_to_use);
-% params.CD_n_ch_thr = 9;
-% params.CD_n_TT_thr  = length(params.TT_to_use);
-% params.CD_n_ch_thr = 0.5 * sum(params.active_TT_channels(:)); % at least on half of the channels
+if length(exp.details.TT_to_use) >= 8
+    params.CD_n_TT_thr = round(0.5*length(exp.details.TT_to_use));
+else
+    params.CD_n_TT_thr = min(4, length(exp.details.TT_to_use));
+end
 params.is_save_artifacts = 0;
 
 %% detect!

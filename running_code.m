@@ -2458,7 +2458,16 @@ plot(lags,ccc)
 %% 
 [S,t,f,Serr]=mtspecgramtrigc(LFP(TT_trigger,:)',ripples.peak_IX,chrnx_win,chrnx_movingwin);
 
-
+%%
+main_dir = 'D:\shir_data_fix\0184_Shir';
+folders = dir(main_dir);
+folders([1 2])=[];
+for ii_folder = 1:length(folders)
+    fprintf('%d: %s\n', ii_folder, folders(ii_folder).name)
+    tic
+    util_fix_ncs(fullfile(main_dir,folders(ii_folder).name,'nlx'));
+    toc
+end
 
 
 
