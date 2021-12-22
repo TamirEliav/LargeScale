@@ -122,6 +122,119 @@ disp(X1)
 disp(X2)
 
 
+%%
+clear; clc
+exp_ID = 'b0184_d191130';
+exp = exp_load_data(exp_ID, 'details', 'path');
+dir_IN = exp.path.spikes_raw;
+limits_ts = [];
+TT = exp.details.refCh(1);
+ch = exp.details.refCh(2);
+csc_file = sprintf('spikes_%s_TT%d_ch%d.ncs',exp_ID,TT,ch);
+csc_file = fullfile(dir_IN,csc_file);
+csc_ref_ch = Nlx_csc_read(csc_file, limits_ts);
+data = zeros([size(exp.details.activeChannels),length(csc_ref_ch)]);
+%%
+tic
+for TT = 1:exp.details.numTT
+    parfor ch = 1:4
+        fprintf('TT%d_ch%d\n',TT,ch);
+        % load ch data
+        csc_file = sprintf('spikes_%s_TT%d_ch%d.ncs',exp_ID,TT,ch);
+        csc_file = fullfile(dir_IN,csc_file);
+        if ~exist(csc_file,'file')
+            continue;
+        end
+        data(TT,ch,:) = Nlx_csc_read(csc_file,limits_ts);
+    end
+end
+toc
+
+%%
+sdf=median(data,[1 2]);
+
+
+%% select best TT for dislaying ripple traces
+events_all = ripples.all;
+IX = [events_all.peak_IX];
+IX = IX+[-10:10]';
+pripple_TT_at_peaks = pripple_TT(IX,:);
+mean(pripple_TT_at_peaks)
+n_contrib_events = zeros(1,nTT);
+contrib_events = false(length(events_all),nTT);
+for TT=1:nTT
+    events_TT = ripples.by_TT{TT};
+    if isempty(events_TT)
+        continue;
+    end
+    t1 = [events_all.peak_ts];
+    t2 = [events_TT.peak_ts];
+    tdiff = abs(t1-t2');
+    thr = 100; % usec
+    TF = tdiff < thr;
+    fprintf('TT %d: %d\n',TT,sum(any(TF)))
+    contrib_events(:,TT) = any(TF);
+    n_contrib_events(TT) = sum(any(TF));
+end
+figure
+subplot(131);bar(1:nTT,n_contrib_events); ylabel('num events')
+subplot(132);bar(1:nTT,mean(pripple_TT_at_peaks)); ylabel('pripple')
+subplot(133);bar(1:nTT,n_contrib_events.*mean(pripple_TT_at_peaks)); ylabel('product')
+
+
+%%
+IX = [events_all.peak_IX];
+IX = IX+[-200:200]';
+% signal = LFP2;
+% signal = sum(ripple,3);
+signal = pripple_TT;
+sdf = signal(IX,:);
+sdf = reshape(sdf,size(IX,1),size(IX,2),nTT);
+
+%%
+close all
+for TT=TT_to_use
+    figure
+    sdf2=squeeze(sdf(:,:,TT));
+    sdf3=sdf2;
+%     sdf3 = sdf3+[1:nEvents].*25;
+%     plot(sdf3)
+    imagesc(sdf3')
+    title("TT"+TT)
+end
+
+%%
+% sdf4= squeeze(sum(sdf,1));
+sdf4 = squeeze(max(sdf,[],1));
+% sdf4(isnan(sdf4))=0;
+sdf4 = sdf4(:,TT_to_use);
+[IDX C] = kmeans(sdf4,2);
+
+[coeff,score,latent,tsquared,explained,mu] = pca(sdf4);
+[~,sorted_IX] = sort(score(:,2));
+
+% figure
+% scatter(score(:,1),score(:,2),5,IDX,'filled')
+
+figure
+imagesc(coeff(:,[1 2]))
+yticklabels(TT_to_use)
+colormap bone
+colorbar
+
+figure
+imagesc(contrib_events(sorted_IX,TT_to_use))
+
+figure
+subplot(121)
+imagesc(squeeze(sdf(:,sorted_IX,1))')
+% imagesc(squeeze(sdf(:,:,1))')
+subplot(122)
+imagesc(squeeze(sdf(:,sorted_IX,12))')
+% imagesc(squeeze(sdf(:,:,12))')
+
+
+
 
 
 

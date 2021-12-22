@@ -1,9 +1,5 @@
 function ripples_detect(exp_ID)
 
-%% TODO: add somewhere here a section that selects the best tetrode i.e. with the strongest 
-% ripples and saves the average LFP across valid channel from this tetrode.
-% alternatievly, that the best SINGLE CHANNEL instead of TETRODE.
-
 %% get exp info
 exp = exp_load_data(exp_ID,'details','path','rest');
 prm = PARAMS_GetAll();
@@ -16,23 +12,21 @@ nCh = size(active_channels,2);
 
 %% load data
 % TODO: load data from all TTs and run detection by TT for all TTs. For 
-% detection by pooling tetrodes, use only TT_to_use
-[ripple, ts, fs, params, ch_valid] = LFP_load(exp_ID,'ripple',TT_to_use);
-[gamma , ts, fs, params, ch_valid] = LFP_load(exp_ID,'high_gamma',TT_to_use);
+% detection by pooling tetrodes, use only TT_to_use.
+[ripple, ts, fs, params, ch_valid] = LFP_load(exp_ID,TT_to_use,'band','ripple');
+[gamma , ts, fs, params, ch_valid] = LFP_load(exp_ID,TT_to_use,'band','high_gamma');
 
 %% bands power by hilbert envelope (per channel)
 pripple = abs(hilbert(ripple)).^2;
 pgamma = abs(hilbert(gamma)).^2;
 
-%%
+%% sum over ch/TT + smoothing
 pripple_TT = squeeze(nansum(pripple,3)); % sum over channels per TT
 pripple_all = squeeze(nansum(pripple,[2 3])); % sum over channels and TTs
 pripple_TT = smoothdata(pripple_TT,1, 'gaussian',5*round(fs*prm.ripples.smooth_ker*1e-3), 'includenan');
 pripple_all = smoothdata(pripple_all, 'gaussian',5*round(fs*prm.ripples.smooth_ker*1e-3), 'includenan');
 pripple_TT  = sqrt(pripple_TT);
 pripple_all = sqrt(pripple_all);
-
-% TODO: calc STD for each TT and save it to the final strcut
 
 pgamma_TT = squeeze(nansum(pgamma,3)); % sum over channels per TT
 pgamma_all = squeeze(nansum(pgamma,[2 3])); % sum over channels and TTs
@@ -77,26 +71,50 @@ ripple_gamma_ratio_all = pripple_all ./ pgamma_all;
 clear ripples_TT ripples_TT_invalid
 for TT = 1:nTT
     if ismember(TT,TT_to_use)
-        [ripples_TT{TT}, ripples_TT_invalid{TT}] = detect_ripples(zpripple_TT(:,TT), ts, ripple_gamma_ratio_TT(:,TT), ...
+        ripples_TT{TT} = detect_ripples(zpripple_TT(:,TT), ts, ripple_gamma_ratio_TT(:,TT), ...
             prm.ripples.high_thr_std, prm.ripples.low_thr_std, prm.ripples.min_width_msec, prm.ripples.merge_thr_msec, prm.ripples.ripple_gamma_power_ratio_thr);
     else
         ripples_TT{TT} = [];
-        ripples_TT_invalid{TT} = [];
     end
 end
-[ripples_all, ripples_all_invalid] = detect_ripples(zpripple_all, ts, ripple_gamma_ratio_all, ...
+ripples_all = detect_ripples(zpripple_all, ts, ripple_gamma_ratio_all, ...
         prm.ripples.high_thr_std, prm.ripples.low_thr_std, prm.ripples.min_width_msec, prm.ripples.merge_thr_msec, prm.ripples.ripple_gamma_power_ratio_thr);
+
+%% select representative TT (for display etc...)
+contrib_events_per_TT = zeros(length(ripples_all),nTT);
+t1 = [ripples_all.peak_ts];
+for TT=TT_to_use
+    events_TT = ripples_TT{TT};
+    t2 = [events_TT.peak_ts];
+    tdiff = abs(t1-t2');
+    thr = 50e3; % 50ms
+    contrib_events_per_TT(:,TT) = any(tdiff < thr);
+end
+num_contrib_events_per_TT = sum(contrib_events_per_TT);
+prc_contrib_events_per_TT = 100 .* num_contrib_events_per_TT ./ length(ripples_all);
+
+IX = [ripples_all.peak_IX];
+mean_pripple_per_TT = mean(pripple_TT(IX,:));
+[~,best_TT] = max(num_contrib_events_per_TT);
+
+%% get LFP traces using selected TT
+[LFP, ~, ~, ~, ch_valid] = LFP_load(exp_ID,best_TT);
+LFP_raw = mean(LFP(:,best_TT,:),3);
+LFP_filt = mean(ripple(:,best_TT,:),3);
 
 %% save ripples detection results to mat file
 ripples = struct();
 ripples.params = prm.ripples;
 ripples.by_TT = ripples_TT;
-ripples.by_TT_invalid = ripples_TT_invalid;
 ripples.all = ripples_all;
-ripples.all_invalid = ripples_all_invalid;
 ripples.zpripple_all = zpripple_all;
 ripples.t = ts;
 ripples.fs = params.SamplingFrequency;
+ripples.LFP_raw = LFP_raw;
+ripples.LFP_filt = LFP_filt;
+ripples.best_TT = best_TT;
+ripples.mean_pripple_per_TT = mean_pripple_per_TT;
+ripples.prc_contrib_events_per_TT = prc_contrib_events_per_TT;
 file_name = fullfile('L:\Analysis\Results\exp\ripples',[exp_ID '_exp_ripples']);
 save(file_name,'ripples');
 
@@ -104,7 +122,7 @@ end
 
 
 %%
-function [ripples, invalid_ripples] = detect_ripples(zpripple, ts, ripple_gamma_ratio, high_thr, low_thr, min_duration, merge_thr, ratio_thr)
+function ripples = detect_ripples(zpripple, ts, ripple_gamma_ratio, high_thr, low_thr, min_duration, merge_thr, ratio_thr)
     fs = 1e6 / median(diff(ts));
     zpripple = zpripple(:)';
     ripple_gamma_ratio = ripple_gamma_ratio(:)';
@@ -141,7 +159,7 @@ function [ripples, invalid_ripples] = detect_ripples(zpripple, ts, ripple_gamma_
                     events.ripple_gamma_power_ratio_at_peak > ratio_thr;
     
     ripples = soa2aos(events);
-    invalid_ripples = ripples(~[ripples.valid]);
+%     invalid_ripples = ripples(~[ripples.valid]);
     ripples(~[ripples.valid])=[];
 end
 

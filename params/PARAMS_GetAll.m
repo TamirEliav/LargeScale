@@ -59,7 +59,7 @@ prm.oscillations.time_AC.win_size = 2;
 % prm.ripples.ripple_gamma_power_ratio_thr = 0; % zero means technically not applied
 
 prm.ripples.smooth_ker = 4; % ms
-prm.ripples.high_thr_std = 2; % no minimum duration
+prm.ripples.high_thr_std = 2.5; % no minimum duration
 prm.ripples.low_thr_std = 1; % for event edges
 prm.ripples.merge_thr_msec = 25;
 prm.ripples.min_width_msec = 25;
@@ -67,7 +67,7 @@ prm.ripples.ripple_gamma_power_ratio_thr = 0; % zero means technically not appli
 
 prm.MUA.bin_size = 1; % ms
 prm.MUA.smooth_ker = 15; % ms
-prm.MUA.high_thr_std = 2; % no minimum duration
+prm.MUA.high_thr_std = 2.5; % no minimum duration
 prm.MUA.low_thr_std = 1;  % for event edges
 
 prm.FR_map.bin_size = 0.2;

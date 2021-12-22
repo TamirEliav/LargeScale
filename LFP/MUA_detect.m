@@ -3,7 +3,6 @@ function MUA_detect(exp_ID)
 %% get exp info
 exp = exp_load_data(exp_ID,'details','path','rest');
 prm = PARAMS_GetAll();
-active_channels = exp.details.activeChannels;
 nTT = exp.details.numTT;
 sleep_ti = exp_get_sessions_ti(exp_ID, 'Sleep1','Sleep2');
 sleep_ti(any(isnan(sleep_ti),2),:) = []; % remove nan in case of missing sessions
