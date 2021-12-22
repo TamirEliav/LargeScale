@@ -1,14 +1,13 @@
 function decoding_plot_flight_conf_mat(exp_ID, params_opt)
 
-%% load data
-decode_dir_IN = 'F:\sequences\decoded\flight';
+%% folders and params
+epoch_type = 'flight';
 out_dir = 'F:\sequences\decoded_figs\flight\conf_mat';
 mkdir(out_dir)
 
 %% load data
 exp = exp_load_data(exp_ID, 'details','path','flight','pos');
-decode_filename = fullfile(decode_dir_IN, exp_ID, sprintf('%s_flight_opt_%d.nc',exp_ID,params_opt) );
-decode = decoding_read_decoded_file(decode_filename);
+decode = decoding_load_data(exp_ID, epoch_type, params_opt);
 
 %% arrange data to compare
 t = decode.time;
@@ -60,6 +59,9 @@ for ii_dir_pooling_opt = 1:length(directions_to_use_opts)
     x = pos_real(IX);
     y = pos_predict(IX);
     N = histcounts2(x,y,bin_edges,bin_edges)';
+%     bin_edges_x = bin_edges;
+%     bin_edges_y = bin_edges(1:2:end);
+%     N = histcounts2(x,y,bin_edges_x,bin_edges_y)';
     N_norm_by_real = N ./ sum(N,1);
     N_norm_by_predict = N ./ sum(N,2);
     
@@ -80,6 +82,10 @@ for ii_dir_pooling_opt = 1:length(directions_to_use_opts)
     colorbar('Location','eastoutside')
     set_pos_prediction_axis(bin_edges,pos_ticks);
 end
+pnl(1,2,1).select();
+text(-0.2,1.05,{'norm.';'each row'},'Units','normalized');
+pnl(1,3,1).select();
+text(-0.2,1.05,{'norm.';'each col'},'Units','normalized');
 
 pnl(2,1,1).select();
 switch 1
@@ -169,7 +175,7 @@ h.FontSize=14;
 
 fig_filename = fullfile(out_dir, sprintf('%s_flight_decoding_opt_%d',exp_ID,params_opt));
 saveas(hf, fig_filename, 'jpg');
-close(hf);
+% close(hf);
 
 %% save flight decoding results to mat file
 res = struct();

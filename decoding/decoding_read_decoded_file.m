@@ -1,5 +1,8 @@
-function decode = decoding_read_decoded_file(filename)
-
+function decode = decoding_read_decoded_file(filename,opts)
+arguments
+    filename
+    opts.load_likelihood = false
+end
 %% read decoded file
 h = h5info(filename);
 decode = struct();
@@ -8,8 +11,9 @@ decode.time = h5read(filename,'/time')';
 decode.state = h5read(filename,'/state')';
 decode.state = deblank(string(cell2mat(decode.state)))';
 decode.posterior = h5read(filename,'/acausal_posterior');
-if contains('likelihood',{h.Datasets.Name})
+if opts.load_likelihood %&& contains('likelihood',{h.Datasets.Name})
     decode.likelihood = h5read(filename,'/likelihood');
+    % TODO: need to multiple by 3 (number of movement dynamics)...
     decode.likelihood = decode.likelihood ./ sum(decode.likelihood,[1 2]);
 end
 decode.params = attr2struct(h.Attributes);

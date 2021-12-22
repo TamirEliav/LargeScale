@@ -7,7 +7,7 @@ function decoding_plot_flight_posterior(exp_ID, params_opt)
 epoch_type = 'flight';
 
 %% load data
-exp = exp_load_data(exp_ID, 'details','path','rest','ripples','MUA','PE','pos','flight');
+exp = exp_load_data(exp_ID, 'details','path','pos','flight','MUA');
 dir_IN = 'F:\sequences\decoded';
 dir_OUT = 'F:\sequences\decoded_figs';
 figs_dir = fullfile(dir_OUT, epoch_type, exp_ID, "opt_"+params_opt);
@@ -139,7 +139,7 @@ for ii_fig = 1:nFigs
     h.Position(2) = 1.02;
     h.FontSize = 14;
 
-    h=pnl.xlabel('Time (ms)');
+    h=pnl.xlabel('Time (s)');
     h.FontSize = 12;
 %     pnl(1,1,1).select();
 %     yyaxis left
@@ -158,7 +158,7 @@ for ii_fig = 1:nFigs
     h.Box = 'on';
     
     pnl(1,1,2).select();
-    h=legend(decode.state,'NumColumns',round(length(decode.state)/2),'Location','southoutside');
+    h=legend(decode.state,'NumColumns',2,'Location','southoutside');
     h.Position([1 2]) = [0.025 0.01];
     h.Interpreter = 'none';
     h.Box = 'on';

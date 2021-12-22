@@ -16,7 +16,7 @@ mkdir(dir_OUT);
 
 %% load data
 [events, params] = decoding_load_events_quantification(exp_ID, epoch_type, params_opt, event_type);
-decode = decoding_load_data(exp_ID, epoch_type, params_opt);
+decode = decoding_load_data(exp_ID, epoch_type, params_opt, 'load_likelihood',True);
 
 %% arrange data
 event = events(event_num);
@@ -24,7 +24,6 @@ radius_bins = round(params.radius / params.decode.pos_bin_size);
 margin_bins = round(decode.Fs * margin);
 IX1 = [event.start_IX:event.end_IX];
 IX2 = [(event.start_IX-margin_bins):(event.end_IX+margin_bins)];
-state = decode.state(event.state_num);
 seq_model = event.seq_model; seq_model.decoder_type_str = "model"; seq_model.decoder_type_field = 'posterior';
 seq_bayes = event.seq_bayes; seq_bayes.decoder_type_str = "bayes"; seq_bayes.decoder_type_field = 'likelihood';
 seqs = [seq_model seq_bayes];
