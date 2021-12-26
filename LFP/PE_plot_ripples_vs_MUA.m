@@ -23,6 +23,7 @@ MUA_t_IX = find_nearest_point(MUA_ts, exp.ripples.t);
 trig_ripple.zpripple = trigger_signal_by_IX(exp.ripples.zpripple_all, MUA_t_IX, win_n_sample, 0);
 trig_ripple.t = linspace(-win_sec,win_sec,size(trig_ripple.zpripple,2));
 
+% why we do the following 3 lines??...
 trig_MUA.FR(isnan(trig_MUA.FR)) = 0;
 trig_MUA.zFR(isnan(trig_MUA.zFR)) = 0;
 trig_ripple.zpripple(isnan(trig_ripple.zpripple)) = 0;
@@ -54,11 +55,13 @@ X=[];
 X(:,end+1) = [rpl.ripple_gamma_power_ratio_at_peak];
 X(:,end+1) = [rpl.ripple_gamma_power_ratio_mean];
 X(:,end+1) = exp.MUA.zFR(rpl_t_IX);
+X = min(X,prctile(X,[99])); % trim outliers
 dist_metric = 'sqeuclidean';
+rng(0)
 g = kmeans(X,2,'Distance',dist_metric,'Replicates',100);
 g(isnan(g)) = 0;
 g(g==0) = 3;
-[~,g_sort_IX] = sort(mean(splitapply(@mean,X,g),2),'descend'); % make sure cluster 1 contains high values
+[~,g_sort_IX] = sort(splitapply(@(x)(nanmean(x,'all')),X,g),'descend'); % make sure cluster 1 contains high values
 g2 = zeros(size(g));
 for ii = 1:length(g_sort_IX)
     g2(g==ii) = g_sort_IX(ii);
@@ -157,13 +160,15 @@ hax.YScale = 'log';
 X=[];
 X(:,end+1) = [exp.MUA.events.peak_zFR];
 X(:,end+1) = exp.ripples.zpripple_all(MUA_t_IX);
+X = min(X,prctile(X,[99])); % trim outliers
 dist_metric = 'sqeuclidean';
 % dist_metric = 'correlation';
 % dist_metric = 'cosine';
-g = kmeans(X,2,'Distance',dist_metric,'Replicates',100);
+rng(0)
+g = kmeans(X,2,'Distance',dist_metric,'Replicates',1000);
 g(isnan(g)) = 0;
 g(g==0) = 3;
-[~,g_sort_IX] = sort(mean(splitapply(@mean,X,g),2),'descend'); % make sure cluster 1 contains high values
+[~,g_sort_IX] = sort(splitapply(@(x)(nanmean(x,'all')),X,g),'descend'); % make sure cluster 1 contains high values
 g2 = zeros(size(g));
 for ii = 1:length(g_sort_IX)
     g2(g==ii) = g_sort_IX(ii);

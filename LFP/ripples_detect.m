@@ -4,63 +4,50 @@ function ripples_detect(exp_ID)
 exp = exp_load_data(exp_ID,'details','path','rest');
 prm = PARAMS_GetAll();
 active_channels = exp.details.activeChannels;
-sleep_ti = exp_get_sessions_ti(exp_ID, 'Sleep1','Sleep2');
-sleep_ti(any(isnan(sleep_ti),2),:) = []; % remove nan in case of missing sessions
 TT_to_use = find(contains(exp.details.TT_loc,{'CA1','CA3'}));
 nTT = size(active_channels,1);
 nCh = size(active_channels,2);
 
-%% load data
+%% load LFP data
 % TODO: load data from all TTs and run detection by TT for all TTs. For 
 % detection by pooling tetrodes, use only TT_to_use.
-[ripple, ts, fs, params, ch_valid] = LFP_load(exp_ID,TT_to_use,'band','ripple');
-[gamma , ts, fs, params, ch_valid] = LFP_load(exp_ID,TT_to_use,'band','high_gamma');
+[ripple, ts, fs, params, ch_valid] = LFP_load(exp_ID,'band','ripple');
+[gamma , ts, fs, params, ch_valid] = LFP_load(exp_ID,'band','high_gamma');
+
+%% get relevant session times
+sleep_ti = exp_get_sessions_ti(exp_ID, 'Sleep1','Sleep2');
+sleep_ti(any(isnan(sleep_ti),2),:) = []; % remove nan in case of missing sessions
+immobility_ti = [sleep_ti; exp.rest.ti];
+is_sleep = any(ts>sleep_ti(:,1)&ts<sleep_ti(:,2),1);
+is_immobility = any(ts>immobility_ti(:,1)&ts<immobility_ti(:,2),1);
+is_rest = any(ts>exp.rest.ti(:,1)&ts<exp.rest.ti(:,2),1);
 
 %% bands power by hilbert envelope (per channel)
 pripple = abs(hilbert(ripple)).^2;
 pgamma = abs(hilbert(gamma)).^2;
 
-%% sum over ch/TT + smoothing
-pripple_TT = squeeze(nansum(pripple,3)); % sum over channels per TT
-pripple_all = squeeze(nansum(pripple,[2 3])); % sum over channels and TTs
+%% average over ch/TT + smoothing
+pripple_TT = squeeze(nanmean(pripple,3)); % sum over channels per TT
+pripple_all = squeeze(nanmean(pripple(:,TT_to_use,:),[2 3])); % sum over channels from RELEVANT TTs
 pripple_TT = smoothdata(pripple_TT,1, 'gaussian',5*round(fs*prm.ripples.smooth_ker*1e-3), 'includenan');
 pripple_all = smoothdata(pripple_all, 'gaussian',5*round(fs*prm.ripples.smooth_ker*1e-3), 'includenan');
 pripple_TT  = sqrt(pripple_TT);
 pripple_all = sqrt(pripple_all);
 
-pgamma_TT = squeeze(nansum(pgamma,3)); % sum over channels per TT
-pgamma_all = squeeze(nansum(pgamma,[2 3])); % sum over channels and TTs
+pgamma_TT = squeeze(nanmean(pgamma,3)); % sum over channels per TT
+pgamma_all = squeeze(nanmean(pgamma(:,TT_to_use,:),[2 3])); % sum over channels from RELEVANT TTs
 pgamma_TT = smoothdata(pgamma_TT,1, 'gaussian',5*round(fs*prm.ripples.smooth_ker*1e-3), 'includenan');
 pgamma_all = smoothdata(pgamma_all, 'gaussian',5*round(fs*prm.ripples.smooth_ker*1e-3), 'includenan');
 pgamma_TT  = sqrt(pgamma_TT);
 pgamma_all = sqrt(pgamma_all);
 
-%% zscore
-switch 2
-    case 1
-        is_sleep = any(ts>sleep_ti(:,1)&ts<sleep_ti(:,2),1);
-        pripple_TT(~is_sleep,:) = nan;
-        pripple_all(~is_sleep,:) = nan;
-        pgamma_TT(~is_sleep,:) = nan;
-        pgamma_all(~is_sleep,:) = nan;
-
-        zpripple_TT = nanzscore(pripple_TT,0,1);
-        zpripple_all = nanzscore(pripple_all,0,1);
-        zpgamma_TT = nanzscore(pgamma_TT,0,1);
-        zpgamma_all = nanzscore(pgamma_all,0,1);
-
-    case 2
-        %% zscore (using mean and std from sleep only, but applied also to rest)
-        is_sleep = any(ts>sleep_ti(:,1)&ts<sleep_ti(:,2),1);
-        immobility_ti = [sleep_ti; exp.rest.ti];
-        is_immobility = any(ts>immobility_ti(:,1)&ts<immobility_ti(:,2),1);
-        is_rest = any(ts>exp.rest.ti(:,1)&ts<exp.rest.ti(:,2),1);
-%         my_zscore = @(x,IX)( (x-mean(x(IX)))./std(x(IX)) );
-        zpripple_TT = my_zscore(pripple_TT, is_sleep, is_immobility);
-        zpripple_all = my_zscore(pripple_all, is_sleep, is_immobility);
-        zpgamma_TT = my_zscore(pgamma_TT, is_sleep, is_immobility);
-        zpgamma_all = my_zscore(pgamma_all, is_sleep, is_immobility);
-end
+%% zscore (using mean and std from sleep only)
+pripple_mean_TT = mean(pripple_TT(is_sleep,:));
+pripple_std_TT = std(pripple_TT(is_sleep,:));
+pripple_mean_all = mean(pripple_all(is_sleep,:));
+pripple_std_all = std(pripple_all(is_sleep,:));
+zpripple_TT = (pripple_TT - pripple_mean_TT) ./ pripple_std_TT;
+zpripple_all = (pripple_all - pripple_mean_all) ./ pripple_std_all;
 
 %% ripple/gamma power ratio
 ripple_gamma_ratio_TT = pripple_TT ./ pgamma_TT;
@@ -68,16 +55,16 @@ ripple_gamma_ratio_all = pripple_all ./ pgamma_all;
 
 %% detect!
 % TODO: speed up!
-clear ripples_TT ripples_TT_invalid
+ripples_TT = {};
 for TT = 1:nTT
-    if ismember(TT,TT_to_use)
-        ripples_TT{TT} = detect_ripples(zpripple_TT(:,TT), ts, ripple_gamma_ratio_TT(:,TT), ...
-            prm.ripples.high_thr_std, prm.ripples.low_thr_std, prm.ripples.min_width_msec, prm.ripples.merge_thr_msec, prm.ripples.ripple_gamma_power_ratio_thr);
-    else
-        ripples_TT{TT} = [];
-    end
+    zpripple = zpripple_TT(:,TT);
+    zpripple(~is_immobility) = nan;
+    ripples_TT{TT} = detect_ripples(zpripple, ts, ripple_gamma_ratio_TT(:,TT), ...
+        prm.ripples.high_thr_std, prm.ripples.low_thr_std, prm.ripples.min_width_msec, prm.ripples.merge_thr_msec, prm.ripples.ripple_gamma_power_ratio_thr);
 end
-ripples_all = detect_ripples(zpripple_all, ts, ripple_gamma_ratio_all, ...
+zpripple = zpripple_all;
+zpripple(~is_immobility) = nan;
+ripples_all = detect_ripples(zpripple, ts, ripple_gamma_ratio_all, ...
         prm.ripples.high_thr_std, prm.ripples.low_thr_std, prm.ripples.min_width_msec, prm.ripples.merge_thr_msec, prm.ripples.ripple_gamma_power_ratio_thr);
 
 %% select representative TT (for display etc...)
@@ -98,9 +85,18 @@ mean_pripple_per_TT = mean(pripple_TT(IX,:));
 [~,best_TT] = max(num_contrib_events_per_TT);
 
 %% get LFP traces using selected TT
-[LFP, ~, ~, ~, ch_valid] = LFP_load(exp_ID,best_TT);
-LFP_raw = mean(LFP(:,best_TT,:),3);
-LFP_filt = mean(ripple(:,best_TT,:),3);
+[LFP, ~, ~, ~, ~] = LFP_load(exp_ID,best_TT);
+LFP_raw = nanmean(LFP(:,best_TT,:),3);
+LFP_filt = nanmean(ripple(:,best_TT,:),3);
+
+%%
+% figure
+% hold on
+% y = LFP_raw;
+% % y = LFP_filt;
+% plot(ts, y)
+% plot([events_TT.peak_ts],y([events_TT.peak_IX]), 'r*')
+% rescale_plot_data('x',[1e-6 ts(1)]);
 
 %% save ripples detection results to mat file
 ripples = struct();
@@ -112,9 +108,13 @@ ripples.t = ts;
 ripples.fs = params.SamplingFrequency;
 ripples.LFP_raw = LFP_raw;
 ripples.LFP_filt = LFP_filt;
-ripples.best_TT = best_TT;
-ripples.mean_pripple_per_TT = mean_pripple_per_TT;
-ripples.prc_contrib_events_per_TT = prc_contrib_events_per_TT;
+ripples.stats.mean_pripple_per_TT = mean_pripple_per_TT;
+ripples.stats.prc_contrib_events_per_TT = prc_contrib_events_per_TT;
+ripples.stats.best_TT = best_TT;
+ripples.stats.pripple_mean_TT = pripple_mean_TT;
+ripples.stats.pripple_std_TT = pripple_std_TT;
+ripples.stats.pripple_mean_all = pripple_mean_all;
+ripples.stats.pripple_std_all = pripple_std_all;
 file_name = fullfile('L:\Analysis\Results\exp\ripples',[exp_ID '_exp_ripples']);
 save(file_name,'ripples');
 
@@ -163,12 +163,6 @@ function ripples = detect_ripples(zpripple, ts, ripple_gamma_ratio, high_thr, lo
     ripples(~[ripples.valid])=[];
 end
 
-
-%%
-function z = my_zscore(x,IX1,IX2)
-    z = (x-mean(x(IX1))) ./ std(x(IX1));
-    z(~IX2) = nan;
-end
 
 
 

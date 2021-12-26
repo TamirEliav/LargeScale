@@ -1,7 +1,7 @@
 function [LFP, ts, fs, params, ch_valid] = LFP_load(exp_ID,TT_or_ch_to_use,opts)
 arguments
     exp_ID
-    TT_or_ch_to_use
+    TT_or_ch_to_use=[]
     opts.band
 end
 % band is optional (as one of the following):
@@ -28,7 +28,7 @@ else
 end
 
 %% option for specific TT/ch
-if exist('TT_or_ch_to_use','var')
+if ~isempty(TT_or_ch_to_use)
     if isvector(TT_or_ch_to_use)
         TT = TT_or_ch_to_use;
         mask = false(size(active_channels));
@@ -78,11 +78,10 @@ LFP_file_IN = fullfile(dir_IN, ['LFP_' exp_ID '_TT' num2str(TT) '_ch' num2str(ch
 nPoints = length(ts);
 nTT = size(ch_valid,1);
 nCh = size(ch_valid,2);
-LFP = zeros(nPoints,nTT,nCh);
+LFP = nan(nPoints,nTT,nCh);
 for TT = 1:nTT
     for ch = 1:nCh
         if ~ch_valid(TT,ch)
-            LFP(:,TT,ch) = nan;
             continue;
         end
         LFP_file_IN = fullfile(dir_IN, ['LFP_' exp_ID '_TT' num2str(TT) '_ch' num2str(ch) '.ncs']);
