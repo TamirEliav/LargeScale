@@ -15,16 +15,98 @@ from argparse import Namespace
 
 #%%
 paramsets = [
-    Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 15.0, state_decay_timescale = 2.0),
-    Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 15.0, state_decay_timescale = 2.0),
-    Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 20.0, state_decay_timescale = 2.0),
-    Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 20.0, state_decay_timescale = 2.0),
-    Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 25.0, state_decay_timescale = 2.0),
-    Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 25.0, state_decay_timescale = 2.0),
-    Namespace(pos_bin_size = 0.2, pos_std = 0.4, mark_std = 15.0, state_decay_timescale = 2.0),
-    Namespace(pos_bin_size = 0.2, pos_std = 0.4, mark_std = 20.0, state_decay_timescale = 2.0),
-    Namespace(pos_bin_size = 0.2, pos_std = 0.4, mark_std = 25.0, state_decay_timescale = 2.0),
+    Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 15.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 15.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 20.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 20.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 25.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 25.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.2, pos_std = 0.4, mark_std = 15.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.2, pos_std = 0.4, mark_std = 20.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.2, pos_std = 0.4, mark_std = 25.0, state_decay_timescale = 2.0, replay_speed=1),
+    
+    Namespace(pos_bin_size = 0.2, pos_std = 0.4, mark_std = 20.0, state_decay_timescale = 4.0, replay_speed=40),
     ]
+
+#%% 
+exp_ID_list = [
+    # 'b0184_d191128',
+    # 'b0184_d191129',
+    # 'b0184_d191130',
+    # 'b0184_d191201',
+    # 'b0184_d191202',
+    # 'b0184_d191203',
+    # 'b0184_d191204',
+    # 'b0184_d191205',
+    # 'b0184_d191208',
+    # 'b0184_d191209',
+    # 'b0184_d191210',
+    # 'b0184_d191211',
+    # 'b0184_d191212',
+    # 'b0184_d191215',
+    # 'b0184_d191216',
+    # 'b0184_d191217',
+    # 'b0184_d191220',
+    # 'b0184_d191222',
+    # 'b0184_d191224',
+    # 'b0184_d191225',
+    # 'b0184_d191226',
+    # 'b0184_d200101',
+    # 'b0184_d200102',
+
+    'b9861_d180519',
+    'b9861_d180521',
+    'b9861_d180522',
+    'b9861_d180523',
+    'b9861_d180524',
+    'b9861_d180525',
+    'b9861_d180526',
+    'b9861_d180527',
+    'b9861_d180529',
+    'b9861_d180530',
+    'b9861_d180531',
+    'b9861_d180601',
+    'b9861_d180603',
+    'b9861_d180604',
+    'b9861_d180605',
+    'b9861_d180606',
+    'b9861_d180607',
+    'b9861_d180608',
+    'b9861_d180609',
+    'b9861_d180610',
+    'b9861_d180611',
+    'b9861_d180612',
+    'b9861_d180613',
+    'b9861_d180614',
+    'b9861_d180615',
+    'b9861_d180616',
+    'b9861_d180617',
+    'b9861_d180618',
+    'b9861_d180619',
+    'b9861_d180620',
+    'b9861_d180621',
+    'b9861_d180622',
+    'b9861_d180623',
+    'b9861_d180624',
+    'b9861_d180625',
+    'b9861_d180626',
+    'b9861_d180627',
+    'b9861_d180628',
+    'b9861_d180629',
+    'b9861_d180630',
+    'b9861_d180701',
+    'b9861_d180702',
+    'b9861_d180703',
+    'b9861_d180704',
+    'b9861_d180705',
+    'b9861_d180706',
+    'b9861_d180708',
+    'b9861_d180709',
+    'b9861_d180710',
+    'b9861_d180711',
+    ]
+
+opt_params_list = [4]
 
 #%%
 def get_flights_to_decode(exp_ID,opt_params):
@@ -60,25 +142,28 @@ def create_job_submission_str(exp_ID, opt_params, flights_to_decode, folder):
         f' --pos_std {params.pos_std}'
         f' --mark_std {params.mark_std}'
         f' --state_decay_timescale {params.state_decay_timescale}'
+        f' --replay_speed {params.replay_speed}'
         f' --res_dir {res_dir}'
         )
     # bsub options
     queue_name = 'new-short'
-    memory_usage = 1024
-    num_cores = 24
-    wall_time = '06:00'
-    # job_slot_limit = 30
+    memory_usage = 8192
+    NUMBA_NUM_THREADS = 16
+    wall_time = '02:00'
     job_list_str = str(flights_to_decode).replace(' ','')
     bsub_opts = (
         f' -q {queue_name}'
         f' -J jobs{job_list_str}'
         # f' -J jobs{job_list_str}%{job_slot_limit}'
         f' -R rusage[mem={memory_usage}]'
-        f' -n {num_cores} -R "span[hosts=1]"'
-        f' -W {wall_time}'
+        # f' -n {num_cores} -R "span[hosts=1]"'
+        # f' -R "affinity[core({num_cores})]"'
+        f' -R "affinity[thread({NUMBA_NUM_THREADS})]"'
+        # f' -R "affinity[thread*{NUMBA_NUM_THREADS}]"'
+        f' -We {wall_time}'
         f' -outdir "../jobs_output/%J"'
         f' -o "../jobs_output/%J/%J_%I.txt"'
-        f' -env "all, NUMBA_NUM_THREADS={num_cores}"'
+        f' -env "all, NUMBA_NUM_THREADS={NUMBA_NUM_THREADS}"'
         # f' -env "NUMBA_NUM_THREADS={num_cores}"'
         # f' -env "OMP_NUM_THREADS={num_cores}"'
         # f' -env "MKL_NUM_THREADS={num_cores}"'
@@ -107,8 +192,12 @@ def main():
     parser = argparse.ArgumentParser(description='decode during a specific flight')
     parser.add_argument("--exp_ID", dest='exp_ID', type=str, nargs="+", default=['b9861_d180527'], help="exp_ID")
     parser.add_argument("--opt_params", dest='opt_params', type=int, nargs="+", default=[1], help="Decoding paramset opt(s)")
+    parser.add_argument("--use_lists_in_code", dest='use_lists_in_code', type=int, default=[0], help="Use exp/parrams list from code (0/1)")
     # parser.add_argument("--queue_name", dest='queue_name', type=str, default="new-short", help="which queue to use")
     args = parser.parse_args()
+    if args.use_lists_in_code:
+        args.exp_ID = exp_ID_list
+        args.opt_params = opt_params_list
     for arg in vars(args):
         print(arg, ':', getattr(args, arg))
     

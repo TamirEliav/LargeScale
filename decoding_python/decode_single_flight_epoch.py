@@ -23,6 +23,7 @@ def main():
     parser.add_argument('--pos_std', dest='pos_std', type=float, default=2.0, help='position std (in meters)')
     parser.add_argument('--mark_std', dest='mark_std', type=float, default=20.0, help='marks std (in uVolts)')
     parser.add_argument('--state_decay_timescale', dest='state_decay_timescale', type=float, default=1.0, help='state_decay_timescale (in seconds)')
+    parser.add_argument('--replay_speed', dest='replay_speed', type=int, default=1, help='replay speed')
     parser.add_argument('--res_dir', dest='res_dir', type=str, default='.', help='results folder')
     args = parser.parse_args()
     args.job_id = os.getenv('LSB_JOBID', 'None')
@@ -38,7 +39,8 @@ def main():
     exp = exp_decode.exp_decode(args.exp_ID)
     exp.load_data(folder='..//data_pre_proc')
     start = time.time()
-    exp.decode_behave(state_decay_timescale = args.state_decay_timescale,
+    exp.decode_behave(replay_speed=args.replay_speed,
+                      state_decay_timescale = args.state_decay_timescale,
                       pos_bin_size = args.pos_bin_size,
                       pos_std = args.pos_std,
                       mark_std = args.mark_std,
@@ -52,6 +54,7 @@ def main():
                                      'pos_std' : args.pos_std,
                                      'mark_std' : args.mark_std,
                                      'state_decay_timescale' : args.state_decay_timescale,
+                                     'replay_speed' : args.replay_speed,
                                      'job_id' : args.job_id})
     # folder = Path('.').resolve().parent.joinpath('data_decoded',args.job_id)
     folder = Path(args.res_dir)

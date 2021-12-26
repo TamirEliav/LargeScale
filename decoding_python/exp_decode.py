@@ -292,11 +292,17 @@ class exp_decode():
                                          pos_std]) # amplitude 1, amplitude 2, amplitude 3, amplitude 4, position       
             }
         }
-        continuous_transition_types = [['empirical_movement', 'uniform',  'uniform',            'uniform'],
-                                        ['uniform',           'uniform',  'uniform',            'uniform'],
-                                        ['uniform',           'uniform',  'empirical_movement', 'uniform'],
-                                        ['uniform',           'uniform',  'uniform',            'uniform']]
-        encoding_group_to_state = ['Inbound', 'Inbound', 'Outbound', 'Outbound']
+        
+        continuous_transition_types = [
+            ['empirical_movement', 'uniform',  'uniform',   'uniform', 'uniform', 'uniform'],
+            ['uniform',            'identity', 'uniform',   'uniform', 'uniform', 'uniform'],
+            ['uniform',            'uniform',  'uniform',   'uniform', 'uniform', 'uniform'],
+            ['uniform',            'uniform',  'uniform',   'empirical_movement', 'uniform', 'uniform'],
+            ['uniform',            'uniform',  'uniform',   'uniform',            'identity', 'uniform'],
+            ['uniform',            'uniform',  'uniform',   'uniform',            'uniform', 'uniform'],
+            ]
+        encoding_group_to_state = ['Inbound', 'Inbound', 'Inbound', 'Outbound', 'Outbound', 'Outbound']
+        
         dt = 1/data.attrs['fs']
         state_diag_val = 1-1/(state_decay_timescale/dt)
         classifier = ClusterlessClassifier(replay_speed=replay_speed,

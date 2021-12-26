@@ -22,8 +22,8 @@ def join_jobs_results(path):
     return res
 
 #%% general definitions
-# dir_IN = "X:\\sequences\\decoding"
-dir_IN = "X:\\sequences\\decoding_without_likelihood_saved"
+dir_IN = "X:\\sequences\\decoding"
+# dir_IN = "X:\\sequences\\decoding_without_likelihood_saved"
 dir_OUT = "F:\sequences\decoded"
 exp_IDs = [
     # 'b9861_d180519',
@@ -32,14 +32,34 @@ exp_IDs = [
     # 'b9861_d180523',
     # 'b9861_d180524',
     # 'b9861_d180525',
-    'b9861_d180526',
+    # 'b9861_d180526',
     # 'b9861_d180527',
     # 'b9861_d180529',
     # 'b9861_d180530',
     
+    # 'b0184_d191128',
+    # 'b0184_d191129',
     # 'b0184_d191130',
     # 'b0184_d191201',
     # 'b0184_d191202',
+    # 'b0184_d191203',
+    # 'b0184_d191204',
+    # 'b0184_d191205',
+    'b0184_d191208',
+    # 'b0184_d191209',
+    # 'b0184_d191210',
+    # 'b0184_d191211',
+    # 'b0184_d191212',
+    # 'b0184_d191215',
+    # 'b0184_d191216',
+    # 'b0184_d191217',
+    # 'b0184_d191220',
+    # # 'b0184_d191222',
+    # 'b0184_d191224',
+    # 'b0184_d191225',
+    # 'b0184_d191226',
+    # 'b0184_d200101',
+    # 'b0184_d200102',
     
     # 'b0034_d180305',
     # 'b0034_d180306',
@@ -69,14 +89,15 @@ exp_IDs = [
     # 'b0148_d170806', 
     # 'b0148_d170807',
     ]
-# session_type = 'flight'
+session_type = 'flight'
+# session_type = 'sleep'
 # session_type = 'rest'
-session_type = 'sleep'
 # opt_params_list = [4]
+opt_params_list = [10]
 # opt_params_list = [1,2,3,4,5,6]
 # opt_params_list = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
 # opt_params_list = [8,9,10,11,12,13,14]
-opt_params_list = [11]
+# opt_params_list = [14]
 # opt_params_list = [15,16,17,18,19,20,21]
 # opt_params_list = [8,9,10,11,12,13,14,15,16,17,18,19,20,21]
 

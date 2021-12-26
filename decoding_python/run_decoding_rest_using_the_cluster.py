@@ -71,9 +71,11 @@ def create_job_submission_str(exp_ID, opt_params, epochs_to_decode, folder):
         )
     # bsub options
     queue_name = 'new-short'
-    memory_usage = 1024
-    num_cores = 24
-    wall_time = '06:00'
+    # memory_usage = 4096
+    memory_usage = 16384
+    # num_cores = 1
+    NUMBA_NUM_THREADS = 16
+    wall_time = '01:00'
     # job_slot_limit = 30
     job_list_str = str(epochs_to_decode).replace(' ','')
     bsub_opts = (
@@ -81,11 +83,14 @@ def create_job_submission_str(exp_ID, opt_params, epochs_to_decode, folder):
         f' -J jobs{job_list_str}'
         # f' -J jobs{job_list_str}%{job_slot_limit}'
         f' -R rusage[mem={memory_usage}]'
-        f' -n {num_cores} -R "span[hosts=1]"'
-        f' -W {wall_time}'
+        # f' -n {num_cores} -R "span[hosts=1]"'
+        # f' -R "affinity[core({num_cores})]"'
+        f' -R "affinity[thread({NUMBA_NUM_THREADS})]"'
+        # f' -R "affinity[thread*{NUMBA_NUM_THREADS}]"'
+        f' -We {wall_time}'
         f' -outdir "../jobs_output/%J/"'
         f' -o "../jobs_output/%J/%J_%I.txt"'
-        f' -env "all, NUMBA_NUM_THREADS={num_cores}"'
+        f' -env "all, NUMBA_NUM_THREADS={NUMBA_NUM_THREADS}"'
         # f' -env "NUMBA_NUM_THREADS={num_cores}"'
         # f' -env "OMP_NUM_THREADS={num_cores}"'
         # f' -env "MKL_NUM_THREADS={num_cores}"'
