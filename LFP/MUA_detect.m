@@ -43,13 +43,13 @@ FR = fs.*smoothdata(nanmean(N),'gaussian',ker_win_n_samples);
 is_sleep = any(t>sleep_ti(:,1)&t<sleep_ti(:,2),1);
 immobility_ti = [sleep_ti; exp.rest.ti];
 is_immobility = any(t>immobility_ti(:,1)&t<immobility_ti(:,2),1);
-% my_zscore = @(x,IX)( (x-mean(x(IX)))./std(x(IX)) );
-zFR = FR;
-zFR = my_zscore(zFR, is_sleep, is_immobility);
-% zFR(~is_sleep) = nan;
-% zFR = nanzscore(zFR);
-xthr1 = zFR > prm.MUA.high_thr_std;
-xthr2 = zFR > prm.MUA.low_thr_std;
+FR_mean = nanmean(FR(is_sleep));
+FR_std = nanstd(FR(is_sleep));
+zFR = (FR - FR_mean) ./ FR_std;
+zFR_immobility = zFR;
+zFR_immobility(~is_immobility) = nan;
+xthr1 = zFR_immobility > prm.MUA.high_thr_std;
+xthr2 = zFR_immobility > prm.MUA.low_thr_std;
 xthr12 = extend_intervals(xthr1,xthr2);
 cc = bwconncomp(xthr12);
 % create MUA events struct
@@ -83,6 +83,8 @@ MUA.t  = t;
 MUA.fs = fs;
 MUA.FR = FR;
 MUA.zFR = zFR;
+MUA.FR_mean = FR_mean;
+MUA.FR_std = FR_std;
 MUA.events = soa2aos(events);
 MUA.trig.t = trig_t;
 MUA.trig.FR_mean = trig_FR_mean;
@@ -93,14 +95,6 @@ file_name = fullfile('L:\Analysis\Results\exp\MUA',[exp_ID '_exp_MUA']);
 save(file_name,'MUA');
 
 end
-
-%%
-function z = my_zscore(x,IX1,IX2)
-    z = (x-mean(x(IX1))) ./ std(x(IX1));
-    z(~IX2) = nan;
-end
-
-
 
 
 %%

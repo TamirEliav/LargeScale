@@ -13,7 +13,7 @@ mkdir(dir_OUT);
 
 %% load data
 exp = exp_load_data(exp_ID, 'details','path','rest','ripples','MUA','PE','pos','flight');
-decode = decoding_load_data(exp_ID, epoch_type, params_opt);
+decode = decoding_load_data(exp_ID, epoch_type, params_opt, 'load_likelihood', true);
 events = decoding_load_events(exp_ID, epoch_type, params_opt, event_type);
 
 

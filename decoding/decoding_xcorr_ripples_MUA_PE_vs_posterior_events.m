@@ -19,7 +19,7 @@ seqs = [events.seq_model];
 
 %%
 if length(events)<=1
-    fprintf('No enough events for %s %s dec param %d %s\n', exp_ID, epoch_type, params_opt);
+    fprintf('No enough events for %s %s dec param %d\n', exp_ID, epoch_type, params_opt);
     fig=figure;
     text(.5,.5,'Not enough events!')
     sgtitle(sprintf('%s_%s_opt_%d',exp_ID, epoch_type, params_opt),'interpreter','none');

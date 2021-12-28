@@ -58,12 +58,18 @@ for ii_dir_pooling_opt = 1:length(directions_to_use_opts)
     IX = any(direction_real == directions_to_use,1)';
     x = pos_real(IX);
     y = pos_predict(IX);
-    N = histcounts2(x,y,bin_edges,bin_edges)';
+    N = histcounts2(x,y,bin_edges,bin_edges)'; % transpose so yaxis(rows)=predict and xaxis(cols)=real
 %     bin_edges_x = bin_edges;
 %     bin_edges_y = bin_edges(1:2:end);
 %     N = histcounts2(x,y,bin_edges_x,bin_edges_y)';
     N_norm_by_real = N ./ sum(N,1);
     N_norm_by_predict = N ./ sum(N,2);
+    if ii_dir_pooling_opt==1 % compute sparisity only for pooled directions
+        sparsity = zeros(length(N),1);
+        for ii_bin = 1:length(N)
+            sparsity(ii_bin) = cumputeSparsity(N(ii_bin,:)); % per row (redicted pos)
+        end
+    end
     
     pnl(1,1,ii_dir_pooling_opt).select();
     title("directions: "+strjoin(string(directions_to_use'),','));
@@ -191,6 +197,9 @@ res.direction_mean_acc = mean(diag(cm));
 res.pos_err = pos_err;
 res.pos_err_mean = mean(pos_err);
 res.pos_err_median = median(pos_err);
+res.sparsity = sparsity;
+res.sparsity_mean = mean(sparsity);
+res.sparsity_max = max(sparsity);
 res_filename = fullfile(out_dir, sprintf('%s_flight_decoding_opt_%d',exp_ID,params_opt));
 save(res_filename, 'res');
 

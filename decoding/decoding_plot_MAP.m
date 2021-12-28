@@ -7,7 +7,7 @@ arguments
 end
 
 %% load data
-exp = exp_load_data(exp_ID, 'ripples','MUA','PE','LM');
+exp = exp_load_data(exp_ID, 'ripples','MUA','PE','LM','pos');
 decode = decoding_load_data(exp_ID, epoch_type, params_opt);
 if strcmp(epoch_type, 'flight')
     decode_flight = decode;
@@ -33,11 +33,18 @@ h.Interpreter = 'none';
 h.FontSize = 12;
 pnl(2,1).select();
 hold on
+if strcmp(epoch_type,'flight')
+    pos_ts_IX = interp1(decode.time, 1:length(decode.time), exp.pos.proc_1D.ts, 'previous');
+    plot(pos_ts_IX,exp.pos.proc_1D.pos,'r-','LineWidth',0.5);
+end
 clear h
 h = arrayfun(@(x)(plot(x,nan,'.','MarkerSize',20)),[1:length(decode.state)]); % dummy points for legend
 hax=gca;
 hax.ColorOrderIndex = 1;
-splitapply(@(IX,x)(plot(IX,x,'.')),1:length(decode.time), decode.MAP_pos, decode.MAP_state_IX)
+x = 1:length(decode.time);
+y = decode.MAP_pos;
+c = decode.MAP_state_IX;
+splitapply(@(IX,x)(plot(IX,x,'.')),x, y, c);
 gaps_IX = find(diff(decode.time) > median(diff(decode.time)));
 arrayfun(@(x)(xline(x,'g','time gap','LineWidth',0.5)), gaps_IX);
 rescale_plot_data('x',[1/decode.Fs 0]);
@@ -57,12 +64,15 @@ title({decode_flight.epoch_type;'over representation'})
 linkaxes(pnl(2).de.axis,'y')
 pnl(1,1).select();
 hold on
-MUA_ts_IX = interp1(decode.time, 1:length(decode.time), exp.MUA.t, 'nearest');
-% ripples_ts_IX = interp1(decode.time, 1:length(decode.time), exp.ripples.t, 'nearest');
-PE_events_ts_IX = interp1(decode.time, 1:length(decode.time), [exp.PE.thr.peak_ts], 'nearest');
+MUA_ts_IX = interp1(decode.time, 1:length(decode.time), exp.MUA.t, 'previous');
+% ripples_ts_IX = interp1(decode.time, 1:length(decode.time), exp.ripples.t, 'previous');
+PE_events_ts_IX = interp1(decode.time, 1:length(decode.time), [exp.PE.thr.peak_ts], 'previous');
+MUA_ts_IX(ismember(MUA_ts_IX, gaps_IX)) = nan; % remove points out of the current decoding epoch time
+PE_events_ts_IX(ismember(PE_events_ts_IX, gaps_IX)) = nan; % remove points out of the current decoding epoch time
 plot(MUA_ts_IX, exp.MUA.zFR);
 % plot(ripples_ts_IX , exp.ripples.zpripple_all);
 plot(PE_events_ts_IX, [exp.PE.thr.peak_zFR],'*r');
+arrayfun(@(x)(xline(x,'g','time gap','LineWidth',0.5)), gaps_IX);
 legend("Firing rate","Pop events")
 xlim([0 1.05*length(decode.time)])
 ylim([0 10])
