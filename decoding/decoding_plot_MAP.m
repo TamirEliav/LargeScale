@@ -18,33 +18,45 @@ end
 dir_OUT = 'F:\sequences\decoded_figs\MAP_entire_session';
 mkdir(dir_OUT);
 
+%%
+bin_centers = decode.pos;
+bin_edges = centers2edges(bin_centers);
+
 %% plot figure
 fig=figure;
 fig.WindowState = 'maximized';
 pnl = panel();
-pnl.pack('v',[.3 .7])
+pnl.pack('v',[.15 0.15 .7])
 pnl(1).pack('h',[.85 .05 .05]);
 pnl(2).pack('h',[.85 .05 .05]);
+pnl(3).pack('h',[.85 .05 .05]);
 pnl.de.margin = 10;
 pnl.margintop = 15;
 % pnl.margin = 25;
 h = pnl.title({exp_ID;sprintf('MAP estimate - %s',epoch_type)});
 h.Interpreter = 'none';
 h.FontSize = 12;
-pnl(2,1).select();
+
+% MAP positio/state
+pnl(3,1).select();
+hax=gca;
 hold on
 if strcmp(epoch_type,'flight')
     pos_ts_IX = interp1(decode.time, 1:length(decode.time), exp.pos.proc_1D.ts, 'previous');
     plot(pos_ts_IX,exp.pos.proc_1D.pos,'r-','LineWidth',0.5);
 end
 clear h
-h = arrayfun(@(x)(plot(x,nan,'.','MarkerSize',20)),[1:length(decode.state)]); % dummy points for legend
-hax=gca;
 hax.ColorOrderIndex = 1;
+h = arrayfun(@(x)(plot(x,nan,'.','MarkerSize',20)),[1:length(decode.state)]); % dummy points for legend
 x = 1:length(decode.time);
 y = decode.MAP_pos;
-c = decode.MAP_state_IX;
-splitapply(@(IX,x)(plot(IX,x,'.')),x, y, c);
+g = decode.MAP_state_IX;
+nStates = length(decode.state);
+g = [g 1:nStates];
+x = [x nan(1,nStates)];
+y = [y nan(1,nStates)];
+hax.ColorOrderIndex = 1;
+splitapply(@(IX,x)(plot(IX,x,'.')),x, y, g);
 gaps_IX = find(diff(decode.time) > median(diff(decode.time)));
 arrayfun(@(x)(xline(x,'g','time gap','LineWidth',0.5)), gaps_IX);
 rescale_plot_data('x',[1/decode.Fs 0]);
@@ -53,33 +65,70 @@ hl = legend(h,decode.state,'Interpreter','none','Location','northoutside');
 hl.Position = [0.84 0.87 0.1 0.1];
 xlabel('Time (s)')
 ylabel('Position (m)')
-pnl(2,2).select(); hold on
-histogram(decode.MAP_pos,       'BinWidth',decode.params.pos_bin_size, 'Orientation','horizontal','Normalization','probability');
+
+% MAP pos hist
+pnl(3,2).select();
+hold on
+for ii_state = 1:length(decode.state)
+    if contains(decode.state(ii_state),'empirical')
+        IX = g == ii_state;
+        histogram(y(IX), 'BinEdges',bin_edges, 'Orientation','horizontal','Normalization','probability','DisplayStyle','stairs','LineWidth',1.5);
+    else
+        plot(nan,nan); % to keep the color progression...
+    end
+end
 arrayfun(@(y,str)(yline(y,'Color',0.5.*[1 1 1],'LineWidth',0.5)),[exp.LM.pos_proj], string({exp.LM.name}))
 title({decode.epoch_type;'over representation'})
-pnl(2,3).select();
-histogram(decode_flight.MAP_pos,'BinWidth',decode.params.pos_bin_size, 'Orientation','horizontal','Normalization','probability');
-arrayfun(@(y,str)(yline(y,'Color',0.5.*[1 1 1],'LineWidth',0.5)),[exp.LM.pos_proj], string({exp.LM.name}))
-title({decode_flight.epoch_type;'over representation'})
-linkaxes(pnl(2).de.axis,'y')
-pnl(1,1).select();
-hold on
+
+% flight error hist
+pnl(3,3).select();
+err_thr_prc = 5;
+err_thr_m = range(bin_edges)*err_thr_prc/100;
+pos_real = interp1(exp.pos.proc_1D.ts, exp.pos.proc_1D.pos, decode_flight.time);
+pos_predict = decode_flight.MAP_pos;
+TF = abs(pos_real-pos_predict) < err_thr_m;
+% histogram(pos_predict(~TF), 'BinEdges',bin_edges, 'Orientation','horizontal','Normalization','probability');
+N_error = histcounts(pos_predict(~TF), 'BinEdges',bin_edges, 'Normalization','count');
+N_total = histcounts(pos_predict,      'BinEdges',bin_edges, 'Normalization','count');
+predict_err_prob = N_error./N_total;
+barh(bin_centers,predict_err_prob,'r');
+arrayfun(@(y,str)(yline(y,'Color',0.5.*[1 1 1],'LineWidth',0.5)),[exp.LM.pos_proj], string({exp.LM.name}));
+title({decode_flight.epoch_type;'Predict errors'})
+linkaxes(pnl(3).de.axis,'y')
+
+% -------- ripple power and MUA firing rate
+% arrange data
 MUA_ts_IX = interp1(decode.time, 1:length(decode.time), exp.MUA.t, 'previous');
-% ripples_ts_IX = interp1(decode.time, 1:length(decode.time), exp.ripples.t, 'previous');
+ripples_ts_IX = interp1(decode.time, 1:length(decode.time), exp.ripples.t, 'previous');
 PE_events_ts_IX = interp1(decode.time, 1:length(decode.time), [exp.PE.thr.peak_ts], 'previous');
 MUA_ts_IX(ismember(MUA_ts_IX, gaps_IX)) = nan; % remove points out of the current decoding epoch time
 PE_events_ts_IX(ismember(PE_events_ts_IX, gaps_IX)) = nan; % remove points out of the current decoding epoch time
+% ripple
+pnl(1,1).select();
+hold on
+plot(ripples_ts_IX , exp.ripples.zpripple_all);
+plot(PE_events_ts_IX, [exp.PE.thr.peak_zpripple],'*r');
+arrayfun(@(x)(xline(x,'g','LineWidth',0.5)), gaps_IX);
+legend("Ripple","Pop events")
+xlim([0 1.05*length(decode.time)])
+ylim([0 10])
+rescale_plot_data('x',[1/decode.Fs 0]);
+xlabel('Time (s)')
+ylabel('Ripple power (z)')
+% MUA 
+pnl(2,1).select();
+hold on
 plot(MUA_ts_IX, exp.MUA.zFR);
-% plot(ripples_ts_IX , exp.ripples.zpripple_all);
 plot(PE_events_ts_IX, [exp.PE.thr.peak_zFR],'*r');
-arrayfun(@(x)(xline(x,'g','time gap','LineWidth',0.5)), gaps_IX);
-legend("Firing rate","Pop events")
+arrayfun(@(x)(xline(x,'g','LineWidth',0.5)), gaps_IX);
+legend("MUA","Pop events")
 xlim([0 1.05*length(decode.time)])
 ylim([0 10])
 rescale_plot_data('x',[1/decode.Fs 0]);
 xlabel('Time (s)')
 ylabel('Firing rate (z)')
-linkaxes([pnl(1,1).axis pnl(2,1).axis],'x')
+% link time
+linkaxes([pnl(1,1).axis pnl(2,1).axis pnl(3,1).axis],'x')
 
 params_str = {
     sprintf('params opt: %d',params_opt),

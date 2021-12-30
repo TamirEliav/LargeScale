@@ -1,5 +1,11 @@
 function decoding_plot_flight_conf_mat(exp_ID, params_opt)
 
+arguments
+    %% 
+    exp_ID = 'b9861_d180526'
+    params_opt = 4;
+end
+
 %% folders and params
 epoch_type = 'flight';
 out_dir = 'F:\sequences\decoded_figs\flight\conf_mat';
@@ -18,9 +24,8 @@ direction_predict = decode.MAP_direction;
 
 %% plotting params
 cmap_str = 'bone';
-bin_edges = decode.pos;
-bin_centers = edges2centers(bin_edges);
-bin_size = median(diff(bin_edges));
+bin_centers = decode.pos;
+[bin_edges,bin_size] = centers2edges(bin_centers);
 pos_ticks = 0:20:200;
 
 %% plot figure
@@ -29,15 +34,15 @@ hf.WindowState = 'maximized';
 pnl = panel();
 pnl.pack('h',[70 30]);
 pnl(1).pack(3,3);
-pnl(2).pack('v',[30 30 30]);
-pnl(2,1).pack('h',2);
-pnl(2,3).pack('h',2);
+pnl(2).pack('v',[30 30 40]);
+pnl(2,1).pack('h',[40 60]);
+pnl(2,3).pack('h',[70 30]);
 % pnl.select('all');
 % pnl.identify()
 pnl.margin = 15;
 pnl.de.margin = 5;
 pnl(1).margin = 30;
-pnl(2).de.margin = 15;
+pnl(2).de.margin = 20;
 pnl(1,1,1).margin = 5;
 pnl(1,1,2).margin = 5;
 pnl(1,1,3).margin = 5;
@@ -154,25 +159,30 @@ plot(G_pos_predict, pos_error_median_by_predicted_pos, ':', 'LineWidth',2);
 set(gca,'YScale','log')
 ylabel('median error (m)')
 xlabel('Position (m)')
-legend('@real','@predicted','Location',[.9 .35 .01 .01],'units','normalized');
+legend('@real','@predicted','Location',[.8 .665 .01 .01],'units','normalized');
 
+% prediction error over-representation
+err_thr_prc = 5;
+err_thr_m = range(bin_edges)*err_thr_prc/100;
+TF = abs(pos_real-pos_predict) < err_thr_m;
+mean_err_prob = 1-mean(TF);
+N = histcounts(pos_predict(~TF),bin_edges);
+err_prob_by_predicted = N./length(pos_predict);
+err_prob_by_predicted_max = max(err_prob_by_predicted);
+err_prob_by_predicted_mean = mean(err_prob_by_predicted);
 pnl(2,3,1).select();
-x = pos_error_median_by_real_pos;
-y = interp1(G_pos_predict, pos_error_median_by_predicted_pos, G_pos_real);
-% plot(x,y,'.k')
-lm = fitlm(x,y,'RobustOpts','on');
-plot(lm);
-lm_coef = lm.Coefficients;
-cc=corrcoef(x,y);
-% title("r="+cc(1,2)+" p="+pval(1,2));
-title(sprintf('R^2=%.2g',lm.Rsquared.Ordinary));
-legend off
-hax=gca;
-hax.TickLength(1) = 0.05;
-hax.XScale = 'log';
-hax.YScale = 'log';
-xlabel('Median error @ real (m)')
-ylabel('Median error @ predict (m)')
+hold on
+plot(pos_real(TF),pos_predict(TF),'k.');
+plot(pos_real(~TF),pos_predict(~TF),'r.');
+axis equal
+legend('correct',sprintf('error (>%g%%)',err_thr_prc),'Location',[.74 .37 .005 .01],'units','normalized');
+xlabel('Real position (m)');
+ylabel('Predicted position (m)');
+pnl(2,3,2).select();
+barh(bin_centers, err_prob_by_predicted,'r');
+xlabel('Error prob.');
+ylabel('Predicted position (m)');
+linkaxes([pnl(2,3,1).axis pnl(2,3,2).axis],'y')
 
 h=pnl.title(exp_ID);
 h.Interpreter='none';
@@ -181,7 +191,6 @@ h.FontSize=14;
 
 fig_filename = fullfile(out_dir, sprintf('%s_flight_decoding_opt_%d',exp_ID,params_opt));
 saveas(hf, fig_filename, 'jpg');
-% close(hf);
 
 %% save flight decoding results to mat file
 res = struct();
@@ -197,9 +206,17 @@ res.direction_mean_acc = mean(diag(cm));
 res.pos_err = pos_err;
 res.pos_err_mean = mean(pos_err);
 res.pos_err_median = median(pos_err);
+res.pos_err_mean_prc = res.pos_err_mean / range(bin_edges);
+res.pos_err_median_prc = res.pos_err_median / range(bin_edges);
 res.sparsity = sparsity;
 res.sparsity_mean = mean(sparsity);
 res.sparsity_max = max(sparsity);
+res.err_thr_prc = err_thr_prc;
+res.err_thr_m = err_thr_m;
+res.mean_err_prob = mean_err_prob;
+res.err_prob_by_predicted = err_prob_by_predicted;
+res.err_prob_by_predicted_max = err_prob_by_predicted_max;
+res.err_prob_by_predicted_mean = err_prob_by_predicted_mean;
 res_filename = fullfile(out_dir, sprintf('%s_flight_decoding_opt_%d',exp_ID,params_opt));
 save(res_filename, 'res');
 

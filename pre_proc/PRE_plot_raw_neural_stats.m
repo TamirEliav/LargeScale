@@ -5,7 +5,7 @@ clear;clc
 
 %% load exp summary and choose exps
 exp_t = DS_get_exp_summary();
-bat_num = 184;
+bat_num = 79;
 % exp_t(~contains(exp_t.recordingArena, '200m'),:) = [];
 exp_t(exp_t.position_data_exist==0,:) = [];
 exp_t(exp_t.neural_data_exist==0,:) = [];
