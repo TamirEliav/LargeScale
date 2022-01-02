@@ -69,8 +69,6 @@ switch 3
         spikes_filter_params.type = 'highpassfir1';
         spikes_filter_params.passband  = opts.passband_spikes(1);
 end
-LFP_filter_params
-spikes_filter_params
 
 %% filter!
 parfor ii_ch = 1:length(active_channels)

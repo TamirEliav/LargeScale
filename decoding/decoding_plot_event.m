@@ -1,15 +1,13 @@
-function decoding_plot_event(exp_ID, epoch_type, params_opt, event_num, win_s,clim_prc)
-
+function decoding_plot_event(exp_ID, epoch_type, params_opt, event_type, event_num, win_s,clim_prc)
 arguments
     %% temp for development...
-    % exp_ID = 'b0184_d191201';
     exp_ID = 'b9861_d180526';
-    % epoch_type = 'rest'
     epoch_type = 'sleep';
-    params_opt = 20;
-    % epoch_type = 'flight';
-    % params_opt = 4;
-    event_num = 113;
+    params_opt = 11;
+    event_type = 'posterior';
+%     event_type = 'PE';
+    event_num = 49;
+%     event_num = 113;
     win_s = 0.5;
     clim_prc = 1;
 end
@@ -25,40 +23,23 @@ switch numel(win_s)
         win_s = [-1 1].*0.5;
 end
 
+%% folders
+dir_OUT = 'F:\sequences\decoded_figs\event_examples';
+figs_dir = fullfile(dir_OUT);
+mkdir(figs_dir);
 
 %% load data
 exp = exp_load_data(exp_ID, 'details','path','rest','ripples','MUA','PE','pos');
-dir_IN = 'F:\sequences\decoded';
-dir_OUT = 'F:\sequences\decoded_figs\event_examples';
-% figs_dir = fullfile(dir_OUT, epoch_type, exp_ID, "opt_"+params_opt);
-figs_dir = fullfile(dir_OUT);
-decode_filename = fullfile(dir_IN, epoch_type, exp_ID, sprintf('%s_%s_opt_%d.nc',exp_ID,epoch_type,params_opt));
-decode = decoding_read_decoded_file(decode_filename);
-mkdir(figs_dir);
-
-%% event to use
-PE_to_use = exp.PE.thr;
-PE_ti = [PE_to_use.start_ts; PE_to_use.end_ts]';
-switch epoch_type
-    case 'rest'
-        rest_ti = exp.rest.ti;
-        IX = any(PE_ti>shiftdim(rest_ti(:,1),-2) & PE_ti<shiftdim(rest_ti(:,2),-2), [2 3]);
-        PE_to_use = PE_to_use(IX);
-    case 'sleep'
-        sleep_ti = exp_get_sessions_ti(exp_ID, 'Sleep1','Sleep2');
-        sleep_ti(any(isnan(sleep_ti),2),:) = []; % remove nan in case of missing sessions
-        IX = any(PE_ti>shiftdim(sleep_ti(:,1),-2) & PE_ti<shiftdim(sleep_ti(:,2),-2), [2 3]);
-        PE_to_use = PE_to_use(IX);
-    case 'flight'
-        
-end
-[PE_to_use.num] = disperse(1:length(PE_to_use));
-PE = PE_to_use(event_num);
+decode = decoding_load_data(exp_ID, epoch_type, params_opt);
+events = decoding_load_events(exp_ID, epoch_type, params_opt, event_type);
 
 %% arrange data
+% event to use
+event = events(event_num);
 % time window to display
-t0 = PE.peak_ts;
+t0 = event.peak_ts;
 ti = t0 + win_s.*1e6;
+% ti = ti - win_s(1).*1e6;
 
 % get ripples/MUA
 IX = get_data_in_ti(exp.ripples.t, ti);
@@ -84,11 +65,10 @@ if isempty(IX)
     error('data is missing!')
 end
 
-% change time to ms aligned to event peak
-zpripple_t = (zpripple_t-t0) * 1e-3;
-zFR_t = (zFR_t-t0) * 1e-3;
-prob_t = (prob_t-t0) * 1e-3;
-
+% % change time to ms aligned to event peak
+% zpripple_t = (zpripple_t-t0) * 1e-3;
+% zFR_t = (zFR_t-t0) * 1e-3;
+% prob_t = (prob_t-t0) * 1e-3;
 
 %% create figure
 hf = figure;
@@ -98,16 +78,17 @@ hf.Position = [1 1 figsize];
 hf.PaperUnits = 'centimeters';
 hf.PaperPosition = [1 1 figsize];
 pnl = panel();
-pnl.margin = [20 15 65 12];
+pnl.margin = [20 10 65 15];
 pnl.de.margin = 5;
 pnl.pack('v',[.08 .08 .27 .27 .27]);
 pnl.de.margin = 5;
-pnl(3).marginbottom = 20;
+pnl(3).marginbottom = 15;
+pnl(4).marginbottom = 15;
+% pnl(5).marginbottom = 15;
 
 % plot MUA
 pnl(1).select();
 plot(zFR_t, zFR,'LineWidth',1.5);
-xlim(prob_t([1 end]))
 yticks([0 ceil(max(zFR))])
 % ylabel({'Multi unit activity';'firing rate (z)'})
 ylabel({'MUA';'(z)'},'fontsize',14)
@@ -116,18 +97,21 @@ box on
 hax=gca;
 hax.XTickLabel = [];
 hax.YLim(2) = ceil(max(zFR));
+rescale_plot_data('x',[1e-3 ti(1)]);
+xlim((win_s-win_s(1)).*1e3)
 
 % plot state prob
 pnl(2).select();
 plot(prob_t, prob_state','LineWidth',1.5);
 box on
 hax=gca;
-hax.XLim = prob_t([1 end]);
 hax.YLim = [0 1];
 hax.YTick = [0 1];
 hax.TickDir = 'out';
 hax.XTickLabel = [];
 ylabel({'State';'prob.'},'fontsize',14)
+rescale_plot_data('x',[1e-3 ti(1)]);
+xlim((win_s-win_s(1)).*1e3)
 % h=legend(decode.state,'NumColumns',round(length(decode.state)/3),'Location','southoutside');
 h=legend(decode.state,'NumColumns',1,'Location','southoutside');
 h.Position([1 2]) = [0.74 0.78];
@@ -138,18 +122,21 @@ h.Box = 'on';
 pnl(3).select();
 hold on
 plot_prob_map(prob_t, decode.pos, prob_pos, clim_prc);
-
+rescale_plot_data('x',[1e-3 ti(1)]);
+xlim((win_s-win_s(1)).*1e3)
 % plot position prob (per direction)
 for ii_dir = 1:2
     pnl(3+ii_dir).select();
     plot_prob_map(prob_t, decode.pos, squeeze(prob_pos_by_map(ii_dir,:,:)), clim_prc);
+    rescale_plot_data('x',[1e-3 ti(1)]);
     h = title(directions_strs(ii_dir));
     h.Units = 'normalized';
     h.Position = [-0.06 0.98];
+    xlim((win_s-win_s(1)).*1e3)
 end
 
-% fig_name = sprintf('%s_event_%d_win_%d-%dms', exp_ID, event_num, 1e3*abs(win_s));
-fig_name = sprintf('%s_%s_opt_%d_event_%d_win_%d-%dms', exp_ID, epoch_type, params_opt, event_num, 1e3*abs(win_s));
+%%
+fig_name = sprintf('%s_%s_opt_%d_%s_event_%d_win_%d-%dms', exp_ID, epoch_type, params_opt, event_type, event_num, 1e3*abs(win_s));
 h = pnl.title(fig_name);
 h.Interpreter = 'none';
 h.Position(2) = 1.03;

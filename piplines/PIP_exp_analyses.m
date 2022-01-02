@@ -1,4 +1,3 @@
-
 %% exp analysis pipline
 clear
 clc
@@ -12,93 +11,24 @@ p = mfilename('fullpath')
 code_txt = fileread([p '.m'])
 disp('-------------------------------------------------------------------')
 
-%%
-% list of days to run decoding analysis
-% exp_list = {...
-%     'b0184_d191126'
-%     'b0184_d191127'
-%     'b0184_d191128'
-%     'b0184_d191129'
-%     'b0184_d191130'
-%     'b0184_d191201'
-%     'b0184_d191202'
-%     'b0184_d191203'
-%     'b0184_d191204'
-%     'b0184_d191205'
-%     'b0184_d191208'
-%     'b0184_d191209'
-    
-%     'b9861_d180519'
-%     'b9861_d180521'
-%     'b9861_d180522'
-%     'b9861_d180523'
-%     'b9861_d180524'
-%     'b9861_d180525'
-%     'b9861_d180526'
-%     'b9861_d180527'
-%     'b9861_d180529'
-%     'b9861_d180530'
-%     
-%     'b0034_d180305'
-%     'b0034_d180306'
-%     'b0034_d180308'
-%     'b0034_d180310'
-%     'b0034_d180311'
-%     'b0034_d180312'
-%     'b0034_d180313'
-%     'b0034_d180314'
-%     'b0034_d180315'
-
-%     'b2289_d180518'
-%     'b2289_d180520'
-    
-%     'b0079_d161003'
-% TODO: run filtering for bat 79    
-% TODO: look for additional good days from bat 79    
-    
-%     'b0148_d170606'
-%     'b0148_d170607'
-%     'b0148_d170608'
-%     'b0148_d170625' % fig 1 sorting example from the paper
-%     'b0148_d170626'
-%     'b0148_d170627'
-% %     'b0148_d170628' % had error 
-%     'b0148_d170703'
-%     'b0148_d170718'
-%     'b0148_d170720'
-%     'b0148_d170723'
-%     'b0148_d170801'
-%     'b0148_d170802'
-% %     'b0148_d170803' % had error 
-%     'b0148_d170806'
-%     'b0148_d170807'
-    
-%     };
-
-% list of days that had problems running the ripples/MUA/PE code
-% exp_list = {
-%     'b0034_d180305'
-%     'b0034_d180306'
-% };
-
 %% load exp summary and choose exps
 exp_t = DS_get_exp_summary();
-% exp_t(~contains(exp_t.recordingArena, '200m'),:) = [];
+% exp_t(~contains(exp_t.recordingArena, ['200m']),:) = [];
+exp_t(~contains(exp_t.recordingArena, {'200m','120m'}),:) = [];
 exp_t(exp_t.position_data_exist==0,:) = [];
 exp_t(exp_t.neural_data_exist==0,:) = [];
 % exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = [];
-% exp_t(~ismember(exp_t.batNum, [9861 184] ),:) = [];
-% exp_t(~ismember(exp_t.batNum, [184] ),:) = [];
-% exp_t(~ismember(exp_t.batNum, [9861] ),:) = [];
-exp_t(~ismember(exp_t.batNum, [34] ),:) = [];
+% exp_t(~ismember(exp_t.batNum, [184 9861 34 2289 79 148] ),:) = [];
+exp_t(~ismember(exp_t.batNum, [2289] ),:) = [];
 exp_t(~contains(exp_t.TT_loc,{'CA1','CA3'}),:) = [];
 % exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
-% exp_t(exp_t.date > datetime('17/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
-% exp_t(contains(exp_t.exp_ID, exp_list),:) = [];
 % exp_t(~contains(exp_t.exp_ID, exp_list),:) = [];
 % exp_t = flip(exp_t);
 exp_t 
 whos exp_t 
+
+%% run some pop analysis
+% decoding_flight_pop_analysis(exp_t.exp_ID);
 
 %%
 forcecalc = 0;
@@ -106,13 +36,12 @@ err_list = {};
 for ii_exp = 1:height(exp_t)
     %%
     exp_ID = exp_t.exp_ID{ii_exp};
-    disp(datetime)
-    fprintf('%d/%d %s\n', ii_exp, height(exp_t), exp_ID);
+    fprintf('%d/%d %s \t\t (start run: %s)\n', ii_exp, height(exp_t), exp_ID, datetime);
     
     %%
 try
-    exp_create_details(exp_ID);
-%     exp=exp_load_data(exp_ID,'details','path','rest','MUA');
+%     exp_create_details(exp_ID);
+%     exp=exp_load_data(exp_ID,'details','path');
 %     util_fix_ncs(exp.path.nlx);
 %     Nlg2Nlx(exp.path.raw,forcecalc);
 %     PRE_filter_CSCs(exp_ID, forcecalc);
@@ -147,14 +76,14 @@ try
 %     decoding_detect_spikes(exp_ID,forcecalc);
 %     decoding_prepare_exp_data(exp_ID);
 
-%     ripples_detect(exp_ID);
+    ripples_detect(exp_ID);
 %     MUA_detect(exp_ID);
 %     PE_plot_ripples_vs_MUA(exp_ID); % I put the detection here...
 %     ripples_MUA_PE_save_to_nlx(exp_ID,forcecalc);
 
 %     ripples_trigger_LFP(exp_ID);
 %     ripples_trigger_MUA(exp_ID);
-%     ripples_xcorr(exp_ID)
+%     ripples_xcorr(exp_ID);
     
 
 %     for params_opt = 4%1:6
@@ -162,24 +91,24 @@ try
 % %         decoding_plot_flight_posterior(exp_ID, params_opt);
 %     end
     
-%     epoch_type = 'sleep';
-% % % %     epoch_type = 'rest';
-% %     epoch_type = 'flight';
-% %     params_opts = [4];
-%     params_opts = [8:14];
-% % % %     event_type = 'PE';
+% %     epoch_type = 'sleep';
+% % % % %     epoch_type = 'rest';
+%     epoch_type = 'flight';
+%     params_opts = [4];
+% %     params_opts = [8:14];
+% % % % %     event_type = 'PE';
 %     event_type = 'posterior';
 %     for params_opt = params_opts
 %         fprintf('params_opt: %d\n', params_opt);
 %         decoding_plot_MAP(exp_ID, epoch_type, params_opt);
-%         decoding_detect_posterior_events(exp_ID, epoch_type, params_opt);
-%         decoding_seq_quantify(exp_ID, epoch_type, params_opt, event_type);
-%         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type);
-%         close all
-%         decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, event_type);
-%         decoding_xcorr_ripples_MUA_PE_vs_posterior_events(exp_ID, epoch_type, params_opt);
+% %         decoding_detect_posterior_events(exp_ID, epoch_type, params_opt);
+% %         decoding_seq_quantify(exp_ID, epoch_type, params_opt, event_type);
+% %         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type);
+% %         close all
+% %         decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, event_type);
+% %         decoding_xcorr_ripples_MUA_PE_vs_posterior_events(exp_ID, epoch_type, params_opt);
 %     end
-%     decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
+% %     decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
 
 catch err
     getReport(err)

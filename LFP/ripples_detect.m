@@ -4,6 +4,7 @@ function ripples_detect(exp_ID)
 exp = exp_load_data(exp_ID,'details','path','rest');
 prm = PARAMS_GetAll();
 active_channels = exp.details.activeChannels;
+valid_TTs = any(active_channels,2);
 TT_to_use = find(contains(exp.details.TT_loc,{'CA1','CA3'}));
 nTT = size(active_channels,1);
 nCh = size(active_channels,2);
@@ -57,6 +58,10 @@ ripple_gamma_ratio_all = pripple_all ./ pgamma_all;
 % TODO: speed up!
 ripples_TT = {};
 for TT = 1:nTT
+    if ~valid_TTs(TT)
+        ripples_TT{TT} = [];
+        continue
+    end
     zpripple = zpripple_TT(:,TT);
     zpripple(~is_immobility) = nan;
     ripples_TT{TT} = detect_ripples(zpripple, ts, ripple_gamma_ratio_TT(:,TT), ...
@@ -85,9 +90,9 @@ mean_pripple_per_TT = mean(pripple_TT(IX,:));
 [~,best_TT] = max(num_contrib_events_per_TT);
 
 %% get LFP traces using selected TT
-[LFP, ~, ~, ~, ~] = LFP_load(exp_ID,best_TT);
-LFP_raw = nanmean(LFP(:,best_TT,:),3);
-LFP_filt = nanmean(ripple(:,best_TT,:),3);
+% [LFP, ~, ~, ~, ~] = LFP_load(exp_ID,best_TT);
+% LFP_raw = nanmean(LFP(:,best_TT,:),3);
+% LFP_filt = nanmean(ripple(:,best_TT,:),3);
 
 %%
 % figure
@@ -101,13 +106,14 @@ LFP_filt = nanmean(ripple(:,best_TT,:),3);
 %% save ripples detection results to mat file
 ripples = struct();
 ripples.params = prm.ripples;
-ripples.by_TT = ripples_TT;
-ripples.all = ripples_all;
-ripples.zpripple_all = zpripple_all;
+ripples.TT_to_use = TT_to_use;
+ripples.events_by_TT = ripples_TT;
+ripples.events = ripples_all;
+ripples.zpripple = zpripple_all;
 ripples.t = ts;
 ripples.fs = params.SamplingFrequency;
-ripples.LFP_raw = LFP_raw;
-ripples.LFP_filt = LFP_filt;
+% ripples.LFP_raw = LFP_raw;
+% ripples.LFP_filt = LFP_filt;
 ripples.stats.mean_pripple_per_TT = mean_pripple_per_TT;
 ripples.stats.prc_contrib_events_per_TT = prc_contrib_events_per_TT;
 ripples.stats.best_TT = best_TT;

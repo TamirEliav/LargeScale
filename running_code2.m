@@ -83,6 +83,9 @@ decoding_plot_event('b0184_d191130', 'sleep', 11, 333,  0.5)
 decoding_plot_event('b0184_d191130', 'sleep', 11, 350,  0.5)
 
 %%
+decoding_plot_event('b9861_d180526', 'sleep', 11, 'posterior', 49, [-.45 1.12]);
+
+%%
 decoding_plot_event('b9861_d180526', 'sleep', 14, 113, 1);
 decoding_plot_event('b9861_d180527', 'sleep', 11, 824, 0.42);
 decoding_plot_event('b0184_d191130', 'sleep', 11, 53,  [-.32 .11]);
