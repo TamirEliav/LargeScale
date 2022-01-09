@@ -44,11 +44,11 @@ if ~run_LFP_filtering && ~run_SPIKES_filtering
     return
 end
 
-%% create filters
+%% create out folders
 mkdir(exp.path.LFP);
 mkdir(exp.path.spikes_raw);
-fprintf('Start filtering raw data for %s', exp_ID);
 
+%% create filters
 t_start_end = [];
 clear LFP_filter_params spikes_filter_params
 LFP_filter_params.passband  = opts.passband_LFP;
@@ -71,6 +71,7 @@ switch 3
 end
 
 %% filter!
+fprintf('Start filtering raw data for %s\n', exp_ID);
 parfor ii_ch = 1:length(active_channels)
     TT = ceil(ii_ch/4);
     ch_num = mod(ii_ch-1,4)+1;

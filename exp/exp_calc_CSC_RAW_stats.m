@@ -23,7 +23,7 @@ csc_reref_std = nan(size(exp.details.activeChannels));
 csc_reref_abs_median = nan(size(exp.details.activeChannels));
 parfor TT = exp.details.TT_to_use
     for ch = 1:4%size(exp.details.activeChannels,2)
-        fprintf('TT%d_ch%d\n',TT,ch);
+%         fprintf('TT%d_ch%d\n',TT,ch);
         % load ch data
         csc_file = sprintf('spikes_%s_TT%d_ch%d.ncs',exp_ID,TT,ch);
         csc_file = fullfile(dir_IN,csc_file);

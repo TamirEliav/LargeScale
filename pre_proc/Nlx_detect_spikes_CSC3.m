@@ -251,7 +251,8 @@ for TT = params.TT_to_use
     rrr = max(rrr,[],1);
     TT_events_lib_thrded = ( rrr >=  params.lib_corr_thr );
     
-    figure('Units','normalized','Position',[0 0 1 1]);
+    fig = figure;
+    fig.WindowState = 'maximized';
     hold on
     h= histogram(rrr);
     h.NumBins = h.NumBins * 5;
@@ -260,8 +261,8 @@ for TT = params.TT_to_use
     ylabel('Counts')
     title(sprintf('TT %d',TT));
     lib_corr_figname = fullfile(dir_OUT, sprintf('lib_corr_TT_%d',TT));
-    saveas(gcf,lib_corr_figname,'tif')
-    close gcf
+    saveas(fig,lib_corr_figname,'tif')
+    close(fig)
     
     time_measure.lib_corr(TT) = toc;
     stats.lib_nAccepted(TT) = sum(TT_events_lib_thrded);
@@ -431,7 +432,8 @@ for TT = params.TT_to_use
     max_points_plot_cluster = 50000;
     max_volt_plot = 500;
     %% waveforms
-    figure('Units','normalized','Position',[0 0 1 1]);
+    fig = figure;
+    fig.WindowState = 'maximized';
     pnl = panel();
     pnl.pack(4,4);
     pnl.margin = [30 30 20 20];
@@ -489,10 +491,11 @@ for TT = params.TT_to_use
     pnl(1,4).select();
     text(1.1,1.1,sprintf('max waveforms=%d',max_points_plot_wvfrm),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
     filename_out = fullfile(dir_OUT,strrep(NTT_filename,'.NTT','_artifacts_waveforms'));
-    saveas(gcf, filename_out, 'tif')
-    close(gcf)
+    saveas(fig, filename_out, 'tif')
+    close(fig)
     %% clusters
-    figure('Units','normalized','Position',[0 0 1 1]);
+    fig = figure;
+    fig.WindowState = 'maximized';
     pnl = panel();
     pnl.pack(4,6);
     pnl.margin = [30 30 20 20];
@@ -537,8 +540,8 @@ for TT = params.TT_to_use
     pnl(1,size(features_pairs,1)).select();
     text(1.1,1.1,sprintf('max points=%d',max_points_plot_cluster),'Units','normalized','HorizontalAlignment','right','VerticalAlignment','top');
     filename_out = fullfile(dir_OUT,strrep(NTT_filename,'.NTT','_artifacts_clusters'));
-    saveas(gcf, filename_out, 'tif')
-    close(gcf)
+    saveas(fig, filename_out, 'tif')
+    close(fig)
     
     %% save artifacts in NTT file
     if params.is_save_artifacts

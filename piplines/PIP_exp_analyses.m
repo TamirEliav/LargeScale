@@ -18,17 +18,18 @@ exp_t(~contains(exp_t.recordingArena, {'200m','120m'}),:) = [];
 exp_t(exp_t.position_data_exist==0,:) = [];
 exp_t(exp_t.neural_data_exist==0,:) = [];
 % exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = [];
-% exp_t(~ismember(exp_t.batNum, [184 9861 34 2289 79 148] ),:) = [];
-exp_t(~ismember(exp_t.batNum, [2289] ),:) = [];
+exp_t(~ismember(exp_t.batNum, [184 9861 34 2289 79 148 2382 194] ),:) = [];
+% exp_t(~ismember(exp_t.batNum, [194] ),:) = [];
 exp_t(~contains(exp_t.TT_loc,{'CA1','CA3'}),:) = [];
 % exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
-% exp_t(~contains(exp_t.exp_ID, exp_list),:) = [];
+exp_t(contains(exp_t.exp_ID, {'b0194_d180429'}),:) = [];
 % exp_t = flip(exp_t);
 exp_t 
 whos exp_t 
 
 %% run some pop analysis
-% decoding_flight_pop_analysis(exp_t.exp_ID);
+exp_list = exp_t.exp_ID;
+decoding_flight_pop_analysis(exp_list);
 
 %%
 forcecalc = 0;
@@ -76,7 +77,7 @@ try
 %     decoding_detect_spikes(exp_ID,forcecalc);
 %     decoding_prepare_exp_data(exp_ID);
 
-    ripples_detect(exp_ID);
+%     ripples_detect(exp_ID);
 %     MUA_detect(exp_ID);
 %     PE_plot_ripples_vs_MUA(exp_ID); % I put the detection here...
 %     ripples_MUA_PE_save_to_nlx(exp_ID,forcecalc);

@@ -40,7 +40,7 @@ end
 if run_bands_filtering
     % at this point we should not have the LFP output dir, so let's create it!
     mkdir(exp.path.LFP_bands)
-    fprintf('Filtering LFPs for %s', exp_ID)
+    fprintf('Filtering LFP bands for %s\n', exp_ID)
     
     for ii_band = 1:length(bands_freqs)
         t_start_end = [];
