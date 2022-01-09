@@ -6,7 +6,7 @@ prm = PARAMS_GetAll();
 win_sec = 0.5;
 
 %% trigger the MUA by ripple times
-rpl = exp.ripples.all;
+rpl = exp.ripples.events;
 rpl_ts = [rpl.peak_ts];
 MUA_ts = [exp.MUA.events.peak_ts];
 
@@ -20,7 +20,7 @@ trig_MUA.t = linspace(-win_sec,win_sec,size(trig_MUA.zFR,2));
 % trig ripple power (z) by MUA evnets
 win_n_sample = round(win_sec * exp.ripples.fs);
 MUA_t_IX = find_nearest_point(MUA_ts, exp.ripples.t);
-trig_ripple.zpripple = trigger_signal_by_IX(exp.ripples.zpripple_all, MUA_t_IX, win_n_sample, 0);
+trig_ripple.zpripple = trigger_signal_by_IX(exp.ripples.zpripple, MUA_t_IX, win_n_sample, 0);
 trig_ripple.t = linspace(-win_sec,win_sec,size(trig_ripple.zpripple,2));
 
 % why we do the following 3 lines??...
@@ -159,7 +159,7 @@ hax.YScale = 'log';
 % cluster
 X=[];
 X(:,end+1) = [exp.MUA.events.peak_zFR];
-X(:,end+1) = exp.ripples.zpripple_all(MUA_t_IX);
+X(:,end+1) = exp.ripples.zpripple(MUA_t_IX);
 X = min(X,prctile(X,[99])); % trim outliers
 dist_metric = 'sqeuclidean';
 % dist_metric = 'correlation';
@@ -233,7 +233,7 @@ hax.TickDir = 'out';
 % ---------------------------------------------
 pnl(4,1).select()
 x = [exp.MUA.events.peak_zFR];
-y = exp.ripples.zpripple_all(MUA_t_IX);
+y = exp.ripples.zpripple(MUA_t_IX);
 scatter(x,y,20,clrs(g,:),'.')
 ylabel('Ripple power at MUA peak (z)')
 xlabel('MUA peak FR (z)')
@@ -279,10 +279,10 @@ fig_filename = fullfile('L:\Analysis\Results\exp\PE', [exp_ID '_PE_ripples_vs_MU
 saveas(gcf,fig_filename,'jpeg')
 
 %% merge ripples and MUA to PE
-rpl = exp.ripples.all;
+rpl = exp.ripples.events;
 mua = exp.MUA.events;
 [rpl.peak_zFR] = disperse(interp1(exp.MUA.t,exp.MUA.zFR, [rpl.peak_ts]));
-[mua.peak_zpripple] = disperse(interp1(exp.ripples.t,exp.ripples.zpripple_all, [mua.peak_ts]));
+[mua.peak_zpripple] = disperse(interp1(exp.ripples.t,exp.ripples.zpripple, [mua.peak_ts]));
 t = exp.MUA.t; % use MUA timestamps
 PE_all = merge_ripples_and_MUA(rpl,mua,t);
 PE_strong = merge_ripples_and_MUA(rpl(grp_rpl==1),mua(grp_mua==1),t);

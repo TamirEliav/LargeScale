@@ -194,16 +194,12 @@ saveas(hf, fig_filename, 'jpg');
 
 %% save flight decoding results to mat file
 res = struct();
+res_raw = struct();
 res.params = decode.params;
 res.params_opt = params_opt;
 res.pos = decode.pos;
-res.pos_real = pos_real;
-res.pos_predict = pos_predict;
-res.direction_real = direction_real;
-res.direction_predict = direction_predict;
 res.direction_confusion_matrix = cm;
 res.direction_mean_acc = mean(diag(cm));
-res.pos_err = pos_err;
 res.pos_err_mean = mean(pos_err);
 res.pos_err_median = median(pos_err);
 res.pos_err_mean_prc = res.pos_err_mean / range(bin_edges);
@@ -218,7 +214,12 @@ res.err_prob_by_predicted = err_prob_by_predicted;
 res.err_prob_by_predicted_max = err_prob_by_predicted_max;
 res.err_prob_by_predicted_mean = err_prob_by_predicted_mean;
 res_filename = fullfile(out_dir, sprintf('%s_flight_decoding_opt_%d',exp_ID,params_opt));
-save(res_filename, 'res');
+res_raw.pos_real = pos_real;
+res_raw.pos_predict = pos_predict;
+res_raw.pos_err = pos_err;
+res_raw.direction_real = direction_real;
+res_raw.direction_predict = direction_predict;
+save(res_filename, 'res','res_raw');
 
 end
 %%

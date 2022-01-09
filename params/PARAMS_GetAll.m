@@ -117,6 +117,11 @@ M = containers.Map([bats_colors_mapping{:,1}],...
                     bats_colors_mapping(:,2));
 prm.graphics.colors.bats = M; % this is a colormap
 
+%% decoding params
+prm.decode.err_thr_prc = 5;
+prm.decode.inc_criteria.err_prob = 0.4;
+prm.decode.inc_criteria.max_predict_err_prob = 0.05;
+
 %% different param sets
 prm.parmaset = paramset_global_var;
 switch paramset_global_var

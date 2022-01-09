@@ -236,9 +236,28 @@ subplot(122)
 imagesc(squeeze(sdf(:,sorted_IX,12))')
 % imagesc(squeeze(sdf(:,:,12))')
 
-
-
-
+%% 09/01/2022 - copy flight decoding results per inclusion criteria
+% inc_type = 'manual';
+inc_type = 'auto';
+inc_list_filename = 'F:\sequences\inclusion\exp_inc_list.xlsx';
+T = readtable(inc_list_filename, 'ReadRowNames',1,'ReadVariableNames',1);
+dir_IN = 'F:\sequences\decoded_figs\flight\conf_mat';
+main_dir_OUT = 'F:\sequences\inclusion\';
+main_dir_OUT = fullfile(main_dir_OUT,inc_type);
+switch inc_type
+    case 'manual'
+        [group, id] = findgroups(T.included_manual);
+    case 'auto'
+        [group, id] = findgroups(T.included_auto);
+end
+for g = 1:length(id)
+    IX=group==g;
+    tmpl_list = T.exp_ID(IX);
+    ext = 'jpg';
+    dir_OUT = fullfile(main_dir_OUT,"grp_"+id(g));
+    mkdir(dir_OUT);
+    util_copy_files_by_template(dir_IN, dir_OUT, tmpl_list, ext);
+end
 
 
 

@@ -82,6 +82,7 @@ title({decode.epoch_type;'over representation'})
 
 % flight error hist
 pnl(3,3).select();
+% TODO: take from params function
 err_thr_prc = 5;
 err_thr_m = range(bin_edges)*err_thr_prc/100;
 pos_real = interp1(exp.pos.proc_1D.ts, exp.pos.proc_1D.pos, decode_flight.time);
@@ -89,8 +90,9 @@ pos_predict = decode_flight.MAP_pos;
 TF = abs(pos_real-pos_predict) < err_thr_m;
 % histogram(pos_predict(~TF), 'BinEdges',bin_edges, 'Orientation','horizontal','Normalization','probability');
 N_error = histcounts(pos_predict(~TF), 'BinEdges',bin_edges, 'Normalization','count');
-N_total = histcounts(pos_predict,      'BinEdges',bin_edges, 'Normalization','count');
-predict_err_prob = N_error./N_total;
+% N_total = histcounts(pos_predict,      'BinEdges',bin_edges, 'Normalization','count');
+% predict_err_prob = N_error./N_total;
+predict_err_prob = N_error./length(pos_predict);
 barh(bin_centers,predict_err_prob,'r');
 arrayfun(@(y,str)(yline(y,'Color',0.5.*[1 1 1],'LineWidth',0.5)),[exp.LM.pos_proj], string({exp.LM.name}));
 title({decode_flight.epoch_type;'Predict errors'})
@@ -141,11 +143,7 @@ annotation('textbox', [0.84 0.8 0.2 0.05], 'String',params_str,'LineStyle','None
 %%
 fig_name = sprintf('%s_MAP_%s_opt_%d',exp_ID, epoch_type, params_opt);
 filename = fullfile(dir_OUT, fig_name);
-% saveas(fig, filename , 'tif');
 saveas(fig, filename , 'jpg');
-% for dpi = 100:50:300
-%     exportgraphics(fig, sprintf('%s_%d_dpi.jpg',filename,dpi),'Resolution',dpi);
-% end
 
 
 %%

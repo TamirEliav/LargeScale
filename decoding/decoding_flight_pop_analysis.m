@@ -1,13 +1,14 @@
 function decoding_flight_pop_analysis(exp_list,params_opt)
-% arguments
-%     %%
-%     exp_list
-%     params_opt = 4
-% end
+arguments
+    %%
+    exp_list
+    params_opt = 4
+end
 
-%% folders
+%% folders & params
+prm = PARAMS_GetAll();
 dir_OUT = 'F:\sequences\decoded_figs\flight\population';
-mkdir(dir_OUT)
+mkdir(dir_OUT);
 
 %% arrange exp list
 exp_t = DS_get_exp_summary();
@@ -22,8 +23,8 @@ for ii_exp = 1:height(exp_t)
     exp_ID = exp_t.exp_ID{ii_exp};
     exp = exp_load_data(exp_ID,'details');
     filename = fullfile(dir_IN, sprintf('%s_%s_decoding_opt_%d',exp_ID,epoch_type,params_opt) );
-    clear res
-    load(filename);
+    clear res res_raw
+    load(filename,'res');
     res.exp_ID = exp_ID;
     res.sparsity_max = max(res.sparsity);
     res.details = exp.details;
@@ -40,15 +41,15 @@ num_TT_used = cellfun(@(x)(sum(contains(x,'CA'))), {details.TT_loc});
 X = [];
 X(:,end+1) = [res_all.pos_err_mean];
 X(:,end+1) = [res_all.pos_err_median];
-X(:,end+1) = [res_all.sparsity_mean];
-X(:,end+1) = [res_all.sparsity_max];
+X(:,end+1) = [res_all.pos_err_median_prc].*100;
+X(:,end+1) = [res_all.mean_err_prob];
 X(:,end+1) = [res_all.err_prob_by_predicted_max];
 X(:,end+1) = [res_all.num_TT_used];
 labels = {
     'pos err (mean) [m]';
     'pos err (median) [m]';
-    'sparsity (mean)';
-    'sparsity (max)';
+    'pos err (median) [%]';
+    'mean error prob';
     'max predicted error prob';
     'numTT'};
 G = [details.batNum];
@@ -68,8 +69,16 @@ T = table(...
     'VariableNames',...
     {'pos_err_mean','pos_err_median','sparsity_mean','sparsity_max','err_prob_by_predicted_max','mean_err_prob','num_TT_used','included_manual','bat_num'},...
     'RowNames', exp_t.exp_ID);
+T.Properties.DimensionNames{1} = 'exp_ID';
 
-%%
+%% add auto inclusion criteria 
+T.included_auto = ...
+    T.mean_err_prob             < prm.decode.inc_criteria.err_prob & ...
+    T.err_prob_by_predicted_max < prm.decode.inc_criteria.max_predict_err_prob;
+filename = 'F:\sequences\inclusion\exp_inc_list.xlsx';
+writetable(T,filename,'WriteVariableNames',true,'WriteRowNames',true);
+
+%% colors (TODO: get better colors from a pallete)
 fig=figure;
 hax=gca;
 clr = hax.ColorOrder;
@@ -130,7 +139,7 @@ bats_numbers = unique(T.bat_num);
 for ii_bat = 1:length(bats_numbers)
     bat_num = bats_numbers(ii_bat);
     IX1 = T.bat_num==bat_num;
-    h1 = plot(x(IX1),y(IX1),'o', 'MarkerSize',8,'UserData',T.Row(IX1),'LineWidth',1.5,'DisplayName',"bat "+bat_num);
+    h1 = plot(x(IX1),y(IX1),'o', 'MarkerSize',8,'UserData',T.exp_ID(IX1),'LineWidth',1.5,'DisplayName',"bat "+bat_num);
     h1.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('exp ID','UserData');
 end
 for ii_bat = 1:length(bats_numbers)
@@ -139,7 +148,7 @@ for ii_bat = 1:length(bats_numbers)
     if ~any(IX2)
         continue;
     end
-    h2 = plot(x(IX2),y(IX2),'*k', 'MarkerSize',5,'UserData',T.Row(IX2),'DisplayName','yes');
+    h2 = plot(x(IX2),y(IX2),'*k', 'MarkerSize',5,'UserData',T.exp_ID(IX2),'DisplayName','yes');
     h2.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('exp ID','UserData');
 end
 for ii_bat = 1:length(bats_numbers)
@@ -148,7 +157,7 @@ for ii_bat = 1:length(bats_numbers)
     if ~any(IX3)
         continue;
     end
-    h2 = plot(x(IX3),y(IX3),'+k', 'MarkerSize',5,'UserData',T.Row(IX3),'DisplayName','maybe');
+    h2 = plot(x(IX3),y(IX3),'+k', 'MarkerSize',5,'UserData',T.exp_ID(IX3),'DisplayName','maybe');
     h2.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('exp ID','UserData');
 end
 
@@ -159,8 +168,8 @@ end
 %     h2(ii_grp).DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('exp ID','UserData');
 % end
 
-xline(0.4)
-yline(0.05)
+xline(prm.decode.inc_criteria.err_prob)
+yline(prm.decode.inc_criteria.max_predict_err_prob)
 hax=gca;
 hax.XScale = 'log';
 hax.YScale = 'log';
@@ -173,7 +182,6 @@ filename = fullfile(dir_OUT, 'flight_decoding_pop_scatter_max_predict_err_prob_v
 saveas(fig, filename , 'fig');
 saveas(fig, filename , 'jpg');
 
-
 end
 
 
@@ -181,7 +189,7 @@ end
 function exp_t = add_manual_inclusion(exp_t)
 %%
 inc_list_filename = "L:\Analysis\Code\inclusion_lists\decoding_exp_list.xlsx";
-T = readtable(inc_list_filename, 'ReadRowNames',1);
+T = readtable(inc_list_filename, 'ReadRowNames',true,'ReadVariableNames',true);
 exp_t = innerjoin(exp_t,T,'keys','exp_ID');
 
 end
