@@ -18,8 +18,8 @@ exp_t(~contains(exp_t.recordingArena, {'200m','120m'}),:) = [];
 exp_t(exp_t.position_data_exist==0,:) = [];
 exp_t(exp_t.neural_data_exist==0,:) = [];
 % exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = [];
-exp_t(~ismember(exp_t.batNum, [184 9861 34 2289 79 148 2382 194] ),:) = [];
-% exp_t(~ismember(exp_t.batNum, [194] ),:) = [];
+% exp_t(~ismember(exp_t.batNum, [184 9861 34 2289 79 148 2382 194] ),:) = [];
+exp_t(~ismember(exp_t.batNum, [184] ),:) = [];
 exp_t(~contains(exp_t.TT_loc,{'CA1','CA3'}),:) = [];
 % exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
 exp_t(contains(exp_t.exp_ID, {'b0194_d180429'}),:) = [];
@@ -28,8 +28,8 @@ exp_t
 whos exp_t 
 
 %% run some pop analysis
-exp_list = exp_t.exp_ID;
-decoding_flight_pop_analysis(exp_list);
+% exp_list = exp_t.exp_ID;
+% decoding_flight_pop_analysis(exp_list);
 
 %%
 forcecalc = 0;
@@ -92,24 +92,24 @@ try
 % %         decoding_plot_flight_posterior(exp_ID, params_opt);
 %     end
     
-% %     epoch_type = 'sleep';
-% % % % %     epoch_type = 'rest';
+    epoch_type = 'sleep';
+%     epoch_type = 'rest';
 %     epoch_type = 'flight';
 %     params_opts = [4];
-% %     params_opts = [8:14];
-% % % % %     event_type = 'PE';
-%     event_type = 'posterior';
-%     for params_opt = params_opts
-%         fprintf('params_opt: %d\n', params_opt);
-%         decoding_plot_MAP(exp_ID, epoch_type, params_opt);
-% %         decoding_detect_posterior_events(exp_ID, epoch_type, params_opt);
-% %         decoding_seq_quantify(exp_ID, epoch_type, params_opt, event_type);
-% %         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type);
-% %         close all
-% %         decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, event_type);
-% %         decoding_xcorr_ripples_MUA_PE_vs_posterior_events(exp_ID, epoch_type, params_opt);
-%     end
-% %     decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
+    params_opts = [8:14];
+%     event_type = 'PE';
+    event_type = 'posterior';
+    for params_opt = params_opts
+        fprintf('params_opt: %d\n', params_opt);
+        decoding_plot_MAP(exp_ID, epoch_type, params_opt);
+        decoding_detect_posterior_events(exp_ID, epoch_type, params_opt);
+        decoding_seq_quantify(exp_ID, epoch_type, params_opt, event_type);
+        decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type);
+        decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, event_type);
+        decoding_xcorr_ripples_MUA_PE_vs_posterior_events(exp_ID,epoch_type,params_opt);
+        close all
+    end
+    decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
 
 catch err
     getReport(err)

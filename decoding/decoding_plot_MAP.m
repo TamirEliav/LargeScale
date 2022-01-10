@@ -108,7 +108,7 @@ PE_events_ts_IX(ismember(PE_events_ts_IX, gaps_IX)) = nan; % remove points out o
 % ripple
 pnl(1,1).select();
 hold on
-plot(ripples_ts_IX , exp.ripples.zpripple_all);
+plot(ripples_ts_IX , exp.ripples.zpripple);
 plot(PE_events_ts_IX, [exp.PE.thr.peak_zpripple],'*r');
 arrayfun(@(x)(xline(x,'g','LineWidth',0.5)), gaps_IX);
 legend("Ripple","Pop events")

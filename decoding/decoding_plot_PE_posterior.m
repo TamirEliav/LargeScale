@@ -58,7 +58,7 @@ for ii_fig = 1:nFigs
 
         % get ripples/MUA
         IX = get_data_in_ti(exp.ripples.t, ti);
-        zpripple = exp.ripples.zpripple_all(IX);
+        zpripple = exp.ripples.zpripple(IX);
         zpripple_t = exp.ripples.t(IX);
         IX = get_data_in_ti(exp.MUA.t, ti);
         zFR = exp.MUA.zFR(IX);
