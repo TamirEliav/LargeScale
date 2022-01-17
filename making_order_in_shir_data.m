@@ -7,7 +7,9 @@ close all
 %% 
 % bat = 184;
 % bat = 2382;
-bat = 194;
+bat = 2311;
+% bat = 194;
+% bat = 9845;
 switch bat
     %% bat 0184
     case 184
@@ -92,6 +94,34 @@ switch bat
         pos = exp.pos;
         FE = exp.flight.FE;
         
+    %% bat 2311
+    case 2311
+        ii_exp = 1;
+        exp_list = {
+            'b2311_d191218';
+            'b2311_d191219';
+            'b2311_d191220';
+            'b2311_d191222';
+            'b2311_d191223';
+            'b2311_d191224';
+            'b2311_d191225';
+            'b2311_d191226';
+            'b2311_d191229';
+            'b2311_d191230';
+            'b2311_d191231';
+            'b2311_d200101';
+            'b2311_d200102';
+        };
+        exp_ID = exp_list{ii_exp};
+        exp_create_details(exp_ID);
+        exp=exp_load_data(exp_ID,'details','path','pos','flight');
+        ts = exp.details.session_ts;
+        labels = exp.details.session_names;
+        labels = [labels+" start" labels+" end"]';
+        labels = reshape({labels{:}},2,[])';
+        pos = exp.pos;
+        FE = exp.flight.FE;
+     
     %% bat 194
     case 194
         ii_exp = 1
@@ -132,11 +162,53 @@ switch bat
         labels = reshape({labels{:}},2,[])';
         pos = exp.pos;
         FE = exp.flight.FE;
-        
+    %% bat 9845
+    case 9845
+        ii_exp = 22
+        exp_list = {
+            'b9845_d170212'; % TODO: pre-proc pos+flight
+            'b9845_d170213'; % TODO: pre-proc pos+flight
+            'b9845_d170215'; % TODO: pre-proc pos+flight
+            'b9845_d170216'; % TODO: problem with bespoon. I think sync is bad (timestemps are wrong)
+            'b9845_d170217';
+            'b9845_d170219';
+            'b9845_d170220';
+            'b9845_d170221';
+            'b9845_d170222';
+            'b9845_d170223';
+            'b9845_d170516';
+            'b9845_d170517';
+            'b9845_d170518';
+            'b9845_d170525';
+            'b9845_d170527'; % TODO: the tag (bsp_pos is moving) during sleep1, but I think this is shir walking because the seed is rather slow...
+            'b9845_d170528';
+            'b9845_d170529';
+            'b9845_d170603';
+            'b9845_d170605';
+            'b9845_d170606'; % TODO: pre-proc pos+flight
+            'b9845_d170608'; % TODO: pre-proc pos+flight
+            'b9845_d170612';
+            'b9845_d170614';
+            'b9845_d170615'; % TODO: pre-proc pos+flight
+            'b9845_d170622';
+            'b9845_d170628'; % TODO: pre-proc pos+flight
+            'b9845_d170709'; % TODO: pre-proc pos+flight
+                };
+        exp_ID = exp_list{ii_exp}
+        exp_create_details(exp_ID);
+        exp=exp_load_data(exp_ID,'details','path','pos','flight');
+        ts = exp.details.session_ts;
+        labels = exp.details.session_names;
+        labels = [labels+" start" labels+" end"]';
+        labels = reshape({labels{:}},2,[])';
+        pos = exp.pos;
+        FE = exp.flight.FE;
 end
 %%
 exp_ID
-lp = {'r-','r--';'g-','g--';'b-','b--';'c-','c--'};
+% lp = {'r-','r--';'g-','g--';'b-','b--';'c-','c--'};
+lp = {'r-','r--';'g-','g--';'b-','b--';'c-','c--';'m-','m--'};
+lp = [lp;lp];
 lp = lp(1:size(labels,1),:);
 fig=figure;
 fig.WindowState = 'maximized';

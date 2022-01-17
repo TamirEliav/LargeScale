@@ -199,7 +199,7 @@ if use_clock_diff_correction
     title('linear fit residuals')
     legend({'all points';'excluding outliers'})
     
-    suptitle(main_dir)
+    sgtitle(main_dir)
     fig_file = fullfile(Nlx_OutDir, 'Clock_diff_correction');
     saveas(gcf, fig_file , 'tif')
     
@@ -246,7 +246,7 @@ usec_2_min = 1/60*1e-6;
 % BV_values = BV_values(4:end)
 figure
 plot( usec_2_min.*(BV_timestamps - BV_timestamps(1)), BV_values , '-o')
-title('Battery discharge')
+% subtitle('Battery discharge')
 xlabel('time (minutes)')
 ylabel('Voltage (V)')
 grid on
@@ -259,7 +259,7 @@ if is_recording
 end
 
 legend({'battey voltage','record mode change event'})
-suptitle(main_dir)
+sgtitle(main_dir)
 
 fig_file = fullfile(Nlx_OutDir, 'Battery_discharge');
 saveas(gcf, fig_file , 'tif')

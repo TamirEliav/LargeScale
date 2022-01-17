@@ -80,9 +80,9 @@ h=title('processed (interp/extrap/upsample) - position vs. time');
 h.Units = 'normalized'; h.Position = [0.05 1]; h.HorizontalAlignment = 'Left'; h.FontSize = 12;
 
 %% save figure
-fig_filename = fullfile('L:\Analysis\Results\exp\position', [exp_ID '_exp_position'])
+fig_filename = fullfile('L:\Analysis\Results\exp\pos', [exp_ID '_exp_pos'])
 saveas(gcf,fig_filename,'tif')
-saveas(gcf,fig_filename,'fig')
+% saveas(gcf,fig_filename,'fig')
 
 
 

@@ -7,7 +7,7 @@ exp = exp_load_data(exp_ID,'details','path','pos','flight','rest');
 details = exp.details;
 
 %% get sleep ts
-sleep_ti = exp_get_sessions_ti(exp_ID, 'Sleep1','Sleep2');
+sleep_ti = exp_get_sessions_ti(exp_ID, 'Sleep1','Sleep2','Sleep3','Sleep4');
 sleep_ti(any(isnan(sleep_ti),2),:) = []; % remove nan in case of missing sessions
 
 %% prepare NTT file names

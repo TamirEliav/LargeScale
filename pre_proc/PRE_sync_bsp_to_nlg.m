@@ -34,6 +34,7 @@ pairs_good_bsp_ts = mean(bsp_TTL_ts_msec([ix(IX), ix(IX)+1]) .* 1e6,2);
 mathing_TTL_bsp_ts = bsp_TTL_ts_msec(union(ix(IX), ix(IX)+1))*1e6;
 mathing_TTL_nlg_ts = nlg_TTL_ts_msec(union(iy(IX), iy(IX)+1))*1e3;
 
+% TODO: I don't understand what I tried to validate here....
 if length(unique(pairs(1,IX))) ~= length(IX) || ...
    length(unique(pairs(2,IX))) ~= length(IX)
    error()
@@ -138,7 +139,7 @@ saveas(gcf, fullfile(out_dir, 'sync_bsp_nlg__TTL_timinigs'), 'fig')
 save( fullfile(out_dir, 'bsp2nlg_sync_ts') , 'sync_ts');
 
 %% convert bsp data timestamps
-files_to_convert = dir(fullfile(bsp_dir, '*pos*.mat'))
+files_to_convert = dir(fullfile(bsp_dir, '*pos*.mat'));
 for ii_file = 1:length(files_to_convert)
     clear bsp_pos
     load( fullfile(bsp_dir, files_to_convert(ii_file).name) );

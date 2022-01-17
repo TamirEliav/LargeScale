@@ -5,7 +5,8 @@ exp = exp_load_data(exp_ID,'pos','LM');
 prm = PARAMS_GetAll();
 
 %% arrange relevant data
-session_ti = exp_get_sessions_ti(exp_ID,'Behave');
+session_ti = exp_get_sessions_ti(exp_ID,'Behave','Light1','Light2');
+session_ti(any(isnan(session_ti),2),:) = []; % remove nan in case of missing sessions
 IX = get_data_in_ti(exp.pos.proc_1D.ts, session_ti);
 pos.fs = exp.pos.proc_1D.fs;
 pos.ts = exp.pos.proc_1D.ts(IX);
