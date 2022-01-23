@@ -36,12 +36,13 @@ res_all = [res_all{:}];
 details = [res_all.details];
 num_TT_used = cellfun(@(x)(sum(contains(x,'CA'))), {details.TT_loc});
 [res_all.num_TT_used] = disperse(num_TT_used);
+[res_all.pos_err_median_prc] = disperse([res_all.pos_err_median_prc].*100);
 
 %% arrange results in a matrix
 X = [];
 X(:,end+1) = [res_all.pos_err_mean];
 X(:,end+1) = [res_all.pos_err_median];
-X(:,end+1) = [res_all.pos_err_median_prc].*100;
+X(:,end+1) = [res_all.pos_err_median_prc];
 X(:,end+1) = [res_all.mean_err_prob];
 X(:,end+1) = [res_all.err_prob_by_predicted_max];
 X(:,end+1) = [res_all.num_TT_used];
@@ -57,36 +58,45 @@ G = [details.batNum];
 
 %% arrange results in a table
 T = table(...
+    exp_t.bat_num,...
     [res_all.pos_err_mean]',...
     [res_all.pos_err_median]',...
-    [res_all.sparsity_mean]',...
-    [res_all.sparsity_max]',...
+    [res_all.pos_err_mean_prc]',...
+    [res_all.pos_err_median_prc]',...
     [res_all.err_prob_by_predicted_max]',...
     [res_all.mean_err_prob]',...
     [res_all.num_TT_used]',...
     exp_t.included_manual,...
-    exp_t.bat_num,...
     'VariableNames',...
-    {'pos_err_mean','pos_err_median','sparsity_mean','sparsity_max','err_prob_by_predicted_max','mean_err_prob','num_TT_used','included_manual','bat_num'},...
+    {'bat_num','pos_err_mean_m','pos_err_median_m','pos_err_mean_prc','pos_err_median_prc','err_prob_by_predicted_max','mean_err_prob','num_TT_used','included_manual'},...
     'RowNames', exp_t.exp_ID);
 T.Properties.DimensionNames{1} = 'exp_ID';
 
 %% add auto inclusion criteria 
-T.included_auto = ...
-    T.mean_err_prob             < prm.decode.inc_criteria.err_prob & ...
-    T.err_prob_by_predicted_max < prm.decode.inc_criteria.max_predict_err_prob;
+TF = true(size(T,1),1);
+TF = TF & T.mean_err_prob < prm.decode.inc_criteria.err_prob;
+TF = TF & T.pos_err_median_prc  < prm.decode.inc_criteria.median_err_prc;
+% TF = TF & T.err_prob_by_predicted_max < prm.decode.inc_criteria.max_predict_err_prob;
+T.included_auto = TF;
 filename = 'F:\sequences\inclusion\exp_inc_list.xlsx';
 writetable(T,filename,'WriteVariableNames',true,'WriteRowNames',true);
 
 %% colors (TODO: get better colors from a pallete)
-fig=figure;
-hax=gca;
-clr = hax.ColorOrder;
-close(fig)
+switch 2
+    case 1
+        fig=figure;
+        hax=gca;
+        clr = hax.ColorOrder;
+        close(fig)
+    case 2
+        clr = brewermap(12,'set1');
+end
 
 %% plot scatters
 fig=figure;
 fig.WindowState = 'maximized';
+hax=gca;
+hax.ColorOrder = clr;
 h=gplotmatrix(X,[],G,clr,[],[],[],[],labels);
 clear hlinks
 for ii_grp = 1:size(h,3)
@@ -109,8 +119,10 @@ saveas(fig, filename , 'jpg');
 %% max predicted error probability vs. median error
 fig=figure;
 fig.WindowState = 'maximized';
+hax=gca;
+hax.ColorOrder = clr;
 hold on
-x = [res_all.pos_err_median_prc]'.*100;
+x = [res_all.pos_err_median_prc]';
 y = [res_all.err_prob_by_predicted_max]';
 h = splitapply(@(x,y,exp_ID)(plot(x,y,'.','MarkerSize',15,'UserData',exp_ID)), x,y,exp_list,g);
 for ii_grp = 1:length(h)
@@ -128,9 +140,11 @@ filename = fullfile(dir_OUT, 'flight_decoding_pop_scatter_max_predict_err_prob_v
 saveas(fig, filename , 'fig');
 saveas(fig, filename , 'jpg');
 
-%% max predicted error probability vs. median error
+%% max predicted error probability vs. mean error rate
 fig=figure;
 fig.WindowState = 'maximized';
+hax=gca;
+hax.ColorOrder = clr;
 hold on
 x = T.mean_err_prob;
 y = T.err_prob_by_predicted_max;
@@ -181,6 +195,57 @@ sgtitle('Flight decoding populaiton analysis')
 filename = fullfile(dir_OUT, 'flight_decoding_pop_scatter_max_predict_err_prob_vs_error_prob');
 saveas(fig, filename , 'fig');
 saveas(fig, filename , 'jpg');
+
+
+%% median error vs. mean error rate
+fig=figure;
+fig.WindowState = 'maximized';
+hax=gca;
+hax.ColorOrder = clr;
+hold on
+x = T.mean_err_prob;
+y = [res_all.pos_err_median_prc]';
+TF = T.included_manual;
+bats_numbers = unique(T.bat_num);
+for ii_bat = 1:length(bats_numbers)
+    bat_num = bats_numbers(ii_bat);
+    IX1 = T.bat_num==bat_num;
+    h1 = plot(x(IX1),y(IX1),'o', 'MarkerSize',8,'UserData',T.exp_ID(IX1),'LineWidth',1.5,'DisplayName',"bat "+bat_num);
+    h1.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('exp ID','UserData');
+end
+for ii_bat = 1:length(bats_numbers)
+    bat_num = bats_numbers(ii_bat);
+    IX2 = T.bat_num==bat_num & TF==1;
+    if ~any(IX2)
+        continue;
+    end
+    h2 = plot(x(IX2),y(IX2),'*k', 'MarkerSize',5,'UserData',T.exp_ID(IX2),'DisplayName','yes');
+    h2.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('exp ID','UserData');
+end
+for ii_bat = 1:length(bats_numbers)
+    bat_num = bats_numbers(ii_bat);
+    IX3 = T.bat_num==bat_num & TF==0.5;
+    if ~any(IX3)
+        continue;
+    end
+    h2 = plot(x(IX3),y(IX3),'+k', 'MarkerSize',5,'UserData',T.exp_ID(IX3),'DisplayName','maybe');
+    h2.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('exp ID','UserData');
+end
+
+xline(prm.decode.inc_criteria.err_prob);
+yline(prm.decode.inc_criteria.median_err_prc);
+hax=gca;
+hax.XScale = 'log';
+hax.YScale = 'log';
+% legend("bat "+bats_numbers,'Location','northwest');
+legend('Location','northwest')
+xlabel('Error probability')
+ylabel('Median position error (normalized to environment size) [%]')
+sgtitle('Flight decoding populaiton analysis')
+filename = fullfile(dir_OUT, 'flight_decoding_pop_scatter_median_err_vs_error_prob');
+saveas(fig, filename , 'fig');
+saveas(fig, filename , 'jpg');
+
 
 end
 

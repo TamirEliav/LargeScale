@@ -258,9 +258,31 @@ for g = 1:length(id)
     mkdir(dir_OUT);
     util_copy_files_by_template(dir_IN, dir_OUT, tmpl_list, ext);
 end
-
-
-
+%%
+T2 = T(T.included_auto,:);
+figure
+tiledlayout('flow')
+nexttile
+histogram(T2.pos_err_median_m,20)
+text(0.75,0.9,"n="+length(x),'units','normalized');
+xlabel('Median position error (m)')
+ylabel('Counts')
+nexttile
+histogram(T2.pos_err_median_prc,20)
+text(0.75,0.9,"n="+length(x),'units','normalized');
+xlabel('Median position error (%)')
+ylabel('Counts')
+nexttile
+histogram(T2.mean_err_prob,20)
+text(0.75,0.9,"n="+length(x),'units','normalized');
+xlabel('Error probability')
+ylabel('Counts')
+nexttile
+histogram(T2.err_prob_by_predicted_max,20)
+text(0.75,0.9,"n="+length(x),'units','normalized');
+xlabel('Max predicted error prob.')
+ylabel('Counts')
+saveas(gcf,'F:\sequences\inclusion\inc_features_hist','jpg');
 
 
 

@@ -119,8 +119,9 @@ prm.graphics.colors.bats = M; % this is a colormap
 
 %% decoding params
 prm.decode.err_thr_prc = 5;
-prm.decode.inc_criteria.err_prob = 0.4;
-prm.decode.inc_criteria.max_predict_err_prob = 0.05;
+prm.decode.inc_criteria.err_prob = 0.3;
+prm.decode.inc_criteria.median_err_prc = 2; % percentage of the env size
+prm.decode.inc_criteria.max_predict_err_prob = 0.05; % not used
 
 %% different param sets
 prm.parmaset = paramset_global_var;
