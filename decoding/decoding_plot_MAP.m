@@ -1,14 +1,11 @@
-function decoding_plot_MAP(exp_ID, epoch_type, params_opt)
-arguments
-    %% 
-    exp_ID = 'b9861_d180526'
-    epoch_type {mustBeMember(epoch_type,{'sleep','rest','flight'})} = 'sleep'
-    params_opt = 11;
-end
+function decoding_plot_MAP(decode)
+%%
+exp_ID = decode.exp_ID;
+epoch_type = decode.epoch_type;
+params_opt = decode.params_opt;
 
 %% load data
 exp = exp_load_data(exp_ID, 'ripples','MUA','PE','LM','pos');
-decode = decoding_load_data(exp_ID, epoch_type, params_opt);
 if strcmp(epoch_type, 'flight')
     decode_flight = decode;
 else

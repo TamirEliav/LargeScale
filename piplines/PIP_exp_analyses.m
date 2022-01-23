@@ -12,35 +12,42 @@ p = mfilename('fullpath')
 code_txt = fileread([p '.m'])
 disp('-------------------------------------------------------------------')
 
+%%
+% list of days without pos/flight structs for bats 9845/194
+% exp_list = {
+%     'b0194_d180429'
+% %     'b9845_d170212'
+%     'b9845_d170213'
+% %     'b9845_d170215'
+% %     'b9845_d170606'
+%     'b9845_d170608'
+%     'b9845_d170615'
+%     }
+
 %% load exp summary and choose exps
 exp_t = DS_get_exp_summary();
+exp_list = decoding_get_inclusion_list();
 % exp_t(~contains(exp_t.recordingArena, ['200m']),:) = [];
 exp_t(~contains(exp_t.recordingArena, {'200m','120m'}),:) = [];
 exp_t(exp_t.position_data_exist==0,:) = [];
 exp_t(exp_t.neural_data_exist==0,:) = [];
-% exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = [];
-exp_t(~ismember(exp_t.batNum, [9861 34 2289 79 148 184 194 2382 9845] ),:) = [];
+% exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = []; % 5 wild bats in the paper
+% exp_t(~ismember(exp_t.batNum, [9861 34 2289 79 148 184 194 2382 9845] ),:) = [];
+exp_t(~ismember(exp_t.batNum, [9861 34 2289 148 184 194 2382] ),:) = []; % bats good for decoding
 % exp_t(~ismember(exp_t.batNum, [194] ),:) = [];
 % exp_t(~ismember(exp_t.batNum, [9845] ),:) = [];
 exp_t(~contains(exp_t.TT_loc,{'CA1','CA3'}),:) = [];
 % exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
-% list of days without pos/flight structs for bats 9845/194
-exp_list = {
-    'b0194_d180429'
-%     'b9845_d170212'
-    'b9845_d170213'
-%     'b9845_d170215'
-%     'b9845_d170606'
-    'b9845_d170608'
-    'b9845_d170615'
-    }
-exp_t(ismember(exp_t.exp_ID,exp_list),:)=[];
+exp_t(ismember(exp_t.exp_ID,'b0194_d180429'),:)=[]; % bad position data
+% exp_t(ismember(exp_t.exp_ID,exp_list),:)=[];
+exp_t(~ismember(exp_t.exp_ID,exp_list),:)=[];
+
 exp_t 
 whos exp_t 
 
 %% run some pop analysis
-exp_list = exp_t.exp_ID;
-decoding_flight_pop_analysis(exp_list);
+% exp_list = exp_t.exp_ID;
+% decoding_flight_pop_analysis(exp_list);
 
 %%
 forcecalc = 0;
@@ -106,22 +113,23 @@ try
 % %         decoding_plot_flight_posterior(exp_ID, params_opt);
 %     end
     
-%     epoch_type = 'sleep';
-% %     epoch_type = 'rest';
-% %     params_opts = [8:14];
-%     params_opts = [11];
-% %     event_type = 'PE';
-%     event_type = 'posterior';
-%     for params_opt = params_opts
-%         fprintf('params_opt: %d\n', params_opt);
-%         decoding_plot_MAP(exp_ID, epoch_type, params_opt);
-%         decoding_detect_posterior_events(exp_ID, epoch_type, params_opt);
-%         decoding_seq_quantify(exp_ID, epoch_type, params_opt, event_type);
-%         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type); 
-%         decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, event_type);
-%         decoding_xcorr_ripples_MUA_PE_vs_posterior_events(exp_ID,epoch_type,params_opt);
-%         close all
-%     end
+    epoch_type = 'sleep';
+%     epoch_type = 'rest';
+%     params_opts = [8:14];
+    params_opts = [11];
+%     event_type = 'PE';
+    event_type = 'posterior';
+    for params_opt = params_opts
+        fprintf('params_opt: %d\n', params_opt);
+        decode = decoding_load_data(exp_ID, epoch_type, params_opt);
+        decoding_plot_MAP(decode);
+        decoding_detect_posterior_events(decode);
+        decoding_seq_quantify(decode, event_type);
+        decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type); 
+        decoding_plot_PE_posterior(decode, event_type);
+        decoding_xcorr_ripples_MUA_PE_vs_posterior_events(decode);
+        close all
+    end
 % %     decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
 
 catch err

@@ -1,30 +1,30 @@
-function decoding_plot_PE_posterior(exp_ID, epoch_type, params_opt, event_type, win_s)
-    arguments
-        %% temp for development...
-%         exp_ID = 'b0184_d191201';
-        exp_ID = 'b9861_d180526'
-        % epoch_type = 'rest'
-        epoch_type = 'sleep';
-        params_opt = 11;
-        event_type {mustBeMember(event_type,{'PE','posterior','ripples','MUA'})} = 'posterior'
-        win_s = 0.5;
-    end
+function decoding_plot_PE_posterior(decode, event_type, win_s)
+arguments
+    %% temp for development...
+    decode
+    event_type {mustBeMember(event_type,{'PE','posterior','ripples','MUA'})} = 'posterior'
+    win_s = 0.5;
+end
+%%
+exp_ID = decode.exp_ID;
+epoch_type = decode.epoch_type;
+params_opt = decode.params_opt;
 
 %% IN/OUT folders
-dir_IN = 'F:\sequences\decoded';
 dir_OUT = 'F:\sequences\decoded_figs';
 figs_dir = fullfile(dir_OUT, epoch_type, event_type, exp_ID, "opt_"+params_opt);
+if exist(figs_dir,'dir')
+    rmdir(figs_dir,'s');
+end
 mkdir(figs_dir);
 
 %% load data
 exp = exp_load_data(exp_ID, 'details','path','rest','ripples','MUA','PE','pos');
 events_all = decoding_load_events(exp_ID, epoch_type, params_opt, event_type);
-decode_filename = fullfile(dir_IN, epoch_type, exp_ID, sprintf('%s_%s_opt_%d.nc',exp_ID,epoch_type,params_opt));
-decode = decoding_read_decoded_file(decode_filename);
 
 %%
-nRows = 5;
-nCols = 5;
+nRows = 4;
+nCols = 7;
 nPanels = nRows * nCols;
 nFigs = ceil(length(events_all) / nPanels);
 
@@ -44,12 +44,12 @@ for ii_fig = 1:nFigs
     pnl.de.margin = [10 10 10 10];
     for r = 1:nRows
         for c = 1:nCols
-            pnl(r,c).pack('v',[.2 .2 .6]);
+            pnl(r,c).pack('v',[.15 .15 .7]);
             pnl(r,c).de.margin = 1;
         end
     end
     for ii_events = 1:length(events)
-        r = ceil(ii_events/(nRows));
+        r = ceil(ii_events/(nCols));
         c = mod(ii_events-1, nCols)+1;
 
         % time window to display

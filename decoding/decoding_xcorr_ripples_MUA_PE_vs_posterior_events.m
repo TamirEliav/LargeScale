@@ -1,11 +1,8 @@
-function decoding_xcorr_ripples_MUA_PE_vs_posterior_events(exp_ID, epoch_type, params_opt)
-arguments
-    %% 
-    exp_ID = 'b9861_d180526'
-    epoch_type {mustBeMember(epoch_type,{'sleep','rest','flight'})} = 'sleep'
-    params_opt = 11;
-%     event_type {mustBeMember(event_type,{'PE','posterior','ripples','MUA'})} = 'posterior'
-end
+function decoding_xcorr_ripples_MUA_PE_vs_posterior_events(decode)
+%%
+exp_ID = decode.exp_ID;
+epoch_type = decode.epoch_type;
+params_opt = decode.params_opt;
 
 %% IN/OUT folders
 dir_OUT = 'F:\sequences\xcorr_ripples_vs_posterior_events';
@@ -13,7 +10,6 @@ mkdir(dir_OUT);
 
 %% load data
 exp = exp_load_data(exp_ID,'details','path','ripples','MUA','PE');
-decode = decoding_load_data(exp_ID, epoch_type, params_opt);
 [events, params] = decoding_load_events_quantification(exp_ID, epoch_type, params_opt, 'posterior');
 seqs = [events.seq_model];
 

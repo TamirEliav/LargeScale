@@ -1,13 +1,8 @@
-function decoding_detect_posterior_events(exp_ID, epoch_type, params_opt)
-    arguments
-        %%
-        exp_ID = 'b9861_d180526';
-%         epoch_type (1,:) char {mustBeMember(epoch_type,{'sleep','rest','flight'})} = 'sleep'
-        epoch_type = 'sleep';
-%         epoch_type = 'rest';
-        params_opt = 11; % decoding params
-    end
-
+function decoding_detect_posterior_events(decode)
+%%
+exp_ID = decode.exp_ID;
+epoch_type = decode.epoch_type;
+params_opt = decode.params_opt;
 
 %% load data
 fprintf('Detecting posterior events for data:\n')
@@ -18,8 +13,6 @@ dir_OUT = 'F:\sequences\posterior_events';
 figs_dir = fullfile(dir_OUT,'figs');
 mkdir(dir_OUT);
 mkdir(figs_dir);
-decode_filename = fullfile(dir_IN, epoch_type, exp_ID, sprintf('%s_%s_opt_%d.nc',exp_ID,epoch_type,params_opt));
-decode = decoding_read_decoded_file(decode_filename);
 
 %% get movement states
 mvmnt_states_IX = find(contains(decode.state, "empirical_movement"));
@@ -69,7 +62,7 @@ for ii_state = 1:length(mvmnt_states_IX)
     saveas(gcf, filename, 'jpg');
     close(gcf);
     
-    %% 
+    %% calc some events features
     sym_index = @(x)(corr(x',flip(x')));
     [events.peak_ts] = disperse(decode.time([events.peak_IX]));
     [events.start_ts] = disperse(decode.time([events.start_IX]));
@@ -80,35 +73,11 @@ for ii_state = 1:length(mvmnt_states_IX)
     lengths  = splitapply(@length,state_prob,g);
     [events.peak_relative_loc] = disperse(max_IX./lengths);
 
-    %%
+    %% arrange results in a struct
     events_all(ii_state).state_str = state_str;
     events_all(ii_state).state_num = state_num;
     events_all(ii_state).events = events;
     events_all(ii_state).opts = opts;
-
-    %%
-    X=[];
-    X = [X;[events.peak_val]];
-    X = [X;[events.duration]];
-    X = [X;[events.mean_prob]];
-    X = [X;[events.symmetry]];
-    X = [X;[events.peak_relative_loc]];
-    X = X';
-    figure
-    if isempty(X)
-        text(0.5,0.5,'No posterior events detected','Units','normalized','FontSize',20,'HorizontalAlignment','center');
-    else
-        gplotmatrix(X,[],[],[],[],[],[],[],{'peak','duration','mean prob','symmetry','peak loc'});
-    end
-    title( {exp_ID;...
-            decode.state(mvmnt_states_IX(ii_state))+sprintf(' (%s)',epoch_type)},...
-          'Interpreter','none');
-    fig=gcf;
-    fig.WindowState = 'maximized';
-    mkdir(figs_dir, 'gmatplot')
-    filename = fullfile(figs_dir, 'gmatplot', sprintf('%s_posterior_events_gmatplot_%s_dec_prm_%d_%s',exp_ID,epoch_type,params_opt,state_str));
-    saveas(gcf, filename, 'jpg');
-    close(gcf);
     
 end
 

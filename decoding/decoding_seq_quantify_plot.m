@@ -23,21 +23,22 @@ seqs = [events.seq_model];
 close all
 figs={}; filters={};
 [figs{end+1},filters{end+1}]= plot_features_scatters(seqs);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_KS','>',0.5);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_KS','>',0.6);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_KS','>',0.7);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_KS','>',0.8);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_sparsity','>',0.5);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_sparsity','>',0.6);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_sparsity','>',0.7);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_sparsity','>',0.8);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'score','>',0.2);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'score','>',0.3);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'score','>',0.4);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'score','>',0.5);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'score','>',0.6);
-[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'score','>',0.7);
+[figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_sparsity','>',0.5,'score','>',0.25);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_KS','>',0.5);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_KS','>',0.6);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_KS','>',0.7);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_KS','>',0.8);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_sparsity','>',0.5);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_sparsity','>',0.6);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_sparsity','>',0.7);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'confidence_sparsity','>',0.8);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'score','>',0.2);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'score','>',0.3);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'score','>',0.4);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'score','>',0.5);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'score','>',0.6);
+% [figs{end+1},filters{end+1}]= plot_features_scatters(seqs,'duration','>',0.05,'distance','>',5,'score','>',0.7);
 
 title_str = sprintf('%s - %s - x%d - %s',exp_ID, epoch_type, params.decode.replay_speed, event_type);
 for ii_fig = 1:length(figs)
@@ -84,7 +85,7 @@ end
 
     %% plot scatter matrix figure
     T = struct2table(seqs);
-    T = T(:,["distance","duration","start_pos","end_pos","score","compression","confidence_KS","confidence_sparsity"]);
+    T = T(:,["distance","duration","start_pos","end_pos","score","compression","confidence_sparsity"]);
     fig = figure;
     fig.WindowState = 'maximized';
     if ~isempty(T)
