@@ -284,7 +284,22 @@ xlabel('Max predicted error prob.')
 ylabel('Counts')
 saveas(gcf,'F:\sequences\inclusion\inc_features_hist','jpg');
 
-
+%% check replay compression value of examples in my thesis figure
+compressions = [];
+for ii_example = 1:size(panel_A,1)
+    %% load data
+    exp_ID = examples_list(ii_example).exp_ID;
+    epoch_type = examples_list(ii_example).epoch_type;
+    event_num = examples_list(ii_example).event_num;
+%     decode = decoding_load_data(exp_ID, 'sleep', 11);
+%     exp = exp_load_data(exp_ID,'details','path','MUA','ripples');
+%     TT = exp.ripples.stats.best_TT;
+%     [LFP.signal, LFP.ts, LFP.fs, LFP.params] = LFP_load(exp_ID,TT,'band','ripple');
+%     LFP.avg_signal = nanmean(LFP.signal,[2 3]);
+    events = decoding_load_events_quantification(exp_ID,epoch_type,11,"posterior");
+    event = events(event_num);
+    compressions(ii_example) = event.seq_model.compression;
+end
 
 
 

@@ -290,7 +290,7 @@ PE_thr = merge_ripples_and_MUA(...
     rpl([rpl.peak_zFR]      > prm.MUA.high_thr_std), ...
     mua([mua.peak_zpripple] > prm.ripples.high_thr_std), t);
 
-%% save ripples detection results
+%% save PE detection results
 PE = struct();
 PE.all = PE_all;
 PE.strong = PE_strong;
