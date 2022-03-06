@@ -77,6 +77,10 @@ for ii=1:2
     rescale_plot_data('x',[1e-6 ti(1)])
     xlabel('Time (s)')
     ylabel('Position (m)')
+    xlim([0 20])
+    ylim([0 150])
+    xticks([0:10:20])
+    yticks([0:50:150])
 end
 axes(panel_A(1));
 text(-0.6,1.3, 'A', 'Units','normalized','FontWeight','bold');
@@ -157,7 +161,7 @@ cla
 hold on
 plot(CDF_edges, CDFs,'LineWidth',0.3);
 shadedErrorBar(CDF_edges, CDFs', {@mean,@nansem},'lineprops',{'k','linewidth',3});
-xlabel('Position error (m)')
+xlabel('Positional decoding error (m)')
 ylabel('Cumulative fraction')
 text(-0.3,1.22, 'C', 'Units','normalized','FontWeight','bold');
 hax=gca;
@@ -184,3 +188,4 @@ hax.TickLength(1) = [0.03];
 fig_name_out = fullfile(res_dir, fig_name_str);
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 disp('figure was successfully saved to pdf/tiff/fig formats');
+diary off

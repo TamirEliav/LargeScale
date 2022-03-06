@@ -301,7 +301,28 @@ for ii_example = 1:size(panel_A,1)
     compressions(ii_example) = event.seq_model.compression;
 end
 
-
+%% 26/02/2022 - check sleep session durations
+session_names = [];
+session_durations = [];
+for ii_exp = 1:height(T)
+    exp_ID = T.exp_ID{ii_exp};
+    exp = exp_load_data(exp_ID,'details');
+    session_names = [session_names; string(exp.details.session_names)];
+    ti = exp_get_sessions_ti(exp_ID,'Sleep1','Sleep2');
+    session_durations = [session_durations  diff(ti,1,2)*1e-6/60];
+end
+session_durations = session_durations';
+bats = T.bat_num;
+x = session_durations(:);
+g = [bats; bats];
+violinplot(x,g);
+xlabel('bat');
+ylabel('Sleep session duration (s)');
+min(session_durations(:))
+max(session_durations(:))
+mean(session_durations(:))
+median(session_durations(:))
+prctile(session_durations(:),[25 75])
 
 
 

@@ -5,7 +5,7 @@ exp = exp_load_data(exp_ID,'details','path','rest');
 prm = PARAMS_GetAll();
 active_channels = exp.details.activeChannels;
 valid_TTs = any(active_channels,2);
-TT_to_use = find(contains(exp.details.TT_loc,{'CA1','CA3'}));
+TT_to_use = find(contains(exp.details.TT_loc,{'CA1','CA3'})); % TODO: for ripple detection use only CA1! not CA3!
 nTT = size(active_channels,1);
 nCh = size(active_channels,2);
 

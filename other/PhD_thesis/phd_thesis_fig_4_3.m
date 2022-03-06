@@ -58,13 +58,13 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 % create panels
 panels_size = [4 4];
 panels(1,1) = axes('position', [2 19 panels_size]);
-panels(2,1) = axes('position', [7.5 19 panels_size]);
-panels(3,1) = axes('position', [13 19 panels_size]);
-% panels(1,2) = axes('position', [2 23 4 1]);
-% panels(2,2) = axes('position', [7.5 23 4 1]);
-% panels(3,2) = axes('position', [13 23 4 1]);
-% panels(4) = axes('position', [2 13 panels_size]);
-% panels(5) = axes('position', [7.5 13 panels_size]);
+panels(2,1) = axes('position', [7.5 19 panels_size.*[2 1]]);
+panels(3,1) = axes('position', [2 13 panels_size]);
+panels(1,2) = axes('position', [4 20.5 2 2]);
+% panels(2,2) = axes('position', [9.5 20.5 2 2]);
+panels(3,2) = axes('position', [4 14.5 2 2]);
+% panels(4,1) = axes('position', [2 13 panels_size]);
+panels(4,1) = axes('position', [7.5 13 panels_size]);
 % panels(6) = axes('position', [13 13 panels_size]);
 % panels(7) = axes('position', [2 7 panels_size]);
 % panels(8) = axes('position', [7.5 7 panels_size]);
@@ -82,14 +82,20 @@ bats = unique(T.bat_num)
 
 %% load data
 events = {};
+FE_all = [];
+FE_median_speed_all = [];
 for ii_exp = 1:height(T)
     % load exp data
     exp_ID = T.exp_ID{ii_exp};
-%     exp = exp_load_data(exp_ID,'details','path','ripples','MUA','PE');
+    exp = exp_load_data(exp_ID,'details','flight');
     epoch_type = 'sleep';
     params_opt = 11;
     [events_session, params] = decoding_load_events_quantification(exp_ID, epoch_type, params_opt, 'posterior');
     events{ii_exp} = events_session;
+    FE=exp.flight.FE;
+    FE([FE.distance]<100)=[];
+    FE_all = [FE_all FE];
+    FE_median_speed_all(ii_exp) = median(abs([FE.vel]));
 end
 T.nEvents = cellfun(@length,events)'; % note this is without filtering sequence by features!
 sortrows( groupsummary(T,'bat_num',["median","mean","max","sum"],"nEvents"),"sum_nEvents", 'descend')
@@ -104,66 +110,171 @@ seqs([seqs.score]<0.5)=[];
 seqs([seqs.distance]<3)=[];
 
 %%
-clr = 0.5*[1 1 1];
+clr_replay = 0.*[1 1 1];
+% clr_flight = [0.0863    0.7294    0.1294];
+clr_flight = 0.5*[1 1 1];
+lw_replay = 2;
+lw_flight = 1;
 
-%% Duration
+%% Duration (replay)
 axes(panels(1,1));
 cla
 hold on
 x = [seqs.duration];
-histogram(x,'FaceColor',clr);
-xline(median(x),'r',sprintf('%.2g',median(x)))
-xlabel('Duration (s)')
-ylabel('Counts')
-text(-0.27,1.1, 'A', 'Units','normalized','FontWeight','bold');
-fprintf('\nDuration (s) stats:\n');
+fprintf('\nReplay duration (s) stats:\n');
 report_stats(x);
-% axes(panels(1,2));
-% cla
-% hold on
-% h=boxplot(x,'Orientation','horizontal','BoxStyle','filled');
-% axis off
+h=histogram(x);
+% h.BinEdges = linspace(0,35,100);
+h.DisplayStyle = 'stairs';
+% h.FaceColor = clr_replay;
+h.EdgeColor = clr_replay;
+h.LineWidth = lw_replay;
+m = median(x);
+h=xline(m,'r',sprintf('%.2g',m));
+h.LabelOrientation = 'horizontal';
+h.FontSize = 8;
+yticks([0 400])
+xlabel('Replay duration (s)')
+ylabel('Counts','Units','normalized','Position',[-0.1 0.5])
+text(-0.27,1.1, 'A', 'Units','normalized','FontWeight','bold');
 
-%% Distance
+%% Duration (flight) - inset
+axes(panels(1,2));
+cla
+hold on
+x = [FE_all.duration];
+fprintf('\nFlight duration (s) stats:\n');
+report_stats(x);
+h=histogram(x);
+h.BinEdges = linspace(0,35,100);
+h.DisplayStyle = 'stairs';
+% h.FaceColor = clr_flight;
+h.EdgeColor = clr_flight;
+h.LineWidth = lw_flight;
+m = median(x);
+h=xline(m,'r',sprintf('%#.03g',m));
+h.LabelOrientation = 'horizontal';
+h.FontSize = 8;
+yticks([0 400])
+xlabel('Flight duration (s)','Units','normalized','Position',[0.5 -0.15])
+ylabel('Counts','Units','normalized','Position',[-0.1 0.5])
+hax=gca;
+hax.XRuler.TickLabelGapOffset = -2;
+hax.XAxis.TickLength(1) = 0.02;
+
+%% Distance (replay)
 axes(panels(2,1));
 cla
 hold on
 x = [seqs.distance];
-histogram(x,'FaceColor',clr);
-xline(median(x),'r',sprintf('%.2g',median(x)))
-xlabel('Distance (m)')
-ylabel('Counts')
-text(-0.27,1.1, 'B', 'Units','normalized','FontWeight','bold');
-fprintf('\nDistance (m) stats:\n');
+h=histogram(x);
+% h.BinEdges = linspace(0,35,100);
+h.DisplayStyle = 'stairs';
+% h.FaceColor = clr_replay;
+h.EdgeColor = clr_replay;
+h.LineWidth = lw_replay;
+h.Normalization='pdf';
+m = median(x);
+h=xline(m,'r',sprintf('%.2g',m));
+h.LabelOrientation = 'horizontal';
+h.FontSize = 8;
+fprintf('\nReplay distance (m) stats:\n');
 report_stats(x);
-% axes(panels(2,2));
-% cla
-% hold on
-% h=boxplot(x,'Orientation','horizontal','BoxStyle','filled');
-% axis off
 
-%% Compression
+x = [FE_all.distance];
+h=histogram(x);
+h.BinWidth = 5;
+% h.BinEdges = linspace(0,35,100);
+% h.BinEdges = linspace(0,200,40);
+h.DisplayStyle = 'stairs';
+% h.FaceColor = clr_flight;
+h.EdgeColor = clr_flight;
+h.LineWidth = lw_flight;
+h.Normalization='pdf';
+m = median(x);
+h=xline(m,'r',sprintf('%#.04g',m));
+h.LabelOrientation = 'horizontal';
+h.FontSize = 8;
+h.LabelHorizontalAlignment = 'left';
+fprintf('\nFlight distance (m) stats:\n');
+report_stats(x);
+
+yticks([0 0.1])
+xlabel('Distance (m)')
+ylabel('Probability density','Units','normalized','Position',[-0.03 0.5])
+
+h1=plot(nan,nan,'Color',clr_replay,'LineWidth',lw_replay);
+h2=plot(nan,nan,'Color',clr_flight,'LineWidth',lw_flight);
+legend([h1 h2],'Replay','Flight','box','off')
+
+text(-0.135,1.1, 'B', 'Units','normalized','FontWeight','bold');
+
+%% Speed (replay)
 axes(panels(3,1));
 cla
 hold on
-x = [seqs.compression];
-histogram(x,'FaceColor',clr);
-xline(median(x),'r',sprintf('%.2g',median(x)))
-xlabel('Compression')
-ylabel('Counts')
-text(-0.27,1.1, 'C', 'Units','normalized','FontWeight','bold');
-fprintf('\nCompression stats:\n');
+x = [seqs.speed];
+fprintf('\nReplay speed (m/s) stats:\n');
 report_stats(x);
-% axes(panels(3,2));
-% cla
-% hold on
-% h=boxplot(x,'Orientation','horizontal','BoxStyle','outline','PlotStyle','traditional','MedianStyle','line','Notch','on');
-% axis off
+h=histogram(x);
+% h.BinEdges = linspace(0,35,100);
+h.DisplayStyle = 'stairs';
+h.EdgeColor = clr_replay;
+h.LineWidth = lw_replay;
+m = median(x);
+h=xline(m,'r',sprintf('%#.03g',m));
+h.LabelOrientation = 'horizontal';
+h.FontSize = 8;
+yticks([0 500]);
+xlabel('Replay speed (m/s)')
+ylabel('Counts','Units','normalized','Position',[-0.1 0.5])
+text(-0.27,1.1, 'C', 'Units','normalized','FontWeight','bold');
 
-%% link axes
-% linkaxes(panels(1,:),'x');
-% linkaxes(panels(2,:),'x');
-% linkaxes(panels(3,:),'x');
+%% Speeed (flight) - inset
+axes(panels(3,2));
+cla
+hold on
+x = FE_median_speed_all; % per sessions
+% x = arrayfun(@(x)(median([x.vel])), FE_all); % per individual flight epochs
+fprintf('\nFlight speed (m/s) stats:\n');
+report_stats(x);
+h=histogram(x);
+h.BinEdges = linspace(0,10,15);
+h.DisplayStyle = 'stairs';
+% h.FaceColor = clr_flight;
+h.EdgeColor = clr_flight;
+h.LineWidth = lw_flight;
+m = median(x);
+h=xline(m,'r',sprintf('%#.02g',m));
+h.LabelOrientation = 'horizontal';
+h.FontSize = 8;
+yticks([0 40])
+xlabel('Flight speed (m/s)','Units','normalized','Position',[0.5 -0.15])
+ylabel('Counts','Units','normalized','Position',[-0.1 0.5])
+hax=gca;
+hax.XRuler.TickLabelGapOffset = -2;
+hax.XAxis.TickLength(1) = 0.02;
+
+%% Compression
+axes(panels(4));
+cla
+hold on
+x = [seqs.compression];
+fprintf('\nReplay compression-ratio stats:\n');
+report_stats(x);
+h=histogram(x);
+% h.BinEdges = linspace(0,35,100);
+h.DisplayStyle = 'stairs';
+h.EdgeColor = clr_replay;
+h.LineWidth = lw_replay;
+m = median(x);
+h=xline(m,'r',sprintf('%#.03g',m));
+h.LabelOrientation = 'horizontal';
+h.FontSize = 8;
+yticks([0 400]);
+xlabel('Compression-ratio')
+ylabel('Counts','Units','normalized','Position',[-0.1 0.5])
+text(-0.27,1.1, 'D', 'Units','normalized','FontWeight','bold');
 
 %% save fig(s)
 if exist('bats_to_include','var')
@@ -176,6 +287,7 @@ fig_name_out = fullfile(res_dir, [fig_name_str bats_str]);
 print(fig, fig_name_out, '-dpdf', '-cmyk', '-painters');
 
 disp('figure was successfully saved to pdf/tiff/fig formats');
+diary off
 
 
 

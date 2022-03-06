@@ -206,5 +206,6 @@ ylabel('MUA (Hz)')
 fig_name_out = fullfile(res_dir, [fig_name_str '_' char(strjoin(string(examples_IX),'_'))]);
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 disp('figure was successfully saved to pdf/tiff/fig formats');
+diary off
 
 

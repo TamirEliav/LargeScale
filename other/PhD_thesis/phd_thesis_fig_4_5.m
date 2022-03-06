@@ -129,7 +129,7 @@ for ii_exp = 1:height(T)
     %% events xcorr (posterior vs ripples)
     t1 = [seqs.ts];
     t2 = [exp.ripples.events.peak_ts];
-    tdiff = (t1-t2').*1e-6;
+    tdiff = (t2'-t1).*1e-6;
     fraction = sum(any(abs(tdiff)<win1)) / size(tdiff,2); % fraction of the posterior events which had ripple event nearby
     tdiff = tdiff(:);
     tdiff(abs(tdiff)>win1) = [];
@@ -139,7 +139,7 @@ for ii_exp = 1:height(T)
     %% events xcorr (posterior vs MUA)
     t1 = [seqs.ts];
     t2 = [exp.MUA.events.peak_ts];
-    tdiff = (t1-t2').*1e-6;
+    tdiff = (t2'-t1).*1e-6;
     fraction = sum(any(abs(tdiff)<win1)) / size(tdiff,2); % fraction of the posterior events which had MUA event nearby
     tdiff = tdiff(:);
     tdiff(abs(tdiff)>win1) = [];
@@ -149,7 +149,7 @@ for ii_exp = 1:height(T)
     %% events xcorr (posterior vs PE)
     t1 = [seqs.ts];
     t2 = [exp.PE.thr.peak_ts];
-    tdiff = (t1-t2').*1e-6;
+    tdiff = (t2'-t1).*1e-6;
     fraction = sum(any(abs(tdiff)<win1)) / size(tdiff,2); % fraction of the posterior events which had population event nearby
     tdiff = tdiff(:);
     tdiff(abs(tdiff)>win1) = [];
@@ -197,8 +197,12 @@ xlabel('Time from replay (s)')
 ylabel('Counts')
 histogram(cat(1,xcorr_posterior_ripples_tdiff{:}), bins_edges);
 prc = [xcorr_posterior_ripples_fraction{:}] .* 100;
-text(1,0.9,sprintf('%.2g %s %.2g %%',mean(prc),'\pm',std(prc)),'Units','normalized','HorizontalAlignment','right','FontSize',8,'Interpreter','tex');
-h=title('Replay events vs. ripples events','Units','normalized','Position',[0.5 1.05]);
+disp('posterior vs ripples:');
+fprintf('%.2g %s %.2g %% (mean+-SD)\n',mean(prc),'\pm',std(prc));
+fprintf('%.2g %s %.2g %% (mean+-SEM)\n',mean(prc),'\pm',nansem(prc));
+% fraction_str = sprintf('%.2g %s %.2g %%',mean(prc),'\pm',std(prc));
+% text(1,0.9,fraction_str,'Units','normalized','HorizontalAlignment','right','FontSize',8,'Interpreter','tex');
+h=title('Replay events vs. ripple events','Units','normalized','Position',[0.5 1.05]);
 
 %% xcorr - posterior vs MUA
 axes(panels(5))
@@ -208,7 +212,11 @@ xlabel('Time from replay (s)')
 ylabel('Counts')
 histogram(cat(1,xcorr_posterior_MUA_tdiff{:}), bins_edges);
 prc = [xcorr_posterior_MUA_fraction{:}] .* 100;
-text(1,0.9,sprintf('%.2g %s %.2g %%',mean(prc),'\pm',std(prc)),'Units','normalized','HorizontalAlignment','right','FontSize',8,'Interpreter','tex');
+disp('posterior vs MUA:');
+fprintf('%.2g %s %.2g %% (mean+-SD)\n',mean(prc),'\pm',std(prc));
+fprintf('%.2g %s %.2g %% (mean+-SEM)\n',mean(prc),'\pm',nansem(prc));
+% fraction_str = sprintf('%.2g %s %.2g %%',mean(prc),'\pm',std(prc));
+% text(1,0.9,fraction_str,'Units','normalized','HorizontalAlignment','right','FontSize',8,'Interpreter','tex');
 h=title('Replay events vs. MUA events','Units','normalized','Position',[0.5 1.05]);
 
 %% xcorr - posterior vs ripples
@@ -219,7 +227,11 @@ xlabel('Time from replay (s)')
 ylabel('Counts')
 histogram(cat(1,xcorr_posterior_PE_tdiff{:}), bins_edges);
 prc = [xcorr_posterior_PE_fraction{:}] .* 100;
-text(1,0.9,sprintf('%.2g %s %.2g %%',mean(prc),'\pm',std(prc)),'Units','normalized','HorizontalAlignment','right','FontSize',8,'Interpreter','tex');
+disp('posterior vs PE:');
+fprintf('%.2g %s %.2g %% (mean+-SD)\n',mean(prc),'\pm',std(prc));
+fprintf('%.2g %s %.2g %% (mean+-SEM)\n',mean(prc),'\pm',nansem(prc));
+% fraction_str = sprintf('%.2g %s %.2g %%',mean(prc),'\pm',std(prc));
+% text(1,0.9,fraction_str,'Units','normalized','HorizontalAlignment','right','FontSize',8,'Interpreter','tex');
 h=title('Replay events vs. population events','Units','normalized','Position',[0.5 1.05]);
 
 %% num ripples per replay event vs duration
@@ -251,7 +263,7 @@ y = [n_ripples_per_replay{:}];
 cla
 hold on
 % plot(x,y,'o');
-violinplot(x,y)
+violinplot(x,y);
 ylabel('Compression');
 xlabel('No. of ripples');
 
@@ -262,7 +274,7 @@ y = [n_ripples_per_replay{:}];
 cla
 hold on
 % plot(x,y,'o')
-violinplot(x,y)
+violinplot(x,y);
 ylabel('Score');
 xlabel('No. of ripples');
 
@@ -282,6 +294,7 @@ end
 fig_name_out = fullfile(res_dir, [fig_name_str bats_str]);
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 disp('figure was successfully saved to pdf/tiff/fig formats');
+diary off
 
 
 

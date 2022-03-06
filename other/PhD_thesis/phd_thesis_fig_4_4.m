@@ -211,6 +211,9 @@ h.BarWidth = 0.7;
 h.FaceColor = 0.5*[1 1 1];
 ylabel('Fraction')
 text(-0.4,1.1, 'B', 'Units','normalized','FontWeight','bold');
+binom_pval = myBinomTest(sum(g=='Forward'),length(g),0.5,'two');
+disp('Panel B:');
+fprintf('Binomial test (two-sided), pal=%.2g\n',binom_pval);
 
 %% correlation of distance vs duration
 x = [seqs.duration]';
@@ -307,6 +310,7 @@ fig_name_out = fullfile(res_dir, [fig_name_str bats_str '_gplotmat_density']);
 saveas(fig_gplotmat_density, fig_name_out, 'tif');
 
 disp('figure was successfully saved to pdf/tiff/fig formats');
+diary off
 
 
 %%

@@ -93,7 +93,7 @@ res.middle_pos = mean([res.start_pos res.end_pos]);
 res.direction = sign(res.end_pos-res.start_pos);
 if contains(opts.state, 'Outbound'); res.state_direction =  1; end
 if contains(opts.state, 'Inbound');  res.state_direction = -1; end
-if ~isfield(res,'state_direction'); res.state_direction = nan; end
+if ~isfield(res,'state_direction'); res.state_direction = nan; end % TODO: we should get the "state direction" also in the bayseian decoder case!
 res.forward = res.direction == res.state_direction;
 res.compression = res.speed / opts.RW_speed;
 res.start_ts = opts.time(start_IX);
