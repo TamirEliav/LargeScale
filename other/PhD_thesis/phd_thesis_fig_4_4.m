@@ -67,13 +67,12 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 
 % create panels
 panels_size = [4 4];
-panels_A(1) = axes('position', [2 19 panels_size]);
-panels_A(2) = axes('position', [7 19 panels_size]);
-panels_A(3) = axes('position', [12 19 panels_size]);
-panels_A(4) = axes('position', [2 13.5 panels_size]);
-panels_A(5) = axes('position', [7 13.5 panels_size]);
-
-panels_B(1) = axes('position', [17 19 2 4]);
+panels_A(1) = axes('position', [1.5 19 2 4]);
+panels_B(1) = axes('position', [5 19 panels_size]);
+panels_B(2) = axes('position', [10 19 panels_size]);
+panels_B(3) = axes('position', [15 19 panels_size]);
+panels_B(4) = axes('position', [5 13.5 panels_size]);
+panels_B(5) = axes('position', [10 13.5 panels_size]);
 
 %% choose bats / sessions
 [exp_list,T] = decoding_get_inclusion_list();
@@ -102,7 +101,7 @@ sortrows( groupsummary(T,'bat_num',["median","mean","max","sum"],"nEvents"),"sum
 %% pool data
 events = [events{:}];
 
-%% running thr (score)
+%% forward by score (cummulative thr)
 thrs = linspace(0,1,25);
 prc_forward = zeros(size(thrs));
 for ii_thr = 1:length(thrs)
@@ -116,15 +115,28 @@ ylim([0 1]);
 xlabel('Replay score thr')
 ylabel('Fraction of forward replays');
 
+%% forward by score (by bins)
+seqs = [events.seq_model];
+EDGES = linspace(min([seqs.score]), max([seqs.score]), 50);
+CENTERS = edges2centers(EDGES);
+BINS = discretize([seqs.score],EDGES);
+fraction_forward = splitapply(@(x)(mean([x.forward])), seqs, BINS);
+figure
+bar(CENTERS, fraction_forward);
+ylim([0 1])
+xlabel('Replay score')
+ylabel('Fraction of forward replays');
+
 %% apply inclusion criteria 
 seqs = [events.seq_model];
-% seqs([seqs.compression]<2)=[];
-seqs([seqs.score]<0.5)=[];
-seqs([seqs.distance]<3)=[];
+seqs = decoding_apply_seq_inclusion_criteria(seqs);
+% remove high compression outliers (TODO: deal with those in a better way
+% than just removing it)
+[seqs([seqs.compression]>25).compression] = deal(nan);
 
 %%
 X = [];
-X = [X; seqs.middle_pos];
+X = [X; seqs.middle_pos_norm];
 X = [X; seqs.distance];
 X = [X; seqs.duration];
 X = [X; seqs.compression];
@@ -151,7 +163,7 @@ nbins = [25 25];
 sigma = 2;
 
 %% score vs duration
-axes(panels_A(1));
+axes(panels_B(1));
 cla
 hold on
 x = [seqs.duration];
@@ -159,10 +171,10 @@ y = [seqs.score];
 density_diff(x,y,g,nbins,sigma,cmap);
 xlabel('Duration (s)')
 ylabel('Score')
-text(-0.25,1.1, 'A', 'Units','normalized','FontWeight','bold');
+text(-0.25,1.1, 'B', 'Units','normalized','FontWeight','bold');
 
 %% score vs distance
-axes(panels_A(2));
+axes(panels_B(2));
 cla
 hold on
 x = [seqs.distance];
@@ -172,7 +184,7 @@ xlabel('Distance (m)')
 ylabel('Score')
 
 %% score vs compression
-axes(panels_A(3));
+axes(panels_B(3));
 cla
 hold on
 x = [seqs.compression];
@@ -182,7 +194,7 @@ xlabel('Compression')
 ylabel('Score')
 
 %% Distance vs duration
-axes(panels_A(4));
+axes(panels_B(4));
 cla
 hold on
 x = [seqs.duration];
@@ -192,7 +204,7 @@ xlabel('Duration (s)')
 ylabel('Distance (m)')
 
 %% Distance vs duration
-axes(panels_A(5));
+axes(panels_B(5));
 cla
 hold on
 x = [seqs.duration];
@@ -203,14 +215,14 @@ ylabel('Compression')
 box on
 
 %%
-axes(panels_B(1));
+axes(panels_A(1));
 cla
 hold on
 h=histogram(g,'Normalization','probability');
 h.BarWidth = 0.7;
 h.FaceColor = 0.5*[1 1 1];
 ylabel('Fraction')
-text(-0.4,1.1, 'B', 'Units','normalized','FontWeight','bold');
+text(-0.4,1.1, 'A', 'Units','normalized','FontWeight','bold');
 binom_pval = myBinomTest(sum(g=='Forward'),length(g),0.5,'two');
 disp('Panel B:');
 fprintf('Binomial test (two-sided), pal=%.2g\n',binom_pval);
@@ -312,6 +324,24 @@ saveas(fig_gplotmat_density, fig_name_out, 'tif');
 disp('figure was successfully saved to pdf/tiff/fig formats');
 diary off
 
+%%
+figure
+subplot(211)
+hold on
+x = [seqs.start_pos_norm];
+histogram(x(g=='Forward'),linspace(0,1,100),'Normalization','probability');
+histogram(x(g=='Reverse'),linspace(0,1,100),'Normalization','probability');
+legend('Forward','Reverse')
+xlabel('Start position (norm.)')
+ylabel('Probability')
+subplot(212)
+hold on
+x = [seqs.end_pos_norm];
+histogram(x(g=='Forward'),linspace(0,1,100),'Normalization','probability');
+histogram(x(g=='Reverse'),linspace(0,1,100),'Normalization','probability');
+legend('Forward','Reverse')
+xlabel('End position (norm.)')
+ylabel('Probability')
 
 %%
 function density_diff(x,y,g,nbins,sigma,cmap)
@@ -331,8 +361,9 @@ function density_diff(x,y,g,nbins,sigma,cmap)
     hax=gca;
     m1 = min(N,[],'all');
     m2 = max(N,[],'all');
-    m = max(abs([m1 m2]));
-%     m = m2;
+%     m = max(abs([m1 m2]));
+    m = abs(m1);
+%     m = abs(m2);
 %     m = mean(abs([m1 m2]));
     hax.CLim = [-m m];
 end

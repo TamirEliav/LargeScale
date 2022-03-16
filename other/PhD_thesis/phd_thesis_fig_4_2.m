@@ -101,6 +101,18 @@ examples_list = examples_list(examples_IX);
 %% graphics
 event_margins = 0.2; % in %
 
+%%
+% for ii_example = 1:size(panel_A,1)
+%     axes(panel_A(ii_example, 1));
+%     cla
+%     exp_ID = examples_list(ii_example).exp_ID;
+%     epoch_type = examples_list(ii_example).epoch_type;
+%     event_num = examples_list(ii_example).event_num;
+%     events = decoding_load_events_quantification(exp_ID,epoch_type,11,"posterior");
+%     event = events(event_num);
+%     text(.5,.5,sprintf('compress=%.3g',event.seq_model.compression),'HorizontalAlignment','center')
+% end
+
 %% load data for panels A and B
 for ii_example = 1:size(panel_A,1)
     %% load data
@@ -114,6 +126,7 @@ for ii_example = 1:size(panel_A,1)
     LFP.avg_signal = nanmean(LFP.signal,[2 3]);
     events = decoding_load_events_quantification(exp_ID,epoch_type,11,"posterior");
     event = events(event_num);
+    seq = event.seq_model;
     ti = [event.start_ts event.end_ts];
     ti = ti + [-1 1].*event_margins*range(ti);
 
@@ -159,6 +172,7 @@ for ii_example = 1:size(panel_A,1)
     prob_t = decode.time(IX);
     prob_pos = decode.posterior_pos(:,IX);
     imagesc(prob_t, decode.pos, prob_pos);
+    plot([seq.start_ts seq.end_ts],[seq.start_pos seq.end_pos],'--m');
     hax = gca;
     hax.TickDir = 'out';
     hax.TickLength(1) = 0.008;

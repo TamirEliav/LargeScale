@@ -13,6 +13,7 @@ field_options = {
     'MUA',          1
     'PE',           1
     'rest',         1
+    'MUA_FR_map',   1
     };
 
 %% parse input

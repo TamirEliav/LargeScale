@@ -35,6 +35,7 @@ exp_t(exp_t.neural_data_exist==0,:) = [];
 % exp_t(~ismember(exp_t.batNum, [9861 34 2289 79 148 184 194 2382 9845] ),:) = [];
 exp_t(~ismember(exp_t.batNum, [9861 34 2289 148 184 194 2382] ),:) = []; % bats good for decoding
 % exp_t(~ismember(exp_t.batNum, [194] ),:) = [];
+exp_t(~ismember(exp_t.batNum, [184] ),:) = [];
 % exp_t(~ismember(exp_t.batNum, [9845] ),:) = [];
 exp_t(~contains(exp_t.TT_loc,{'CA1','CA3'}),:) = [];
 % exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
@@ -101,6 +102,8 @@ try
 %     PE_plot_ripples_vs_MUA(exp_ID); % I put the detection here...
 %     ripples_MUA_PE_save_to_nlx(exp_ID,forcecalc);
 
+%     exp_calc_MUA_FR_map(exp_ID);
+
 %     ripples_trigger_LFP(exp_ID);
 %     ripples_trigger_MUA(exp_ID);
 %     ripples_xcorr(exp_ID);
@@ -113,8 +116,8 @@ try
 % %         decoding_plot_flight_posterior(exp_ID, params_opt);
 %     end
     
-    epoch_type = 'sleep';
-%     epoch_type = 'rest';
+%     epoch_type = 'sleep';
+    epoch_type = 'rest';
 %     params_opts = [8:14];
     params_opts = [11];
 %     event_type = 'PE';
@@ -125,12 +128,12 @@ try
         decoding_plot_MAP(decode);
         decoding_detect_posterior_events(decode);
         decoding_seq_quantify(decode, event_type);
-        decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type); 
-        decoding_plot_PE_posterior(decode, event_type);
-        decoding_xcorr_ripples_MUA_PE_vs_posterior_events(decode);
+%         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type); 
+%         decoding_plot_PE_posterior(decode, event_type);
+%         decoding_xcorr_ripples_MUA_PE_vs_posterior_events(decode);
         close all
     end
-% %     decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
+%     decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
 
 catch err
     getReport(err)
