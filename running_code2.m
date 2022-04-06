@@ -324,6 +324,54 @@ mean(session_durations(:))
 median(session_durations(:))
 prctile(session_durations(:),[25 75])
 
+%% 19/03/2022 - how many TTs were in CA1 or CA3 per session
+[exp_list, T] = decoding_get_inclusion_list();
+T(~T.included_auto,:)=[];
+for ii_exp = 1:height(T)
+    exp_ID = T.exp_ID{ii_exp};
+    exp = exp_load_data(exp_ID, 'details');
+    T.num_tt_ca1(ii_exp) = sum(contains(exp.details.TT_loc,'CA1'));
+    T.num_tt_ca3(ii_exp) = sum(contains(exp.details.TT_loc,'CA3'));
+end
+
+%% rest duration hist per bat
+[exp_list, T] = decoding_get_inclusion_list();
+T(~T.included_auto,:)=[];
+exps = cellfun(@(exp_ID)(exp_load_data(exp_ID,'details','rest')),T.exp_ID);
+rest = [exps.rest];
+details = [exps.details];
+for ii = 1:length(rest)
+    [rest(ii).events.bat_num] = deal(details(ii).batNum);
+end
+events = [rest.events];
+%%
+figure
+subplot(211)
+hold on
+n = 1000;
+edges = linspace(0,120,n);
+durations = [events.duration];
+histogram(durations,edges,'Normalization','count');
+title('all bats')
+xlabel('Rest on balls duration (s)')
+ylabel('Counts')
+subplot(212)
+hold on
+[G,ID] = findgroups([events.bat_num]);
+for ii_bat=1:length(ID)
+    IX = G==ii_bat;
+    histogram(durations(IX),edges,'Normalization','count','DisplayStyle','stairs','LineWidth',2)
+end
+legend("bat "+ID);
+title('Per bat')
+xlabel('Rest on balls duration (s)')
+ylabel('Counts')
+linkaxes(findobj(gcf, 'type', 'axes'), 'x')
+
+
+
+%%
+
 
 
 

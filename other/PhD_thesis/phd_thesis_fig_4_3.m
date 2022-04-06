@@ -89,6 +89,7 @@ for ii_exp = 1:height(T)
     exp_ID = T.exp_ID{ii_exp};
     exp = exp_load_data(exp_ID,'details','flight');
     epoch_type = 'sleep';
+%     epoch_type = 'rest';
     params_opt = 11;
     [events_session, params] = decoding_load_events_quantification(exp_ID, epoch_type, params_opt, 'posterior');
     events{ii_exp} = events_session;
@@ -278,12 +279,12 @@ text(-0.27,1.1, 'D', 'Units','normalized','FontWeight','bold');
 
 %% save fig(s)
 if exist('bats_to_include','var')
-    bats_str = ['_bats_' char(strjoin(""+bats,'_'))];
+    bats_str = ['bats_' char(strjoin(""+bats,'_'))];
 else
-    bats_str = '_bats_all';
+    bats_str = 'bats_all';
 end
 
-fig_name_out = fullfile(res_dir, [fig_name_str bats_str]);
+fig_name_out = fullfile(res_dir, sprintf('%s_%s_%s',fig_name_str, epoch_type, bats_str));
 print(fig, fig_name_out, '-dpdf', '-cmyk', '-painters');
 
 disp('figure was successfully saved to pdf/tiff/fig formats');

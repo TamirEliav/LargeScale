@@ -91,6 +91,7 @@ for ii_exp = 1:height(T)
     exp_ID = T.exp_ID{ii_exp};
 %     exp = exp_load_data(exp_ID,'details','path','ripples','MUA','PE');
     epoch_type = 'sleep';
+%     epoch_type = 'rest';
     params_opt = 11;
     [events_session, params] = decoding_load_events_quantification(exp_ID, epoch_type, params_opt, 'posterior');
     events{ii_exp} = events_session;
@@ -117,7 +118,7 @@ ylabel('Fraction of forward replays');
 
 %% forward by score (by bins)
 seqs = [events.seq_model];
-EDGES = linspace(min([seqs.score]), max([seqs.score]), 50);
+EDGES = linspace(min([seqs.score]), max([seqs.score]), 25);
 CENTERS = edges2centers(EDGES);
 BINS = discretize([seqs.score],EDGES);
 fraction_forward = splitapply(@(x)(mean([x.forward])), seqs, BINS);
@@ -307,18 +308,18 @@ end
 
 %% save fig(s)
 if exist('bats_to_include','var')
-    bats_str = ['_bats_' char(strjoin(""+bats,'_'))];
+    bats_str = ['bats_' char(strjoin(""+bats,'_'))];
 else
-    bats_str = '_bats_all';
+    bats_str = 'bats_all';
 end
 
-fig_name_out = fullfile(res_dir, [fig_name_str bats_str]);
+fig_name_out = fullfile(res_dir, sprintf('%s_%s_%s',fig_name_str, epoch_type, bats_str));
 print(fig, fig_name_out, '-dpdf', '-cmyk', '-painters');
 
-fig_name_out = fullfile(res_dir, [fig_name_str bats_str '_gplotmat_scatter']);
+fig_name_out = fullfile(res_dir, sprintf('%s_%s_%s_%s',fig_name_str, epoch_type, bats_str,'gplotmat_scatter'));
 saveas(fig_gplotmat_scatter, fig_name_out, 'tif');
 
-fig_name_out = fullfile(res_dir, [fig_name_str bats_str '_gplotmat_density']);
+fig_name_out = fullfile(res_dir, sprintf('%s_%s_%s_%s',fig_name_str, epoch_type, bats_str,'gplotmat_density'));
 saveas(fig_gplotmat_density, fig_name_out, 'tif');
 
 disp('figure was successfully saved to pdf/tiff/fig formats');

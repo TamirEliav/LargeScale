@@ -103,11 +103,15 @@ for ii_exp = 1:height(T)
     %% load exp data
     exp_ID = T.exp_ID{ii_exp};
     exp = exp_load_data(exp_ID,'details','path','ripples','MUA','PE');
-    epoch_type = 'sleep';
+%     epoch_type = 'sleep';
+    epoch_type = 'rest';
     params_opt = 11;
     [events, params] = decoding_load_events_quantification(exp_ID, epoch_type, params_opt, 'posterior');
+    if isempty(events)
+        continue;
+    end
     seqs = [events.seq_model];
-    [seqs.ts]=disperse([events.peak_ts]);
+    [seqs.ts] = disperse([events.peak_ts]);
 
     %% apply inclusion criteria
     seqs([seqs.score]<0.5)=[];
@@ -286,12 +290,12 @@ text(-0.3,1.12, 'B', 'Units','normalized','FontWeight','bold');
 
 %% save fig
 if exist('bats_to_include','var')
-    bats_str = ['_bats_' char(strjoin(""+bats,'_'))];
+    bats_str = ['bats_' char(strjoin(""+bats,'_'))];
 else
-    bats_str = '_bats_all';
+    bats_str = 'bats_all';
 end
 
-fig_name_out = fullfile(res_dir, [fig_name_str bats_str]);
+fig_name_out = fullfile(res_dir, sprintf('%s_%s_%s',fig_name_str, epoch_type, bats_str));
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 disp('figure was successfully saved to pdf/tiff/fig formats');
 diary off

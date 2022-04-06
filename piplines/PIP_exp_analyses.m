@@ -35,7 +35,7 @@ exp_t(exp_t.neural_data_exist==0,:) = [];
 % exp_t(~ismember(exp_t.batNum, [9861 34 2289 79 148 184 194 2382 9845] ),:) = [];
 exp_t(~ismember(exp_t.batNum, [9861 34 2289 148 184 194 2382] ),:) = []; % bats good for decoding
 % exp_t(~ismember(exp_t.batNum, [194] ),:) = [];
-exp_t(~ismember(exp_t.batNum, [184] ),:) = [];
+% exp_t(~ismember(exp_t.batNum, [184] ),:) = [];
 % exp_t(~ismember(exp_t.batNum, [9845] ),:) = [];
 exp_t(~contains(exp_t.TT_loc,{'CA1','CA3'}),:) = [];
 % exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
@@ -129,7 +129,7 @@ try
         decoding_detect_posterior_events(decode);
         decoding_seq_quantify(decode, event_type);
 %         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type); 
-%         decoding_plot_PE_posterior(decode, event_type);
+        decoding_plot_PE_posterior(decode, event_type);
 %         decoding_xcorr_ripples_MUA_PE_vs_posterior_events(decode);
         close all
     end
