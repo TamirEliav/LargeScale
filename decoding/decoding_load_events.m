@@ -34,22 +34,6 @@ switch event_type
         %%
         dir_IN = 'F:\sequences\posterior_events';
         filename = fullfile(dir_IN, sprintf('%s_posterior_events_%s_dec_prm_%d',exp_ID,epoch_type,params_opt));
-        load(filename);
-        % TODO: move this part (arranging in one array) to the events
-        % detection function!
-        for ii_state = 1:length(events_all)
-            [events_all(ii_state).events.state_num] = ...
-                disperse(repelem(events_all(ii_state).state_num,length(events_all(ii_state).events)));
-        end
-        events = [events_all.events];
-        [~, sort_IX] = sort([events.peak_ts], 'ascend');
-        events = events(sort_IX);
+        load(filename,'events');
 end
-[events.num] = disperse(1:length(events));
-
-
-
-
-
-
 

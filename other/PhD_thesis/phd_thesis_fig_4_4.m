@@ -133,7 +133,7 @@ seqs = [events.seq_model];
 seqs = decoding_apply_seq_inclusion_criteria(seqs);
 % remove high compression outliers (TODO: deal with those in a better way
 % than just removing it)
-[seqs([seqs.compression]>25).compression] = deal(nan);
+% [seqs([seqs.compression]>25).compression] = deal(nan);
 
 %%
 X = [];
@@ -363,9 +363,9 @@ function density_diff(x,y,g,nbins,sigma,cmap)
     m1 = min(N,[],'all');
     m2 = max(N,[],'all');
 %     m = max(abs([m1 m2]));
-    m = abs(m1);
+%     m = abs(m1);
 %     m = abs(m2);
-%     m = mean(abs([m1 m2]));
+    m = mean(abs([m1 m2]));
     hax.CLim = [-m m];
 end
 

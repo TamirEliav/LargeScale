@@ -6,6 +6,7 @@ function [events, g, opts] = detect_events(x,opts)
         opts.thr_edges = 1
         opts.merge_thr = nan % no merging by default, units same as Fs
         opts.min_width = nan
+        opts.gaps_IX = []
         opts.plot = false
     end
 
@@ -26,32 +27,42 @@ function [events, g, opts] = detect_events(x,opts)
             end
         end
     end
+
+    %% workaround for gaps in the time series that have an event detected on both side (and thus is merged to one event):
+    % we seperate the events by setting false each points were there is a gap
+    % we apply this workaround in each thresholding step
+    % (xthr1/xthr2/xthr12)
+    xthr1(opts.gaps_IX) = false;
     
     %% extend thr crossing to to a lower edge_thr
     xthr2 = x > opts.thr_edges;
     xthr2(xthr1) = true; % in case we used merging
+    xthr2(opts.gaps_IX) = false;
     xthr12 = extend_intervals(xthr1,xthr2);
+    xthr12(opts.gaps_IX) = false;
     
     %% extract events
     cc = bwconncomp(xthr12);
+
     % create events struct
     events=struct();
     events.duration = 1/opts.Fs .* cellfun(@length,cc.PixelIdxList);
     events.start_IX = cellfun(@min, cc.PixelIdxList);
     events.end_IX = cellfun(@max, cc.PixelIdxList);
-%     events.start_ts = ts(events.start_IX);
-%     events.end_ts = ts(events.end_IX);
     g = bwlabel(xthr12);
     g(g==0)=nan;
     [~,max_IX] = splitapply(@max,x,g); % index relative to event
     events.peak_IX = cellfun(@(IX,max_IX)(IX(max_IX)), cc.PixelIdxList, num2cell(max_IX));
-%     events.peak_ts = ts(events.peak_IX);
     events.peak_val = x(events.peak_IX);
 
     events = soa2aos(events);
     if ~isnan(opts.min_width)
         invalid = [events.duration] < opts.min_width;
         events(invalid) = [];
+        xthr12(ismember(g,find(invalid)))=0;
+        cc = bwconncomp(xthr12);
+        g = bwlabel(xthr12);
+        g(g==0)=nan;
     end
    
     %% 
@@ -65,6 +76,10 @@ function [events, g, opts] = detect_events(x,opts)
         xthr12_vals(xthr12) = x(xthr12);
         plot(xthr12_vals,'r')
         plot([events.peak_IX], [events.peak_val], '*r');
+        for ii_gap = 1:length(opts.gaps_IX)
+            hl = xline(opts.gaps_IX(ii_gap),'g','gap');
+            hl.LineWidth = 2;
+        end
     end
 end
 

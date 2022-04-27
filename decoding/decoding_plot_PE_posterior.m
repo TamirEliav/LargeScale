@@ -20,7 +20,11 @@ mkdir(figs_dir);
 
 %% load data
 exp = exp_load_data(exp_ID, 'details','path','rest','ripples','MUA','PE','pos');
-events_all = decoding_load_events(exp_ID, epoch_type, params_opt, event_type);
+% events_all = decoding_load_events(exp_ID, epoch_type, params_opt, event_type);
+events_all = decoding_load_events_quantification(exp_ID, epoch_type, params_opt, event_type);
+seqs_all = [events_all.seq_model];
+[~, TF] = decoding_apply_seq_inclusion_criteria(seqs_all);
+[events_all.included_seq] = disperse(TF);
 
 %%
 nRows = 4;
@@ -74,14 +78,25 @@ for ii_fig = 1:nFigs
             continue;
         end
 
+        % get seq (radon)
+        seq = events(ii_events).seq_model;
+        seq_t = [seq.start_ts seq.end_ts];
+        seq_pos = [seq.start_pos seq.end_pos];
+
         % change time to ms aligned to event peak
         zpripple_t = (zpripple_t-t0) * 1e-3;
         zFR_t = (zFR_t-t0) * 1e-3;
         prob_t = (prob_t-t0) * 1e-3;
+        seq_t = (seq_t-t0) * 1e-3;
 
-        % plot ripple power / MUA
+        % plot ripple power / MUA 
         pnl(r,c,1).select();
-        title("event #" + events(ii_events).num)
+        title_str = sprintf('event #%d     %.1fm  %.2fs  %.1fx  %.2f',ii_events,seq.distance, seq.duration,seq.compression,seq.score);
+        h = title(title_str);
+        if events(ii_events).included_seq
+            h.Color = 'r';
+            h.FontWeight = 'bold';
+        end
         yyaxis left
         plot(zpripple_t, zpripple,'LineWidth',1.5);
 %         yticks([0 ceil(max(zpripple))])
@@ -111,6 +126,7 @@ for ii_fig = 1:nFigs
         hold on
         imagesc(prob_t, decode.pos, prob_pos);
         axis tight
+        plot(seq_t,seq_pos,'-r');
         if strcmp(epoch_type,'rest')
             plot(prob_t, real_pos, 'r', 'LineWidth',0.01)
         end

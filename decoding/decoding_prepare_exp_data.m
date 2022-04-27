@@ -2,7 +2,6 @@ function decoding_prepare_exp_data(exp_ID)
 
 %% get exp info
 dir_out = "F:\sequences\proc";
-% exp = exp_load_data(exp_ID,'details','path','pos','flight','PE','rest');
 exp = exp_load_data(exp_ID,'details','path','pos','flight','rest');
 details = exp.details;
 
@@ -95,8 +94,6 @@ data.direction = direction;
 data.FE_ti = FE_ti;
 data.sleep_ti = sleep_ti;
 data.rest_ti = exp.rest.ti;
-% data.PE_ts = [exp.PE.thr.peak_ts];
-% data.PE_ti = [exp.PE.thr.start_ts;exp.PE.thr.end_ts]';
 
 %% save data to mat file
 mkdir(dir_out);

@@ -344,11 +344,14 @@ for ii = 1:length(rest)
     [rest(ii).events.bat_num] = deal(details(ii).batNum);
 end
 events = [rest.events];
+[~,sorted_IX] = sort([events.duration],'ascend');
+events = events(sorted_IX);
+
 %%
 figure
 subplot(211)
 hold on
-n = 1000;
+n = 200;
 edges = linspace(0,120,n);
 durations = [events.duration];
 histogram(durations,edges,'Normalization','count');
@@ -368,12 +371,253 @@ xlabel('Rest on balls duration (s)')
 ylabel('Counts')
 linkaxes(findobj(gcf, 'type', 'axes'), 'x')
 
-
+%%
+figure
+hold on
+duration_limits = [1 10];
+% duration_limits = [1.2 1.8];
+nClrPoints = 256;
+duration_clr_points = linspace(duration_limits(1),duration_limits(2),nClrPoints);
+cmap = parula(nClrPoints);
+% duration_clr_points = [duration_limits(1) mean(duration_limits) duration_limits(2)];
+% cmap = [1 0 0;0 1 0; 0 0 1];
+% cmap = parula;
+TF = [events.duration]>duration_limits(1) & [events.duration]<duration_limits(2);
+% arrayfun(@(x,clr)plot(x.pos_original-median(x.pos_original), 'Color',interp1([0 .5 1],[1 0 0;0 1 0; 0 0 1],clr)), events(TF), linspace(0,1,sum(TF)));
+arrayfun(@(x)plot(x.pos_original-median(x.pos_original), 'Color',...
+    interp1(duration_clr_points,cmap,x.duration)), events(TF));
+rescale_plot_data('x',[1/100 0]);
+xlabel('Time (s)')
+ylabel('{\Delta}Position from median position (m)')
+colormap( interp1(duration_clr_points,cmap,duration_clr_points))
+hcb=colorbar ;
+hcb.Ticks=[0 1];
+hcb.TickLabels = duration_limits;
+hcb.Label.String = 'Duration (s)'
 
 %%
+bubblechart([events.mean_prob]-[seqs.score],[seqs.duration],[seqs.score],[seqs.score])
+bubblesize([1 7])
+
+%% 07/04/2022 - test rest detection algorithm (mainly the median position filtering)
+clear
+clc
+fs = 100;
+dt = 1/fs;
+T = 60;
+t = 0:dt:T;
+for rest_win_s = [0.1:0.1:2 2.5 3 3.5 4]
+
+    x = [linspace(0,200,fs*20) 200*ones(1,round(fs*rest_win_s)) linspace(200,0,fs*20)];
+    x(length(t))=0;
+    noise_std = .1;
+    rng(0);
+    x = x+randn(size(x)).*noise_std;
+    
+    win_s = 1;
+    win = round(1 * fs);
+%     win2 = round(.1 * fs);
+    xfilt = smoothdata(x,2, "movmedian",win);
+%     csaps_p = 1e-5;
+%     pos_csaps_pp = csaps(1:length(t), xfilt', csaps_p);
+%     xfilt = fnval(pos_csaps_pp, 1:length(t) );
+%     v = fnval( fnder(pos_csaps_pp), 1:length(t)) .* fs;
+    v = [0 diff(xfilt)].*fs;
+%     v = smoothdata(v,"movmedian",win2);
+    xdev = x-xfilt;
+
+    speed_thr_1 = 1;
+    speed_thr_2 = .1;
+    [events, g, opts] = detect_events(100-abs(v),"thr",100-speed_thr_1,"thr_edges",100-speed_thr_1,"min_width",.25*win);
+    IX = events(1).start_IX:events(1).end_IX;
+    IX1 = find(abs(v(IX))<speed_thr_2,1,'first');
+    IX2 = find(abs(v(IX))<speed_thr_2,1,'last');
+    IX = IX(IX1:IX2);
+    
+    close all
+    fig=figure;
+    fig.WindowState = 'maximized';
+    tiledlayout(3,1,'TileSpacing','compact')
+    ax=[];
+    
+    ax(end+1) = nexttile;
+    hold on
+    plot(t,x,'x')
+    plot(t,xfilt,'-g','LineWidth',2)
+    plot(t(IX),x(IX),'.r')
+    legend("original","Filtered","detected")
+    ylabel('Position (m)');
+    
+    ax(end+1) = nexttile;
+    hold on
+    plot(t,xdev,'.')
+    plot(t(IX),xdev(IX),'.r')
+    ylabel('Original position - Filtered position (m)');
+    
+    ax(end+1) = nexttile;
+    hold on
+    plot(t,abs(v),'.-')
+    plot(t(IX),abs(v(IX)),'.r')
+    xlabel('time (s)');
+    ylabel('Speed (m/s)');
+    
+    linkaxes(ax,'x')
+    xlim([19 25])
+    sgtitle({"real rest duration: " + rest_win_s + "s";...
+            sprintf('detected rest duration: %.2f',range(IX)/fs);...
+            sprintf('position median filter size: %.1fs',win_s)})
+    dir_out = 'L:\Analysis\Results\exp\rest\tests';
+    mkdir(dir_out);
+    filename = fullfile(dir_out, sprintf('rest_detection_median_smothing_duration_%.2fs', rest_win_s) );
+    filename = strrep(filename,'.','_');
+    saveas(fig,filename,'fig');
+    saveas(fig,filename,'jpg');
+
+end
+
+%% 24/04/2022 - time in rest histogram (forward vs reverse) - like in Diba 2007
+for time_bin_width = 1%0.1:0.1:1
+t1=[events.time_from_epoch_start];
+t2=[events.time_to_epoch_end];
+exps = cellfun(@(exp_ID)(exp_load_data(exp_ID,'details','rest')),T.exp_ID);
+rest = [exps.rest];
+rest_durations = range(cat(1,rest.ti),2)*1e-6;
+[N,EDGES] = histcounts(rest_durations,'BinWidth',time_bin_width,'BinLimits',[0 max(rest_durations)]);
+N_rest = flip(cumsum(flip(N)));
+N1_forward = histcounts(t1([seqs.forward]),EDGES);
+N1_reverse = histcounts(t1(~[seqs.forward]),EDGES);
+N2_forward = histcounts(t2([seqs.forward]),EDGES);
+N2_reverse = histcounts(t2(~[seqs.forward]),EDGES);
+CENTERS = edges2centers(EDGES);
+
+max_time = 25;
+t0_lw = 2;
+close all
+fig=figure;
+fig.WindowState = 'maximized';
+subplot(221)
+hold on
+stairs(CENTERS, N1_forward./(N_rest.*time_bin_width),'LineWidth',2);
+stairs(CENTERS, N1_reverse./(N_rest.*time_bin_width),'LineWidth',2);
+xline(0,'LineWidth',t0_lw,'Color','k')
+hax=gca;
+hax.XLim = [0 max_time];
+hax.YLim(1) = 0;
+xlabel('Time from rest start (s)')
+ylabel('Events rate (events/s)');
+legend("forward","Reverse",'Location','northeast')
+subplot(222)
+hold on
+stairs(-CENTERS, N2_forward./(N_rest.*time_bin_width),'LineWidth',2);
+stairs(-CENTERS, N2_reverse./(N_rest.*time_bin_width),'LineWidth',2);
+xline(0,'LineWidth',t0_lw,'Color','k')
+hax=gca;
+hax.XLim = [-max_time 0];
+hax.YLim(1) = 0;
+xlabel('Time from rest end (s)')
+ylabel('Events rate (events/s)');
+legend("forward","Reverse",'Location','northwest')
+subplot(223)
+hold on
+stairs(CENTERS, N1_forward,'LineWidth',2);
+stairs(CENTERS, N1_reverse,'LineWidth',2);
+xline(0,'LineWidth',t0_lw,'Color','k')
+hax=gca;
+hax.XLim = [0 max_time];
+hax.YLim(1) = 0;
+xlabel('Time from rest start (s)')
+ylabel('Events count');
+legend("forward","Reverse",'Location','northeast')
+subplot(224)
+hold on
+stairs(-CENTERS, N2_forward,'LineWidth',2);
+stairs(-CENTERS, N2_reverse,'LineWidth',2);
+xline(0,'LineWidth',t0_lw,'Color','k')
+hax=gca;
+hax.XLim = [-max_time 0];
+hax.YLim(1) = 0;
+xlabel('Time from rest end (s)')
+ylabel('Events count');
+legend("forward","Reverse",'Location','northwest')
+
+sgtitle({'Reverse replay immediately after landing but no forward replay before takeoff';...
+         sprintf('bin width = %.2f',time_bin_width)});
+filename = fullfile('F:\sequences\figures\',sprintf('timing_of_reverse_vs_forward_replay_in_rest_bin_size_%d_ms.jpg',round(time_bin_width*1e3)));
+saveas(fig,filename,'jpg');
+end
+
+%%
+IX = true(size(seqs));
+IX = IX & ~[seqs.forward];
+IX = IX & [events.time_from_epoch_start]<25;
+figure
+tiledlayout('flow')
+nexttile
+plot([events(IX).time_from_epoch_start], [seqs(IX).compression],'.')
+xlabel('Time from rest start (s)'); ylabel('Compression')
+nexttile
+plot([events(IX).time_from_epoch_start], [seqs(IX).distance],'.')
+xlabel('Time from rest start (s)'); ylabel('distance (m)')
+nexttile
+plot([events(IX).time_from_epoch_start], [seqs(IX).duration],'.')
+xlabel('Time from rest start (s)'); ylabel('duration (s)')
+nexttile
+plot([events(IX).time_from_epoch_start], [seqs(IX).score],'.')
+xlabel('Time from rest start (s)'); ylabel('score')
+
+%% classify events
+gEarlyLate = categorical([events.time_from_epoch_start]<1,[false,true],["Late","Early"])';
+gForRev = categorical([seqs.forward],[true false],{'Forward','Reverse'})';
+gTakeLand = classify_replay_landing_takeoff_other(seqs);
+gPastFuture = categorical( ([events.rest_ball_num] == 1 & [seqs.state_direction] == 1) | ...
+                           ([events.rest_ball_num] == 2 & [seqs.state_direction] == -1), ...
+    [true false],{'Future','Past'})';
+
+%%
+fig=figure; fig.WindowState = 'maximized';
+tiledlayout('flow');
+nexttile; histogram(gEarlyLate .* gForRev .* gTakeLand .* gPastFuture, 'DisplayOrder','descend');
+nexttile; histogram(gEarlyLate .* gForRev .* gTakeLand,     'DisplayOrder','descend');
+nexttile; histogram(gEarlyLate .* gForRev .* gPastFuture,   'DisplayOrder','descend');
+nexttile; histogram(gEarlyLate .* gTakeLand .* gPastFuture, 'DisplayOrder','descend');
+nexttile; histogram(gForRev .* gTakeLand .* gPastFuture,    'DisplayOrder','descend');
+nexttile; histogram(gEarlyLate .* gForRev,     'DisplayOrder','descend');
+nexttile; histogram(gEarlyLate .* gTakeLand,   'DisplayOrder','descend');
+nexttile; histogram(gEarlyLate .* gPastFuture, 'DisplayOrder','descend');
+nexttile; histogram(gForRev .* gTakeLand,      'DisplayOrder','descend');
+nexttile; histogram(gForRev .* gPastFuture,    'DisplayOrder','descend');
+nexttile; histogram(gTakeLand .* gPastFuture,  'DisplayOrder','descend');
+nexttile; histogram(gEarlyLate , 'DisplayOrder','descend');
+nexttile; histogram(gForRev,     'DisplayOrder','descend');
+nexttile; histogram(gTakeLand ,  'DisplayOrder','descend');
+nexttile; histogram(gPastFuture, 'DisplayOrder','descend');
+sgtitle('Rest replay classifications')
+filename = 'F:\sequences\figures\Rest_replay_classifications';
+saveas(fig,filename,'fig');
+saveas(fig,filename,'jpg');
+
+%%
+X = [[seqs.compression]; 
+     [seqs.distance];
+     [seqs.duration];
+     [seqs.score];
+     [seqs.middle_pos_norm];]';
+features_names = ["compression","distance","duration","score","middle_pos_norm",];
+% g = gEarlyLate .* gForRev .* gTakeLand .* gPastFuture;
+g = gEarlyLate .* gTakeLand .* gPastFuture;
+g = categorical(g=='Early Landing Past',[false true],["other","Early Landing Past"]);
+% g = gEarlyLate .* gPastFuture;
+% g = gEarlyLate;
+nCat = length(categories(g));
+clrs = brewermap(nCat, 'Set1');
+clrs=[];
+figure
+gplotmatrix(X,[],g,clrs,'o+d*',5,[],[],features_names);
+
+%%
+figure
+plot([events.rest_ball_num],[seqs.middle_pos_norm],'.')
 
 
-
-
-
+    
 %%

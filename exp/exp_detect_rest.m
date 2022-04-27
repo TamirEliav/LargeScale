@@ -55,17 +55,17 @@ switch pos_smoothing_opt
         x = exp.pos.proc_1D.pos;
         nanx = isnan(x);
         x(nanx) = interp1(t(~nanx), x(~nanx), t(nanx));
-        csaps_p = 1e-5;
-        win_s = 10;
+%         csaps_p = 1e-5;
+        win_s = 1;
         win = round(win_s * exp.pos.proc_1D.fs);
         xfilt = smoothdata(x,2, "movmedian",win);
         vel = [0 diff(xfilt).*prm.pos.resample_fs];
-        pos_csaps_pp = csaps(1:length(t), xfilt', csaps_p);
-        xfilt = fnval(pos_csaps_pp, 1:length(exp.pos.proc_1D.ts) );
-        vel = fnval( fnder(pos_csaps_pp), 1:length(exp.pos.proc_1D.ts)) .* prm.pos.resample_fs;
-        win_s = .1;
-        win = round(win_s * exp.pos.proc_1D.fs);
-        vel = smoothdata(vel,2, "movmedian",win);
+%         pos_csaps_pp = csaps(1:length(t), xfilt', csaps_p);
+%         xfilt = fnval(pos_csaps_pp, 1:length(exp.pos.proc_1D.ts) );
+%         vel = fnval( fnder(pos_csaps_pp), 1:length(exp.pos.proc_1D.ts)) .* prm.pos.resample_fs;
+%         win_s = .1;
+%         win = round(win_s * exp.pos.proc_1D.fs);
+%         vel = smoothdata(vel,2, "movmedian",win);
 
         pos.pos = xfilt(IX);
         pos.vel = vel(IX);
@@ -91,11 +91,12 @@ pos.vel(nanvel) = interp1(pos.ts(~nanvel), pos.vel(~nanvel), pos.ts(nanvel));
 
 
 %% params
-prm.balls.balls_loc_detect_speed_thr = 0.2;
-prm.balls.rest_speed_thr = 1;
-prm.balls.rest_speed_thr_edges = 0.1; % TODO: impolement!
-prm.balls.min_duration = 0; % in seconds
-prm.balls.merge_thr = 0.5; % in seconds
+prm.balls.balls_loc_detect_speed_thr = 0.2; % m/s
+prm.balls.rest_speed_thr = 1; % m/s
+prm.balls.rest_speed_thr_edges = 0.1; % m/s
+prm.balls.rest_speed_thr_edges_duration = 0.1; % s
+prm.balls.min_duration = 1; % in seconds
+prm.balls.merge_thr = 1; % in seconds
 prm.balls.max_dist_from_ball = 2; % in meters. TODO: fit some curve to the detected rest epochs and realign the ball locations PER rest epoch!
 
 %% extract balls exact location from the data
@@ -125,13 +126,21 @@ cc = bwconncomp(xthr);
 xthr2 = false(size(xthr));
 for ii = 1:cc.NumObjects
     IX = cc.PixelIdxList{ii};
-    new_start_IX = find(abs(pos.vel(IX))<prm.balls.rest_speed_thr_edges, 1,"first");
-    new_end_IX = find(abs(pos.vel(IX))<prm.balls.rest_speed_thr_edges, 1,"last");
-    new_IX = IX(new_start_IX:new_end_IX);
+    nPointsMargin = round(prm.balls.rest_speed_thr_edges_duration * pos.fs);
+    new_start_IX = find(abs(pos.vel(IX))<prm.balls.rest_speed_thr_edges, nPointsMargin, "first");
+    new_end_IX = find(abs(pos.vel(IX))<prm.balls.rest_speed_thr_edges, nPointsMargin, "last");
+    if length(new_start_IX)<nPointsMargin |...
+       length(new_end_IX)<nPointsMargin | ...
+       new_start_IX(end)>new_end_IX(1)
+        continue;
+    end
+    new_IX = IX(new_start_IX(end):new_end_IX(1));
     xthr2(new_IX) = true;
 end
 xthr = xthr2;
 cc = bwconncomp(xthr);
+g = bwlabel(xthr);
+g(g==0)=nan;
 
 % create rest events struct
 events=struct();
@@ -146,11 +155,14 @@ events.mean_vel = splitapply(@mean,pos.vel,g);
 events.ball_num = splitapply(@mode,pos.nearest_ball_num,g);
 events.valid = events.duration > prm.balls.min_duration;
 events = soa2aos(events);
-events(~[events.valid])=[];
+invalid = ~[events.valid];
+events(invalid)=[];
+xthr(ismember(g,find(invalid)))=false;
+cc = bwconncomp(xthr);
 [events.ts] = disperse(cellfun(@(IX)(pos.ts(IX)),cc.PixelIdxList,'UniformOutput',false));
 [events.pos] = disperse(cellfun(@(IX)(pos.pos(IX)),cc.PixelIdxList,'UniformOutput',false));
 [events.pos_original] = disperse(cellfun(@(IX)(pos.pos_original(IX)),cc.PixelIdxList,'UniformOutput',false));
-[events.vel] = disperse(cellfun(@(IX)(pos.pos(IX)),cc.PixelIdxList,'UniformOutput',false));
+[events.vel] = disperse(cellfun(@(IX)(pos.vel(IX)),cc.PixelIdxList,'UniformOutput',false));
 
 %%
 fig=figure;
@@ -168,6 +180,7 @@ xlabel('Time (s)')
 ylabel('Position (m)')
 title({'rest on the balls detection';exp_ID},'Interpreter','none')
 file_name = fullfile(dir_out ,[exp_ID '_exp_rest_detection']);
+saveas(fig,file_name,'fig')
 saveas(fig,file_name,'jpg')
 
 %% save rest on the balls results to mat file

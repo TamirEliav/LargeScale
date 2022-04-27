@@ -22,12 +22,14 @@ for ii_state = 1:length(mvmnt_states_IX)
     state_num = mvmnt_states_IX(ii_state);
     state_prob = decode.posterior_state(state_num,:);
     state_str = decode.state(state_num);
+    gaps_IX = find(diff(decode.time) > 2*median(diff(decode.time)));
     [events,g,opts] = detect_events(state_prob,...
                             "Fs",decode.Fs,...
                             "thr",0.8,...
                             "thr_edges",0.5,...
                             "merge_thr",0.1,...
                             "min_width",0.05,...
+                            "gaps_IX", gaps_IX,...
                             "plot",true);
 	details_str = {
         "#events = "+length(events);...
@@ -42,11 +44,6 @@ for ii_state = 1:length(mvmnt_states_IX)
         sprintf('state decay timescale: %.3g s',decode.params.state_decay_timescale),
         };
     text(1, 1, details_str ,'Units','normalized','HorizontalAlignment','left','VerticalAlignment','top');
-    gaps_IX = find(diff(decode.time) > median(diff(decode.time)));
-    for ii_gap = 1:length(gaps_IX)
-        hl = xline(gaps_IX(ii_gap),'g','time gap');
-        hl.LineWidth = 2;
-    end
     rescale_plot_data('x',[1/decode.Fs 0]);
     ylim([0 1]);
     xlabel('Time (s)');
@@ -64,6 +61,7 @@ for ii_state = 1:length(mvmnt_states_IX)
     
     %% calc some events features
     sym_index = @(x)(corr(x',flip(x')));
+    [events.state_num] = deal(state_num);
     [events.peak_ts] = disperse(decode.time([events.peak_IX]));
     [events.start_ts] = disperse(decode.time([events.start_IX]));
     [events.end_ts] = disperse(decode.time([events.end_IX]));
@@ -81,9 +79,15 @@ for ii_state = 1:length(mvmnt_states_IX)
     
 end
 
+%% join events from different states
+events = [events_all.events];
+[~, sort_IX] = sort([events.peak_ts], 'ascend');
+events = events(sort_IX);
+[events.num] = disperse(1:length(events));
+
 %% save all events to mat file
 filename = fullfile(dir_OUT, sprintf('%s_posterior_events_%s_dec_prm_%d',exp_ID,epoch_type,params_opt));
-save(filename, 'events_all');
+save(filename, 'events', 'opts');
 
 
 end

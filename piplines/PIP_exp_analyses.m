@@ -40,6 +40,7 @@ exp_t(~ismember(exp_t.batNum, [9861 34 2289 148 184 194 2382] ),:) = []; % bats 
 exp_t(~contains(exp_t.TT_loc,{'CA1','CA3'}),:) = [];
 % exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
 exp_t(ismember(exp_t.exp_ID,'b0194_d180429'),:)=[]; % bad position data
+% exp_t(~ismember(exp_t.exp_ID,'b2382_d190814'),:)=[]; % rest decoding need to finish (session with long rest epoch)
 % exp_t(ismember(exp_t.exp_ID,exp_list),:)=[];
 exp_t(~ismember(exp_t.exp_ID,exp_list),:)=[];
 
@@ -124,12 +125,13 @@ try
     event_type = 'posterior';
     for params_opt = params_opts
         fprintf('params_opt: %d\n', params_opt);
-        decode = decoding_load_data(exp_ID, epoch_type, params_opt);
-        decoding_plot_MAP(decode);
-        decoding_detect_posterior_events(decode);
-        decoding_seq_quantify(decode, event_type);
+%         decode = decoding_load_data(exp_ID, epoch_type, params_opt);
+%         decoding_plot_MAP(decode);
+%         decoding_detect_posterior_events(decode);
+%         decoding_seq_quantify(decode, event_type);
+        decoding_seq_quantify_add_info(exp_ID, epoch_type, params_opt , event_type);
 %         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type); 
-        decoding_plot_PE_posterior(decode, event_type);
+%         decoding_plot_PE_posterior(decode, event_type);
 %         decoding_xcorr_ripples_MUA_PE_vs_posterior_events(decode);
         close all
     end

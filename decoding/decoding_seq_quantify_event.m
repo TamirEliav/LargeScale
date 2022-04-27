@@ -42,9 +42,17 @@ xc = floor((nTime+1)./2);
 yc = floor((nPos +1)./2);
 xx = 1:nTime;
 yy = slope.*(xx - xc) + yc - offset;
+
+pos_IX = 1:nPos;
+radius_bins = opts.radius/opts.dx;
+mask = pos_IX' < (yy+radius_bins) & pos_IX' > (yy-radius_bins);
+score2 = sum(prob.*mask,'all')/nTime; % this score calculation should be used, the previous one calculated above is positively biased and can even go > 1 values
+
 invalid_yy = (yy<0.5) | (yy>nPos+0.5);
 xx(invalid_yy)=nan;
 yy(invalid_yy)=nan;
+
+
 
 %% sequence line fitting (radon)
 % based (with some modifications) on code from here:
@@ -106,7 +114,8 @@ res = struct();
 res.slope = slope;
 res.offset = offset; % offset from the center pixel (see doc radon)
 res.theta = theta;
-res.score = score;
+res.score = score2;
+res.score_incorrect = score;
 res.compression = compression;              % this is defined directly by the fitted line
 res.xx = xx;
 res.yy = yy;

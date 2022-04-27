@@ -142,12 +142,12 @@ tbl_seq_cls = table(gForRev,gTakeLand,gPastFuture);
 fig2=figure;
 fig2.WindowState = 'maximized';
 tiledlayout(3,3)
-nexttile
-heatmap(tbl_seq_cls,'gTakeLand','gForRev');
-nexttile
-heatmap(tbl_seq_cls,'gForRev','gPastFuture')
-nexttile
-heatmap(tbl_seq_cls,'gTakeLand','gPastFuture')
+% nexttile
+% heatmap(tbl_seq_cls,'gTakeLand','gForRev');
+% nexttile
+% heatmap(tbl_seq_cls,'gForRev','gPastFuture')
+% nexttile
+% heatmap(tbl_seq_cls,'gTakeLand','gPastFuture')
 nexttile
 histogram(gForRev); ylabel('Counts')
 nexttile
@@ -155,10 +155,14 @@ histogram(gTakeLand); ylabel('Counts')
 nexttile
 histogram(gPastFuture); ylabel('Counts')
 nexttile
-histogram(gTakeLand.*gForRev.*gPastFuture,'DisplayOrder','descend'); ylabel('Counts')
+histogram(gTakeLand.*gForRev,'DisplayOrder','descend'); ylabel('Counts')
+nexttile
+histogram(gTakeLand.*gPastFuture,'DisplayOrder','descend'); ylabel('Counts')
 nexttile
 histogram(gForRev.*gPastFuture,'DisplayOrder','descend'); ylabel('Counts')
-sgtitle('Rest replay classifications')
+nexttile
+histogram(gTakeLand.*gForRev.*gPastFuture,'DisplayOrder','descend'); ylabel('Counts')
+sgtitle('Rest replay classifications');
 
 %% plot replay start/end position histograms (per forward/reverse replays)
 nbins = 100;
@@ -371,26 +375,7 @@ diary off
 
 
 %%
-function g = classify_replay_landing_takeoff_other(seqs,thr)
-%     near_balls_TF = [seqs.start_pos_norm] < thr | [seqs.start_pos_norm] > (1-thr) | ...
-%                     [seqs.end_pos_norm] < thr   | [seqs.end_pos_norm] > (1-thr) ;
-    
-    landing_TF = (~[seqs.forward] & (  ([seqs.start_pos_norm] < thr     & [seqs.state_direction]==-1) | ...
-                                       ([seqs.start_pos_norm] > (1-thr) & [seqs.state_direction]== 1) ) )...
-                 | ...
-                 ( [seqs.forward] & (  ([seqs.end_pos_norm]   < thr     & [seqs.state_direction]==-1) | ...
-                                       ([seqs.end_pos_norm]   > (1-thr) & [seqs.state_direction]== 1) ) );
-    
-    takeoff_TF = (~[seqs.forward] & (  ([seqs.end_pos_norm] < thr     & [seqs.state_direction]== 1) | ...
-                                       ([seqs.end_pos_norm] > (1-thr) & [seqs.state_direction]==-1) ) )...
-                 | ...
-                 ( [seqs.forward] & (  ([seqs.start_pos_norm]   < thr     & [seqs.state_direction]== 1) | ...
-                                       ([seqs.start_pos_norm]   > (1-thr) & [seqs.state_direction]==-1) ) );
-    g = zeros(size(seqs));
-    g(landing_TF) = 1;
-    g(takeoff_TF) = 2;
-    g = categorical(g,[0 1 2],{'Other','Landing','Takeoff'})';
-end
+
 
 
 
