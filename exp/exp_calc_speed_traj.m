@@ -1,7 +1,7 @@
 function exp_calc_speed_traj(exp_ID)
 
 %% load exp data
-exp = exp_load_data(exp_ID,'pos','flight');
+exp = exp_load_data(exp_ID,'flight');
 prm = PARAMS_GetAll();
 
 %%

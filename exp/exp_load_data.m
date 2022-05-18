@@ -6,6 +6,7 @@ field_options = {
     'details',      1
     'pos',          1
     'flight',       1
+    'flight_6m',    1
     'LM',           0
     'csc_raw_stats',1
     'wingbeat',     1

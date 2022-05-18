@@ -91,7 +91,7 @@ for ii_fig = 1:nFigs
 
         % plot ripple power / MUA 
         pnl(r,c,1).select();
-        title_str = sprintf('event #%d     %.1fm  %.2fs  %.1fx  %.2f',ii_events,seq.distance, seq.duration,seq.compression,seq.score);
+        title_str = sprintf('event #%d     %.1fm  %.2fs  %.1fx  %.2f',events(ii_events).num, seq.distance, seq.duration,seq.compression,seq.score);
         h = title(title_str);
         if events(ii_events).included_seq
             h.Color = 'r';

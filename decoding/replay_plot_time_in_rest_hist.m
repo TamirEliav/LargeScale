@@ -4,7 +4,7 @@ clear cll
 clc
 
 %% params
-grp_opt = 11; % opt 5 is the best option
+grp_opt = 5; % opt 5 is the best option
 TakeLand_thr = 0.05;
 time_bin_width = 1;
 max_time = 25;

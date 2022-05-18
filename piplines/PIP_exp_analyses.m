@@ -25,27 +25,45 @@ disp('-------------------------------------------------------------------')
 %     }
 
 %% load exp summary and choose exps
-exp_t = DS_get_exp_summary();
-exp_list = decoding_get_inclusion_list();
-% exp_t(~contains(exp_t.recordingArena, ['200m']),:) = [];
-exp_t(~contains(exp_t.recordingArena, {'200m','120m'}),:) = [];
-exp_t(exp_t.position_data_exist==0,:) = [];
-exp_t(exp_t.neural_data_exist==0,:) = [];
-% exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = []; % 5 wild bats in the paper
-% exp_t(~ismember(exp_t.batNum, [9861 34 2289 79 148 184 194 2382 9845] ),:) = [];
-exp_t(~ismember(exp_t.batNum, [9861 34 2289 148 184 194 2382] ),:) = []; % bats good for decoding
-% exp_t(~ismember(exp_t.batNum, [194] ),:) = [];
-% exp_t(~ismember(exp_t.batNum, [184] ),:) = [];
-% exp_t(~ismember(exp_t.batNum, [9845] ),:) = [];
-exp_t(~contains(exp_t.TT_loc,{'CA1','CA3'}),:) = [];
-% exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
-exp_t(ismember(exp_t.exp_ID,'b0194_d180429'),:)=[]; % bad position data
-% exp_t(~ismember(exp_t.exp_ID,'b2382_d190814'),:)=[]; % rest decoding need to finish (session with long rest epoch)
-% exp_t(ismember(exp_t.exp_ID,exp_list),:)=[];
-exp_t(~ismember(exp_t.exp_ID,exp_list),:)=[];
+% exp_t = DS_get_exp_summary();
+% exp_list = decoding_get_inclusion_list();
+% % exp_t(~contains(exp_t.recordingArena, ['200m']),:) = [];
+% exp_t(~contains(exp_t.recordingArena, {'200m','120m'}),:) = [];
+% exp_t(exp_t.position_data_exist==0,:) = [];
+% exp_t(exp_t.neural_data_exist==0,:) = [];
+% % exp_t(~ismember(exp_t.batNum, [79,148,34,9861,2289] ),:) = []; % 5 wild bats in the paper
+% % exp_t(~ismember(exp_t.batNum, [9861 34 2289 79 148 184 194 2382 9845] ),:) = [];
+% exp_t(~ismember(exp_t.batNum, [9861 34 2289 148 184 194 2382] ),:) = []; % bats good for decoding
+% % exp_t(~ismember(exp_t.batNum, [194] ),:) = [];
+% % exp_t(~ismember(exp_t.batNum, [184] ),:) = [];
+% % exp_t(~ismember(exp_t.batNum, [9845] ),:) = [];
+% exp_t(~contains(exp_t.TT_loc,{'CA1','CA3'}),:) = [];
+% % exp_t(exp_t.date < datetime('08/06/2018','InputFormat','dd/MM/yyyy'),:) = [];
+% exp_t(ismember(exp_t.exp_ID,'b0194_d180429'),:)=[]; % bad position data
+% % exp_t(~ismember(exp_t.exp_ID,'b2382_d190814'),:)=[]; % rest decoding need to finish (session with long rest epoch)
+% % exp_t(ismember(exp_t.exp_ID,exp_list),:)=[];
+% exp_t(~ismember(exp_t.exp_ID,exp_list),:)=[];
+% 
+% exp_t 
+% whos exp_t 
 
+%% load exp summary and choose exps - preproc 2bats data
+exp_t = DS_get_exp_summary();
+% exp_t(~ismember(exp_t.batNum, [2336] ),:) = []; % Ayelet
+exp_t(~ismember(exp_t.batNum, [2299] ),:) = []; % shaked
+% exp_t(~ismember(exp_t.batNum, [2382] ),:) = []; % shir
+% exp_t(exp_t.date >= datetime('23/06/2019','InputFormat','dd/MM/yyyy'),:) = [];
+% exp_t = flip(exp_t);
 exp_t 
 whos exp_t 
+
+%%
+% clc
+% exp_ID = exp_t.exp_ID{end-0}
+% exp_create_details(exp_ID);
+% close all
+% check_data(exp_ID);
+% exp_detect_rest(exp_ID);
 
 %% run some pop analysis
 % exp_list = exp_t.exp_ID;
@@ -61,7 +79,7 @@ for ii_exp = 1:height(exp_t)
     
     %%
 try
-%     exp_create_details(exp_ID);
+    exp_create_details(exp_ID);
 %     exp=exp_load_data(exp_ID,'details','path');
 %     exp=exp_load_data(exp_ID,'details','path','pos','flight');
 %     util_fix_ncs(exp.path.nlx);
@@ -95,14 +113,13 @@ try
 
 %     exp_detect_rest(exp_ID);
 
-%     decoding_detect_spikes(exp_ID,forcecalc);
+    decoding_detect_spikes(exp_ID,forcecalc);
 %     decoding_prepare_exp_data(exp_ID);
 
 %     ripples_detect(exp_ID);
 %     MUA_detect(exp_ID);
 %     PE_plot_ripples_vs_MUA(exp_ID); % I put the detection here...
 %     ripples_MUA_PE_save_to_nlx(exp_ID,forcecalc);
-
 %     exp_calc_MUA_FR_map(exp_ID);
 
 %     ripples_trigger_LFP(exp_ID);
@@ -112,30 +129,34 @@ try
 
 %     epoch_type = 'flight';
 %     for params_opt = 4%1:6
+%         decode = decoding_load_data(exp_ID, epoch_type, params_opt);
 %         decoding_plot_flight_conf_mat(exp_ID, params_opt);
-%         decoding_plot_MAP(exp_ID, epoch_type, params_opt);
+%         decoding_plot_MAP(decode);
 % %         decoding_plot_flight_posterior(exp_ID, params_opt);
 %     end
     
-%     epoch_type = 'sleep';
-    epoch_type = 'rest';
-%     params_opts = [8:14];
-    params_opts = [11];
-%     event_type = 'PE';
-    event_type = 'posterior';
-    for params_opt = params_opts
-        fprintf('params_opt: %d\n', params_opt);
+
+% %     epoch_type = 'sleep';
+%     epoch_type = 'rest';
+% %     params_opts = [8:14];
+% %     params_opts = [11];
+%     params_opts = [11];
+% %     event_type = 'PE';
+%     event_type = 'posterior';
+%     for params_opt = params_opts
+%         fprintf('params_opt: %d\n', params_opt);
 %         decode = decoding_load_data(exp_ID, epoch_type, params_opt);
-%         decoding_plot_MAP(decode);
-%         decoding_detect_posterior_events(decode);
-%         decoding_seq_quantify(decode, event_type);
-        decoding_seq_quantify_add_info(exp_ID, epoch_type, params_opt , event_type);
-%         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type); 
+% %         decoding_plot_MAP(decode);
+% %         decoding_detect_posterior_events(decode);
+% %         decoding_seq_quantify(decode, event_type);
+% %         decoding_seq_quantify_add_info(exp_ID, epoch_type, params_opt , event_type);
+% %         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type); 
 %         decoding_plot_PE_posterior(decode, event_type);
-%         decoding_xcorr_ripples_MUA_PE_vs_posterior_events(decode);
-        close all
-    end
-%     decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
+% %         decoding_plot_session_seqs(exp_ID, epoch_type, params_opt, event_type);
+% %         decoding_xcorr_ripples_MUA_PE_vs_posterior_events(decode);
+%         close all
+%     end
+% %     decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
 
 catch err
     getReport(err)
@@ -173,6 +194,26 @@ diary off
 
 
 %%
+function check_data(exp_ID)
 
+%%
+% [~, LFP_ts] = LFP_load(exp_ID,1,"band",'delta');
+exp=exp_load_data(exp_ID,'details','path','pos','flight','flight_6m','rest');
+FE = [exp.flight.FE];
+% FE = [exp.flight_6m.FE];
+fig=figure;
+fig.WindowState = 'maximized';
+hold on
+plot(exp.pos.proc_1D.ts,exp.pos.proc_1D.pos,'.k')
+plot([FE.ts],[FE.pos],'.r')
+ylimits = ylim;
+for ii_session = 1:length(exp.details.session_names)
+    area(exp.details.session_ts(ii_session,:),ylimits([2 2]),'FaceAlpha',0.15);
+end
+% xline(LFP_ts([1 end]),'r','rec');
+% rescale_plot_data('x',[1e-6/60 exp.details.session_ts(1)]);
+sgtitle(exp_ID,'Interpreter','none');
+zoom on
+end
 
 

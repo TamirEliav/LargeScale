@@ -6,7 +6,7 @@ prm = PARAMS_GetAll();
 dir_out = 'L:\Analysis\Results\exp\rest';
 
 %% arrange relevant data
-session_ti = exp_get_sessions_ti(exp_ID,'Behave','Light1','Light2');
+session_ti = exp_get_sessions_ti(exp_ID,'Behave','Behave_6m','Light1','Light2');
 session_ti(any(isnan(session_ti),2),:) = []; % remove nan in case of missing sessions
 IX = get_data_in_ti(exp.pos.proc_1D.ts, session_ti);
 pos.fs = exp.pos.proc_1D.fs;
@@ -120,6 +120,12 @@ xthr = false(1,length(pos.ts));
 for ii = 1:length(start_IX)
     xthr(start_IX(ii):end_IX(ii)) = true;
 end
+% the problem that we workaround here is that the two balls are so
+% close to each other such that 2m from any ball is almost anywhere.
+% Thus, we cut adjacent rest epochs from different ball. 
+% This is to overcome erronous detection of rest epochs that merged two 
+% epochs from different balls into one epoch.
+xthr(diff(pos.nearest_ball_num)~=0) = false;
 cc = bwconncomp(xthr);
 
 % cut edges with more strict thr
@@ -190,6 +196,8 @@ rest.events = events;
 rest.ti = [events.start_ts; events.end_ts]';
 rest.fs = pos.fs;
 rest.balls_loc = balls_loc;
+rest.ts = pos.ts;
+rest.vel_smooth = pos.vel;
 file_name = fullfile(dir_out ,[exp_ID '_exp_rest']);
 save(file_name,'rest');
 

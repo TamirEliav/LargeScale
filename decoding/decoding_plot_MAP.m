@@ -1,4 +1,8 @@
-function decoding_plot_MAP(decode)
+function decoding_plot_MAP(decode,flight_decoding_param_opt)
+arguments
+    decode
+    flight_decoding_param_opt = 4
+end
 %%
 exp_ID = decode.exp_ID;
 epoch_type = decode.epoch_type;
@@ -9,7 +13,6 @@ exp = exp_load_data(exp_ID, 'ripples','MUA','PE','LM','pos');
 if strcmp(epoch_type, 'flight')
     decode_flight = decode;
 else
-    flight_decoding_param_opt = 4;
     decode_flight = decoding_load_data(exp_ID, 'flight', flight_decoding_param_opt);
 end
 dir_OUT = 'F:\sequences\decoded_figs\MAP_entire_session';
@@ -40,7 +43,7 @@ hax=gca;
 hold on
 if strcmp(epoch_type,'flight')
     pos_ts_IX = interp1(decode.time, 1:length(decode.time), exp.pos.proc_1D.ts, 'previous');
-    plot(pos_ts_IX,exp.pos.proc_1D.pos,'r-','LineWidth',0.5);
+    plot(pos_ts_IX,exp.pos.proc_1D.pos,'r-','LineWidth',0.01);
 end
 clear h
 hax.ColorOrderIndex = 1;
@@ -62,6 +65,11 @@ hl = legend(h,decode.state,'Interpreter','none','Location','northoutside');
 hl.Position = [0.84 0.87 0.1 0.1];
 xlabel('Time (s)')
 ylabel('Position (m)')
+ylimits = [min(decode.pos) max(decode.pos)];
+if range(ylimits)<10
+    ylimits = ylimits + 0.2.*range(ylimits).*[-1 1];
+end
+ylim(ylimits);
 
 % MAP pos hist
 pnl(3,2).select();
@@ -76,6 +84,7 @@ for ii_state = 1:length(decode.state)
 end
 arrayfun(@(y,str)(yline(y,'Color',0.5.*[1 1 1],'LineWidth',0.5)),[exp.LM.pos_proj], string({exp.LM.name}))
 title({decode.epoch_type;'over representation'})
+ylim(ylimits);
 
 % flight error hist
 pnl(3,3).select();
@@ -93,6 +102,8 @@ predict_err_prob = N_error./length(pos_predict);
 barh(bin_centers,predict_err_prob,'r');
 arrayfun(@(y,str)(yline(y,'Color',0.5.*[1 1 1],'LineWidth',0.5)),[exp.LM.pos_proj], string({exp.LM.name}));
 title({decode_flight.epoch_type;'Predict errors'})
+ylim(ylimits);
+
 linkaxes(pnl(3).de.axis,'y')
 
 % -------- ripple power and MUA firing rate

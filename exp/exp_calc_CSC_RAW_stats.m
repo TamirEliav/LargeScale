@@ -13,6 +13,8 @@ if ~isempty(exp.details.refCh)
     csc_file = sprintf('spikes_%s_TT%d_ch%d.ncs',exp_ID,TT,ch);
     csc_file = fullfile(dir_IN,csc_file);
     [csc_ref_ch,~] = Nlx_csc_read(csc_file, limits_ts);
+else
+    csc_ref_ch = nan;
 end
 
 %%
@@ -21,7 +23,7 @@ csc_std = nan(size(exp.details.activeChannels));
 csc_abs_median = nan(size(exp.details.activeChannels));
 csc_reref_std = nan(size(exp.details.activeChannels));
 csc_reref_abs_median = nan(size(exp.details.activeChannels));
-parfor TT = exp.details.TT_to_use
+parfor TT = 1:exp.details.numTT
     for ch = 1:4%size(exp.details.activeChannels,2)
 %         fprintf('TT%d_ch%d\n',TT,ch);
         % load ch data

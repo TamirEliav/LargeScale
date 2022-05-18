@@ -428,8 +428,8 @@ for TT = params.TT_to_use
     unit_labels = {'detected','lib','min sep','Coincidence'};
     unit_numbers = [0 1 2 3];
     features_pairs = [1 2;1 3;1 4;2 3;2 4;3 4];
-    max_points_plot_wvfrm = 2000;
-    max_points_plot_cluster = 50000;
+    max_points_plot_wvfrm = 500;
+    max_points_plot_cluster = 10000;
     max_volt_plot = 500;
     %% waveforms
     fig = figure;

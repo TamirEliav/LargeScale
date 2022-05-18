@@ -1,12 +1,18 @@
 function exp_calc_MUA_FR_map(exp_ID)
 
 %% load data
-exp = exp_load_data(exp_ID,'details','MUA','flight','rest');
+exp = exp_load_data(exp_ID,'details','MUA','flight','flight_6m','rest');
+
+%%
+if isfield(exp,'flight_6m')
+    FE = [exp.flight_6m.FE];
+else
+    FE = [exp.flight.FE];
+    FE([FE.distance]<100)=[];
+end
 
 %% arrange data
 MUA = exp.MUA;
-FE=exp.flight.FE;
-FE([FE.distance]<100)=[];
 FR_during_FE = interp1([MUA.t],[MUA.FR],[FE.ts],'linear','extrap');
 pos = [FE.pos];
 % pos_norm = interp1(exp.rest.balls_loc',[0 1],pos,'linear','extrap');

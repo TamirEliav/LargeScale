@@ -2,7 +2,7 @@ function decoding_prepare_exp_data(exp_ID)
 
 %% get exp info
 dir_out = "F:\sequences\proc";
-exp = exp_load_data(exp_ID,'details','path','pos','flight','rest');
+exp = exp_load_data(exp_ID,'details','path','pos','flight','flight_6m','rest');
 details = exp.details;
 
 %% get sleep ts
@@ -14,6 +14,7 @@ NTT_files = {};
 tt_to_use = ones(1,exp.details.numTT);
 tt_to_use = tt_to_use & ismember(1:exp.details.numTT,exp.details.TT_to_use);
 tt_to_use = tt_to_use & contains(exp.details.TT_loc,{'CA1','CA3'});
+% tt_to_use(11)=false; % TODO: test, remove this line!!!
 tt_to_use_numbers = find(tt_to_use);
 filenames = "spikes_"+exp_ID+"_TT"+tt_to_use_numbers'+".ntt";
 NTT_files = fullfile(exp.path.decoding_spikes_detection,filenames);
@@ -51,17 +52,25 @@ position = interp1(exp.pos.proc_1D.ts, exp.pos.proc_1D.pos, t);
 direction = interp1(exp.pos.proc_1D.ts, sign(exp.pos.proc_1D.vel_csaps), t);
 
 % remove low speed from flight data
-thr_prc = 0.85;
-keep_takeoff_landing = 1;
-balls_loc = exp.rest.balls_loc;
-max_dist_from_ball = 1;
-FE = exp.flight.FE;
-FE = FE([FE.distance] > 100);
+if isfield(exp,'flight')
+    thr_prc = 0.85;
+    keep_takeoff_landing = 1;
+    balls_loc = exp.rest.balls_loc;
+    max_dist_from_ball = 1;
+    FE = exp.flight.FE;
+    FE = FE([FE.distance] > 100);
+elseif isfield(exp,'flight_6m')
+    thr_prc = 0.85;
+    keep_takeoff_landing = 1;
+    balls_loc = exp.rest.balls_loc;
+    max_dist_from_ball = 1;
+    FE = exp.flight_6m.FE;
+    FE = FE([FE.distance] > 1);
+end
 FE_before = FE;
 FE = FE_remove_low_speed(FE,thr_prc,keep_takeoff_landing,balls_loc,max_dist_from_ball);
 FE_after = FE;
 FE_ti = [[FE.start_ts];[FE.end_ts]]';
-FE_dist = [FE.distance];
 
 is_FE = any(t>FE_ti(:,1)&t<FE_ti(:,2),1);
 is_sleep = any(t>sleep_ti(:,1)&t<sleep_ti(:,2),1);
@@ -150,7 +159,6 @@ end
 
 %%
 function FE = FE_remove_low_speed(FE,thr_prc,keep_takeoff_landing,balls_loc,max_dist_from_ball)
-    keep_takeoff_landing = 1;
     for ii_FE = 1:length(FE)
         fe = FE(ii_FE);
         thr = abs(thr_prc * median([fe.vel])); % median of the single flight vel
