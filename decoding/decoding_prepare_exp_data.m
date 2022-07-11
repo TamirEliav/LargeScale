@@ -59,7 +59,9 @@ if isfield(exp,'flight')
     max_dist_from_ball = 1;
     FE = exp.flight.FE;
     FE = FE([FE.distance] > 100);
-elseif isfield(exp,'flight_6m')
+end
+% if 6m data exist, override the 200 data
+if isfield(exp,'flight_6m')
     thr_prc = 0.85;
     keep_takeoff_landing = 1;
     balls_loc = exp.rest.balls_loc;

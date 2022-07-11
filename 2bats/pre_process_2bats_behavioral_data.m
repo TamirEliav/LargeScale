@@ -1,11 +1,12 @@
 %%
+close all
 clear
 clc
 
 %% load data
-behave_dir_IN = 'G:\Tamir\work\PROJECTS\LargeScale\DATA\2299_2299\bat2299_behavioral_data_from_shaked\';
-out_dir = 'G:\Tamir\work\PROJECTS\LargeScale\DATA\2299_2299\processed_data_adjusted';
-files = dir(fullfile(behave_dir_IN,'*.mat'));
+behave_dir_IN = 'L:\2bats\bat2299_behavioral_data_from_shaked\';
+out_dir = 'L:\2bats\processed_data_adjusted\';
+files = dir(fullfile(behave_dir_IN,'*2299*.mat'));
 varNames = {'exp_ID','session_names','session_ts'};
 varTypes = {'string','string','string'};
 T = table('Size',[length(files) length(varNames)], 'VariableNames',varNames,'VariableTypes',varTypes);
@@ -46,15 +47,27 @@ for ii_file = 1:length(files)
     pos.proc_1D.vel_csaps(isnan(pos.proc_1D.pos)) = nan;
 
     % cross-overs
-    co_ts = cat(1,b.co{:});
+    co_ts = cat(1,b.co.ts);
     [co_ts, co_sort_IX] = sort(co_ts,'ascend');
     co_pos = interp1(b.bsp(1).ts_synced, b.bsp(1).pos_upsampled(1,:), co_ts, 'linear','extrap');
-    g = arrayfun(@(x,d)(d.*ones(1,length(x{:}))),b.co,1:length(b.co),'UniformOutput',false);
-    g = [g{:}];
-    g = g(co_sort_IX);
+    gDir = arrayfun(@(co,d)(d.*ones(1,length(co.ts))),b.co,1:length(b.co),'UniformOutput',false);
+    gDir = [gDir{:}];
+    gDir = gDir(co_sort_IX);
+    if ~isfield(b.co,'click_rate_attention_range')
+        for ii_dir = 1:length(b.co)
+            b.co(ii_dir).click_rate_attention_range = nan(size(b.co(ii_dir).ts));
+            b.co(ii_dir).excluded_from_audio_analysis = ones(size(b.co(ii_dir).ts));
+        end
+    end
+    co_click_rate = cat(1,b.co.click_rate_attention_range);
+    co_click_rate = co_click_rate(co_sort_IX);
+    co_excluded_from_audio_analysis = cat(1,b.co.excluded_from_audio_analysis);
+    co_excluded_from_audio_analysis = co_excluded_from_audio_analysis(co_sort_IX);
     pos.proc_1D.co.ts = co_ts;
     pos.proc_1D.co.pos = co_pos;
-    pos.proc_1D.co.direction = g;
+    pos.proc_1D.co.direction = gDir';
+    pos.proc_1D.co.click_rate = co_click_rate;
+    pos.proc_1D.co.excluded_from_audio_analysis = co_excluded_from_audio_analysis;
     
     bsp = b.bsp(find(~[b.bsp.self]));
     pos.proc_1D.other.pos = bsp.pos_upsampled;
@@ -84,10 +97,10 @@ load('G:\Tamir\work\PROJECTS\LargeScale\DATA\2299_2299\bat2299_behavioral_data_f
 co_ts = cat(1,b.co{:});
 [co_ts co_sort_IX] = sort(co_ts,'ascend');
 co_pos = interp1(b.bsp(1).ts_synced, b.bsp(1).pos_upsampled(1,:), co_ts, 'linear','extrap');
-g = arrayfun(@(x,d)(d.*ones(1,length(x{:}))),b.co,1:length(b.co),'UniformOutput',false);
-g = [g{:}];
-g = g(co_sort_IX);
-co_clrs = interp1([1 2],[1 0 0; 0 0 1],g,'linear');
+gDir = arrayfun(@(x,d)(d.*ones(1,length(x{:}))),b.co,1:length(b.co),'UniformOutput',false);
+gDir = [gDir{:}];
+gDir = gDir(co_sort_IX);
+co_clrs = interp1([1 2],[1 0 0; 0 0 1],gDir,'linear');
 sessions_name = {b.events.session};
 sessions_ti = [b.events.start_time;b.events.end_time]';
 
