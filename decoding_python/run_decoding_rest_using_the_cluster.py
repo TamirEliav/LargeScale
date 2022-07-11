@@ -15,7 +15,7 @@ from argparse import Namespace
 
 #%%
 paramsets = [
-    Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=1),
+    Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=1),     # 1
     Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=10),
     Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=20),
     Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=40),
@@ -23,14 +23,143 @@ paramsets = [
     Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=160),
     Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=200),
     
-    Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=1),
+    Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=1),     # 8
     Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=10),
     Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=20),
     Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=40),
     Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=80),
     Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=160),
     Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=200),
+
+
+    Namespace(pos_bin_size = 0.2, pos_std = 0.4, mark_std = 20.0, state_decay_timescale = 0.1, replay_speed=40),   # 15
+    Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 20.0, state_decay_timescale = 0.5, replay_speed=40),
+    Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 20.0, state_decay_timescale = 1.0, replay_speed=40),
+    Namespace(pos_bin_size = 0.3, pos_std = 0.3, mark_std = 20.0, state_decay_timescale = 1.0, replay_speed=40),
+    Namespace(pos_bin_size = 0.4, pos_std = 0.4, mark_std = 20.0, state_decay_timescale = 1.0, replay_speed=40),
+    Namespace(pos_bin_size = 0.5, pos_std = 0.5, mark_std = 20.0, state_decay_timescale = 1.0, replay_speed=40), # 20
     ]
+
+
+#%% 
+exp_ID_list = [
+    # 'b0034_d180312',
+    # 'b0034_d180313',
+    # 'b0148_d170606',
+    # 'b0148_d170613',
+    # 'b0148_d170614',
+    # 'b0148_d170619',
+    # 'b0148_d170620',
+    # 'b0148_d170621',
+    # 'b0148_d170622',
+    # 'b0148_d170625',
+    # 'b0148_d170626',
+    # 'b0148_d170627',
+    # 'b0148_d170628',
+    # 'b0148_d170703',
+    # 'b0148_d170718',
+    # 'b0148_d170720',
+    # 'b0148_d170802',
+    # 'b2289_d180518',
+    # 'b9861_d180524',
+    # 'b9861_d180525',
+    # 'b9861_d180526',
+    # 'b9861_d180527',
+    # 'b0184_d191129',
+    # 'b0184_d191130',
+    # 'b0184_d191201',
+    # 'b0184_d191202',
+    # 'b0184_d191203',
+    # 'b0184_d191204',
+    # 'b0184_d191205',
+    # 'b0184_d191208',
+    # 'b0184_d191209',
+    # 'b0184_d191210',
+    # 'b0184_d191211',
+    # 'b0184_d191212',
+    # 'b0184_d191215',
+    # 'b0184_d191216',
+    # 'b0184_d191220',
+    # 'b0184_d191225',
+    # 'b0184_d200102',
+    
+    # 'b2382_d190620',
+    # 'b2382_d190623',
+    # 'b2382_d190624',
+    # 'b2382_d190627',
+    # 'b2382_d190703',
+    # 'b2382_d190709',
+    # 'b2382_d190712',
+    # 'b2382_d190714',
+    # 'b2382_d190715',
+    # 'b2382_d190716',
+    # 'b2382_d190718',
+    # 'b2382_d190721',
+    # 'b2382_d190722',
+    # 'b2382_d190725',
+    # 'b2382_d190728',
+    # 'b2382_d190729',
+    # 'b2382_d190730',
+    # 'b2382_d190731',
+    # 'b2382_d190801',
+    # 'b2382_d190804',
+    # 'b2382_d190805',
+    # 'b2382_d190807',
+    # 'b2382_d190808',
+    # 'b2382_d190811',
+    # 'b2382_d190812',
+    # 'b2382_d190813',
+    # 'b2382_d190814', # this has a very long rest epoch (number 4), need to run seperately with more memory/cores/CPU-time
+    # 'b0194_d180503',
+    # 'b0194_d180505',
+    # 'b0194_d180507',
+    # 'b0194_d180508',
+    # 'b0194_d180509',
+    # 'b0194_d180510',
+    # 'b0194_d180513',
+    # 'b0194_d180514',
+    # 'b0194_d180515',
+    # 'b0194_d180516',
+    # 'b0194_d180520',
+    # 'b0194_d180521',
+    # 'b0194_d180604',
+    # 'b0194_d180605',
+    # 'b0194_d180606',
+    # 'b0194_d180612',
+    # 'b0194_d180614',    
+    
+    # 'b2299_d191124',
+    # 'b2299_d191125',
+    # 'b2299_d191126',
+    # 'b2299_d191127',
+    # 'b2299_d191128',
+    # 'b2299_d191201',
+    # 'b2299_d191202',
+    # 'b2299_d191203',
+    # 'b2299_d191204',
+    # 'b2299_d191205',
+    # 'b2299_d191208',
+    # 'b2299_d191209',
+    # 'b2299_d191210',
+    # 'b2299_d191211',
+    # 'b2299_d191212',
+    # 'b2299_d191213',
+    
+    # 6m
+    'b0184_d191124',
+    'b0184_d191125',
+    'b0184_d191126',
+    'b0184_d191127',
+    
+    ]
+
+# opt_params_list = [8,9,10,11,12,13,14]
+# opt_params_list = [11]
+# opt_params_list = [15]
+opt_params_list = [19,20]
+# opt_params_list = [16,17]
+# opt_params_list = [25]
+# opt_params_list = [8,9,10,12,13,14]
 
 #%%
 def get_epochs_to_decode(exp_ID,opt_params):
@@ -71,16 +200,21 @@ def create_job_submission_str(exp_ID, opt_params, epochs_to_decode, folder):
         )
     # bsub options
     queue_name = 'new-short'
+    # queue_name = 'new-medium'
     # memory_usage = 4096
     memory_usage = 16384
+    # memory_usage = 65536
+    # memory_usage = 8192
     # num_cores = 1
+    # NUMBA_NUM_THREADS = 8
     NUMBA_NUM_THREADS = 16
+    # NUMBA_NUM_THREADS = 32
     wall_time = '01:00'
     # job_slot_limit = 30
     job_list_str = str(epochs_to_decode).replace(' ','')
     bsub_opts = (
         f' -q {queue_name}'
-        f' -J jobs{job_list_str}'
+        f' -J rest_{exp_ID}{job_list_str}'
         # f' -J jobs{job_list_str}%{job_slot_limit}'
         f' -R rusage[mem={memory_usage}]'
         # f' -n {num_cores} -R "span[hosts=1]"'
@@ -119,7 +253,11 @@ def main():
     parser = argparse.ArgumentParser(description='decode during a specific rest epoch')
     parser.add_argument("-e", "--exp_ID", dest='exp_ID', type=str, nargs="+", default=['b9861_d180527'], help="exp_ID")
     parser.add_argument("-o", "--opt_params", dest='opt_params', type=int, nargs="+", default=[1], help="Decoding paramset opt(s)")
+    parser.add_argument("--use_lists_in_code", dest='use_lists_in_code', type=int, default=0, help="Use exp/parrams list from code (0/1)")
     args = parser.parse_args()
+    if args.use_lists_in_code:
+        args.exp_ID = exp_ID_list
+        args.opt_params = opt_params_list
     for arg in vars(args):
         print(arg, ':', getattr(args, arg))
     

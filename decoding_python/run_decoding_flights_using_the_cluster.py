@@ -15,21 +15,36 @@ from argparse import Namespace
 
 #%%
 paramsets = [
-    Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 15.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 15.0, state_decay_timescale = 2.0, replay_speed=1), # 1
     Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 15.0, state_decay_timescale = 2.0, replay_speed=1),
     Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 20.0, state_decay_timescale = 2.0, replay_speed=1),
     Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 20.0, state_decay_timescale = 2.0, replay_speed=1),
-    Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 25.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.5, pos_std = 1.0, mark_std = 25.0, state_decay_timescale = 2.0, replay_speed=1), # 5
     Namespace(pos_bin_size = 1.0, pos_std = 2.0, mark_std = 25.0, state_decay_timescale = 2.0, replay_speed=1),
     Namespace(pos_bin_size = 0.2, pos_std = 0.4, mark_std = 15.0, state_decay_timescale = 2.0, replay_speed=1),
     Namespace(pos_bin_size = 0.2, pos_std = 0.4, mark_std = 20.0, state_decay_timescale = 2.0, replay_speed=1),
     Namespace(pos_bin_size = 0.2, pos_std = 0.4, mark_std = 25.0, state_decay_timescale = 2.0, replay_speed=1),
     
-    Namespace(pos_bin_size = 0.2, pos_std = 0.4, mark_std = 20.0, state_decay_timescale = 4.0, replay_speed=40),
+    Namespace(pos_bin_size = 0.20, pos_std = 0.4, mark_std = 20.0, state_decay_timescale = 4.0, replay_speed=40),  # 10
+    Namespace(pos_bin_size = 0.20, pos_std = 0.4, mark_std = 20.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.10, pos_std = 0.2, mark_std = 20.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.05, pos_std = 0.2, mark_std = 20.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.05, pos_std = 0.4, mark_std = 20.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.05, pos_std = 0.1, mark_std = 20.0, state_decay_timescale = 2.0, replay_speed=1), # 15
+    Namespace(pos_bin_size = 0.05, pos_std = 0.1, mark_std = 15.0, state_decay_timescale = 2.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.05, pos_std = 0.1, mark_std = 15.0, state_decay_timescale = 0.5, replay_speed=1),
+    Namespace(pos_bin_size = 0.3, pos_std = 0.3, mark_std = 20.0, state_decay_timescale = 1.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.4, pos_std = 0.4, mark_std = 20.0, state_decay_timescale = 1.0, replay_speed=1),
+    Namespace(pos_bin_size = 0.5, pos_std = 0.5, mark_std = 20.0, state_decay_timescale = 1.0, replay_speed=1), # 20
+    Namespace(pos_bin_size = 1.0, pos_std = 1.0, mark_std = 20.0, state_decay_timescale = 1.0, replay_speed=1),
     ]
 
 #%% 
 exp_ID_list = [
+    # 'b0184_d191124',
+    # 'b0184_d191125',
+    # 'b0184_d191126',
+    'b0184_d191127',
     # 'b0184_d191128',
     # 'b0184_d191129',
     # 'b0184_d191130',
@@ -150,44 +165,162 @@ exp_ID_list = [
     # 'b0079_d161004',
     # 'b0079_d161005',
 
-    'b0148_d170606',
-    'b0148_d170607',
-    'b0148_d170608',
-    'b0148_d170611',
-    'b0148_d170612',
-    'b0148_d170613',
-    'b0148_d170614',
-    'b0148_d170615',
-    'b0148_d170618',
-    'b0148_d170619',
-    'b0148_d170620',
-    'b0148_d170621',
-    'b0148_d170622',
-    'b0148_d170625',
-    'b0148_d170626',
-    'b0148_d170627',
-    'b0148_d170628',
-    'b0148_d170703',
-    'b0148_d170704',
-    'b0148_d170705',
-    'b0148_d170710',
-    'b0148_d170711',
-    'b0148_d170712',
-    'b0148_d170713',
-    'b0148_d170716',
-    'b0148_d170717',
-    'b0148_d170718',
-    'b0148_d170720',
-    'b0148_d170723',
-    'b0148_d170801',
-    'b0148_d170802',
-    'b0148_d170803',
-    'b0148_d170806',
-    'b0148_d170807',
+    # 'b0148_d170606',
+    # 'b0148_d170607',
+    # 'b0148_d170608',
+    # 'b0148_d170611',
+    # 'b0148_d170612',
+    # 'b0148_d170613',
+    # 'b0148_d170614',
+    # 'b0148_d170615',
+    # 'b0148_d170618',
+    # 'b0148_d170619',
+    # 'b0148_d170620',
+    # 'b0148_d170621',
+    # 'b0148_d170622',
+    # 'b0148_d170625',
+    # 'b0148_d170626',
+    # 'b0148_d170627',
+    # 'b0148_d170628',
+    # 'b0148_d170703',
+    # 'b0148_d170704',
+    # 'b0148_d170705',
+    # 'b0148_d170710',
+    # 'b0148_d170711',
+    # 'b0148_d170712',
+    # 'b0148_d170713',
+    # 'b0148_d170716',
+    # 'b0148_d170717',
+    # 'b0148_d170718',
+    # 'b0148_d170720',
+    # 'b0148_d170723',
+    # 'b0148_d170801',
+    # 'b0148_d170802',
+    # 'b0148_d170803',
+    # 'b0148_d170806',
+    # 'b0148_d170807',
+    
+    # 'b2382_d190619',
+    # 'b2382_d190620',
+    # 'b2382_d190623',
+    # 'b2382_d190624',
+    # 'b2382_d190625',
+    # 'b2382_d190627',
+    # 'b2382_d190628',
+    # 'b2382_d190630',
+    # 'b2382_d190701',
+    # 'b2382_d190703',
+    # 'b2382_d190707',
+    # 'b2382_d190708',
+    # 'b2382_d190709',
+    # 'b2382_d190712',
+    # 'b2382_d190714',
+    # 'b2382_d190715',
+    # 'b2382_d190716',
+    # 'b2382_d190718',
+    # 'b2382_d190721',
+    # 'b2382_d190722',
+    # 'b2382_d190724',
+    # 'b2382_d190725',
+    # 'b2382_d190728',
+    # 'b2382_d190729',
+    # 'b2382_d190730',
+    # 'b2382_d190731',
+    # 'b2382_d190801',
+    # 'b2382_d190804',
+    # 'b2382_d190805',
+    # 'b2382_d190807',
+    # 'b2382_d190808',
+    # 'b2382_d190811',
+    # 'b2382_d190812',
+    # 'b2382_d190813',
+    # 'b2382_d190814',
 
+    # # 'b0194_d180429', % need to pre-process the data for this day
+    # 'b0194_d180501',
+    # 'b0194_d180502',
+    # 'b0194_d180503',
+    # 'b0194_d180505',
+    # 'b0194_d180507',
+    # 'b0194_d180508',
+    # 'b0194_d180509',
+    # 'b0194_d180510',
+    # 'b0194_d180513',
+    # 'b0194_d180514',
+    # 'b0194_d180515',
+    # 'b0194_d180516',
+    # 'b0194_d180520',
+    # 'b0194_d180521',
+    # 'b0194_d180522',
+    # 'b0194_d180528',
+    # 'b0194_d180531',
+    # 'b0194_d180604',
+    # 'b0194_d180605',
+    # 'b0194_d180606',
+    # 'b0194_d180607',
+    # 'b0194_d180610',
+    # 'b0194_d180611',
+    # 'b0194_d180612',
+    # 'b0194_d180614',
+
+    # 'b2311_d191218',
+    # 'b2311_d191219',
+    # 'b2311_d191220',
+    # 'b2311_d191222',
+    # 'b2311_d191223',
+    # 'b2311_d191224',
+    # 'b2311_d191225',
+    # 'b2311_d191226',
+    # 'b2311_d191229',
+    # 'b2311_d191230',
+    # 'b2311_d191231',
+    # 'b2311_d200101',
+    # 'b2311_d200102',
+    
+    # 'b9845_d170212',
+    # 'b9845_d170215',
+    # 'b9845_d170216',
+    # 'b9845_d170217',
+    # 'b9845_d170219',
+    # 'b9845_d170220',
+    # 'b9845_d170221',
+    # 'b9845_d170222',
+    # 'b9845_d170223',
+    # 'b9845_d170516',
+    # 'b9845_d170517',
+    # 'b9845_d170518',
+    # 'b9845_d170525',
+    # 'b9845_d170527',
+    # 'b9845_d170528',
+    # 'b9845_d170529',
+    # 'b9845_d170603',
+    # 'b9845_d170605',
+    # 'b9845_d170606',
+    # 'b9845_d170612',
+    # 'b9845_d170614',
+    # 'b9845_d170622',
+    
+    # 'b2299_d191124',
+    # 'b2299_d191125',
+    # 'b2299_d191126',
+    # 'b2299_d191127',
+    # 'b2299_d191128',
+    # 'b2299_d191201',
+    # 'b2299_d191202',
+    # 'b2299_d191203',
+    # 'b2299_d191204',
+    # 'b2299_d191205',
+    # 'b2299_d191208',
+    # 'b2299_d191209',
+    # 'b2299_d191210',
+    # 'b2299_d191211',
+    # 'b2299_d191212',
+    # 'b2299_d191213',
+    
     ]
 
-opt_params_list = [4]
+# opt_params_list = [4]
+opt_params_list = [11,12,13,14,15,16,17,18,19,20,21]
 
 #%%
 def get_flights_to_decode(exp_ID,opt_params):
@@ -228,9 +361,10 @@ def create_job_submission_str(exp_ID, opt_params, flights_to_decode, folder):
         )
     # bsub options
     queue_name = 'new-short'
-    memory_usage = 8192
+    # memory_usage = 8192
+    memory_usage = 16384
     NUMBA_NUM_THREADS = 16
-    wall_time = '02:00'
+    wall_time = '00:10'
     job_list_str = str(flights_to_decode).replace(' ','')
     bsub_opts = (
         f' -q {queue_name}'
@@ -273,7 +407,7 @@ def main():
     parser = argparse.ArgumentParser(description='decode during a specific flight')
     parser.add_argument("--exp_ID", dest='exp_ID', type=str, nargs="+", default=['b9861_d180527'], help="exp_ID")
     parser.add_argument("--opt_params", dest='opt_params', type=int, nargs="+", default=[1], help="Decoding paramset opt(s)")
-    parser.add_argument("--use_lists_in_code", dest='use_lists_in_code', type=int, default=[0], help="Use exp/parrams list from code (0/1)")
+    parser.add_argument("--use_lists_in_code", dest='use_lists_in_code', type=int, default=0, help="Use exp/parrams list from code (0/1)")
     # parser.add_argument("--queue_name", dest='queue_name', type=str, default="new-short", help="which queue to use")
     args = parser.parse_args()
     if args.use_lists_in_code:
