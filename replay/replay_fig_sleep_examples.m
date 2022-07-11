@@ -91,12 +91,27 @@ examples_list = [
     struct('exp_ID','b0184_d191208', 'epoch_type','sleep', 'event_num',70),
     struct('exp_ID','b0184_d191209', 'epoch_type','sleep', 'event_num',78),
     struct('exp_ID','b9861_d180526', 'epoch_type','sleep', 'event_num',49),
+
+    struct('exp_ID','b0184_d191130', 'epoch_type','rest', 'event_num',204),
+    struct('exp_ID','b0184_d191202', 'epoch_type','rest', 'event_num',171),
+    struct('exp_ID','b0184_d191202', 'epoch_type','rest', 'event_num',184),
+    struct('exp_ID','b0184_d191202', 'epoch_type','rest', 'event_num',198),
+    struct('exp_ID','b0184_d191203', 'epoch_type','rest', 'event_num',100),
+    struct('exp_ID','b0184_d191203', 'epoch_type','rest', 'event_num',123),
+    struct('exp_ID','b0184_d191203', 'epoch_type','rest', 'event_num',135),
+    struct('exp_ID','b0184_d191203', 'epoch_type','rest', 'event_num',204),
+    struct('exp_ID','b0184_d191203', 'epoch_type','rest', 'event_num',214),
+    struct('exp_ID','b0184_d191203', 'epoch_type','rest', 'event_num',199),
+    struct('exp_ID','b0184_d191203', 'epoch_type','rest', 'event_num',202),
+    struct('exp_ID','b0184_d191204', 'epoch_type','rest', 'event_num',109),
+    struct('exp_ID','b0184_d191208', 'epoch_type','rest', 'event_num',13),
     ];
 % examples_IX = [1:9];
 % examples_IX = [10:18];
 % examples_IX = [1 3 4 6 14 8 9 13 18];
 % examples_IX = [1 4 6 7 8 11 12 14 18];
 examples_IX = [1 4 6 13 8 11 12 14 18]; % chosen examples
+examples_IX = [23:31]; % rest examples 
 examples_list = examples_list(examples_IX);
 
 %%
@@ -117,7 +132,7 @@ for ii_example = 1:size(panel_A,1)
     exp_ID = examples_list(ii_example).exp_ID;
     epoch_type = examples_list(ii_example).epoch_type;
     event_num = examples_list(ii_example).event_num;
-    decode = decoding_load_data(exp_ID, 'sleep', 11);
+    decode = decoding_load_data(exp_ID, epoch_type, 11);
     exp = exp_load_data(exp_ID,'details','path','MUA','ripples');
     TT = exp.ripples.stats.best_TT;
     [LFP.signal, LFP.ts, LFP.fs, LFP.params] = LFP_load(exp_ID,TT,'band','ripple');

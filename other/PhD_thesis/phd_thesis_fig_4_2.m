@@ -8,7 +8,7 @@ clc
 %% plotting options
 
 %% define output files
-res_dir = 'E:\Tamir\PhD\Thesis\resources\ch_4_seq';
+res_dir = 'E:\Tamir\work\PhD\Thesis\resources\ch_4_seq';
 mkdir(res_dir)
 fig_name_str = 'Fig_5_2_replay_examples';
 fig_caption_str = ' ';

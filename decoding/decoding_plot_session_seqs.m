@@ -107,15 +107,18 @@ rescale_plot_data('x',[1e-6 xlimits(1)]);
 % marginal
 ax(2)=axes('Units','normalized','Position',[.9 .05 .09 .85]);
 hold on
-seqs_edges = [seqs.start_pos; seqs.end_pos];
-seqs_edges = [min(seqs_edges ); max(seqs_edges )]';
-x = linspace(exp.rest.balls_loc(1),exp.rest.balls_loc(2),200);
-[~,~,~,x_per_seq] = get_data_in_ti(x,seqs_edges);
-clear hh
-hh(1)=histogram([x_per_seq{[seqs.state_direction]==1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(2,:));
-hold on
-hh(2)=histogram([x_per_seq{[seqs.state_direction]==-1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(1,:));
+if ~isempty(seqs)
+    seqs_edges = [seqs.start_pos; seqs.end_pos];
+    seqs_edges = [min(seqs_edges ); max(seqs_edges )]';
+    x = linspace(exp.rest.balls_loc(1),exp.rest.balls_loc(2),200);
+    [~,~,~,x_per_seq] = get_data_in_ti(x,seqs_edges);
+    clear hh
+    hh(1)=histogram([x_per_seq{[seqs.state_direction]==1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(2,:));
+    hold on
+    hh(2)=histogram([x_per_seq{[seqs.state_direction]==-1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(1,:));
+end
 hax=gca;
+hold on
 m = hax.XLim(2) / max(exp.MUA_FR_map.maps,[],"all");
 plot(exp.MUA_FR_map.maps(1,:).*m, exp.MUA_FR_map.bin_centers, ':', 'Color',clrs(2,:),'LineWidth',1);
 plot(exp.MUA_FR_map.maps(2,:).*m, exp.MUA_FR_map.bin_centers, ':', 'Color',clrs(1,:),'LineWidth',1);
@@ -227,14 +230,17 @@ for ii_epoch = 1:n_epochs
 
     % marginal
     pnl(2,ii_epoch).select()
-    seqs_edges = [seqs_epoch.start_pos; seqs_epoch.end_pos];
-    seqs_edges = [min(seqs_edges ); max(seqs_edges )]';
-    x = linspace(exp.rest.balls_loc(1),exp.rest.balls_loc(2),200);
-    [~,~,~,x_per_seq] = get_data_in_ti(x,seqs_edges);
-    histogram([x_per_seq{[seqs_epoch.state_direction]==1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(2,:));
-    hold on
-    histogram([x_per_seq{[seqs_epoch.state_direction]==-1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(1,:));
+    if ~isempty(seqs_epoch)
+        seqs_edges = [seqs_epoch.start_pos; seqs_epoch.end_pos];
+        seqs_edges = [min(seqs_edges ); max(seqs_edges )]';
+        x = linspace(exp.rest.balls_loc(1),exp.rest.balls_loc(2),200);
+        [~,~,~,x_per_seq] = get_data_in_ti(x,seqs_edges);
+        histogram([x_per_seq{[seqs_epoch.state_direction]==1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(2,:));
+        hold on
+        histogram([x_per_seq{[seqs_epoch.state_direction]==-1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(1,:));
+    end
     hax=gca;
+    hold on
     m = hax.XLim(2) / max(exp.MUA_FR_map.maps,[],"all");
     plot(exp.MUA_FR_map.maps(1,:).*m, exp.MUA_FR_map.bin_centers, ':', 'Color',clrs(2,:),'LineWidth',1);
     plot(exp.MUA_FR_map.maps(2,:).*m, exp.MUA_FR_map.bin_centers, ':', 'Color',clrs(1,:),'LineWidth',1);

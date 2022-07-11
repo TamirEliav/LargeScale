@@ -99,5 +99,6 @@ fig_name_out = fullfile(res_dir, fig_name_str);
 saveas(fig,fig_name_out,'pdf');
 saveas(fig,fig_name_out,'jpeg');
 disp('figure was successfully saved to pdf/tiff/fig formats');
+close(fig)
 
 
