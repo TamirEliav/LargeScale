@@ -52,14 +52,20 @@ disp('-------------------------------------------------------------------')
 % whos exp_t 
 
 %% load exp summary and choose exps - preproc 2bats data
-exp_t = DS_get_exp_summary();
+% exp_t = DS_get_exp_summary();
 % exp_t(~ismember(exp_t.batNum, [2336] ),:) = []; % Ayelet
-exp_t(~ismember(exp_t.batNum, [2299] ),:) = []; % shaked
+% exp_t(~ismember(exp_t.batNum, [2299] ),:) = []; % shaked
 % exp_t = exp_t([end-[3 1 0]],:);
-% exp_t(~ismember(exp_t.batNum, [2382] ),:) = []; % shir
 % exp_t(exp_t.date > datetime('20/06/2019','InputFormat','dd/MM/yyyy'),:) = [];
 % exp_t(exp_t.date < datetime('19/06/2019','InputFormat','dd/MM/yyyy'),:) = [];
 % exp_t = flip(exp_t);
+
+%% replay - 82 days inclusion list
+[exp_list,exp_t] = decoding_get_inclusion_list();
+exp_t = exp_t(exp_list,:);
+exp_t(ismember(exp_t.bat_num, [2382] ),:) = [];
+
+%%
 exp_t 
 whos exp_t 
 
@@ -149,8 +155,9 @@ try
     epoch_type = 'rest';
 %     params_opts = [8:14];
 %     params_opts = [11];
-    params_opts = [16 17]; % longer state time decay
+%     params_opts = [16 17]; % longer state time decay
 %     params_opts = [18 19 20]; % best bin sizes for 6m
+    params_opts = [21]; % random_walk (instead of empirical_speed), all other params as in opt 11
 %     event_type = 'PE';
     event_type = 'posterior';
     flight_decoding_param_opt = 4; % best for 200/120m
@@ -162,7 +169,7 @@ try
         decoding_detect_posterior_events(decode);
         decoding_seq_quantify(decode, event_type);
         decoding_seq_quantify_add_info(exp_ID, epoch_type, params_opt , event_type);
-% %         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type); 
+        decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type); 
         decoding_plot_PE_posterior(decode, event_type);
         decoding_plot_session_seqs(exp_ID, epoch_type, params_opt, event_type);
 %         decoding_xcorr_ripples_MUA_PE_vs_posterior_events(decode);

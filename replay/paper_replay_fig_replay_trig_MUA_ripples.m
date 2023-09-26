@@ -7,7 +7,7 @@ clc
 
 %% options
 % bats_to_include = [34 9861];
-win = 2; % in seconds
+win = 10; % in seconds
 
 %% define output files
 res_dir =  'L:\paper_replay\figures\';
@@ -78,6 +78,13 @@ shadedErrorBar(t, data_sleep.triggered_zpripple_cat, {@nanmean,@nansem},'linepro
 shadedErrorBar(t, data_rest.triggered_zpripple_cat, {@nanmean,@nansem},'lineprops',{'b-'});
 xlabel('Time from replay (s)')
 ylabel('Ripple power (z)')
+hax=gca;
+ch = hax.Children;
+m1 = min(cat(1,ch([4 8]).YData));
+m2 = max(cat(1,ch([4 8]).YData));
+m = [m1 m2];
+hax.YLim(1) = m1 - 0.025*range(m);
+hax.YLim(2) = m2 + 0.025*range(m);
 
 %% event-triggered MUA
 axes(panels(2))
@@ -88,6 +95,13 @@ shadedErrorBar(t, data_sleep.triggered_MUA_zFR_cat, {@nanmean,@nansem},'lineprop
 shadedErrorBar(t, data_rest.triggered_MUA_zFR_cat, {@nanmean,@nansem},'lineprops',{'b-'});
 xlabel('Time from replay (s)')
 ylabel('MUA firing rate (z)')
+hax=gca;
+ch = hax.Children;
+m1 = min(cat(1,ch([4 8]).YData));
+m2 = max(cat(1,ch([4 8]).YData));
+m = [m1 m2];
+hax.YLim(1) = m1 - 0.025*range(m);
+hax.YLim(2) = m2 + 0.025*range(m);
 
 %%
 % axes(panel_legend)
@@ -206,7 +220,7 @@ else
     bats_str = 'bats_all';
 end
 
-fig_name_out = fullfile(res_dir, sprintf('%s_%s_%s',fig_name_str, epoch_type, bats_str));
+fig_name_out = fullfile(res_dir, sprintf('%s_%dms_%s',fig_name_str, win*1e3, bats_str));
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 disp('figure was successfully saved to pdf/tiff/fig formats');
 diary off
@@ -238,7 +252,7 @@ seqs_all = [];
 for ii_exp = 1:height(T)
     %% load exp data
     exp_ID = T.exp_ID{ii_exp};
-    exp = exp_load_data(exp_ID,'details','path','ripples','MUA','PE');
+    exp = exp_load_data(exp_ID,'details','path','ripples','MUA','PE','rest');
     [events, params] = decoding_load_events_quantification(exp_ID, epoch_type, params_opt, 'posterior');
     if isempty(events)
         continue;
@@ -256,10 +270,23 @@ for ii_exp = 1:height(T)
     %% trigger signals (ripples/MUA) around posterior events
     win_samples = round(win*exp.ripples.fs);
     trigger_IX = interp1(exp.ripples.t, 1:length(exp.ripples.t), [seqs.ts], 'nearest');
-    triggered_zpripple_all{ii_exp} = trigger_signal_by_IX(exp.ripples.zpripple', trigger_IX, win_samples);
+    signal = exp.ripples.zpripple';
+    if epoch_type == "rest"
+        is_rest = any(exp.ripples.t>exp.rest.ti(:,1)&exp.ripples.t<exp.rest.ti(:,2),1);
+        signal(~is_rest) = nan;
+        signal = (signal-nanmean(signal)) ./ nanstd(signal);
+    end
+    triggered_zpripple_all{ii_exp} = trigger_signal_by_IX(signal, trigger_IX, win_samples);
+    
     win_samples = round(win*exp.MUA.fs);
     trigger_IX = interp1(exp.MUA.t, 1:length(exp.MUA.t), [seqs.ts], 'nearest');
-    triggered_MUA_zFR_all{ii_exp} = trigger_signal_by_IX(exp.MUA.zFR, trigger_IX, win_samples);
+    signal = exp.MUA.zFR;
+    if epoch_type == "rest"
+        is_rest = any(exp.MUA.t>exp.rest.ti(:,1)&exp.MUA.t<exp.rest.ti(:,2),1);
+        signal(~is_rest) = nan;
+        signal = (signal-nanmean(signal)) ./ nanstd(signal);
+    end
+    triggered_MUA_zFR_all{ii_exp} = trigger_signal_by_IX(signal, trigger_IX, win_samples);
 
     %% events xcorr (posterior vs ripples)
     t1 = [seqs.ts];

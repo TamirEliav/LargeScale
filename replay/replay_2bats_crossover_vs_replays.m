@@ -1,7 +1,7 @@
 %%
 clear
 clc
-% close all
+close all
 
 %% params
 epoch_type = 'rest';
@@ -15,6 +15,8 @@ features_fn = {
     'forward',
     'g_exp_ID',
     'prev_co_click_rate',
+    'prev_co_time_diff',
+    'prev_co_same_map',
     };
 
 %% choose exp days for 2 bats with good behavioral decoding
@@ -33,6 +35,7 @@ exp_list = {
     'b2299_d191213',
     }
 
+
 %% load data
 events_all_sessions = {};
 for ii_exp = 1:length(exp_list)
@@ -41,17 +44,21 @@ for ii_exp = 1:length(exp_list)
     exp_ID = exp_list{ii_exp};
     exp = exp_load_data(exp_ID, 'details', 'pos');
     [events, params]= decoding_load_events_quantification(exp_ID, epoch_type, params_opt, event_type);
-    [~, TF] = decoding_apply_seq_inclusion_criteria([events.seq_model]);
+    [seqs, TF] = decoding_apply_seq_inclusion_criteria([events.seq_model]);
     events(~TF)=[];
     co = exp.pos.proc_1D.co;
     prev_co_IX = interp1(co.ts, 1:length(co.ts), [events.peak_ts], "previous","extrap");
     prev_co_invalid = isnan(prev_co_IX);
     prev_co_IX(prev_co_invalid)=1; % workaround because matlab don't allow using nan as index, we will remove those invalid events at the end
+    prev_co_ts = co.ts(prev_co_IX);
+    prev_co_direction = co.direction(prev_co_IX);
+    prev_co_direction(prev_co_direction==2)=-1;
+    [events.prev_co_time_diff] = disperse(([events.peak_ts] - prev_co_ts').*1e-6);
+    [events.prev_co_same_map] = disperse(prev_co_direction'==[seqs.state_direction]);
     [events.prev_co_pos] = disperse(co.pos(prev_co_IX));
     [events.prev_co_direction] = disperse(co.direction(prev_co_IX));
     [events.prev_co_click_rate] = disperse(co.click_rate(prev_co_IX));
     [events.prev_co_excluded_from_audio_analysis] = disperse(co.excluded_from_audio_analysis(prev_co_IX));
-%     [events.prev_co_pos] = disperse(interp1(co.ts, co.pos, [events.peak_ts], "previous"));
     [events.exp_ID] = deal(exp_ID);
     events(prev_co_invalid)=[];
     events_all_sessions{ii_exp} = events;
@@ -64,6 +71,8 @@ events_all = [events_all_sessions{:}];
 seqs_all = [events_all.seq_model];
 [seqs_all.g_exp_ID] = disperse(findgroups({events_all.exp_ID}));
 [seqs_all.prev_co_click_rate] = disperse([events_all.prev_co_click_rate]);
+[seqs_all.prev_co_time_diff] = disperse([events_all.prev_co_time_diff]);
+[seqs_all.prev_co_same_map] = disperse([events_all.prev_co_same_map]);
 
 %%
 fig=figure;
@@ -90,6 +99,12 @@ sgtitle('Replay position vs. crossover positions (2 bats)')
 filename = fullfile('F:\sequences\figures\replay_vs_crossover\',sprintf('replay_vs_crossover_opt_%d.pdf',params_opt));
 exportgraphics(fig,filename);
 
+%% prepare data info 
+data_info = struct();
+data_info.exp_ID = string({events_all.exp_ID});
+data_info.ts = [events_all.peak_ts];
+data_info.evnet_num = [events_all.num];
+
 %% calc correlations 
 clc
 % close all
@@ -98,25 +113,44 @@ replay_pos_limits = [25 115];
 
 TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2);
 msg_str = sprintf('replay position between %d-%d', replay_pos_limits);
-run_corr(X,Y,TF,msg_str,params_opt);
+run_corr(X,Y,TF,msg_str,params_opt,data_info);
 
 replay_dist_thr = 5;
 TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.distance]>replay_dist_thr;
 msg_str = sprintf('replay position between %d-%d & replay distance>%d', replay_pos_limits, replay_dist_thr);
-run_corr(X,Y,TF,msg_str,params_opt);
+run_corr(X,Y,TF,msg_str,params_opt,data_info);
 
 replay_dist_thr = 10;
 TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.distance]>replay_dist_thr;
 msg_str = sprintf('replay position between %d-%d & replay distance>%d', replay_pos_limits, replay_dist_thr);
-run_corr(X,Y,TF,msg_str,params_opt);
+run_corr(X,Y,TF,msg_str,params_opt,data_info);
 
 TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.forward];
 msg_str = sprintf('replay position between %d-%d & forward', replay_pos_limits);
-run_corr(X,Y,TF,msg_str,params_opt);
+run_corr(X,Y,TF,msg_str,params_opt,data_info);
 
 TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & ~[seqs_all.forward];
 msg_str = sprintf('replay position between %d-%d & reverse', replay_pos_limits);
-run_corr(X,Y,TF,msg_str,params_opt);
+run_corr(X,Y,TF,msg_str,params_opt,data_info);
+
+%%
+replay_dist_thr = 10;
+TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.distance]>replay_dist_thr;
+msg_str = sprintf('replay position between %d-%d & replay distance>%d', replay_pos_limits, replay_dist_thr);
+xxx = [seqs_all.prev_co_time_diff];
+yyy = abs(X-Y);
+ccc = [seqs_all.prev_co_same_map];
+figure
+scatter(xxx(TF),yyy(TF),10,ccc(TF),'filled')
+xlabel('Time diff')
+ylabel('Position diff')
+xlim([0 100])
+h=colorbar
+h.Label.String = 'same map?'
+cmap = colormap;
+cmap = flip(cmap);
+cmap = [1 0 0; 0 0 1];
+colormap(cmap)
 
 %% weighted linear regression
 % clc
@@ -166,14 +200,18 @@ fprintf('tail=%s\n',stats.tail);
 % fprintf('\n');
 end
 
-function print_scatter(x,y,TF,msg_str,stats,params_opt)
+%%
+function print_scatter(x,y,TF,msg_str,stats,params_opt,data_info)
 dir_out = 'F:\sequences\figures\replay_vs_crossover';
-filename = fullfile(dir_out, sprintf('replay_vs_crossover_opt_%d_%s.pdf',params_opt,msg_str) );
+filename = fullfile(dir_out, sprintf('replay_vs_crossover_opt_%d_%s',params_opt,msg_str) );
 filename = strrep(filename, '>','_gt_');
 fig=figure;
 hold on
 axis equal
-scatter(x(TF),y(TF),20,'k','filled');
+hs = scatter(x(TF),y(TF),20,'k','filled');
+row = dataTipTextRow('exp_ID',data_info.exp_ID(TF)); hs.DataTipTemplate.DataTipRows(end+1) = row;
+row = dataTipTextRow('ts',data_info.ts(TF),'%d'); hs.DataTipTemplate.DataTipRows(end+1) = row;
+row = dataTipTextRow('event_num',data_info.evnet_num(TF),'%d'); hs.DataTipTemplate.DataTipRows(end+1) = row;
 xlim([10 125])
 ylim([10 125])
 refline(1,0);
@@ -184,15 +222,16 @@ text(0.88,0.30, sprintf('n=%d\n',stats.n), 'Units','normalized','FontSize',9);
 text(0.88,0.20, sprintf('Pearson: \n r=%.2g, p=%.2g\n',stats.Pearson.r, stats.Pearson.p), 'Units','normalized','FontSize',9);
 text(0.88,0.05, sprintf('Spearman: \n r=%.2g, p=%.2g\n',stats.Spearman.r, stats.Spearman.p), 'Units','normalized','FontSize',9);
 mkdir(dir_out);
-exportgraphics(fig,filename);
+exportgraphics(fig,[filename '.pdf']);
+save(filename,'x','y','TF','stats','msg_str','params_opt');
 end
 
 
 %%
-function run_corr(x,y,TF,msg_str,params_opt)
+function run_corr(x,y,TF,msg_str,params_opt,data_info)
 stats = calc_corr(x,y,TF);
 report_corr_res(stats,msg_str);
-print_scatter(x,y,TF,msg_str,stats,params_opt);
+print_scatter(x,y,TF,msg_str,stats,params_opt,data_info);
 
 end
 

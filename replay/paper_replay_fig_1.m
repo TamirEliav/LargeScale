@@ -4,8 +4,13 @@ clear
 clc
 
 %% plotting options
-% err_dist_normalization = 'cdf';
-err_dist_normalization = 'pdf';
+err_dist_normalization = 'cdf';
+% err_dist_normalization = 'pdf';
+
+%% graphics params
+sleep_clr = [.6 .1 .8];
+rest_clr = [.1 .8 .1];
+flight_clr = 'r';
 
 %% define output files
 res_dir =  'L:\paper_replay\figures';
@@ -86,9 +91,6 @@ win_samples = round(win_s*fs);
 plot(t,pos,'-k','LineWidth',1)
 
 % add shaded area for different epochs
-sleep_clr = 'k';
-rest_clr = 'g';
-flight_clr = 'r';
 sleep_ti = exp_get_sessions_ti(exp_ID,'Sleep1','Sleep2');
 rest_ti = exp.rest.ti;
 flight_ti = [exp.flight.FE.start_ts; exp.flight.FE.end_ts]';

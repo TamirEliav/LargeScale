@@ -618,6 +618,13 @@ gplotmatrix(X,[],g,clrs,'o+d*',5,[],[],features_names);
 figure
 plot([events.rest_ball_num],[seqs.middle_pos_norm],'.')
 
-
+%%
+exp_ID = 'b9861_d180526';
+epoch_type = 'sleep';
+params_opt = 11;
+event_num = 49;
+win_s = 2;
+paper_replay_fig_single_replay_example(exp_ID,epoch_type,params_opt,event_num,win_s,...
+    'res_dir','E:\Tamir\work\PROJECTS\LargeScale\paper_replay\figures\Fig_replay_examples\test')
     
 %%

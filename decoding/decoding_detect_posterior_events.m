@@ -15,7 +15,7 @@ mkdir(dir_OUT);
 mkdir(figs_dir);
 
 %% get movement states
-mvmnt_states_IX = find(contains(decode.state, "empirical_movement"));
+mvmnt_states_IX = find(contains(decode.state, "empirical_movement") | contains(decode.state, "random_walk"));
 events_all=struct();
 for ii_state = 1:length(mvmnt_states_IX)
     %%

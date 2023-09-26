@@ -3,6 +3,7 @@ arguments
     exp_ID
     TT_or_ch_to_use=[]
     opts.band
+    opts.limits_ts
 end
 % band is optional (as one of the following):
 % delta
@@ -25,6 +26,13 @@ if ~isfield(opts,'band')
     dir_IN = exp.path.LFP;
 else
     dir_IN = fullfile(exp.path.LFP_bands, opts.band);
+end
+
+%% get time limits
+if ~isfield(opts,'limits_ts')
+    limits_ts = [];
+else
+    limits_ts = opts.limits_ts;
 end
 
 %% option for specific TT/ch
@@ -72,7 +80,7 @@ end
 %% get data length
 [TT,ch] = find(ch_valid,1,'first');
 LFP_file_IN = fullfile(dir_IN, ['LFP_' exp_ID '_TT' num2str(TT) '_ch' num2str(ch) '.ncs']);
-[~, ts, ~, ~] = Nlx_csc_read(LFP_file_IN , []); 
+[~, ts, ~, ~] = Nlx_csc_read(LFP_file_IN , limits_ts); 
 
 %%
 nPoints = length(ts);
@@ -87,7 +95,7 @@ for TT = 1:nTT
         LFP_file_IN = fullfile(dir_IN, ['LFP_' exp_ID '_TT' num2str(TT) '_ch' num2str(ch) '.ncs']);
         % place data in columns as this is how matlab store it continuously 
         % in the memory, so it's slightly faster
-        [LFP(:,TT,ch), ts, fs, params] = Nlx_csc_read(LFP_file_IN , []); 
+        [LFP(:,TT,ch), ts, fs, params] = Nlx_csc_read(LFP_file_IN , limits_ts); 
     end
 end
 

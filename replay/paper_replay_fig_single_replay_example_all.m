@@ -22,7 +22,7 @@ struct('exp_ID','b0184_d191201', 'epoch_type','sleep', 'event_num',100),
 struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',10),
 struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',26),
 struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',59),
-struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',60),
+struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',60), % good
 struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',79), % merged seqs
 struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',124),
 struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',137),
@@ -31,7 +31,7 @@ struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',154),
 struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',159),
 struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',184),
 struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',187),
-struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',204),
+struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',204), % very long
 struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',206),
 struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',209),
 struct('exp_ID','b0184_d191202', 'epoch_type','sleep', 'event_num',217),

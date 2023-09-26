@@ -4,6 +4,8 @@ switch epoch_type
         plot_rest_session(exp_ID, epoch_type, params_opt, event_type);
     case 'sleep'
         plot_sleep_session(exp_ID, epoch_type, params_opt, event_type);
+    otherwise
+        fprintf('Epoch type: %s not supported\n',epoch_type)
 end
 end
 
@@ -59,7 +61,7 @@ ax(1)=axes('Units','normalized','Position',[.03 .05 .85 .85]);
 hold on
 plot(t,pos, 'Color',0.7*[1 1 1])
 hax=gca;
-clrs = hax.ColorOrder([1 4],:);
+clrs = hax.ColorOrder([4 1],:);
 for ii_seq = 1:length(seqs)
     seq = seqs(ii_seq);
     x = [seq.start_ts seq.end_ts];
@@ -67,9 +69,9 @@ for ii_seq = 1:length(seqs)
     c = 'r';
    switch seq.state_direction
        case 1
-           c = clrs(2,:);
-       case -1
            c = clrs(1,:);
+       case -1
+           c = clrs(2,:);
    end
    if seq.forward
        ls = '-';
@@ -113,15 +115,15 @@ if ~isempty(seqs)
     x = linspace(exp.rest.balls_loc(1),exp.rest.balls_loc(2),200);
     [~,~,~,x_per_seq] = get_data_in_ti(x,seqs_edges);
     clear hh
-    hh(1)=histogram([x_per_seq{[seqs.state_direction]==1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(2,:));
+    hh(1)=histogram([x_per_seq{[seqs.state_direction]==1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(1,:));
     hold on
-    hh(2)=histogram([x_per_seq{[seqs.state_direction]==-1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(1,:));
+    hh(2)=histogram([x_per_seq{[seqs.state_direction]==-1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(2,:));
 end
 hax=gca;
 hold on
 m = hax.XLim(2) / max(exp.MUA_FR_map.maps,[],"all");
-plot(exp.MUA_FR_map.maps(1,:).*m, exp.MUA_FR_map.bin_centers, ':', 'Color',clrs(2,:),'LineWidth',1);
-plot(exp.MUA_FR_map.maps(2,:).*m, exp.MUA_FR_map.bin_centers, ':', 'Color',clrs(1,:),'LineWidth',1);
+plot(exp.MUA_FR_map.maps(1,:).*m, exp.MUA_FR_map.bin_centers, ':', 'Color',clrs(1,:),'LineWidth',1);
+plot(exp.MUA_FR_map.maps(2,:).*m, exp.MUA_FR_map.bin_centers, ':', 'Color',clrs(2,:),'LineWidth',1);
 arrayfun(@(y,str)(yline(y,'-',str,'Color',0.5.*[1 1 1],'LineWidth',0.5,'LabelVerticalAlignment','middle')),[exp.LM.pos_proj], string({exp.LM.name}))
 xlabel('Counts')
 ylabel('Position (m)')
@@ -131,10 +133,10 @@ ylim(exp.rest.balls_loc+3.*[-1 1])
 % add legend
 axes('Units','normalized','Position',[.8 .935 .01 .05]);
 hold on
-plot([0 0],[0 1],'Color',clrs(1,:),'LineWidth',2)
-plot([1 1],[0 1],'Color',clrs(2,:),'LineWidth',2)
-plot(0,0,'v','Color',clrs(1,:),'MarkerFaceColor',clrs(1,:))
-plot(1,1,'^','Color',clrs(2,:),'MarkerFaceColor',clrs(2,:))
+plot([1 1],[0 1],'Color',clrs(1,:),'LineWidth',2)
+plot([0 0],[0 1],'Color',clrs(2,:),'LineWidth',2)
+plot(1,1,'^','Color',clrs(1,:),'MarkerFaceColor',clrs(1,:))
+plot(0,0,'v','Color',clrs(2,:),'MarkerFaceColor',clrs(2,:))
 axis off
 
 axes('Units','normalized','Position',[.82 .935 .02 .05]);
@@ -199,7 +201,7 @@ for ii_epoch = 1:n_epochs
     pnl(1,ii_epoch).select()
     hold on
     hax=gca;
-    clrs = hax.ColorOrder([1 4],:);
+    clrs = hax.ColorOrder([4 1],:);
     for ii_seq = 1:length(seqs_epoch)
         seq = seqs_epoch(ii_seq);
         x = [seq.start_ts seq.end_ts];
@@ -207,9 +209,9 @@ for ii_epoch = 1:n_epochs
         c = 'r';
        switch seq.state_direction
            case 1
-               c = clrs(2,:);
-           case -1
                c = clrs(1,:);
+           case -1
+               c = clrs(2,:);
        end
        if seq.forward
            ls = '-';
@@ -235,15 +237,15 @@ for ii_epoch = 1:n_epochs
         seqs_edges = [min(seqs_edges ); max(seqs_edges )]';
         x = linspace(exp.rest.balls_loc(1),exp.rest.balls_loc(2),200);
         [~,~,~,x_per_seq] = get_data_in_ti(x,seqs_edges);
-        histogram([x_per_seq{[seqs_epoch.state_direction]==1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(2,:));
+        histogram([x_per_seq{[seqs_epoch.state_direction]==1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(1,:));
         hold on
-        histogram([x_per_seq{[seqs_epoch.state_direction]==-1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(1,:));
+        histogram([x_per_seq{[seqs_epoch.state_direction]==-1}],x,'Orientation','horizontal','DisplayStyle','stairs','normalization','count','LineWidth',2,'EdgeColor',clrs(2,:));
     end
     hax=gca;
     hold on
     m = hax.XLim(2) / max(exp.MUA_FR_map.maps,[],"all");
-    plot(exp.MUA_FR_map.maps(1,:).*m, exp.MUA_FR_map.bin_centers, ':', 'Color',clrs(2,:),'LineWidth',1);
-    plot(exp.MUA_FR_map.maps(2,:).*m, exp.MUA_FR_map.bin_centers, ':', 'Color',clrs(1,:),'LineWidth',1);
+    plot(exp.MUA_FR_map.maps(1,:).*m, exp.MUA_FR_map.bin_centers, ':', 'Color',clrs(1,:),'LineWidth',1);
+    plot(exp.MUA_FR_map.maps(2,:).*m, exp.MUA_FR_map.bin_centers, ':', 'Color',clrs(2,:),'LineWidth',1);
     arrayfun(@(y,str)(yline(y,'-',str,'Color',0.5.*[1 1 1],'LineWidth',0.5,'LabelVerticalAlignment','middle')),[exp.LM.pos_proj], string({exp.LM.name}))
     xlabel('Counts')
     ylabel('Position (m)')
@@ -254,10 +256,10 @@ ylim(exp.rest.balls_loc+3.*[-1 1])
 % add legend
 axes('Units','normalized','Position',[.8 .935 .01 .05]);
 hold on
-plot([0 0],[0 1],'Color',clrs(1,:),'LineWidth',2)
-plot([1 1],[0 1],'Color',clrs(2,:),'LineWidth',2)
-plot(0,0,'v','Color',clrs(1,:),'MarkerFaceColor',clrs(1,:))
-plot(1,1,'^','Color',clrs(2,:),'MarkerFaceColor',clrs(2,:))
+plot([1 1],[0 1],'Color',clrs(1,:),'LineWidth',2)
+plot([0 0],[0 1],'Color',clrs(2,:),'LineWidth',2)
+plot(1,1,'^','Color',clrs(1,:),'MarkerFaceColor',clrs(1,:))
+plot(0,0,'v','Color',clrs(2,:),'MarkerFaceColor',clrs(2,:))
 axis off
 
 axes('Units','normalized','Position',[.82 .935 .02 .05]);
