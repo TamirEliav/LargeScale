@@ -4,8 +4,8 @@ clc
 close all
 
 %% data options 
-% params_opt = 11; % decoding opt 
-params_opt = 21; % decoding opt (random walk = fixed speed)
+params_opt = 11; % decoding opt 
+% params_opt = 21; % decoding opt (random walk = fixed speed)
 
 %% plotting options
 
@@ -169,9 +169,9 @@ plot(  t  ,   x  +1.5,   'color', clrs{1}, 'LineWidth',lw,'Clipping','off');
 plot([0 1], [.5 .5],     'color', clrs{2}, 'LineWidth',lw,'Clipping','off');
 plot([0 1], [.5 .5]+1.5, 'color', clrs{1}, 'LineWidth',lw,'Clipping','off');
 text(1.3, 2.0, 'Sleep (200m)','FontSize',7,'HorizontalAlignment','left');
-text(1.3, 1.5, 'Sleep (120m)','FontSize',7,'HorizontalAlignment','left');
+text(1.3, 1.5, 'Sleep (130m)','FontSize',7,'HorizontalAlignment','left');
 text(1.3, 0.5, 'Rest (200m)','FontSize',7,'HorizontalAlignment','left');
-text(1.3, 0.0, 'Rest (120m)','FontSize',7,'HorizontalAlignment','left');
+text(1.3, 0.0, 'Rest (130m)','FontSize',7,'HorizontalAlignment','left');
 xlim([0 1])
 ylim([0 1])
 axis off
@@ -192,6 +192,8 @@ hax.XLim = [0 10];
 hax.XTick = [0 5 10];
 hax.TickLength(1) = [0.025];
 hax.XRuler.TickLabelGapOffset = -1;
+[~,P,CI,STATS] = ttest2(X(g=='200m'), X(g=='120m'), 'Tail','both');
+text(0.6,1.1,"{\itP} = "+ sprintf('%.2g',P), 'Units','normalized','FontSize',7);
 
 %% legend (flight speed hists)
 axes(panels{2}(2))
@@ -235,8 +237,8 @@ cla
 hold on
 plot(0,1,'o', 'color', clrs{1}, 'MarkerSize',4,'Clipping','off');
 plot(0,0,'o', 'color', clrs{2}, 'MarkerSize',4,'Clipping','off');
-text(0.4, 1, 'Sleep'+",  {\itr} = " + sprintf('%.2f',r(1)) + ",  {\itP} = "+ sprintf('%.1g',p(1)),'FontSize',7,'HorizontalAlignment','left');
-text(0.4, 0, 'Rest'+",   {\itr} = " + sprintf('%.2f',r(2)) + ",  {\itP} = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left');
+text(0.4, 1, 'Sleep'+":  {\itr} = " + sprintf('%.2f',r(1)) + ",  {\itP} = "+ sprintf('%.1g',p(1)),'FontSize',7,'HorizontalAlignment','left');
+text(0.4, 0, 'Rest'+":   {\itr} = " + sprintf('%.2f',r(2)) + ",  {\itP} = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left');
 xlim([0 1])
 ylim([0 1])
 axis off

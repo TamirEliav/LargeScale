@@ -5,8 +5,8 @@ clc
 close all
 
 %% data options 
-% params_opt = 11; % decoding opt 
-params_opt = 21; % decoding opt (random walk = fixed speed)
+params_opt = 11; % decoding opt 
+% params_opt = 21; % decoding opt (random walk = fixed speed)
 
 %% plotting options
 features_names = {'duration';'compression';'distance';'distance_norm';};
@@ -53,6 +53,11 @@ T2 = groupsummary(T,{'bat_num','recordingArena'});
 T2 = sortrows(T2,{'recordingArena','bat_num'})
 bats = unique(T2.bat_num,'stable');
 nBats = length(bats);
+for ii=1:height(T2)
+    if T2.recordingArena(ii)=="120m"
+        T2.recordingArena{ii}='130m';
+    end
+end
 
 %% create figure
 % figure_size_cm = [21.0 29.7]; % ~A4
@@ -77,8 +82,9 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 
 % create panels
 clear panels
+xoffset = 2;
 panels_hist_size = [2 1.5];
-panles_hist_pos_x = linspace(1.3, 9.8, nFeatures);
+panles_hist_pos_x = linspace(1.3, 9.8, nFeatures)+xoffset;
 panles_hist_pos_y = linspace(24.5, 12, nBats);
 for ii_bat=1:nBats
     panel_pos(2) = panles_hist_pos_y(ii_bat);
@@ -86,7 +92,7 @@ for ii_bat=1:nBats
         panel_pos(1) = panles_hist_pos_x(ii_feature);
         panels{1}(ii_bat,ii_feature) = axes('position', [panel_pos panels_hist_size]);
     end
-    panels{2}(ii_bat) = axes('position', [12.4 panel_pos(2) 7 1.5]);
+    panels{2}(ii_bat) = axes('position', [12.4+xoffset panel_pos(2) 7 1.5]);
 end
 
 %%
@@ -164,10 +170,11 @@ for ii_fn = 1:nFeatures
         hax.XRuler.TickLabelGapOffset = -1;
         hax.YRuler.TickLabelGapOffset = 1;
         if ii_bat == nBats
-            xlabel(xlable_strs{ii_fn}, 'Units','normalized', 'Position',[0.5 -0.3]);
+            xlabel_pos = [0.45 0.5 0.55 0.5];
+            xlabel(xlable_strs{ii_fn}, 'Units','normalized', 'Position',[xlabel_pos(ii_fn) -0.3]);
         end
         if ii_fn == 1
-            ylabel('PDF', 'Units','normalized', 'Position',[-0.2 .5]);
+            ylabel({'Probability';'density'}, 'Units','normalized', 'Position',[-0.2 .5]);
         end
 %         if ii_fn == 1
 %             bat_arena = unique(T.recordingArena(bat_exp_IX));
@@ -181,7 +188,7 @@ end
 if exist('panels_hist_legend','var')
     delete(panels_hist_legend);
 end
-panels_hist_legend = axes('position', [2.2 25.5 0.2 0.3]);
+panels_hist_legend = axes('position', [xoffset+2.2 25.5 0.2 0.3]);
 cla
 hold on
 plot([0 1], [1 1], 'color', clrs{1}, 'LineWidth',lw,'Clipping','off');
@@ -194,7 +201,12 @@ axis off
 
 %% panel E - coverage per session per bat
 % coverage = load('E:\Tamir\work\PROJECTS\LargeScale\paper_replay\data_prepared_for_figures\replay_coverage.mat');
-coverage = decoding_calc_coverage_over_expt_table(T,params_opt,nbins);
+coverage = decoding_calc_coverage_over_exp_table(T,params_opt,nbins);
+for ii_bat = 1:nBats
+    bat_exp_IX = coverage.T.bat_num == T2.bat_num(ii_bat);
+    T2.nEvents(ii_bat) = sum(coverage.n_seqs_all(bat_exp_IX,:,:),'all');
+end
+T2 = sortrows(T2,{'nEvents'},'descend')
 for ii_bat = 1:nBats
     axes(panels{2}(ii_bat))
     cla
@@ -225,11 +237,11 @@ for ii_bat = 1:nBats
         xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.11]);
 %         ylabel({'Replay coverage';'(prob.)'}, 'Units','normalized', 'Position',[-0.1 0.5]);
     end
-    text(1.15, .5, { ...
+    text(-1.9, .5, { ...
         "bat "+T2.bat_num(ii_bat); ...
         T2.recordingArena{ii_bat}; ...
         "{\itn}_{sessions} = " + T2.GroupCount(ii_bat); ...
-        "{\itn}_{events} = " + sum(coverage.n_seqs_all(bat_exp_IX,:,:),'all'); ...
+        "{\itn}_{events} = " + T2.nEvents(ii_bat); ...
         },'FontSize',7,'HorizontalAlignment','center','Units','normalized','FontWeight','bold');
 end
 

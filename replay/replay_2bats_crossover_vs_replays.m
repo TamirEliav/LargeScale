@@ -59,6 +59,11 @@ for ii_exp = 1:length(exp_list)
     [events.prev_co_direction] = disperse(co.direction(prev_co_IX));
     [events.prev_co_click_rate] = disperse(co.click_rate(prev_co_IX));
     [events.prev_co_excluded_from_audio_analysis] = disperse(co.excluded_from_audio_analysis(prev_co_IX));
+    next_co_IX = interp1(co.ts, 1:length(co.ts), [events.peak_ts], "next","extrap");
+    next_co_invalid = isnan(next_co_IX);
+    next_co_IX(next_co_invalid)=1; % workaround because matlab don't allow using nan as index, we will remove those invalid events at the end
+    next_co_ts = co.ts(next_co_IX);
+    [events.next_co_pos] = disperse(co.pos(next_co_IX));
     [events.exp_ID] = deal(exp_ID);
     events(prev_co_invalid)=[];
     events_all_sessions{ii_exp} = events;
@@ -73,6 +78,8 @@ seqs_all = [events_all.seq_model];
 [seqs_all.prev_co_click_rate] = disperse([events_all.prev_co_click_rate]);
 [seqs_all.prev_co_time_diff] = disperse([events_all.prev_co_time_diff]);
 [seqs_all.prev_co_same_map] = disperse([events_all.prev_co_same_map]);
+[seqs_all.prev_co_pos] = disperse([events_all.prev_co_pos]);
+[seqs_all.next_co_pos] = disperse([events_all.next_co_pos]);
 
 %%
 fig=figure;
@@ -113,25 +120,25 @@ replay_pos_limits = [25 115];
 
 TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2);
 msg_str = sprintf('replay position between %d-%d', replay_pos_limits);
-run_corr(X,Y,TF,msg_str,params_opt,data_info);
+run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
 
 replay_dist_thr = 5;
 TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.distance]>replay_dist_thr;
 msg_str = sprintf('replay position between %d-%d & replay distance>%d', replay_pos_limits, replay_dist_thr);
-run_corr(X,Y,TF,msg_str,params_opt,data_info);
+run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
 
 replay_dist_thr = 10;
 TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.distance]>replay_dist_thr;
 msg_str = sprintf('replay position between %d-%d & replay distance>%d', replay_pos_limits, replay_dist_thr);
-run_corr(X,Y,TF,msg_str,params_opt,data_info);
+run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
 
 TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.forward];
 msg_str = sprintf('replay position between %d-%d & forward', replay_pos_limits);
-run_corr(X,Y,TF,msg_str,params_opt,data_info);
+run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
 
 TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & ~[seqs_all.forward];
 msg_str = sprintf('replay position between %d-%d & reverse', replay_pos_limits);
-run_corr(X,Y,TF,msg_str,params_opt,data_info);
+run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
 
 %%
 replay_dist_thr = 10;
@@ -201,7 +208,7 @@ fprintf('tail=%s\n',stats.tail);
 end
 
 %%
-function print_scatter(x,y,TF,msg_str,stats,params_opt,data_info)
+function print_scatter(x,y,TF,msg_str,stats,params_opt,data_info,seqs_all)
 dir_out = 'F:\sequences\figures\replay_vs_crossover';
 filename = fullfile(dir_out, sprintf('replay_vs_crossover_opt_%d_%s',params_opt,msg_str) );
 filename = strrep(filename, '>','_gt_');
@@ -223,15 +230,15 @@ text(0.88,0.20, sprintf('Pearson: \n r=%.2g, p=%.2g\n',stats.Pearson.r, stats.Pe
 text(0.88,0.05, sprintf('Spearman: \n r=%.2g, p=%.2g\n',stats.Spearman.r, stats.Spearman.p), 'Units','normalized','FontSize',9);
 mkdir(dir_out);
 exportgraphics(fig,[filename '.pdf']);
-save(filename,'x','y','TF','stats','msg_str','params_opt');
+save(filename,'x','y','TF','stats','msg_str','params_opt','seqs_all');
 end
 
 
 %%
-function run_corr(x,y,TF,msg_str,params_opt,data_info)
+function run_corr(x,y,TF,msg_str,params_opt,data_info,seqs_all)
 stats = calc_corr(x,y,TF);
 report_corr_res(stats,msg_str);
-print_scatter(x,y,TF,msg_str,stats,params_opt,data_info);
+print_scatter(x,y,TF,msg_str,stats,params_opt,data_info,seqs_all);
 
 end
 

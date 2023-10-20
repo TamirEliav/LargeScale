@@ -5,7 +5,7 @@ clc
 close all
 
 %% plotting options
-example_opt_IX = 10
+example_opt_IX = 10 % I chose option 5
 example_options =[
 struct(exp_ID = 'b0184_d191130', epoch_type = 'sleep', params_opt = 11, event_num = 139)
 struct(exp_ID = 'b0184_d191201', epoch_type = 'sleep', params_opt = 11, event_num = 100)
@@ -92,10 +92,10 @@ end
 
 %% rename decoder states
 states = decode.state';
-states(states=="Inbound-empirical_movement") = "Continuous state dir 2";
+states(states=="Inbound-empirical_movement") = "Movement state dir 2";
 states(states=="Inbound-identity") = "Stationary state dir 2";
 states(states=="Inbound-uniform") = "Fragmented state dir 2";
-states(states=="Outbound-empirical_movement") = "Continuous state dir 1";
+states(states=="Outbound-empirical_movement") = "Movement state dir 1";
 states(states=="Outbound-identity") = "Stationary state dir 1";
 states(states=="Outbound-uniform") = "Fragmented state dir 1";
 
@@ -118,7 +118,7 @@ end
 xlim([0 1])
 ylim([0 1])
 axis off
-title('States legend:','Units','normalized','Position',[0.5 1.4])
+% title('States legend:','Units','normalized','Position',[0.5 1.4])
 
 %% plot MUA
 axes(panels{1}(1));
@@ -136,7 +136,7 @@ hax.YTick = [0 m];
 hax.YLim = [0 m]
 rescale_plot_data('x',[1e-6 t0]);
 % axis off
-ylabel({'MUA';'(Hz)'}, 'Units','normalized', 'Position',[-0.02 .5]);
+ylabel({'Multiunit';'firing-rate';'(Hz)'}, 'Units','normalized', 'Position',[-0.02 .5]);
 title(sprintf('%s_%s_%d',epoch_type,exp_ID,event_num),'Interpreter','none','Units','normalized','Position',[0.5 1.4]);
 
 %% plot LFP
@@ -182,7 +182,7 @@ IX = get_data_in_ti(decode.time, ti);
 prob_t = decode.time(IX);
 prob_pos = decode.posterior_pos(:,IX);
 imagesc(prob_t, decode.pos, prob_pos);
-plot([seq.start_ts seq.end_ts],[seq.start_pos seq.end_pos],'-r','LineWidth',0.01);
+plot([seq.start_ts seq.end_ts],[seq.start_pos seq.end_pos],'-r','LineWidth',1);
 hax = gca;
 hax.CLim = quantile(prob_pos(:),[0.01 0.99]);
 hax.XLim = prob_t([1 end]);
@@ -201,7 +201,7 @@ hax.YTick=[];
 hax.TickDir = 'out';
 hax.TickLength = [0.02 0.02];
 hax.XRuler.TickLabelGapOffset = -4;
-ylabel('Position (m)', 'Units','normalized', 'Position',[-0.07 .5]);
+ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.07 .5]);
 
 %% plot posterior (position)
 axes(panels{1}(5));
@@ -211,7 +211,7 @@ IX = get_data_in_ti(decode.time, ti);
 prob_t = decode.time(IX);
 prob_pos = squeeze(decode.posterior(:,event.state_num,IX));
 imagesc(prob_t, decode.pos, prob_pos);
-plot([seq.start_ts seq.end_ts],[seq.start_pos seq.end_pos],'-r','LineWidth',0.01);
+plot([seq.start_ts seq.end_ts],[seq.start_pos seq.end_pos],'-r','LineWidth',1);
 hax = gca;
 hax.CLim = quantile(prob_pos(:),[0.01 0.99]);
 hax.XLim = prob_t([1 end]);
@@ -229,7 +229,7 @@ hax.YTick = [];
 hax.TickDir = 'out';
 hax.TickLength = [0.02 0.02];
 hax.XRuler.TickLabelGapOffset = 0;
-xlabel('Position (m)', 'Units','normalized', 'Position',[0.5 -0.08]);
+xlabel('Time (s)', 'Units','normalized', 'Position',[0.5 -0.08]);
 ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.07 .5]);
 
 %% link x axes

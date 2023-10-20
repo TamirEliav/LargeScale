@@ -69,6 +69,9 @@ data_sleep = arrange_data(T, epoch_type, params_opt, win);
 epoch_type = 'rest'; params_opt = 11;
 data_rest = arrange_data(T, epoch_type, params_opt, win);
 
+data_to_save = struct();
+data_to_save.win = win;
+
 %% event-triggered ripple power 
 axes(panels(1))
 cla
@@ -86,6 +89,12 @@ m = [m1 m2];
 hax.YLim(1) = m1 - 0.025*range(m);
 hax.YLim(2) = m2 + 0.025*range(m);
 
+data_to_save.ripple.t = t;
+data_to_save.ripple.sleep.mean = nanmean(data_sleep.triggered_zpripple_cat);
+data_to_save.ripple.sleep.sem = nansem(data_sleep.triggered_zpripple_cat);
+data_to_save.ripple.rest.mean = nanmean(data_rest.triggered_zpripple_cat);
+data_to_save.ripple.rest.sem = nansem(data_rest.triggered_zpripple_cat);
+
 %% event-triggered MUA
 axes(panels(2))
 cla
@@ -102,6 +111,12 @@ m2 = max(cat(1,ch([4 8]).YData));
 m = [m1 m2];
 hax.YLim(1) = m1 - 0.025*range(m);
 hax.YLim(2) = m2 + 0.025*range(m);
+
+data_to_save.mua.t = t;
+data_to_save.mua.sleep.mean = nanmean(data_sleep.triggered_MUA_zFR_cat);
+data_to_save.mua.sleep.sem = nansem(data_sleep.triggered_MUA_zFR_cat);
+data_to_save.mua.rest.mean = nanmean(data_rest.triggered_MUA_zFR_cat);
+data_to_save.mua.rest.sem = nansem(data_rest.triggered_MUA_zFR_cat);
 
 %%
 % axes(panel_legend)
@@ -221,6 +236,7 @@ else
 end
 
 fig_name_out = fullfile(res_dir, sprintf('%s_%dms_%s',fig_name_str, win*1e3, bats_str));
+save(fig_name_out,'data_to_save');
 print(gcf, fig_name_out, '-dpdf', '-cmyk', '-painters');
 disp('figure was successfully saved to pdf/tiff/fig formats');
 diary off

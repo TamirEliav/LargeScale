@@ -5,8 +5,8 @@ clc
 close all
 
 %% data options 
-% params_opt = 11; % decoding opt 
-params_opt = 21; % decoding opt (random walk = fixed speed)
+params_opt = 11; % decoding opt 
+% params_opt = 21; % decoding opt (random walk = fixed speed)
 
 %% plotting options
 
@@ -75,6 +75,10 @@ panels{6}(1) = axes('position', [14 13 3 4]);
 panels{4}(2) = axes('position', [3   7 4 4]);
 panels{5}(2) = axes('position', [9   7 3 4]);
 panels{6}(2) = axes('position', [14  7 3 4]);
+sdf=[panels{:}]
+for ii = 1:length(sdf)
+    sdf(ii).Position(1) = sdf(ii).Position(1) + 2;
+end
 
 %% load data
 if ~exist('events','var')
@@ -361,7 +365,6 @@ for ii = 1:length(G)
 end
 % xlabel('Replay speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
 ylabel('Fraction', 'Units','normalized', 'Position',[-0.2 .5]);
-text(1.6,0.5,"Both landing balls",'Units','normalized','FontSize',10,'HorizontalAlignment','center');
 hax=gca;
 hax.TickLength(1) = [0.025];
 hax.XRuler.TickLabelGapOffset = -1;
@@ -407,7 +410,7 @@ for ii = 1:length(G)
 end
 % xlabel('Replay speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
 ylabel('Fraction', 'Units','normalized', 'Position',[-0.2 .5]);
-text(1.6,0.5,"Ball "+ii_ball,'Units','normalized','FontSize',10,'HorizontalAlignment','center');
+% text(1.6,0.5,"Ball "+ii_ball,'Units','normalized','FontSize',10,'HorizontalAlignment','center');
 hax=gca;
 hax.TickLength(1) = [0.025];
 hax.XRuler.TickLabelGapOffset = -1;
@@ -425,6 +428,14 @@ axes(panels{2}(1))
 text(-0.3,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
 text(-0.3,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+
+%% add line titles
+axes(panels{1}(1))
+text(-0.7,0.5,{"Both landing","balls"},'Units','normalized','FontSize',10,'HorizontalAlignment','center');
+axes(panels{4}(1))
+text(-0.7,0.5,{"Ball 1"},'Units','normalized','FontSize',10,'HorizontalAlignment','center');
+axes(panels{4}(2))
+text(-0.7,0.5,{"Ball 2"},'Units','normalized','FontSize',10,'HorizontalAlignment','center');
 
 %%
 fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);
