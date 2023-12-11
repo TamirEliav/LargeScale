@@ -26,8 +26,8 @@ exp_list = {
     'b2299_d191204',
     'b2299_d191205',
     'b2299_d191206',
-    'b2299_d191207',
-    'b2299_d191208',
+    'b2299_d191207', % no data
+    'b2299_d191208', % no data
     'b2299_d191209',
     'b2299_d191210',
 %     'b2299_d191211', % 
@@ -81,7 +81,14 @@ seqs_all = [events_all.seq_model];
 [seqs_all.prev_co_pos] = disperse([events_all.prev_co_pos]);
 [seqs_all.next_co_pos] = disperse([events_all.next_co_pos]);
 
+%% prepare data info 
+data_info = struct();
+data_info.exp_ID = string({events_all.exp_ID});
+data_info.ts = [events_all.peak_ts];
+data_info.evnet_num = [events_all.num];
+
 %%
+replay_pos_limits = [25 115];
 fig=figure;
 fig.WindowState = 'maximized';
 tiledlayout('flow','Padding','tight');
@@ -100,17 +107,15 @@ for ii_fn = 1:length(features_fn)
     hb.Label.String = fn;
     hb.Label.FontSize = 12;
     hb.Label.Interpreter = 'none';
-    colormap parula
+    colormap jet
+%     colormap parula
+    ylim(replay_pos_limits);
+    set(gca,'Color','k')
 end
-sgtitle('Replay position vs. crossover positions (2 bats)')
-filename = fullfile('F:\sequences\figures\replay_vs_crossover\',sprintf('replay_vs_crossover_opt_%d.pdf',params_opt));
-exportgraphics(fig,filename);
-
-%% prepare data info 
-data_info = struct();
-data_info.exp_ID = string({events_all.exp_ID});
-data_info.ts = [events_all.peak_ts];
-data_info.evnet_num = [events_all.num];
+sgtitle(sprintf('Replay position vs. crossover positions (2 bats) - replay pos lim %dm-%dm',replay_pos_limits))
+filename = fullfile('F:\sequences\figures\replay_vs_crossover\',sprintf('replay_vs_crossover_opt_%d_pos_limits_%d_%d',params_opt,replay_pos_limits));
+saveas(gcf,filename,'fig');
+exportgraphics(fig,[filename '.pdf']);
 
 %% calc correlations 
 clc
@@ -138,6 +143,18 @@ run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
 
 TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & ~[seqs_all.forward];
 msg_str = sprintf('replay position between %d-%d & reverse', replay_pos_limits);
+run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
+
+TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.prev_co_same_map];
+msg_str = sprintf('replay position between %d-%d & same map', replay_pos_limits);
+run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
+
+TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.prev_co_same_map] & [seqs_all.forward];
+msg_str = sprintf('replay position between %d-%d & same map & forward', replay_pos_limits);
+run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
+
+TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.prev_co_same_map] & ~[seqs_all.forward];
+msg_str = sprintf('replay position between %d-%d & same map & reverse', replay_pos_limits);
 run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
 
 %%
@@ -230,7 +247,7 @@ text(0.88,0.20, sprintf('Pearson: \n r=%.2g, p=%.2g\n',stats.Pearson.r, stats.Pe
 text(0.88,0.05, sprintf('Spearman: \n r=%.2g, p=%.2g\n',stats.Spearman.r, stats.Spearman.p), 'Units','normalized','FontSize',9);
 mkdir(dir_out);
 exportgraphics(fig,[filename '.pdf']);
-save(filename,'x','y','TF','stats','msg_str','params_opt','seqs_all');
+save(filename,'x','y','TF','stats','msg_str','params_opt','seqs_all','data_info');
 end
 
 

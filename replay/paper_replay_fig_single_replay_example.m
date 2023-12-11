@@ -9,11 +9,15 @@ arguments
     win_s = 0.5;
     opts.res_dir =  'L:\paper_replay\figures\Fig_replay_examples'
     opts.filename_prefix = ''
+    opts.title_str_prefix = ''
 end
 
 %% define output files
 mkdir(opts.res_dir)
 fig_name_str = sprintf('Fig_replay_example_%s_%d_%s_event_%d',epoch_type,params_opt,exp_ID,event_num);
+fig_name_str = [opts.filename_prefix fig_name_str];
+title_str = sprintf('%s_%s_%d',epoch_type,exp_ID,event_num);
+title_str = [opts.title_str_prefix title_str];
 
 %% params
 cmap = bone;
@@ -35,7 +39,7 @@ set(gcf,'Units','centimeters','Position',get(gcf,'paperPosition')+[0 0 0 0]); % 
 set(gcf, 'Renderer', 'painters');
 set(groot, 'defaultAxesTickDir', 'out');
 set(groot,  'defaultAxesTickDirMode', 'manual');
-annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
+% annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 
 % create panels
 clear panels
@@ -46,15 +50,15 @@ panels{2}(1) = axes('position', [5 10.5 3 1]);
 panels{2}(2) = axes('position', [5 10 3 .5]);
 panels{2}(3) = axes('position', [5  6 3 4]);
 
-panels{3}(1) = axes('position', [12 21.5 3 .5]);
-panels{3}(2) = axes('position', [12 20.5 3 1]);
-panels{3}(3) = axes('position', [12 20 3 .5]);
-panels{3}(4) = axes('position', [12 16 3 4]);
+panels{3}(1) = axes('position', [9 21.5 3 .5]);
+panels{3}(2) = axes('position', [9 20.5 3 1]);
+panels{3}(3) = axes('position', [9 20 3 .5]);
+panels{3}(4) = axes('position', [9 16 3 4]);
 
-panels{4}(1) = axes('position', [12 11.5 3 .5]);
-panels{4}(2) = axes('position', [12 10.5 3 1]);
-panels{4}(3) = axes('position', [12 10 3 .5]);
-panels{4}(4) = axes('position', [12  6 3 4]);
+panels{4}(1) = axes('position', [8.7 11.5 3 .5]);
+panels{4}(2) = axes('position', [8.7 10.5 3 1]);
+panels{4}(3) = axes('position', [8.7 10 3 .5]);
+panels{4}(4) = axes('position', [8.7  6 3 4]);
 
 %% load data
 decode = decoding_load_data(exp_ID, epoch_type, params_opt );
@@ -81,7 +85,7 @@ xticks([])
 yticks([])
 rescale_plot_data('x',[1e-6 t0]);
 axis off
-title(sprintf('%s_%s_%d',epoch_type,exp_ID,event_num),'Interpreter','none');
+title(title_str,'Interpreter','none');
 
 %% plot posterior (position)
 axes(panels{1}(2));
@@ -123,7 +127,7 @@ xticks([])
 yticks([])
 rescale_plot_data('x',[1e-6 seq_ti(1)]);
 axis off
-title(sprintf('%s_%s_%d',epoch_type,exp_ID,event_num),'Interpreter','none');
+title(title_str,'Interpreter','none');
 
 %% plot posterior (state)
 axes(panels{2}(2));
@@ -184,7 +188,7 @@ xticks([])
 yticks([])
 rescale_plot_data('x',[1e-6 t0]);
 axis off
-title(sprintf('%s_%s_%d',epoch_type,exp_ID,event_num),'Interpreter','none');
+title(title_str,'Interpreter','none');
 
 %% plot LFP
 axes(panels{3}(2));
@@ -259,9 +263,9 @@ y = exp.MUA.FR(IX);
 area(x,y,'FaceColor','k');
 xticks([])
 yticks([])
-rescale_plot_data('x',[1e-6 seq_ti(1)]);
+rescale_plot_data('x',[1e-6 t0]);
 axis off
-title(sprintf('%s_%s_%d',epoch_type,exp_ID,event_num),'Interpreter','none');
+title(title_str,'Interpreter','none');
 
 %% plot LFP
 axes(panels{4}(2));
@@ -271,7 +275,7 @@ plot(LFP.ts, LFP.avg_signal,'k');
 xlim(seq_ti+[-1 1].*0.2*range(seq_ti))
 xticks([])
 yticks([])
-rescale_plot_data('x',[1e-6 seq_ti(1)]);
+rescale_plot_data('x',[1e-6 t0]);
 axis off
 
 %% plot posterior (state)
@@ -291,7 +295,7 @@ hax.XLim = seq_ti+[-1 1].*0.2*range(seq_ti);
 hax.TickDir = 'out';
 hax.TickLength = [0.02 0.02];
 hax.XRuler.TickLabelGapOffset = -4;
-rescale_plot_data('x',[1e-6 seq_ti(1)]);
+rescale_plot_data('x',[1e-6 t0]);
 
 
 %% plot posterior (position)
@@ -313,16 +317,16 @@ hax.XLim = seq_ti+[-1 1].*0.2*range(seq_ti);
 hax.TickDir = 'out';
 hax.TickLength = [0.02 0.02];
 hax.XRuler.TickLabelGapOffset = -4;
-rescale_plot_data('x',[1e-6 seq_ti(1)]);
+rescale_plot_data('x',[1e-6 t0]);
 
 %% link x axes
 linkaxes(panels{4}(:),'x');
-
+xlim([-1 1].*win_s)
 
 
 
 %% ============ print/save the figure==============
-fig_name_out = fullfile(opts.res_dir, [opts.filename_prefix fig_name_str]);
+fig_name_out = fullfile(opts.res_dir, fig_name_str);
 
 saveas(fig,fig_name_out,'pdf');
 saveas(fig,fig_name_out,'jpeg');

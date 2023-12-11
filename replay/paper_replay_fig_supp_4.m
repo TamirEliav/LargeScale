@@ -1,4 +1,4 @@
-%% Replay - Fig supp 4 - reverse/forward + future+past + takeoff/landing/midair + ball1/ball2
+%% Replay - Fig supp 6 - reverse/forward + future+past + takeoff/landing/midair + ball1/ball2
 %%
 clear 
 clc
@@ -25,7 +25,7 @@ PastFutureCategoriesOrder = {
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_supp_4';
+fig_name_str = 'Extended_Data_Fig_6';
 fig_caption_str = ' ';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -69,12 +69,12 @@ clear panels
 panels{1}(1) = axes('position', [3  19 4 4]);
 panels{2}(1) = axes('position', [9  19 3 4]);
 panels{3}(1) = axes('position', [14 19 3 4]);
-panels{4}(1) = axes('position', [3  13 4 4]);
-panels{5}(1) = axes('position', [9  13 3 4]);
-panels{6}(1) = axes('position', [14 13 3 4]);
-panels{4}(2) = axes('position', [3   7 4 4]);
-panels{5}(2) = axes('position', [9   7 3 4]);
-panels{6}(2) = axes('position', [14  7 3 4]);
+% panels{4}(1) = axes('position', [3  13 4 4]);
+% panels{5}(1) = axes('position', [9  13 3 4]);
+% panels{6}(1) = axes('position', [14 13 3 4]);
+% panels{4}(2) = axes('position', [3   7 4 4]);
+% panels{5}(2) = axes('position', [9   7 3 4]);
+% panels{6}(2) = axes('position', [14  7 3 4]);
 sdf=[panels{:}]
 for ii = 1:length(sdf)
     sdf(ii).Position(1) = sdf(ii).Position(1) + 2;
@@ -123,7 +123,7 @@ gForRev = categorical(gForRev,ForRevCategoriesOrder);
 nFor = sum(gForRev=='Forward');
 nRev = sum(gForRev=='Reverse');
 ForRev_binom_pval = myBinomTest(nFor,length(gForRev),0.5,'two');
-disp('Comparing (immediate) Forward vs. Reverse')
+disp('Comparing Forward vs. Reverse')
 fprintf('Forward: n=%d, Reverse: n=%d, ratio=%.2g\n',nFor,nRev, nFor/nRev);
 fprintf('Binomial test (two-sided), p=%.2g\n', ForRev_binom_pval);
 
@@ -161,10 +161,14 @@ gcounts = tabulate(gTakeLand);
 counts = [gcounts{:,2}];
 proportions = counts./sum(counts);
 expectedProportion = [.05 .9 0.05];
-p = myBinomTest(counts,sum(counts),expectedProportion,'one').*length(counts);
+p = myBinomTest(counts,sum(counts),expectedProportion,'two').*length(counts);
 p(p==0)=realmin;
-xG = 1:length(G);
+fprintf('\nboth balls: takeoff vs landing\n')
+for ii = 1:length(p)
+    fprintf('%s: P binom (two-sided) = %d\n',TakeLandCategoriesOrder{ii},p(ii));
+end
 
+xG = 1:length(G);
 Y = proportions;
 h=bar(xG,Y);
 h.BarWidth = 0.75;
@@ -184,63 +188,63 @@ for ii = 1:length(G)
     text(x,y, str, horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=8);
 end
 % xlabel('Replay speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
-ylabel('Fraction', 'Units','normalized', 'Position',[-0.2 .5]);
+ylabel('Fraction', 'Units','normalized', 'Position',[-0.18 .5]);
 hax=gca;
 hax.TickLength(1) = [0.025];
 hax.XRuler.TickLabelGapOffset = -1;
-hax.YRuler.TickLabelGapOffset = -1;
+hax.YRuler.TickLabelGapOffset = 0;
 hax.XLim = [min(xG) max(xG)] + [-1 1].*0.5;
 
 
 %% takeoff vs landing - separated by balls
-for ii_ball = 1:2
-axes(panels{4}(ii_ball))
-cla
-hold on
-
-events_ball_IX = [events.ball_num] == ii_ball;
-gTakeLand_by_ball = gTakeLand(events_ball_IX);
-G = categorical(categories(gTakeLand_by_ball));
-gcounts = tabulate(gTakeLand_by_ball);
-counts = [gcounts{:,2}];
-proportions = counts./sum(counts);
-expectedProportion = [.05 .9 0.05];
-expectedCounts = expectedProportion .* sum(counts);
-p = myBinomTest(counts,sum(counts),expectedProportion,'one').*length(counts);
-p(p==0)=realmin;
-xG = 1:length(G);
-
-Y = proportions;
-h=bar(xG,Y);
-h.BarWidth = 0.75;
-h.FaceColor = 0.5*[1 1 1];
-hax=gca;
-hax.XTick = xG;
-hax.XTickLabel = TakeLandCategoriesOrder;
-for ii = 1:length(G)
-    x = ii+[-1 1].*h.BarWidth/2;
-    y = expectedProportion(ii).*sum(Y);
-    line(x, [y, y], 'Color', 'r', 'LineWidth', 2);
-    x = ii;
-    y = Y(ii)+0.001*max(Y);
-%     text(x,y, "{\itP} < 10^{"+ceil(log10(p(ii)))+"}", horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=6);
-    signifStr = genSignifStrAstricks(p(ii));
-    str = {signifStr;"{\itn} = " + counts(ii)};
-    text(x,y, str, horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=8);
-end
-% xlabel('Replay speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
-ylabel('Fraction', 'Units','normalized', 'Position',[-0.2 .5]);
-hax=gca;
-hax.TickLength(1) = [0.025];
-hax.XRuler.TickLabelGapOffset = -1;
-hax.YRuler.TickLabelGapOffset = -1;
-hax.XLim = [min(xG) max(xG)] + [-1 1].*0.5;
-
-end
+% for ii_ball = 1:2
+% axes(panels{4}(ii_ball))
+% cla
+% hold on
+% 
+% events_ball_IX = [events.ball_num] == ii_ball;
+% gTakeLand_by_ball = gTakeLand(events_ball_IX);
+% G = categorical(categories(gTakeLand_by_ball));
+% gcounts = tabulate(gTakeLand_by_ball);
+% counts = [gcounts{:,2}];
+% proportions = counts./sum(counts);
+% expectedProportion = [.05 .9 0.05];
+% expectedCounts = expectedProportion .* sum(counts);
+% p = myBinomTest(counts,sum(counts),expectedProportion,'two').*length(counts);
+% p(p==0)=realmin;
+% xG = 1:length(G);
+% 
+% Y = proportions;
+% h=bar(xG,Y);
+% h.BarWidth = 0.75;
+% h.FaceColor = 0.5*[1 1 1];
+% hax=gca;
+% hax.XTick = xG;
+% hax.XTickLabel = TakeLandCategoriesOrder;
+% for ii = 1:length(G)
+%     x = ii+[-1 1].*h.BarWidth/2;
+%     y = expectedProportion(ii).*sum(Y);
+%     line(x, [y, y], 'Color', 'r', 'LineWidth', 2);
+%     x = ii;
+%     y = Y(ii)+0.001*max(Y);
+% %     text(x,y, "{\itP} < 10^{"+ceil(log10(p(ii)))+"}", horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=6);
+%     signifStr = genSignifStrAstricks(p(ii));
+%     str = {signifStr;"{\itn} = " + counts(ii)};
+%     text(x,y, str, horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=8);
+% end
+% % xlabel('Replay speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
+% ylabel('Fraction', 'Units','normalized', 'Position',[-0.2 .5]);
+% hax=gca;
+% hax.TickLength(1) = [0.025];
+% hax.XRuler.TickLabelGapOffset = -1;
+% hax.YRuler.TickLabelGapOffset = -1;
+% hax.XLim = [min(xG) max(xG)] + [-1 1].*0.5;
+% 
+% end
 
 
 %% Forward vs Reverse
-axes(panels{2}(1))
+axes(panels{3}(1))
 cla
 hold on
 G = categorical(categories(gForRev));
@@ -249,10 +253,14 @@ counts = [gcounts{:,2}];
 proportions = counts./sum(counts);
 expectedProportion = [.5 .5];
 expectedCounts = expectedProportion .* sum(counts);
-p = myBinomTest(counts,sum(counts),expectedProportion,'one').*length(counts);
+p = myBinomTest(counts,sum(counts),expectedProportion,'two').*length(counts);
 p(p==0)=realmin;
-xG = 1:length(G);
+fprintf('\nboth balls: Forward vs Reverse\n')
+for ii = 1:length(p)
+    fprintf('%s: P binom (two-sided) = %d\n',ForRevCategoriesOrder{ii},p(ii));
+end
 
+xG = 1:length(G);
 Y = proportions;
 h=bar(xG,Y);
 h.BarWidth = 0.75;
@@ -265,7 +273,7 @@ for ii = 1:length(G)
     y = expectedProportion(ii).*sum(Y);
     line(x, [y, y], 'Color', 'r', 'LineWidth', 2);
     x = ii;
-    y = Y(ii)+0.001*max(Y);
+    y = Y(ii)+0.03*max(Y);
 %     text(x,y, "{\itP} < 10^{"+ceil(log10(p(ii)))+"}", horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=6);
     signifStr = genSignifStrAstricks(p(ii));
     str = {signifStr;"{\itn} = " + counts(ii)};
@@ -276,63 +284,62 @@ ylabel('Fraction', 'Units','normalized', 'Position',[-0.2 .5]);
 hax=gca;
 hax.TickLength(1) = [0.025];
 hax.XRuler.TickLabelGapOffset = -1;
-hax.YRuler.TickLabelGapOffset = -1;
+hax.YRuler.TickLabelGapOffset = 0;
 hax.XLim = [min(xG) max(xG)] + [-1 1].*0.5;
 hax.YLim = [0 0.7];
-
 
 
 %% Forward vs Reverse - separated by balls
-for ii_ball = 1:2
-axes(panels{5}(ii_ball))
-cla
-hold on
-
-events_ball_IX = [events.ball_num] == ii_ball;
-gForRev_by_ball = gForRev(events_ball_IX);
-G = categorical(categories(gForRev_by_ball));
-gcounts = tabulate(gForRev_by_ball);
-counts = [gcounts{:,2}];
-proportions = counts./sum(counts);
-expectedProportion = [.5 .5];
-expectedCounts = expectedProportion .* sum(counts);
-p = myBinomTest(counts,sum(counts),expectedProportion,'one').*length(counts);
-p(p==0)=realmin;
-xG = 1:length(G);
-
-Y = proportions;
-h=bar(xG,Y);
-h.BarWidth = 0.75;
-h.FaceColor = 0.5*[1 1 1];
-hax=gca;
-hax.XTick = xG;
-hax.XTickLabel = ForRevCategoriesOrder;
-for ii = 1:length(G)
-    x = ii+[-1 1].*h.BarWidth/2;
-    y = expectedProportion(ii).*sum(Y);
-    line(x, [y, y], 'Color', 'r', 'LineWidth', 2);
-    x = ii;
-    y = Y(ii)+0.001*max(Y);
-%     text(x,y, "{\itP} < 10^{"+ceil(log10(p(ii)))+"}", horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=6);
-    signifStr = genSignifStrAstricks(p(ii));
-    str = {signifStr;"{\itn} = " + counts(ii)};
-    text(x,y, str, horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=8);
-end
-% xlabel('Replay speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
-ylabel('Fraction', 'Units','normalized', 'Position',[-0.2 .5]);
-hax=gca;
-hax.TickLength(1) = [0.025];
-hax.XRuler.TickLabelGapOffset = -1;
-hax.YRuler.TickLabelGapOffset = -1;
-hax.XLim = [min(xG) max(xG)] + [-1 1].*0.5;
-hax.YLim = [0 0.7];
-
-end
+% for ii_ball = 1:2
+% axes(panels{5}(ii_ball))
+% cla
+% hold on
+% 
+% events_ball_IX = [events.ball_num] == ii_ball;
+% gForRev_by_ball = gForRev(events_ball_IX);
+% G = categorical(categories(gForRev_by_ball));
+% gcounts = tabulate(gForRev_by_ball);
+% counts = [gcounts{:,2}];
+% proportions = counts./sum(counts);
+% expectedProportion = [.5 .5];
+% expectedCounts = expectedProportion .* sum(counts);
+% p = myBinomTest(counts,sum(counts),expectedProportion,'two').*length(counts);
+% p(p==0)=realmin;
+% xG = 1:length(G);
+% 
+% Y = proportions;
+% h=bar(xG,Y);
+% h.BarWidth = 0.75;
+% h.FaceColor = 0.5*[1 1 1];
+% hax=gca;
+% hax.XTick = xG;
+% hax.XTickLabel = ForRevCategoriesOrder;
+% for ii = 1:length(G)
+%     x = ii+[-1 1].*h.BarWidth/2;
+%     y = expectedProportion(ii).*sum(Y);
+%     line(x, [y, y], 'Color', 'r', 'LineWidth', 2);
+%     x = ii;
+%     y = Y(ii)+0.001*max(Y);
+% %     text(x,y, "{\itP} < 10^{"+ceil(log10(p(ii)))+"}", horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=6);
+%     signifStr = genSignifStrAstricks(p(ii));
+%     str = {signifStr;"{\itn} = " + counts(ii)};
+%     text(x,y, str, horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=8);
+% end
+% % xlabel('Replay speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
+% ylabel('Fraction', 'Units','normalized', 'Position',[-0.2 .5]);
+% hax=gca;
+% hax.TickLength(1) = [0.025];
+% hax.XRuler.TickLabelGapOffset = -1;
+% hax.YRuler.TickLabelGapOffset = -1;
+% hax.XLim = [min(xG) max(xG)] + [-1 1].*0.5;
+% hax.YLim = [0 0.7];
+% 
+% end
 
 
 
 %% Future vs Past
-axes(panels{3}(1))
+axes(panels{2}(1))
 cla
 hold on
 G = categorical(categories(gPastFuture));
@@ -341,10 +348,14 @@ counts = [gcounts{:,2}];
 proportions = counts./sum(counts);
 expectedProportion = [.5 .5];
 expectedCounts = expectedProportion .* sum(counts);
-p = myBinomTest(counts,sum(counts),expectedProportion,'one').*length(counts);
+p = myBinomTest(counts,sum(counts),expectedProportion,'two').*length(counts);
 p(p==0)=realmin;
-xG = 1:length(G);
+fprintf('\nboth balls: Future vs Past\n')
+for ii = 1:length(p)
+    fprintf('%s: P binom (two-sided) = %d\n',PastFutureCategoriesOrder{ii},p(ii));
+end
 
+xG = 1:length(G);
 Y = proportions;
 h=bar(xG,Y);
 h.BarWidth = 0.75;
@@ -357,7 +368,7 @@ for ii = 1:length(G)
     y = expectedProportion(ii).*sum(Y);
     line(x, [y, y], 'Color', 'r', 'LineWidth', 2);
     x = ii;
-    y = Y(ii)+0.001*max(Y);
+    y = Y(ii)+0.1*max(Y);
 %     text(x,y, "{\itP} < 10^{"+ceil(log10(p(ii)))+"}", horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=6);
     signifStr = genSignifStrAstricks(p(ii));
     str = {signifStr;"{\itn} = " + counts(ii)};
@@ -368,57 +379,57 @@ ylabel('Fraction', 'Units','normalized', 'Position',[-0.2 .5]);
 hax=gca;
 hax.TickLength(1) = [0.025];
 hax.XRuler.TickLabelGapOffset = -1;
-hax.YRuler.TickLabelGapOffset = -1;
+hax.YRuler.TickLabelGapOffset = 0;
 hax.XLim = [min(xG) max(xG)] + [-1 1].*0.5;
 hax.YLim = [0 0.7];
 
 %% Future vs Past - separated by balls
-for ii_ball = 1:2
-axes(panels{6}(ii_ball))
-cla
-hold on
-
-events_ball_IX = [events.ball_num] == ii_ball;
-gPastFuture_by_ball = gPastFuture(events_ball_IX);
-G = categorical(categories(gPastFuture_by_ball));
-gcounts = tabulate(gPastFuture_by_ball);
-counts = [gcounts{:,2}];
-proportions = counts./sum(counts);
-expectedProportion = [.5 .5];
-expectedCounts = expectedProportion .* sum(counts);
-p = myBinomTest(counts,sum(counts),expectedProportion,'one').*length(counts);
-p(p==0)=realmin;
-xG = 1:length(G);
-
-Y = proportions;
-h=bar(xG,Y);
-h.BarWidth = 0.75;
-h.FaceColor = 0.5*[1 1 1];
-hax=gca;
-hax.XTick = xG;
-hax.XTickLabel = PastFutureCategoriesOrder;
-for ii = 1:length(G)
-    x = ii+[-1 1].*h.BarWidth/2;
-    y = expectedProportion(ii).*sum(Y);
-    line(x, [y, y], 'Color', 'r', 'LineWidth', 2);
-    x = ii;
-    y = Y(ii)+0.001*max(Y);
-%     text(x,y, "{\itP} < 10^{"+ceil(log10(p(ii)))+"}", horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=6);
-    signifStr = genSignifStrAstricks(p(ii));
-    str = {signifStr;"{\itn} = " + counts(ii)};
-    text(x,y, str, horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=8);
-end
-% xlabel('Replay speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
-ylabel('Fraction', 'Units','normalized', 'Position',[-0.2 .5]);
-% text(1.6,0.5,"Ball "+ii_ball,'Units','normalized','FontSize',10,'HorizontalAlignment','center');
-hax=gca;
-hax.TickLength(1) = [0.025];
-hax.XRuler.TickLabelGapOffset = -1;
-hax.YRuler.TickLabelGapOffset = -1;
-hax.XLim = [min(xG) max(xG)] + [-1 1].*0.5;
-hax.YLim = [0 0.7];
-
-end
+% for ii_ball = 1:2
+% axes(panels{6}(ii_ball))
+% cla
+% hold on
+% 
+% events_ball_IX = [events.ball_num] == ii_ball;
+% gPastFuture_by_ball = gPastFuture(events_ball_IX);
+% G = categorical(categories(gPastFuture_by_ball));
+% gcounts = tabulate(gPastFuture_by_ball);
+% counts = [gcounts{:,2}];
+% proportions = counts./sum(counts);
+% expectedProportion = [.5 .5];
+% expectedCounts = expectedProportion .* sum(counts);
+% p = myBinomTest(counts,sum(counts),expectedProportion,'two').*length(counts);
+% p(p==0)=realmin;
+% xG = 1:length(G);
+% 
+% Y = proportions;
+% h=bar(xG,Y);
+% h.BarWidth = 0.75;
+% h.FaceColor = 0.5*[1 1 1];
+% hax=gca;
+% hax.XTick = xG;
+% hax.XTickLabel = PastFutureCategoriesOrder;
+% for ii = 1:length(G)
+%     x = ii+[-1 1].*h.BarWidth/2;
+%     y = expectedProportion(ii).*sum(Y);
+%     line(x, [y, y], 'Color', 'r', 'LineWidth', 2);
+%     x = ii;
+%     y = Y(ii)+0.001*max(Y);
+% %     text(x,y, "{\itP} < 10^{"+ceil(log10(p(ii)))+"}", horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=6);
+%     signifStr = genSignifStrAstricks(p(ii));
+%     str = {signifStr;"{\itn} = " + counts(ii)};
+%     text(x,y, str, horizontalAlignment = 'center',VerticalAlignment='bottom',FontSize=8);
+% end
+% % xlabel('Replay speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
+% ylabel('Fraction', 'Units','normalized', 'Position',[-0.2 .5]);
+% % text(1.6,0.5,"Ball "+ii_ball,'Units','normalized','FontSize',10,'HorizontalAlignment','center');
+% hax=gca;
+% hax.TickLength(1) = [0.025];
+% hax.XRuler.TickLabelGapOffset = -1;
+% hax.YRuler.TickLabelGapOffset = -1;
+% hax.XLim = [min(xG) max(xG)] + [-1 1].*0.5;
+% hax.YLim = [0 0.7];
+% 
+% end
 
 %% add panel letters
 font_size = 11;
@@ -430,12 +441,12 @@ axes(panels{3}(1))
 text(-0.3,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %% add line titles
-axes(panels{1}(1))
-text(-0.7,0.5,{"Both landing","balls"},'Units','normalized','FontSize',10,'HorizontalAlignment','center');
-axes(panels{4}(1))
-text(-0.7,0.5,{"Ball 1"},'Units','normalized','FontSize',10,'HorizontalAlignment','center');
-axes(panels{4}(2))
-text(-0.7,0.5,{"Ball 2"},'Units','normalized','FontSize',10,'HorizontalAlignment','center');
+% axes(panels{1}(1))
+% text(-0.7,0.5,{"Both landing","balls"},'Units','normalized','FontSize',10,'HorizontalAlignment','center');
+% axes(panels{4}(1))
+% text(-0.7,0.5,{"Ball 1"},'Units','normalized','FontSize',10,'HorizontalAlignment','center');
+% axes(panels{4}(2))
+% text(-0.7,0.5,{"Ball 2"},'Units','normalized','FontSize',10,'HorizontalAlignment','center');
 
 %%
 fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);

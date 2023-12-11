@@ -1,4 +1,4 @@
-%% Replay - Fig supp 3 - per bat results
+%% Replay - Fig supp 4 - per bat results
 %%
 clear 
 clc
@@ -14,18 +14,21 @@ xlable_strs = {
     {'Replay';'duration (s)'};
     {'Compression ratio';'(replay speed / flight speed)'};
     {'Replay';'distance (m)'};
-    {'Replay';'distance (norm)'};
+    {'Replay';'distance (norm.)'};
     };
 nFeatures = length(features_names);
 nbins = 50; % spatial bins for coverage
 
 %% graphics params
 PastFutureClrs = [0.1.*[1 1 1]; 1 1 1];
+directions_clrs = {[0    0.3843    0.7451];[ 0.5216    0.2471         0]};
+panels_xlim = [-0.0950    1.9950; -1.9500   40.9500; -0.4500   56.5500; -0.0210    0.4410];
+panels_xticks = {[0 0.5 1 1.5],[0 20 40],[0:25:50],[0 0.2 0.4]};
 
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_supp_3';
+fig_name_str = 'Extended_Data_Fig_4';
 fig_caption_str = ' per bat results';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -169,6 +172,9 @@ for ii_fn = 1:nFeatures
         hax.TickLength(1) = [0.035];
         hax.XRuler.TickLabelGapOffset = -1;
         hax.YRuler.TickLabelGapOffset = 1;
+        hax.XLim = panels_xlim(ii_fn,:);
+        hax.XTick = panels_xticks{ii_fn};
+        hax.XTickLabelRotation = 0;
         if ii_bat == nBats
             xlabel_pos = [0.45 0.5 0.55 0.5];
             xlabel(xlable_strs{ii_fn}, 'Units','normalized', 'Position',[xlabel_pos(ii_fn) -0.3]);
@@ -194,7 +200,7 @@ hold on
 plot([0 1], [1 1], 'color', clrs{1}, 'LineWidth',lw,'Clipping','off');
 plot([0 1], [0 0], 'color', clrs{2}, 'LineWidth',lw,'Clipping','off');
 text(1.5, 1.0, 'Sleep','FontSize',7,'HorizontalAlignment','left');
-text(1.5, 0.0, 'Rest','FontSize',7,'HorizontalAlignment','left');
+text(1.5, 0.0, 'Awake','FontSize',7,'HorizontalAlignment','left');
 xlim([0 1])
 ylim([0 1])
 axis off
@@ -217,10 +223,10 @@ for ii_bat = 1:nBats
     nBins = size(c,4);
     x = linspace(0,1,nBins);
     lw = .2;
-    plot(x, squeeze(c(:,1,1,:)),'-b','LineWidth',lw);
-    plot(x, squeeze(c(:,2,1,:)),'--b','LineWidth',lw);
-    plot(x, squeeze(c(:,1,2,:)),'-r','LineWidth',lw);
-    plot(x, squeeze(c(:,2,2,:)),'--r','LineWidth',lw);
+    plot(x, squeeze(c(:,1,1,:)),'-','LineWidth',lw,'Color',directions_clrs{1});
+    plot(x, squeeze(c(:,2,1,:)),'--','LineWidth',lw,'Color',directions_clrs{1});
+    plot(x, squeeze(c(:,1,2,:)),'-','LineWidth',lw,'Color',directions_clrs{2});
+    plot(x, squeeze(c(:,2,2,:)),'--','LineWidth',lw,'Color',directions_clrs{2});
     hax=gca;
     hax.XTick = [0 1];
     hax.XLim = [0 1];
@@ -243,6 +249,31 @@ for ii_bat = 1:nBats
         "{\itn}_{sessions} = " + T2.GroupCount(ii_bat); ...
         "{\itn}_{events} = " + T2.nEvents(ii_bat); ...
         },'FontSize',7,'HorizontalAlignment','center','Units','normalized','FontWeight','bold');
+end
+
+%% panel E legend
+if exist('panels_coverage_legend','var')
+    delete(panels_coverage_legend);
+end
+panels_coverage_legend(1) = axes('position', [panels{2}(1).Position([1 2])+[1 1.25] 0.5 0.5]);
+panels_coverage_legend(2) = axes('position', [panels{2}(1).Position([1 2])+[4 1.25] 0.5 0.5]);
+arrow_str = {'\rightarrow','\leftarrow'};
+for ii_dir = 1:2
+    axes(panels_coverage_legend(ii_dir))
+    cla
+    hold on
+    t = linspace(0,1,100);
+    x = pulstran(t,linspace(0,1,3),'rectpuls',1/6);
+    x(x>0) = nan;x(~isnan(x)) = 0;
+    clear h
+    plot(  t  ,   x,     'color', directions_clrs{ii_dir}, 'LineWidth',lw,'Clipping','off','LineWidth',1.5);
+    plot([0 1], [.5 .5], 'color', directions_clrs{ii_dir}, 'LineWidth',lw,'Clipping','off','LineWidth',1.5);
+    text(1.3, 0.5, "Sleep dir "+ii_dir,'FontSize',7,'HorizontalAlignment','left');
+    text(1.3, 0, "Awake dir "+ii_dir,'FontSize',7,'HorizontalAlignment','left');
+    text(0.2, -0.3, arrow_str{ii_dir},'Color',directions_clrs{ii_dir},'FontWeight','bold', 'FontSize',10);
+    xlim([0 1])
+    ylim([0 1])
+    axis off
 end
 
 %% add panel letters

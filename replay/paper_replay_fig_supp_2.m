@@ -1,4 +1,4 @@
-%% Replay - Fig supp 2 - replay vs flight speed
+%% Replay - Fig supp 3 - replay vs flight speed
 clear 
 clc
 close all
@@ -17,7 +17,7 @@ lw = 1.1;
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_supp_2';
+fig_name_str = 'Extended_Data_Fig_3';
 fig_caption_str = 'replay and flight speed histograms';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -56,12 +56,16 @@ set(groot,  'defaultAxesTickDirMode', 'manual');
 annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 
 % create panels
-panels{1}(1) = axes('position', [4 15 5 4]);
-panels{1}(2) = axes('position', [6.3 17.8 0.5 0.5]);
-panels{2}(1) = axes('position', [11 15 5 4]);
-panels{2}(2) = axes('position', [11.8 17.8 0.5 0.5]);
-panels{3}(1) = axes('position', [7.5 9 5 4]);
-panels{3}(2) = axes('position', [13.2 12 0.5 0.5]);
+panels{1}(1) = axes('position', [3 15 5 4]);
+panels{1}(2) = axes('position', [5.3 17.8 0.5 0.5]);
+
+panels{2}(1) = axes('position', [10 15 5 4]);
+panels{2}(2) = axes('position', [15.7 18 0.5 0.5]);
+
+panels{3}(1) = axes('position', [10   9 5 4]);
+panels{3}(2) = axes('position', [10.8 11.8 0.5 0.5]);
+
+
 
 %% load data
 if ~exist('events_all','var')
@@ -149,11 +153,14 @@ for ii_epoch_type = 1:length(epoch_types)
     g = gArena{ii_epoch_type};
     histogram(X(g=='200m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{1}, 'EdgeColor',clrs{ii_epoch_type},'LineWidth',lw);
     histogram(X(g=='120m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{2}, 'EdgeColor',clrs{ii_epoch_type},'LineWidth',lw);
+    [~,P,KSSTAT] = kstest2(X(g=='200m'),X(g=='120m'))
+    median(X(g=='200m'))
+    median(X(g=='120m'))
 end
 xlabel('Replay speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
 ylabel('Probability density', 'Units','normalized', 'Position',[-0.2 .5]);
 hax=gca;
-hax.TickLength(1) = [0.025];
+hax.TickLength(1) = [0.016];
 hax.XRuler.TickLabelGapOffset = -1;
 
 %% legend (replay speed hists)
@@ -170,15 +177,15 @@ plot([0 1], [.5 .5],     'color', clrs{2}, 'LineWidth',lw,'Clipping','off');
 plot([0 1], [.5 .5]+1.5, 'color', clrs{1}, 'LineWidth',lw,'Clipping','off');
 text(1.3, 2.0, 'Sleep (200m)','FontSize',7,'HorizontalAlignment','left');
 text(1.3, 1.5, 'Sleep (130m)','FontSize',7,'HorizontalAlignment','left');
-text(1.3, 0.5, 'Rest (200m)','FontSize',7,'HorizontalAlignment','left');
-text(1.3, 0.0, 'Rest (130m)','FontSize',7,'HorizontalAlignment','left');
+text(1.3, 0.5, 'Awake (200m)','FontSize',7,'HorizontalAlignment','left');
+text(1.3, 0.0, 'Awake (130m)','FontSize',7,'HorizontalAlignment','left');
 xlim([0 1])
 ylim([0 1])
 axis off
 
 
-%% panel B - Flight speed
-axes(panels{2}(1))
+%% panel C - Flight speed
+axes(panels{3}(1))
 cla
 hold on
 X = flight_speed_all;
@@ -186,17 +193,17 @@ g=categorical(exp_arena_all);
 histogram(X(g=='200m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{1}, 'EdgeColor','k','LineWidth',lw,'NumBins',7);
 histogram(X(g=='120m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{2}, 'EdgeColor','k','LineWidth',lw,'NumBins',7);
 xlabel('Flight speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
-ylabel('Probability density', 'Units','normalized', 'Position',[-0.2 .5]);
+ylabel('Probability density', 'Units','normalized', 'Position',[-0.15 .5]);
 hax=gca;
 hax.XLim = [0 10];
 hax.XTick = [0 5 10];
-hax.TickLength(1) = [0.025];
+hax.TickLength(1) = [0.016];
 hax.XRuler.TickLabelGapOffset = -1;
 [~,P,CI,STATS] = ttest2(X(g=='200m'), X(g=='120m'), 'Tail','both');
 text(0.6,1.1,"{\itP} = "+ sprintf('%.2g',P), 'Units','normalized','FontSize',7);
 
 %% legend (flight speed hists)
-axes(panels{2}(2))
+axes(panels{3}(2))
 cla
 hold on
 t = linspace(0,1,100);
@@ -206,13 +213,13 @@ clear h
 plot(  t  ,   x  ,       'color', 'k', 'LineWidth',lw,'Clipping','off');
 plot([0 1], [.5 .5],     'color', 'k', 'LineWidth',lw,'Clipping','off');
 text(1.3, 0.5, '200m','FontSize',7,'HorizontalAlignment','left');
-text(1.3, 0.0, '120m','FontSize',7,'HorizontalAlignment','left');
+text(1.3, 0.0, '130m','FontSize',7,'HorizontalAlignment','left');
 xlim([0 1])
 ylim([0 1])
 axis off
 
-%% panel C - speed correlations (replay vs flight)
-axes(panels{3}(1))
+%% panel B - speed correlations (replay vs flight)
+axes(panels{2}(1))
 cla
 hold on
 r=[];
@@ -220,25 +227,35 @@ p=[];
 for ii_epoch_type = 1:length(epoch_types)
     X = flight_speed_all;
     Y = speed_mean_per_session(ii_epoch_type,:)';
-    plot(X,Y,'o','Color',clrs{ii_epoch_type},'MarkerSize',5);
+    lm = fitlm(X,Y)
+    h=plot(lm);
+    h(1).Marker = 'o';
+    h(1).MarkerSize = 5;
+    h(1).Color = clrs{ii_epoch_type};
+    h(2).Color = clrs{ii_epoch_type};
+    h(3).Color = clrs{ii_epoch_type};
+    h(4).Color = clrs{ii_epoch_type};
+    legend off
+%     plot(X,Y,'o','Color',clrs{ii_epoch_type},'MarkerSize',5);
     [r(ii_epoch_type) p(ii_epoch_type)] = corr(X, Y,'rows','pairwise','tail','right','type','Pearson');
 %     text(0.1,0.9, "{\itr} = "+ sprintf('%.2f',r), 'Units','normalized','FontSize',7);
 %     text(0.1,0.8, "{\itP} = "+ sprintf('%.3f',p), 'Units','normalized','FontSize',7,'FontWeight','normal');
 end
+title("")
 xlabel('Flight speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
-ylabel('Replay speed (m/s)', 'Units','normalized', 'Position',[-0.2 .5]);
+ylabel('Replay speed (m/s)', 'Units','normalized', 'Position',[-0.15 .5]);
 hax=gca;
-hax.TickLength(1) = [0.025];
+hax.TickLength(1) = [0.016];
 hax.XRuler.TickLabelGapOffset = -1;
 
 %% legend (speed correlations)
-axes(panels{3}(2))
+axes(panels{2}(2))
 cla
 hold on
 plot(0,1,'o', 'color', clrs{1}, 'MarkerSize',4,'Clipping','off');
 plot(0,0,'o', 'color', clrs{2}, 'MarkerSize',4,'Clipping','off');
 text(0.4, 1, 'Sleep'+":  {\itr} = " + sprintf('%.2f',r(1)) + ",  {\itP} = "+ sprintf('%.1g',p(1)),'FontSize',7,'HorizontalAlignment','left');
-text(0.4, 0, 'Rest'+":   {\itr} = " + sprintf('%.2f',r(2)) + ",  {\itP} = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left');
+text(0.4, 0, 'Awake'+":   {\itr} = " + sprintf('%.2f',r(2)) + ",  {\itP} = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left');
 xlim([0 1])
 ylim([0 1])
 axis off
@@ -248,9 +265,9 @@ font_size = 11;
 axes(panels{1}(1))
 text(-0.3,1.1, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{2}(1))
-text(-0.3,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.25,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
-text(-0.3,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.25,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);

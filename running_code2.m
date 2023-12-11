@@ -626,5 +626,54 @@ event_num = 49;
 win_s = 2;
 paper_replay_fig_single_replay_example(exp_ID,epoch_type,params_opt,event_num,win_s,...
     'res_dir','E:\Tamir\work\PROJECTS\LargeScale\paper_replay\figures\Fig_replay_examples\test')
-    
+  
+
+%%
+[exp_list,T] = decoding_get_inclusion_list();
+T = T(exp_list,:);
+bats = unique(T.bat_num);
+clr_map = containers.Map(num2cell(bats),{'r','g','b','k','m','c','y'});
+figure
+subplot(211)
+hold on
+FE_all = {};
+for ii_exp = 1:length(exp_list)
+    exp_ID = exp_list{ii_exp};
+    exp = exp_load_data(exp_ID,'flight','details');
+    FE = exp.flight.FE;
+    FE([FE.distance]<100)=[];
+    FE_all{ii_exp} = FE;
+    xi = 0:0.5:40;
+    c = clr_map(exp.details.batNum);
+%     histogram([FE.duration],'DisplayStyle','stairs','BinEdges',0:0.5:40,'EdgeColor',c);
+    f = ksdensity([FE.duration],xi);
+    plot(xi,f,'DisplayName',exp_ID,'Color',c,'LineWidth',2)
+end
+subplot(212)
+hold on
+for ii_bat = 1:length(bats)
+    bat_num = bats(ii_bat);
+    bat_session_IX = find(T.bat_num==bat_num);
+    exp=exp_load_data(exp_list{bat_session_IX(1)},'details');
+    FE = [FE_all{bat_session_IX}];
+    xi = 0:0.5:40;
+    c = clr_map(bat_num);
+    f = ksdensity([FE.duration],xi);
+    plot(xi,f,'DisplayName',"bat"+bat_num,'Color',c,'LineWidth',2);
+%     plot(xi,f,'DisplayName',sprintf('bat%d(%s)',bat_num,exp.details.recordingArena),'Color',c,'LineWidth',2);
+end
+legend()
+xlabel('Time (s)')
+
+%%
+
+
+
+
+
+
+
+
+
+
 %%
