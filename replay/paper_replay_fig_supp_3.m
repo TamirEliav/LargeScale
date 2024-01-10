@@ -89,7 +89,8 @@ xoffset = 2;
 panels_hist_size = [2 1.5];
 panles_hist_pos_x = linspace(1.3, 9.8, nFeatures)+xoffset;
 panles_hist_pos_y = linspace(24.5, 12, nBats);
-for ii_bat=1:nBats
+panles_hist_pos_y(end+1) = 8;
+for ii_bat=1:length(panles_hist_pos_y)
     panel_pos(2) = panles_hist_pos_y(ii_bat);
     for ii_feature=1:nFeatures
         panel_pos(1) = panles_hist_pos_x(ii_feature);
@@ -97,6 +98,7 @@ for ii_bat=1:nBats
     end
     panels{2}(ii_bat) = axes('position', [12.4+xoffset panel_pos(2) 7 1.5]);
 end
+delete(panels{2}(end))
 
 %%
 % panels{1}(1) = axes('position', [3 23 3 3]);
@@ -152,7 +154,6 @@ end
 %% panels A-D: features hists per bat
 axes(panels{1}(1))
 hold on
-line_styles = {'-','--'};
 clrs = {[.6 .1 .8],[.1 .8 .1]};
 for ii_fn = 1:nFeatures
     for ii_bat = 1:nBats
@@ -276,6 +277,67 @@ for ii_dir = 1:2
     axis off
 end
 
+%% 2 bats data - load data
+exp_list_2bats = {
+%     'b2299_d191202', % <70% accuracy, excluded
+%     'b2299_d191203', % <70% accuracy, excluded
+    'b2299_d191204',
+    'b2299_d191205',
+    'b2299_d191208',
+    'b2299_d191209',
+%     'b2299_d191210', % <70% accuracy, excluded
+    'b2299_d191213',
+    };
+
+seqs_all_per_session_2bats = {};
+for ii_epoch_type = 1:length(epoch_types)
+    for ii_exp = 1:length(exp_list_2bats)
+        exp_ID = exp_list{ii_exp};
+        exp = exp_load_data(exp_ID,'details');
+        epoch_type = epoch_types{ii_epoch_type};
+        params_opt = 11;
+        event_type = 'posterior';
+        [events, params] = decoding_load_events_quantification(exp_ID, epoch_type, params_opt, event_type);
+        seqs = decoding_apply_seq_inclusion_criteria([events.seq_model]);
+        seqs_all_per_session_2bats{ii_epoch_type,ii_exp} = seqs;
+    end
+end
+
+%% panels F-I: features hist (2bats data)
+axes(panels{1}(end))
+hold on
+clrs = {[.6 .1 .8],[.1 .8 .1]};
+bat_seqs = [seqs_all_per_session_2bats{:}];
+for ii_fn = 1:nFeatures
+    fn = features_names{ii_fn};
+    axes(panels{1}(end,ii_fn));
+    cla
+    hold on
+    lw = 1.1;
+    X = [bat_seqs.(fn)];
+    histogram(X,'DisplayStyle','stairs','Normalization','pdf','LineStyle','-', 'EdgeColor','k','LineWidth',lw);
+    hax=gca;
+    hax.TickLength(1) = [0.035];
+    hax.XRuler.TickLabelGapOffset = -1;
+    hax.YRuler.TickLabelGapOffset = 1;
+    hax.XLim = panels_xlim(ii_fn,:);
+    hax.XTick = panels_xticks{ii_fn};
+    hax.XTickLabelRotation = 0;
+    xlabel_pos = [0.45 0.5 0.55 0.5];
+    xlabel(xlable_strs{ii_fn}, 'Units','normalized', 'Position',[xlabel_pos(ii_fn) -0.3]);
+    if ii_fn == 1
+        ylabel({'Probability';'density'}, 'Units','normalized', 'Position',[-0.2 .5]);
+    end
+    linkaxes(panels{1}(:,ii_fn),'x');
+end
+axes(panels{1}(end,1));
+text(-1.1, .5, { ...
+    "bat 2299"; ...
+    "135m, 2 bats"; ...
+    "{\itn}_{sessions} = " + length(exp_list_2bats); ...
+    "{\itn}_{events} = " + length(bat_seqs); ...
+    },'FontSize',7,'HorizontalAlignment','center','Units','normalized','FontWeight','bold');
+
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1,1))
@@ -289,6 +351,16 @@ text(-0.3,1.3, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_siz
 
 axes(panels{2}(1))
 text(-0.1,1.3, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+
+axes(panels{1}(end,1))
+text(-0.3,1.3, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels{1}(end,2))
+text(-0.3,1.3, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels{1}(end,3))
+text(-0.3,1.3, 'h', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels{1}(end,4))
+text(-0.3,1.3, 'i', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+
 
 %%
 fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);

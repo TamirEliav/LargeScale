@@ -198,8 +198,41 @@ filename = fullfile(dir_OUT,figname);
 saveas(gcf,filename,'tif')
 
 
-
-
+%%
+close all
+directionality_contrast_index = [];
+directionality_fraction = [];
+directionality_binom_pval = [];
+nSeqs = [];
+for ii_epoch_type = 1:length(epoch_types)
+    for ii_exp = 1:length(exp_list)
+        events = events_all_per_session{ii_epoch_type}{ii_exp};
+        seqs = [events.seq_model];
+        n1 = sum([seqs.direction]==1);
+        n2 = sum([seqs.direction]==-1);
+        directionality_contrast_index(ii_epoch_type,ii_exp) = (n1-n2)/(n1+n2);
+        directionality_fraction(ii_epoch_type,ii_exp) = (n1)/(n1+n2);
+        directionality_binom_pval(ii_epoch_type,ii_exp) = myBinomTest(n1,n1+n2,0.5);
+        nSeqs(ii_epoch_type,ii_exp) = length(seqs);
+    end
+end
+vals = directionality_contrast_index;
+% vals = directionality_fraction;
+% vals = directionality_binom_pval;
+vals(nSeqs<20)=nan;
+[G,GID] = findgroups(T.bat_num);
+figure
+hold on
+splitapply(@(x)plot(x,'-o'),vals',G);
+% splitapply(@(x,n)bubblechart(1:length(x),x,n),vals',nSeqs',G);
+ylim([-1 1])
+% ylim([0 1])
+xlabel('#session')
+ylabel('direcitonality')
+legend([string(epoch_types)+GID]');
+figname = 'novelty_directionality';
+filename = fullfile(dir_OUT,figname);
+saveas(gcf,filename,'tif')
 
 
 

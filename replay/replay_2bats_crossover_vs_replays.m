@@ -157,6 +157,26 @@ TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.prev_co_same_ma
 msg_str = sprintf('replay position between %d-%d & same map & reverse', replay_pos_limits);
 run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
 
+TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2);
+TF = TF & ~ismember(data_info.exp_ID, {'b2299_d191202'});
+msg_str = sprintf('replay pos between %d-%d, dec acc>65%%', replay_pos_limits);
+run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
+
+TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2);
+TF = TF & ~ismember(data_info.exp_ID, {'b2299_d191202','b2299_d191203','b2299_d191210'});
+msg_str = sprintf('replay pos between %d-%d, dec acc>70%%', replay_pos_limits);
+run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
+
+TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.prev_co_same_map];
+TF = TF & ~ismember(data_info.exp_ID, {'b2299_d191202'});
+msg_str = sprintf('replay pos between %d-%d & same map, dec acc>65%%', replay_pos_limits);
+run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
+
+TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.prev_co_same_map];
+TF = TF & ~ismember(data_info.exp_ID, {'b2299_d191202','b2299_d191203','b2299_d191210'});
+msg_str = sprintf('replay pos between %d-%d & same map, dec acc>70%%', replay_pos_limits);
+run_corr(X,Y,TF,msg_str,params_opt,data_info,seqs_all);
+
 %%
 replay_dist_thr = 10;
 TF = Y>replay_pos_limits(1) & Y<replay_pos_limits(2) & [seqs_all.distance]>replay_dist_thr;

@@ -9,6 +9,7 @@ params_opt = 11; % decoding opt
 %% plotting options
 panels_xlim = [-0.0950    1.9950; -1.9500   40.9500; -0.4500   56.5500; -0.0210    0.4410];
 panels_xticks = {[0 0.5 1 1.5],[0 20 40],[0:10:50],[0 0.2 0.4]};
+panels_bin_size = [0.05 1 1 0.01];
 
 %% graphics params
 epoch_types = {'sleep','rest'};
@@ -138,7 +139,7 @@ for ii_EL = 1:length(early_late_IX)
             events = [events_all_per_session{ii_epoch_type}{early_late_IX{ii_EL}}];
             seqs = [events.seq_model];
             X = [seqs.(fn)];
-            hh(ii_epoch_type) = histogram(X,'DisplayStyle','stairs','Normalization','pdf','EdgeColor',epoch_type_clrs{ii_epoch_type},'LineWidth',lw);
+            hh(ii_epoch_type) = histogram(X,'DisplayStyle','stairs','Normalization','pdf','EdgeColor',epoch_type_clrs{ii_epoch_type},'LineWidth',lw,'BinWidth',panels_bin_size(ii_fn));
             text(0.5,0.9-ii_epoch_type*0.1, "{\itn}_{" + epoch_types_str{ii_epoch_type} + "} = "+length(X),'units','normalized','FontSize',7)
         end
         linkprop(hh,'BinEdges');

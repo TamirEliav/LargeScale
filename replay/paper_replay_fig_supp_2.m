@@ -10,7 +10,8 @@ params_opt = 11; % decoding opt
 %% plotting options
 
 %% graphics params
-line_styles = {'-','--'};
+line_styles = {'-',':'};
+line_widths = [1.1 2];
 clrs = {[.6 .1 .8],[.1 .8 .1]};
 lw = 1.1;
 
@@ -151,8 +152,8 @@ hold on
 for ii_epoch_type = 1:length(epoch_types)
     X = [seqs_all{ii_epoch_type}.speed];
     g = gArena{ii_epoch_type};
-    histogram(X(g=='200m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{1}, 'EdgeColor',clrs{ii_epoch_type},'LineWidth',lw);
-    histogram(X(g=='120m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{2}, 'EdgeColor',clrs{ii_epoch_type},'LineWidth',lw);
+    histogram(X(g=='200m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{1}, 'EdgeColor',clrs{ii_epoch_type},'LineWidth',line_widths(1));
+    histogram(X(g=='120m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{2}, 'EdgeColor',clrs{ii_epoch_type},'LineWidth',line_widths(2));
     [~,P,KSSTAT] = kstest2(X(g=='200m'),X(g=='120m'))
     median(X(g=='200m'))
     median(X(g=='120m'))
@@ -171,10 +172,12 @@ t = linspace(0,1,100);
 x = pulstran(t,linspace(0,1,3),'rectpuls',1/6);
 x(x>0) = nan;x(~isnan(x)) = 0;
 clear h
-plot(  t  ,   x  ,       'color', clrs{2}, 'LineWidth',lw,'Clipping','off');
-plot(  t  ,   x  +1.5,   'color', clrs{1}, 'LineWidth',lw,'Clipping','off');
-plot([0 1], [.5 .5],     'color', clrs{2}, 'LineWidth',lw,'Clipping','off');
-plot([0 1], [.5 .5]+1.5, 'color', clrs{1}, 'LineWidth',lw,'Clipping','off');
+% plot(  t  ,   x  ,       'color', clrs{2}, 'LineWidth',lw,'Clipping','off');
+% plot(  t  ,   x  +1.5,   'color', clrs{1}, 'LineWidth',lw,'Clipping','off');
+plot([0 1], [0 0],    ':', 'color', clrs{2}, 'LineWidth',line_widths(2),'Clipping','off');
+plot([0 1], [0 0]+1.5,':', 'color', clrs{1}, 'LineWidth',line_widths(2),'Clipping','off');
+plot([0 1], [.5 .5],     'color', clrs{2}, 'LineWidth',line_widths(1),'Clipping','off');
+plot([0 1], [.5 .5]+1.5, 'color', clrs{1}, 'LineWidth',line_widths(1),'Clipping','off');
 text(1.3, 2.0, 'Sleep (200m)','FontSize',7,'HorizontalAlignment','left');
 text(1.3, 1.5, 'Sleep (130m)','FontSize',7,'HorizontalAlignment','left');
 text(1.3, 0.5, 'Awake (200m)','FontSize',7,'HorizontalAlignment','left');
@@ -190,8 +193,8 @@ cla
 hold on
 X = flight_speed_all;
 g=categorical(exp_arena_all);
-histogram(X(g=='200m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{1}, 'EdgeColor','k','LineWidth',lw,'NumBins',7);
-histogram(X(g=='120m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{2}, 'EdgeColor','k','LineWidth',lw,'NumBins',7);
+histogram(X(g=='200m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{1}, 'EdgeColor','k','LineWidth',line_widths(1),'NumBins',7);
+histogram(X(g=='120m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{2}, 'EdgeColor','k','LineWidth',line_widths(2),'NumBins',7);
 xlabel('Flight speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
 ylabel('Probability density', 'Units','normalized', 'Position',[-0.15 .5]);
 hax=gca;
@@ -210,8 +213,9 @@ t = linspace(0,1,100);
 x = pulstran(t,linspace(0,1,3),'rectpuls',1/6);
 x(x>0) = nan;x(~isnan(x)) = 0;
 clear h
-plot(  t  ,   x  ,       'color', 'k', 'LineWidth',lw,'Clipping','off');
-plot([0 1], [.5 .5],     'color', 'k', 'LineWidth',lw,'Clipping','off');
+% plot(  t  ,   x  ,       'color', 'k', 'LineWidth',lw,'Clipping','off');
+plot([0 1], [0 0],':',   'color', 'k', 'LineWidth',line_widths(2),'Clipping','off');
+plot([0 1], [.5 .5],     'color', 'k', 'LineWidth',line_widths(1),'Clipping','off');
 text(1.3, 0.5, '200m','FontSize',7,'HorizontalAlignment','left');
 text(1.3, 0.0, '130m','FontSize',7,'HorizontalAlignment','left');
 xlim([0 1])

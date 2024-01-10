@@ -13,7 +13,8 @@ close all
 % replay_coverage_examples_IX = [75 77 78 81];
 % replay_coverage_examples_IX = [21 19 70 78];
 % replay_coverage_examples_IX = [21 19 70 29];
-replay_coverage_examples_IX = [21 19 70 29];
+% replay_coverage_examples_IX = [21 19 70 29];
+replay_coverage_examples_IX = [21 19 29 70];
 
 % 5	b0184_d191202 21
 % 1	b0184_d191130 19
@@ -146,7 +147,7 @@ xlable_strs = {
     };
 
 %% panels A-D
-line_styles = {'-','--'};
+line_styles = {'-',':'};
 panels_xlim = [-0.0950    1.9950; -1.9500   40.9500; -0.4500   56.5500; -0.0210    0.4410];
 panels_xticks = {[0 0.5 1 1.5],[0 20 40],[0:10:50],[0 0.2 0.4]};
 for ii_fn = 1:length(features_names)
@@ -189,8 +190,10 @@ t = linspace(0,1,100);
 x = pulstran(t,linspace(0,1,3),'rectpuls',1/6);
 x(x>0) = nan;x(~isnan(x)) = 0;
 clear h
-plot(  t  ,   x  ,       'color', epoch_type_clrs{2}, 'LineWidth',lw,'Clipping','off');
-plot(  t  ,   x  +1.5,   'color', epoch_type_clrs{1}, 'LineWidth',lw,'Clipping','off');
+% plot(  t  ,   x  ,       'color', epoch_type_clrs{2}, 'LineWidth',lw,'Clipping','off');
+% plot(  t  ,   x  +1.5,   'color', epoch_type_clrs{1}, 'LineWidth',lw,'Clipping','off');
+plot([0 1], [0 0],     ':', 'color', epoch_type_clrs{2}, 'LineWidth',lw,'Clipping','off');
+plot([0 1], [0 0]+1.5, ':', 'color', epoch_type_clrs{1}, 'LineWidth',lw,'Clipping','off');
 plot([0 1], [.5 .5],     'color', epoch_type_clrs{2}, 'LineWidth',lw,'Clipping','off');
 plot([0 1], [.5 .5]+1.5, 'color', epoch_type_clrs{1}, 'LineWidth',lw,'Clipping','off');
 text(1.3, 2.0, 'Sleep (200m)','FontSize',7,'HorizontalAlignment','left');
@@ -222,7 +225,7 @@ for ii_ex = 1:length(panels{2})
     hax.XRuler.TickLabelGapOffset = -1.5;
     hax.YRuler.TickLabelGapOffset = 1;
     if ii_ex == 1
-        title('Example sessions: spatial coverage','Units','normalized','Position',[0.2 1.14],'FontWeight','normal','HorizontalAlignment','left');
+        title('Four example sessions: replay spatial coverage','Units','normalized','Position',[0.5 1.14],'FontWeight','normal','HorizontalAlignment','center');
 %         hl=legend({'Sleep dir 1','Rest dir 1','Sleep dir 2','Rest dir 2'},'NumColumns',2);
 %         hl.Units = 'normalized';
 %         hl.Position([1 2]) = [0.22 0.715];
@@ -278,7 +281,7 @@ hax.XRuler.TickLabelGapOffset = -1.5;
 hax.YRuler.TickLabelGapOffset = 1;
 xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.11]);
 ylabel({'Replay coverage';'(counts)'}, 'Units','normalized', 'Position',[-0.1 .5]);
-title("{\itn} = "+size(coverage_all,1)+" sessions",'Units','normalized','Position',[0.2 1.05],'FontWeight','normal');
+title("Population: {\itn} = "+size(coverage_all,1)+" sessions",'Units','normalized','Position',[0.27 1.05],'FontWeight','normal');
 
 %% panel G  - all seqs in a session (sleep)
 axes(panels{4}(1))
@@ -290,8 +293,11 @@ epoch_type ='sleep';
 params_opt = 11;
 events = decoding_load_events_quantification(exp_ID, epoch_type, params_opt, 'posterior');
 [seqs, TF] = decoding_apply_seq_inclusion_criteria([events.seq_model]);
+events(~TF) = [];
+epoch_sep = find(diff([events.epoch_num])~=0)+0.5;
 seqs_edges = [seqs.start_pos_norm; seqs.end_pos_norm];
 seqs_IX = 1:length(seqs);
+plot([0 1],repmat(epoch_sep,2,1),':','LineWidth',1.5,'Color',0.5*[1 1 1]);
 h=plot(seqs_edges,[seqs_IX;seqs_IX],'-','LineWidth',.55);
 dir_1_IX = [seqs.state_direction]==1;
 dir_2_IX = [seqs.state_direction]==-1;
@@ -308,7 +314,7 @@ hax.YRuler.TickLabelGapOffset = 1;
 xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.017]);
 ylabel('Replay event no.', 'Units','normalized', 'Position',[-0.06 .5]);
 title('Sleep replays', 'Units','normalized', 'Position',[0.47 0.99],'FontWeight','normal');
-text(1.1, 1.05, 'Example session: individual replays','FontSize',9,'HorizontalAlignment','center','Units','normalized')
+text(1.1, 1.05, 'Example session: all individual replays','FontSize',9,'HorizontalAlignment','center','Units','normalized')
 
 %% Panel G - all seqs in a session (rest)
 axes(panels{4}(2))
@@ -321,8 +327,10 @@ params_opt = 11;
 events = decoding_load_events_quantification(exp_ID, epoch_type, params_opt, 'posterior');
 [seqs, TF] = decoding_apply_seq_inclusion_criteria([events.seq_model]);
 events(~TF)=[];
+epoch_sep = find(diff([events.epoch_num])~=0)+0.5;
 seqs_edges = [seqs.start_pos_norm; seqs.end_pos_norm];
 seqs_IX = 1:length(seqs);
+% plot([0 1],repmat(epoch_sep,2,1),'-','LineWidth',.2,'Color',0.9*[1 1 1]);
 h=plot(seqs_edges,[seqs_IX;seqs_IX],'-','LineWidth',.55);
 dir_1_IX = [seqs.state_direction]==1;
 dir_2_IX = [seqs.state_direction]==-1;
@@ -456,6 +464,8 @@ for ii_epoch_type = 1:length(epoch_types)
     cmap = jet;
 %     cmap = 1-cmap;
     colormap(cmap)
+    hax=gca;
+    hax.CLim(1) = 0;
 
     axes(panels{7}(ii_epoch_type,1))
     switch epoch_types{ii_epoch_type}
@@ -530,6 +540,7 @@ for ii_epoch_type = 1:nEpochTypes
         ylabel({'Position of';'replay {\iti+1} (norm.)'},'Units','normalized','Position',[-0.25 0.5])
     end
     hax=gca;
+    hax.CLim(1) = 0;
     hax.XRuler.TickLength(1) = 0.05;
     hax.YRuler.TickLength(1) = 0.03;
     hax.XRuler.TickLabelGapOffset = -1;
@@ -550,7 +561,7 @@ for ii_epoch_type = 1:nEpochTypes
         hcb.Label.Units = 'normalized';
         hcb.Label.Position = [1.3 0.5];
         text(1.14,1,'Max','Units','normalized','FontSize',7,'HorizontalAlignment','center');
-        text(1.14,0,'Min','Units','normalized','FontSize',7,'HorizontalAlignment','center');
+        text(1.14,0,'0','Units','normalized','FontSize',7,'HorizontalAlignment','center');
     end
 
 %     axes(panels{6}(ii_epoch_type,2))
@@ -603,9 +614,9 @@ hb=bar(N);
 % hb(1).FaceColor = 0.1.*[1 1 1];
 hax=gca;
 hax.XTick = 1:3;
-hax.XTickLabel = {'Takeoff','Mid-air','Landing'};
+hax.XTickLabel = {'Takeoff zone','Mid-air zone','Landing zone'};
 hax.XRuler.TickLabelGapOffset = -1;
-ylabel('Counts (norm.)')
+ylabel('Fraction')
 % create legend
 w = 0.08*range(hax.XLim);
 h = 0.10*range(hax.YLim);

@@ -50,8 +50,9 @@ replay_examples_list = table2struct(readtable(replay_examples_list_filename));
 % replay_ex_opt = 17; 
 replay_examples_options = [
 536 552 493 450 41 76 253 1000;
+450 493 552 536 41 76 253 1000;
 ];
-replay_ex_opt = 1; 
+replay_ex_opt = 2; 
 [~,IX] = ismember(replay_examples_options(replay_ex_opt,:),[replay_examples_list.ex_num]);
 replay_examples = replay_examples_list(IX);
 disp('chosen examples:')
@@ -77,6 +78,14 @@ cmap = bone;
 cmap = flipud(cmap);
 xlimits = [-1 1]*.3;
 xtick = [-0.3:0.1:0.3];
+states_clrs = [
+0 98 190
+230 136 180
+0 251 246
+133  63 0
+160 225 157
+235 223 99
+]./255;
 
 %% define output files
 res_dir =  'L:\paper_replay\figures';
@@ -121,7 +130,7 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 
 % create panels
 offsets_x = linspace(2,17,4);
-offsets_y = linspace(2,14,2)+0.2;
+offsets_y = linspace(3,14,2)+0.2;
 offsets_y = flip(offsets_y);
 clear panels
 for ii=1:2
@@ -136,67 +145,13 @@ for ii=1:2
         H=0;
         ymarg = 0.2;
         y=y+H;       H=H1; panels{jj,ii}(1) = axes('position', [offset+[0 y] W H]);
-        y=y+H+ymarg; H=H1; panels{jj,ii}(2) = axes('position', [offset+[0 y] W H]);
+        y=y+H+ymarg; H=H2; panels{jj,ii}(2) = axes('position', [offset+[0 y] W H]);
         y=y+H+ymarg; H=H2; panels{jj,ii}(3) = axes('position', [offset+[0 y] W H]);
         y=y+H+ymarg; H=H2; panels{jj,ii}(4) = axes('position', [offset+[0 y] W H]);
         y=y+H+ymarg; H=H2; panels{jj,ii}(5) = axes('position', [offset+[0 y] W H]);
-
-%         y=y+0; panels{jj,ii}(1) = axes('position', [offset+[0 2*H1+2*H2] W 1]);
-%         y=y+0; panels{jj,ii}(2) = axes('position', [offset+[0 2*H1+H2] W 1]);
-%         y=y+0; panels{jj,ii}(3) = axes('position', [offset+[0 2*H1] W 1]);
-%         y=y+0; panels{jj,ii}(4) = axes('position', [offset+[0  H1] W H1]);
-%         y=y+0; panels{jj,ii}(5) = axes('position', [offset+[0  0] W H1]);
     end
 end
 panels = {panels{:}}';
-
-%%
-% W = 5;
-% ii=1
-% x = 2;
-% panels{ii}(1) = axes('position', [x 23.8 W 1.5]);
-% panels{ii}(2) = axes('position', [x 22.1 W 1.5]);
-% panels{ii}(3) = axes('position', [x 20.5 W 1.5]);
-% panels{ii}(4) = axes('position', [x 13.0 W 6]);
-% panels{ii}(5) = axes('position', [x  5.5 W 6]);
-% ii=2
-% x = 8.5;
-% panels{ii}(1) = axes('position', [x 23.8 W 1.5]);
-% panels{ii}(2) = axes('position', [x 22.1 W 1.5]);
-% panels{ii}(3) = axes('position', [x 20.5 W 1.5]);
-% panels{ii}(4) = axes('position', [x 13.0 W 6]);
-% panels{ii}(5) = axes('position', [x  5.5 W 6]);
-% ii=3
-% x = 15;
-% panels{ii}(1) = axes('position', [x 23.8 W 1.5]);
-% panels{ii}(2) = axes('position', [x 22.1 W 1.5]);
-% panels{ii}(3) = axes('position', [x 20.5 W 1.5]);
-% panels{ii}(4) = axes('position', [x 13.0 W 6]);
-% panels{ii}(5) = axes('position', [x  5.5 W 6]);
-% 
-% for ii=1:length(panels)
-%     for jj=1:length(panels{ii})
-%         panels{ii}(jj).Position(2) = panels{ii}(jj).Position(2) - 2;
-%     end
-% end
-
-%% load data (temp)
-% ii_ex=1;
-%     ex = replay_examples(ii_ex);
-%     addFieldsToWorkspace(ex);
-%     decode = decoding_load_data(exp_ID, epoch_type, params_opt );
-%     exp = exp_load_data(exp_ID,'details','path','MUA','ripples');
-%     events = decoding_load_events_quantification(exp_ID,epoch_type,params_opt,"posterior");
-%     event = events([events.num] ==event_num);
-%     seq = event.seq_model;
-%     seq_ti = [event.start_ts event.end_ts];
-%     t0 = mean(seq_ti);
-%     ti = t0 + [-1 1].*win_s*1e6;
-%     
-%     TT = exp.ripples.stats.best_TT;
-%     [LFP.signal, LFP.ts, LFP.fs, LFP.params] = LFP_load(exp_ID,TT,'band','ripple','limits_ts',ti);
-%     LFP.avg_signal = nanmean(LFP.signal,[2 3]);
-
 
 %%
 for ii_ex = 1:length(replay_examples)
@@ -213,8 +168,10 @@ for ii_ex = 1:length(replay_examples)
     ti = t0 + [-1 1].*win_s*1e6;
     
     TT = exp.ripples.stats.best_TT;
-    [LFP.signal, LFP.ts, LFP.fs, LFP.params] = LFP_load(exp_ID,TT,'band','ripple','limits_ts',ti);
+    [LFP.signal, LFP.ts, LFP.fs, LFP.params] = LFP_load(exp_ID,TT,'limits_ts',ti);
+    [LFP_ripples.signal, LFP_ripples.ts, LFP_ripples.fs, LFP_ripples.params] = LFP_load(exp_ID,TT,'band','ripple','limits_ts',ti);
     LFP.avg_signal = nanmean(LFP.signal,[2 3]);
+    LFP_ripples.avg_signal = nanmean(LFP_ripples.signal,[2 3]);
     
     %% rename decoder states
     states = decode.state';
@@ -230,17 +187,37 @@ for ii_ex = 1:length(replay_examples)
         if exist('panels_legend','var')
             delete(panels_legend);
         end
-        panels_legend = axes('position', [13.5 26.6 6 0.8]);
+        panels_legend = axes('position', [13.5 24.6 6 0.8]);
         cla
         hold on
         lw=2;
         t = [0 0.05];
         x = [.62 .62 .62 0 0 0];
         y = [1 .5 0 1 .5 0];
-        for ii=1:6
+        hax = gca;
+        hax.ColorOrder = states_clrs;
+        for ii=1:size(states_clrs,1)
             plot(x(ii)+t,y([ii ii]),'-','LineWidth',lw,'Clipping','off');
             text(x(ii)+t(2)+0.02, y(ii), states(ii),'FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
         end
+        ha = annotation("arrow");
+        ha.Parent = panels_legend;
+        ha.HeadStyle = 'vback1';
+        ha.HeadLength = 5;
+        ha.HeadWidth = 5;
+        ha.Units = 'normalized';
+        ha.X = [0 0]-.05;
+        ha.Y = [0 1];
+        ha = annotation("arrow");
+        ha.Parent = panels_legend;
+        ha.HeadStyle = 'vback1';
+        ha.HeadLength = 5;
+        ha.HeadWidth = 5;
+        ha.Units = 'normalized';
+        ha.X = [0 0]+.58;
+        ha.Y = [1 0];
+        hax.Clipping = 'off';
+
         x = [.0 .2];
         y = -0.7;
         plot(x, [1 1].*y, 'r--','Clipping','off')
@@ -255,7 +232,7 @@ for ii_ex = 1:length(replay_examples)
         colormap(cmap);
         hcb = colorbar('southoutside');
         hcb.Units = 'centimeters';
-        hcb.Position = [18.8 25.9 1 0.25];
+        hcb.Position = [18.8 23.9 1 0.25];
         hcb.Label.Rotation = 0;
 %         hcb.Label.Position(1) = 1.5;
         hcb.Label.String = 'Probability';
@@ -290,11 +267,11 @@ for ii_ex = 1:length(replay_examples)
     text(0.5, 1.45, sprintf('%d_%s_%s_%d',ex_num,epoch_type,exp_ID,event_num),'Interpreter','none', ...
         'Units','normalized','FontWeight','normal','FontSize',6,'HorizontalAlignment','center');
     
-    %% plot LFP
+    %% plot LFP (ripple-band)
     axes(panels{ii_ex}(4));
     cla
     hold on
-    plot(LFP.ts, LFP.avg_signal,'k');
+    plot(LFP_ripples.ts, LFP_ripples.avg_signal,'k');
     xlim(ti)
     xticks([])
     yticks([])
@@ -304,10 +281,26 @@ for ii_ex = 1:length(replay_examples)
         text(-0.06, .5, 'Ripple', 'Units','normalized','FontSize',8.25,'Rotation',90,'HorizontalAlignment','center','VerticalAlignment','middle');
     end
     
-    %% plot posterior (state)
+    %% plot LFP (raw)
     axes(panels{ii_ex}(3));
     cla
     hold on
+    plot(LFP.ts, LFP.avg_signal,'k');
+    xlim(ti)
+    xticks([])
+    yticks([])
+    rescale_plot_data('x',[1e-6 t0]);
+    axis off
+    if ismember(ii_ex,[1 5])
+        text(-0.06, .5, 'SWR', 'Units','normalized','FontSize',8.25,'Rotation',90,'HorizontalAlignment','center','VerticalAlignment','middle');
+    end
+
+    %% plot posterior (state)
+    axes(panels{ii_ex}(2));
+    cla
+    hold on
+    hax = gca;
+    hax.ColorOrder = states_clrs;
     IX = get_data_in_ti(decode.time, ti);
     prob_t = decode.time(IX);
     h=plot(decode.time(IX), decode.posterior_state(:,IX),'LineWidth',1);
@@ -332,37 +325,6 @@ for ii_ex = 1:length(replay_examples)
     end
     
     %% plot posterior (position)
-    axes(panels{ii_ex}(2));
-    cla
-    hold on
-    IX = get_data_in_ti(decode.time, ti);
-    prob_t = decode.time(IX);
-    prob_pos = decode.posterior_pos(:,IX);
-    imagesc(prob_t, decode.pos, prob_pos);
-    plot([seq.start_ts seq.end_ts],[seq.start_pos seq.end_pos],'-r','LineWidth',1);
-    hax = gca;
-    hax.CLim = quantile(prob_pos(:),[0.01 0.99]);
-    hax.XLim = prob_t([1 end]);
-    hax.YLim = [min(decode.pos) max(decode.pos)] + [-1 1].*median(diff(decode.pos))*1;
-    box on
-    colormap(cmap);
-    alpha = 0.05;
-    % area([hax.XLim(1) event.start_ts],hax.YLim([2 2]), 'FaceColor','r','FaceAlpha',alpha);
-    % area([event.end_ts hax.XLim(2)],hax.YLim([2 2]),   'FaceColor','r','FaceAlpha',alpha);
-    % area([event.start_ts event.end_ts],hax.YLim([2 2]),   'FaceColor','g','FaceAlpha',alpha);
-    rescale_plot_data('x',[1e-6 t0]);
-    hax.XLim = [-1 1].*win_s;
-    hax.XTick = xtick;
-    hax.XTickLabel=[];
-    hax.YTick=[];
-    hax.TickDir = 'out';
-    hax.TickLength = [0.02 0.02];
-    hax.XRuler.TickLabelGapOffset = -4;
-    if ismember(ii_ex,[1 5])
-        ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.07 .5]);
-    end
-    
-    %% plot posterior (position)
     axes(panels{ii_ex}(1));
     cla
     hold on
@@ -378,21 +340,17 @@ for ii_ex = 1:length(replay_examples)
     hax.YLim = [min(decode.pos) max(decode.pos)] + [-1 1].*median(diff(decode.pos))*1;
     box on
     colormap(cmap);
-    alpha = 0.05;
-    % area([hax.XLim(1) event.start_ts],hax.YLim([2 2]), 'FaceColor','r','FaceAlpha',alpha);
-    % area([event.end_ts hax.XLim(2)],hax.YLim([2 2]),   'FaceColor','r','FaceAlpha',alpha);
-    % area([event.start_ts event.end_ts],hax.YLim([2 2]),   'FaceColor','g','FaceAlpha',alpha);
     rescale_plot_data('x',[1e-6 t0]);
     hax.XLim = [-1 1].*win_s;
     hax.XTick = xtick;
     hax.XTickLabelRotation = 0;
-    hax.YTick = [];
+%     hax.YTick = [];
     hax.TickDir = 'out';
     hax.TickLength = [0.02 0.02];
     hax.XRuler.TickLabelGapOffset = 0;
     xlabel('Time (s)', 'Units','normalized', 'Position',[0.5 -0.15]);
     if ismember(ii_ex,[1 5])
-        ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.07 .5]);
+        ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.23 .5]);
     end
     
     %% link x axes
@@ -400,25 +358,6 @@ for ii_ex = 1:length(replay_examples)
     xlim(xlimits)
 
 end
-
-%% add colorbar
-% for ii=[4 5]
-%     panel = panels{4}(ii);
-%     axes(panel)
-%     hcb = colorbar('southoutside');
-%     hcb.Units = 'centimeters';
-%     cb_offset_x = 1.05;
-%     hcb.Position(1) = panel.Position(1) + panel.Position(3)*cb_offset_x;
-%     cb_offset_x_middle = (hcb.Position(1)+hcb.Position(3)/2-panel.Position(1))/panel.Position(3);
-%     hcb.Label.Rotation = -90;
-%     hcb.Label.Position(1) = 1.5;
-%     hcb.Label.String = 'Probability';
-%     hcb.Ticks = [];
-%     text(cb_offset_x_middle,1,'Max','Units','normalized','FontSize',7,'HorizontalAlignment','center');
-%     text(cb_offset_x_middle,0,'0','Units','normalized','FontSize',7,'HorizontalAlignment','center');
-% %     text(cb_offset_middle,1,clim_prctiles(2)+"%",'Units','normalized','FontSize',7,'HorizontalAlignment','center');
-% %     text(cb_offset_middle,0,clim_prctiles(1)+"%",'Units','normalized','FontSize',7,'HorizontalAlignment','center');
-% end
 
 %% add panel letters
 % font_size = 11;

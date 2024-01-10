@@ -97,7 +97,7 @@ ylim([0 1])
 
 %% panels B - Behavior example
 axes(panels{2}(1))
-% figure
+cla
 hold on
 switch behavior_ex_opt
     case 1
@@ -130,10 +130,10 @@ lw = 2;
 plot(exp.pos.proc_1D.ts, interp_nans(exp.pos.proc_1D.pos),'LineWidth',lw);
 plot(exp.pos.proc_1D.other.ts, interp_nans(exp.pos.proc_1D.other.pos(1,:)),'LineWidth',1);
 plot(exp.pos.proc_1D.co.ts,exp.pos.proc_1D.co.pos,'xk','MarkerSize',8)
-plot([seqs.start_ts;seqs.end_ts],[seqs.start_pos; seqs.end_pos],'-m','LineWidth',1.3);
-% plot([seqs.start_ts],[seqs.start_pos],'.m','MarkerSize',10)
-plot([seqs([seqs.direction]== 1).end_ts],[seqs([seqs.direction]== 1).end_pos],'^m','MarkerSize',2,'MarkerFaceColor','m');
-plot([seqs([seqs.direction]==-1).end_ts],[seqs([seqs.direction]==-1).end_pos],'vm','MarkerSize',2,'MarkerFaceColor','m');
+plot([seqs.start_ts;seqs.end_ts],[seqs.start_pos; seqs.end_pos],'-k','LineWidth',1.);
+plot([seqs.start_ts],[seqs.start_pos],'.k','MarkerSize',7)
+% plot([seqs([seqs.direction]== 1).end_ts],[seqs([seqs.direction]== 1).end_pos],'^m','MarkerSize',2,'MarkerFaceColor','m');
+% plot([seqs([seqs.direction]==-1).end_ts],[seqs([seqs.direction]==-1).end_pos],'vm','MarkerSize',2,'MarkerFaceColor','m');
 xline(35969648929.0)
 xlim(ti)
 rescale_plot_data('x',[1e-6/60 ti(1)]);
@@ -266,7 +266,7 @@ end
 %% panels C - main scatter plot
 axes(panels{5}(1))
 hold on
-data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay position between 25-115.mat';
+% data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay position between 25-115.mat';
 % data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay position between 25-115 & same map.mat';
 % data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay position between 25-115 & same map & forward.mat';
 % data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay position between 25-115 & same map & reverse.mat';
@@ -274,6 +274,11 @@ data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_op
 % data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay position between 25-115 & replay distance_gt_10.mat';
 % data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay position between 25-115 & forward.mat';
 % data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay position between 25-115 & reverse.mat';
+% data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay pos between 25-115, dec acc_gt_65%.mat';
+data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay pos between 25-115, dec acc_gt_70%.mat';
+% data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay pos between 25-115 & same map, dec acc_gt_65%.mat';
+% data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay pos between 25-115 & same map, dec acc_gt_70%.mat';
+
 data = load(data_filename);
 scatter(data.x(data.TF),data.y(data.TF),5,'k','filled');
 axis equal
@@ -394,115 +399,112 @@ hax.YRuler.TickLabelGapOffset = 1;
 % end
 
 %% ------------------------------------------------------------------------
-% compare 1 bat vs 2 bats experiments
-
-%% load data - 1 bat / 2 bats experiments
-epoch_types = {'sleep','rest'};
-exp_list_1bat = decoding_get_inclusion_list();
-exp_list_2bats = {
-    'b2299_d191202',
-    'b2299_d191203',
-    'b2299_d191204',
-    'b2299_d191205',
-    'b2299_d191208',
-    'b2299_d191209',
-    'b2299_d191210',
-    'b2299_d191213',
-    };
-exp_lists = {exp_list_1bat,exp_list_2bats};
-
-events_all_per_session = {};
-for ii_exp_type = 1:length(exp_types)
-    exp_list = exp_lists{ii_exp_type};
-    for ii_epoch_type = 1:length(epoch_types)
-        for ii_exp = 1:length(exp_list)
-            exp_ID = exp_list{ii_exp};
-            exp = exp_load_data(exp_ID,'details');
-            epoch_type = epoch_types{ii_epoch_type};
-            params_opt = 11;
-            event_type = 'posterior';
-            [events, params] = decoding_load_events_quantification(exp_ID, epoch_type, params_opt, event_type);
-            [~, TF] = decoding_apply_seq_inclusion_criteria([events.seq_model]);
-            events(~TF) = [];
-            if isempty(events)
-                continue;
-            end
-            [events.recordingArena] = deal(exp.details.recordingArena);
-            event_struct = events(1,[]);
-            [events(2:end).prev_event] = disperse(events(1:end-1));
-            events(1).prev_event = event_struct;
-            events_all_per_session{ii_exp_type,ii_epoch_type}{ii_exp} = events;
-        end
-    end
-end
-
-%%
-features_names = {'duration';'compression';'distance';'distance_norm';};
-xlable_strs = {
-    'Replay duration (s)';
-    {'Compression ratio';'(replay speed / flight speed)'};
-    'Replay distance (m)';
-    {'Replay distance','(norm. to environment size)'};
-    };
-
-%% 2bats replay inclusion for awake replays
-data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay position between 25-115.mat';
-data_2bats_rest_inclusion = load(data_filename);
-
-
-%% plot boxplots - pool sleep/rest
-boxplot_panels_ylimits = [0 0.8; 0 25; 3 23; .02 .18];
-pvals = [];
-for ii_fn = 1:length(features_names)
-    axes(panels{4}(ii_fn));
-    cla
-    hold on
-    fn = features_names{ii_fn};
-    X={};
-    G={};
-    for ii_exp_type = 1:length(exp_types)
-        events1 = [events_all_per_session{ii_exp_type,1}{:}];
-        events2 = [events_all_per_session{ii_exp_type,2}{:}];
-        seqs1 = [events1.seq_model];
-        seqs2 = [events2.seq_model];
-        seqs = [seqs1 seqs2];
-        x = [seqs.(fn)];
-        g = ii_exp_type;
-        X{ii_exp_type} = x;
-        G{ii_exp_type} = ones(size(seqs)).*g;
-        m1 = prctile(x,50);
-        m2 = prctile(x,[25 75]);
-        m3 = prctile(x,[5 95]);
-        w = 0.2;
-        lw = 1.3;
-        clr = 'k';
-        plot([g-w g+w],[m1 m1],'Color',clr,'LineWidth',lw);
-        plot([g g],m3,'Color',clr,'LineWidth',lw);
-        rectangle('Position',[g-w m2(1) 2*w diff(m2)],'EdgeColor',clr,'FaceColor','none','LineWidth',lw);
-    end
-    pval = ranksum(X{1},X{2});
-    str = genSignifStrAstricks(pval);
-    xx = [g g-1];
-    yy = boxplot_panels_ylimits(ii_fn,[2 2]);
-%         hax= gca;
-%         yy = hax.YLim([2 2]);
-    plot(xx,yy,'k-');
-    font_size = 10;
-    if strcmp(str,'n.s.')
-        font_size = 8;
-        yy = yy.*1.02;
-    end
-    text(mean(xx),mean(yy),str,'HorizontalAlignment','center','VerticalAlignment','bottom','FontSize',font_size);
-    pvals(ii_fn,ii_epoch_type) = pval;
-    xlim([0.2 2.8])
-    ylim(boxplot_panels_ylimits(ii_fn,:))
-    xlabel('');
-    ylabel_x_pos = [-0.65 -0.61 -0.55 -0.7];
-    ylabel(xlable_strs{ii_fn},'units','normalized','position',[ylabel_x_pos(ii_fn) 0.5]);
-    xticks(1:length(exp_types));
-    xticklabels(exp_types);
-    xtickangle(50);    
-end
+% % % % compare 1 bat vs 2 bats experiments
+% % % if 0
+% % % %% load data - 1 bat / 2 bats experiments
+% % % epoch_types = {'sleep','rest'};
+% % % exp_list_1bat = decoding_get_inclusion_list();
+% % % exp_list_2bats = {
+% % % %     'b2299_d191202', % <70% accuracy, excluded
+% % % %     'b2299_d191203', % <70% accuracy, excluded
+% % %     'b2299_d191204',
+% % %     'b2299_d191205',
+% % %     'b2299_d191208',
+% % %     'b2299_d191209',
+% % % %     'b2299_d191210', % <70% accuracy, excluded
+% % %     'b2299_d191213',
+% % %     };
+% % % exp_lists = {exp_list_1bat,exp_list_2bats};
+% % % 
+% % % events_all_per_session = {};
+% % % for ii_exp_type = 1:length(exp_types)
+% % %     exp_list = exp_lists{ii_exp_type};
+% % %     for ii_epoch_type = 1:length(epoch_types)
+% % %         for ii_exp = 1:length(exp_list)
+% % %             exp_ID = exp_list{ii_exp};
+% % %             exp = exp_load_data(exp_ID,'details');
+% % %             epoch_type = epoch_types{ii_epoch_type};
+% % %             params_opt = 11;
+% % %             event_type = 'posterior';
+% % %             [events, params] = decoding_load_events_quantification(exp_ID, epoch_type, params_opt, event_type);
+% % %             [~, TF] = decoding_apply_seq_inclusion_criteria([events.seq_model]);
+% % %             events(~TF) = [];
+% % %             if isempty(events)
+% % %                 continue;
+% % %             end
+% % %             [events.recordingArena] = deal(exp.details.recordingArena);
+% % %             event_struct = events(1,[]);
+% % %             [events(2:end).prev_event] = disperse(events(1:end-1));
+% % %             events(1).prev_event = event_struct;
+% % %             events_all_per_session{ii_exp_type,ii_epoch_type}{ii_exp} = events;
+% % %         end
+% % %     end
+% % % end
+% % % 
+% % % %%
+% % % features_names = {'duration';'compression';'distance';'distance_norm';};
+% % % xlable_strs = {
+% % %     'Replay duration (s)';
+% % %     {'Compression ratio';'(replay speed / flight speed)'};
+% % %     'Replay distance (m)';
+% % %     {'Replay distance','(norm. to environment size)'};
+% % %     };
+% % % 
+% % % %% plot boxplots - pool sleep/rest
+% % % boxplot_panels_ylimits = [0 0.8; 0 25; 3 23; .02 .18];
+% % % pvals = [];
+% % % for ii_fn = 1:length(features_names)
+% % %     axes(panels{4}(ii_fn));
+% % %     cla
+% % %     hold on
+% % %     fn = features_names{ii_fn};
+% % %     X={};
+% % %     G={};
+% % %     for ii_exp_type = 1:length(exp_types)
+% % %         events1 = [events_all_per_session{ii_exp_type,1}{:}];
+% % %         events2 = [events_all_per_session{ii_exp_type,2}{:}];
+% % %         seqs1 = [events1.seq_model];
+% % %         seqs2 = [events2.seq_model];
+% % %         seqs = [seqs1 seqs2];
+% % %         x = [seqs.(fn)];
+% % %         g = ii_exp_type;
+% % %         X{ii_exp_type} = x;
+% % %         G{ii_exp_type} = ones(size(seqs)).*g;
+% % %         m1 = prctile(x,50);
+% % %         m2 = prctile(x,[25 75]);
+% % %         m3 = prctile(x,[5 95]);
+% % %         w = 0.2;
+% % %         lw = 1.3;
+% % %         clr = 'k';
+% % %         plot([g-w g+w],[m1 m1],'Color',clr,'LineWidth',lw);
+% % %         plot([g g],m3,'Color',clr,'LineWidth',lw);
+% % %         rectangle('Position',[g-w m2(1) 2*w diff(m2)],'EdgeColor',clr,'FaceColor','none','LineWidth',lw);
+% % %     end
+% % %     pval = ranksum(X{1},X{2});
+% % %     str = genSignifStrAstricks(pval);
+% % %     xx = [g g-1];
+% % %     yy = boxplot_panels_ylimits(ii_fn,[2 2]);
+% % % %         hax= gca;
+% % % %         yy = hax.YLim([2 2]);
+% % %     plot(xx,yy,'k-');
+% % %     font_size = 10;
+% % %     if strcmp(str,'n.s.')
+% % %         font_size = 8;
+% % %         yy = yy.*1.02;
+% % %     end
+% % %     text(mean(xx),mean(yy),str,'HorizontalAlignment','center','VerticalAlignment','bottom','FontSize',font_size);
+% % %     pvals(ii_fn,ii_epoch_type) = pval;
+% % %     xlim([0.2 2.8])
+% % %     ylim(boxplot_panels_ylimits(ii_fn,:))
+% % %     xlabel('');
+% % %     ylabel_x_pos = [-0.65 -0.61 -0.55 -0.7];
+% % %     ylabel(xlable_strs{ii_fn},'units','normalized','position',[ylabel_x_pos(ii_fn) 0.5]);
+% % %     xticks(1:length(exp_types));
+% % %     xticklabels(exp_types);
+% % %     xtickangle(50);    
+% % % end
+% % % 
+% % % end % if 0
 
 %% add panel letters
 font_size = 11;

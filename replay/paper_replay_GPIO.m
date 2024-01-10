@@ -27,8 +27,9 @@ for ii_exp = 1:length(exp_list_2bats)
 %     res.res.mean_err_prob
 %     res.res.pos_err_median_prc
 end
-100-[res_all.mean_err_prob]'.*100
-[res_all.pos_err_median_prc]'.*100
+exp_list_mean_dec_acc = 100-[res_all.mean_err_prob]'.*100;
+exp_list_median_pos_err_prc = [res_all.pos_err_median_prc]'.*100;
+T_res = table(exp_list_2bats, exp_list_mean_dec_acc,exp_list_median_pos_err_prc)
 % what distance from the balls do we 
 fig_3_replay_inc_range = [25 115];
 balls_locs - fig_3_replay_inc_range

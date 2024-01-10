@@ -32,9 +32,10 @@ replay_examples_options = [
 193 197 131 160 83 112      238 228 216 257 253 247; % awake options
 500 328 348 552 359 354     516 394 364 555 536 378; % sleep options
 540 499 543 460 557 450     561 339 463 483 493 288; % sleep options
-516 499 483 354 536 552     193 197 131 29 247 160; % final chosen options!
+516 499 483 354 536 552     193 197 131  29 247 160; % v6 chosen options
+540 499 483 354 536 552     160 238 197 216  29 247; % final chosen options!
 ];
-replay_ex_opt = 5; 
+replay_ex_opt = 6; 
 replay_examples = replay_examples_list(replay_examples_options(replay_ex_opt,:))
 
 %% graphics params
@@ -111,8 +112,8 @@ panels{7}(1,1) = axes('position', [2 2.5 4 4]);
 panels{7}(2,1) = axes('position', [8 2.5 4 4]);
 panels{7}(1,2) = axes('position', [4.7 5 1.5 1.5]);
 panels{7}(2,2) = axes('position', [10.7 5 1.5 1.5]);
-panels{7}(1,3) = axes('position', [2.35 5.8 .3 .4]);
-panels{7}(2,3) = axes('position', [8.35 5.8 .3 .4]);
+panels{7}(1,3) = axes('position', [2.35 5.8 .36 .4]);
+panels{7}(2,3) = axes('position', [8.35 5.8 .36 .4]);
 
 total_offset = [.5 1];
 for ii = 1:length(panels)
@@ -151,7 +152,7 @@ for ii_bat = 1:length(bats)
     xi = 0:0.5:40;
     c = bats_clr_map(bat_num);
     f = ksdensity([FE.duration],xi);
-    plot(xi,f,'DisplayName',"bat"+bat_num,'Color',c,'LineWidth',2);
+    plot(xi,f,'DisplayName',"bat"+bat_num,'Color',c,'LineWidth',1.6);
 %     plot(xi,f,'DisplayName',sprintf('bat%d(%s)',bat_num,exp.details.recordingArena),'Color',c,'LineWidth',2);
 end
 plot([15 21],[1 1].*0.8,'k-','LineWidth',1.7,'Clipping','off')
@@ -245,7 +246,7 @@ axis off
 plot([0 1],[1 1]*.5,'LineWidth',3,'Color',sleep_clr,'Clipping','off')
 plot([6 7],[1 1]*.5,'LineWidth',3,'Color',rest_clr,'Clipping','off')
 text(1.3,.5,'Sleep','Units','normalized','FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
-text(7.3,.5,'Awake','Units','normalized','FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
+text(7.3,.5,'Awake pauses','Units','normalized','FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
 xlim([0 1])
 ylim([0 1])
 
@@ -479,7 +480,15 @@ for ii_ex = 1:size(panels_ex,1)
     hold on
     IX = get_data_in_ti(decode.time, ti);
     prob_t = decode.time(IX);
+    switch event.state_num
+        case 1
+            other_map_state_num = 4;
+        case 4
+            other_map_state_num = 1;
+    end
     prob_state = squeeze(decode.posterior_state(event.state_num,IX));
+    prob_state_other_map = squeeze(decode.posterior_state(other_map_state_num,IX));
+    plot(prob_t, prob_state_other_map, 'Color',0.5*[1 1 1], 'LineWidth',1);
     plot(prob_t, prob_state, 'k','LineWidth',2);
     hax = gca;
     hax.XLim = prob_t([1 end]);
@@ -565,8 +574,8 @@ for ii = 1:2
     axes(panels{7}(ii,1))
     cla
     hold on
-    shadedErrorBar(data.(fn).t, data.(fn).sleep.mean, data.(fn).sleep.sem,'lineprops',{'Color',sleep_clr});
-    shadedErrorBar(data.(fn).t, data.(fn).rest.mean, data.(fn).rest.sem,'lineprops',{'Color',rest_clr});
+    shadedErrorBar(data.(fn).t, data.(fn).sleep.mean, data.(fn).sleep.sem,'lineprops',{'Color',sleep_clr},'transparent',false);
+    shadedErrorBar(data.(fn).t, data.(fn).rest.mean, data.(fn).rest.sem,'lineprops',{'Color',rest_clr},'transparent',false);
     xlim([-10 10])
     xticks([-10:5:10])
     hax=gca;
@@ -580,8 +589,8 @@ for ii = 1:2
     axes(panels{7}(ii,2))
     cla
     hold on
-    shadedErrorBar(data.(fn).t, data.(fn).sleep.mean, data.(fn).sleep.sem,'lineprops',{'Color',sleep_clr});
-    shadedErrorBar(data.(fn).t, data.(fn).rest.mean, data.(fn).rest.sem,'lineprops',{'Color',rest_clr});
+    shadedErrorBar(data.(fn).t, data.(fn).sleep.mean, data.(fn).sleep.sem,'lineprops',{'Color',sleep_clr},'transparent',false);
+    shadedErrorBar(data.(fn).t, data.(fn).rest.mean, data.(fn).rest.sem,'lineprops',{'Color',rest_clr},'transparent',false);
     xlim([-2 2])
     ylim(panels{7}(ii,1).YLim)
     yticks(panels{7}(ii,1).YTick)
@@ -624,10 +633,10 @@ text(-0.35,1.17, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_s
 
 axes(panels{6}(1,1,end));
 text(-0.5,1.9, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-text(-0.05,1.9, 'Sleep', 'Units','normalized','FontWeight','normal','FontSize',9);
+text(-0.05,1.9, 'Sleep replays', 'Units','normalized','FontWeight','normal','FontSize',9);
 axes(panels{6}(1,2,end));
 text(-0.5,1.9, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-text(-0.05,1.9, 'Awake', 'Units','normalized','FontWeight','normal','FontSize',9);
+text(-0.05,1.9, 'Awake replays', 'Units','normalized','FontWeight','normal','FontSize',9);
 
 axes(panels{7}(1,1))
 text(-0.28,1.05, 'h', 'Units','normalized','FontWeight','bold','FontSize',font_size);

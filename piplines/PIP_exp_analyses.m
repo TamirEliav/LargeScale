@@ -154,10 +154,10 @@ try
 %     epoch_type = 'sleep';
     epoch_type = 'rest';
 %     params_opts = [8:14];
-%     params_opts = [11];
+    params_opts = [11];
 %     params_opts = [16 17]; % longer state time decay
 %     params_opts = [18 19 20]; % best bin sizes for 6m
-    params_opts = [21]; % random_walk (instead of empirical_speed), all other params as in opt 11
+%     params_opts = [21]; % random_walk (instead of empirical_speed), all other params as in opt 11
 %     event_type = 'PE';
     event_type = 'posterior';
     flight_decoding_param_opt = 4; % best for 200/120m
