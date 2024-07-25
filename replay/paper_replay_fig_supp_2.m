@@ -130,9 +130,10 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 
 % create panels
 offsets_x = linspace(2,17,4);
-offsets_y = linspace(3,14,2)+0.2;
+offsets_y = linspace(5,14,2)+0.2;
 offsets_y = flip(offsets_y);
-clear panels
+offsets_y = offsets_y-2;
+clear panels_ex panels
 for ii=1:2
     for jj=1:4
         offset_x = offsets_x(jj);
@@ -144,14 +145,19 @@ for ii=1:2
         y = 0;
         H=0;
         ymarg = 0.2;
-        y=y+H;       H=H1; panels{jj,ii}(1) = axes('position', [offset+[0 y] W H]);
-        y=y+H+ymarg; H=H2; panels{jj,ii}(2) = axes('position', [offset+[0 y] W H]);
-        y=y+H+ymarg; H=H2; panels{jj,ii}(3) = axes('position', [offset+[0 y] W H]);
-        y=y+H+ymarg; H=H2; panels{jj,ii}(4) = axes('position', [offset+[0 y] W H]);
-        y=y+H+ymarg; H=H2; panels{jj,ii}(5) = axes('position', [offset+[0 y] W H]);
+        y=y+H;       H=H1; panels_ex{jj,ii}(1) = axes('position', [offset+[0 y] W H]);
+        y=y+H+ymarg; H=H2; panels_ex{jj,ii}(2) = axes('position', [offset+[0 y] W H]);
+        y=y+H+ymarg; H=H2; panels_ex{jj,ii}(3) = axes('position', [offset+[0 y] W H]);
+        y=y+H+ymarg; H=H2; panels_ex{jj,ii}(4) = axes('position', [offset+[0 y] W H]);
+        y=y+H+ymarg; H=H2; panels_ex{jj,ii}(5) = axes('position', [offset+[0 y] W H]);
     end
 end
-panels = {panels{:}}';
+panels_ex = {panels_ex{:}}';
+offset_y = 22;
+panels{1}(1) = axes('position', [2 offset_y 3 3]);
+% panels{1}(2) = axes('position', [6 offset_y 3 3]);
+% panels{1}(3) = axes('position', [10 offset_y 3 3]);
+% panels{1}(4) = axes('position', [14 offset_y 3 3]);
 
 %%
 for ii_ex = 1:length(replay_examples)
@@ -244,7 +250,7 @@ for ii_ex = 1:length(replay_examples)
     end
 
     %% plot MUA
-    axes(panels{ii_ex}(5));
+    axes(panels_ex{ii_ex}(5));
     cla
     hold on
     IX = get_data_in_ti(exp.MUA.t,ti);
@@ -268,7 +274,7 @@ for ii_ex = 1:length(replay_examples)
         'Units','normalized','FontWeight','normal','FontSize',6,'HorizontalAlignment','center');
     
     %% plot LFP (ripple-band)
-    axes(panels{ii_ex}(4));
+    axes(panels_ex{ii_ex}(4));
     cla
     hold on
     plot(LFP_ripples.ts, LFP_ripples.avg_signal,'k');
@@ -282,7 +288,7 @@ for ii_ex = 1:length(replay_examples)
     end
     
     %% plot LFP (raw)
-    axes(panels{ii_ex}(3));
+    axes(panels_ex{ii_ex}(3));
     cla
     hold on
     plot(LFP.ts, LFP.avg_signal,'k');
@@ -296,7 +302,7 @@ for ii_ex = 1:length(replay_examples)
     end
 
     %% plot posterior (state)
-    axes(panels{ii_ex}(2));
+    axes(panels_ex{ii_ex}(2));
     cla
     hold on
     hax = gca;
@@ -325,7 +331,7 @@ for ii_ex = 1:length(replay_examples)
     end
     
     %% plot posterior (position)
-    axes(panels{ii_ex}(1));
+    axes(panels_ex{ii_ex}(1));
     cla
     hold on
     IX = get_data_in_ti(decode.time, ti);
@@ -354,9 +360,44 @@ for ii_ex = 1:length(replay_examples)
     end
     
     %% link x axes
-    linkaxes(panels{ii_ex}(:),'x');
+    linkaxes(panels_ex{ii_ex}(:),'x');
     xlim(xlimits)
 
+end
+
+%% scatters: number of ripples vs replay duration/distance
+load("L:\processed_data_structs\replay_events.mat");
+events = [events_all_per_session{:}];
+seqs = [events.seq_model];
+
+% features_fn = {'duration','compression','distance','distance_norm'};
+features_fn = {'duration'};
+fn_map = containers.Map();
+fn_map('duration') = 'Replay duration (s)';
+fn_map('compression') = 'Compression ratio';
+fn_map('distance') = 'Replay distance (m)';
+fn_map('distance_norm') = 'Replay distance (norm)';
+nFeatures = length(features_fn);
+for ii_fn = 1:nFeatures
+    axes(panels{1}(ii_fn));
+    cla reset
+    hold on
+    fn = features_fn{ii_fn};
+    fn_label = fn_map(fn);
+    X = [seqs.(fn)];
+    Y = [events.num_ripples];
+    Y(Y==0)=nan;
+    jitter_sd = .1;
+    rng(0);
+    Y_jitter = randn(size(Y)).*jitter_sd;
+    plot(X,Y+Y_jitter,'.k')
+%     swarmchart(Y,X,'.k','XJitter','density','XJitterWidth',.5);
+    [r,pval] = corr(X',Y','type','Spearman','rows','pairwise');
+    fprintf('%s: r=%.2g pval=%.2g\n',fn,r,pval);
+%     view([90 -90])
+%     yticks(1:6)
+    ylabel(fn_label)
+    ylabel('No. ripples')
 end
 
 %% add panel letters

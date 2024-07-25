@@ -74,10 +74,10 @@ set(groot,  'defaultAxesTickDirMode', 'manual');
 annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 
 % create panels
-panels{1}(1) = axes('position', [3 23 3 3]);
-panels{1}(2) = axes('position', [7 23 3 3]);
-panels{1}(3) = axes('position', [11 23 3 3]);
-panels{1}(4) = axes('position', [15 23 3 3]);
+panels{1}(1) = axes('position', [3 23.3 3 2.5]);
+panels{1}(2) = axes('position', [7 23.3 3 2.5]);
+panels{1}(3) = axes('position', [11 23.3 3 2.5]);
+panels{1}(4) = axes('position', [15 23.3 3 2.5]);
 
 panels{2}(1) = axes('position', [12 19.5 7 1.5]);
 panels{2}(2) = axes('position', [12 17.5 7 1.5]);
@@ -94,9 +94,11 @@ panels{6}(1) = axes('position', [7.3   7.5 2 2]);
 panels{7}(1,1) = axes('position', [10.9 7.5 2 2]);
 panels{7}(2,1) = axes('position', [13.5 7.5 2 2]);
 panels{8}(1) = axes('position', [17.5  7.5 2 2]);
+panels{8}(2) = axes('position', [17.5  4 2 2]);
+panels{8}(3) = axes('position', [17.5  1.5 3 2]);
 
-total_offset = [0 -0.5];
-for ii = 2:length(panels)
+total_offset = [0 -0.5]+[0 1];
+for ii = 1:length(panels)
     subpanels = panels{ii};
     subpanels = subpanels(:);
     for jj = 1:length(subpanels)
@@ -113,7 +115,7 @@ events_all_per_session = {};
 for ii_epoch_type = 1:length(epoch_types)
     for ii_exp = 1:length(exp_list)
         exp_ID = exp_list{ii_exp};
-        exp = exp_load_data(exp_ID,'details');
+        exp = exp_load_data(exp_ID,'details','rest');
         epoch_type = epoch_types{ii_epoch_type};
         params_opt = 11;
         event_type = 'posterior';
@@ -123,6 +125,13 @@ for ii_epoch_type = 1:length(epoch_types)
         if isempty(events)
             continue;
         end
+        if isfield(events,'rest_ball_num')
+            [events.rest_ball_loc] = disperse(exp.rest.balls_loc([events.rest_ball_num]));
+        else
+            [events.rest_ball_num] = disperse(nan(size(events)));
+            [events.rest_ball_loc] = disperse(nan(size(events)));
+        end
+        
         [events.recordingArena] = deal(exp.details.recordingArena);
         event_struct = events(1,[]);
         [events(2:end).prev_event] = disperse(events(1:end-1));
@@ -147,9 +156,11 @@ xlable_strs = {
     };
 
 %% panels A-D
+clc
 line_styles = {'-',':'};
 panels_xlim = [-0.0950    1.9950; -1.9500   40.9500; -0.4500   56.5500; -0.0210    0.4410];
 panels_xticks = {[0 0.5 1 1.5],[0 20 40],[0:10:50],[0 0.2 0.4]};
+disp('panels a-d:')
 for ii_fn = 1:length(features_names)
     fn = features_names{ii_fn};
     axes(panels{1}(ii_fn));
@@ -162,6 +173,8 @@ for ii_fn = 1:length(features_names)
 %         histogram(X,'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{ii_epoch_type}, 'EdgeColor','k','LineWidth',lw);
         h1=histogram(X(g=='200m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{1}, 'EdgeColor',epoch_type_clrs{ii_epoch_type},'LineWidth',lw);
         h2=histogram(X(g=='120m'),'DisplayStyle','stairs','Normalization','pdf','LineStyle',line_styles{2}, 'EdgeColor',epoch_type_clrs{ii_epoch_type},'LineWidth',lw);
+        fprintf('%s: median=%.2g  mean=%.2g (%s,200m)\n', fn, median(X(g=='200m')), mean(X(g=='200m')), epoch_types{ii_epoch_type} )
+        fprintf('%s: median=%.2g  mean=%.2g (%s,120m)\n', fn, median(X(g=='120m')), mean(X(g=='120m')), epoch_types{ii_epoch_type} )
     end
 %     xlabel_pos = [];
     xlabel(xlable_strs{ii_fn}, 'Units','normalized', 'Position',[0.5 -0.14]);
@@ -172,11 +185,10 @@ for ii_fn = 1:length(features_names)
     hax=gca;
     hax.XLim = panels_xlim(ii_fn,:);
     hax.XTick = panels_xticks{ii_fn};
-%     hax.TickLength(1) = [0.025];
     hax.XRuler.TickLength(1) = 0.03;
     hax.XRuler.TickLabelGapOffset = -1;
     hax.YRuler.TickLabelGapOffset = 1;
-    fprintf('%s: median %.2g, mean = %.2g\n',fn,median([seqs_pooled.(fn)]),mean([seqs_pooled.(fn)]))
+    fprintf('%s: median = %.2g, mean = %.2g (pooled)\n',fn,median([seqs_pooled.(fn)]),mean([seqs_pooled.(fn)]))
 end
 
 %% legend (hists)
@@ -389,6 +401,10 @@ plot(replay_rate(:,3),replay_rate(:,4),'ok','MarkerSize',2)
 % plot(replay_rate(:,3),replay_rate(:,4),'.k')
 plot([1e-3 1e0],[1e-3 1e0],'Color',[1 1 1].*0.5);
 pval = signrank(replay_rate(:,3),replay_rate(:,4));
+disp('panel i stats:')
+fprintf('replay-rate sleep-after vs before:\n');
+fprintf('median ratio = %.2g\n', nanmedian(replay_rate(:,4)./replay_rate(:,3)) );
+fprintf('pval (signrank test)= %.2g\n', pval );
 % replay_rate_diff_sleep = diff(replay_rate(:,[3 4]),1,2);
 % h=histogram(replay_rate_diff_sleep,'FaceColor','k','Normalization','pdf');
 % pval = signrank(replay_rate_diff_sleep);
@@ -595,10 +611,17 @@ gTakeLand = classify_replay_landing_takeoff_other(seqs, TakeLand_thr);
 gPastFuture = categorical( ([events.rest_ball_num] == 1 & [seqs.state_direction] == 1) | ...
                            ([events.rest_ball_num] == 2 & [seqs.state_direction] == -1), ...
                            [false true],["Past","Future"])';
+gForRev = categorical([seqs.forward],[true false],["Forward","Reverse"])';
 g = gTakeLand .* gPastFuture;
 [N,G] = histcounts(g);
 N = reshape(N,2,3)';
 G = reshape(G,2,3)';
+% do some stats
+TakeoffsFuturePast_binom_pval = myBinomTest(sum(gTakeLand=='Takeoff' & gPastFuture=='Future'),sum(gTakeLand=='Takeoff'),0.5,'two');
+LandingFuturePast_binom_pval = myBinomTest(sum(gTakeLand=='Landing' & gPastFuture=='Past'),sum(gTakeLand=='Landing'),0.5,'two');
+disp('panel 2k stats:')
+fprintf('Takeoff: past vs future, pval=%.2g (binom test)\n',TakeoffsFuturePast_binom_pval);
+fprintf('Landing: past vs future, pval=%.2g (binom test)\n',LandingFuturePast_binom_pval);
 takeoff_IX = find(all(contains(G,'Takeoff'),2));
 midair_IX = find(all(contains(G,'Mid-air'),2));
 landing_IX = find(all(contains(G,'Landing'),2));
@@ -633,6 +656,68 @@ text(x+1.3*w,y2+h/2,'Future','HorizontalAlignment','left','VerticalAlignment','m
 % hl.Position = [hax.Position([1 2])+[0.5 0.75].*hax.Position([3 4]) .5 .5];
 % hl
 
+%% Takeoff/Landing X Past/Future X Forward/Reverse
+axes(panels{8}(2))
+cla reset
+hold on
+
+g = gTakeLand .* gPastFuture .*gForRev;
+[N,G] = histcounts(g);
+N = reshape(N,2,2,3);
+G = reshape(G,2,2,3);
+N = permute(N,[3 2 1]);
+G = permute(G,[3 2 1]);
+new_order = [takeoff_IX midair_IX landing_IX];  
+N = N(new_order,:,:);
+G = G(new_order,:,:);
+
+N([1 3],:,:) = N([1 3],:,:)./TakeLand_thr;
+N([2],  :,:) = N([2],  :,:)./(1-2*TakeLand_thr);
+N = N ./ sum(N,"all");
+
+w = 0.28;
+x = linspace(0,1,3);
+hs = (x(2)-x(1))*0.35;
+clear hb1 hb2
+hb1 = bar(x-hs/2,   squeeze(N(:,1,:)), w, 'stacked');
+hb2 = bar(x+hs/2,   squeeze(N(:,2,:)), w, 'stacked');
+hb1(1).FaceColor = .9*[1 1 1];
+hb1(2).FaceColor = 0*[1 1 1];
+hb2(1).FaceColor = 0.9*[0 1 0];
+hb2(2).FaceColor = 0.6*[0 1 0];
+% hb1(1).FaceColor = 0.0*[1 1 1];
+% hb1(2).FaceColor = 0.0*[1 1 1];
+% hb2(1).FaceColor = 1.0*[1 1 1];
+% hb2(2).FaceColor = 1.0*[1 1 1];
+% plot(hb1(1).XData+w/4.*[-1 1]',hb1(1).YData([1 1;2 2;3 3]'),'w','LineWidth',1.1);
+% plot(hb2(1).XData+w/4.*[-1 1]',hb2(1).YData([1 1;2 2;3 3]'),'k','LineWidth',1.1);
+% hb1(1).EdgeColor = 'w';
+% hb1(2).EdgeColor = 'w';
+% hb2(1).EdgeColor = 'k';
+% hb2(2).EdgeColor = 'k';
+xlim([0 1]+w.*[-1 1])
+
+%%
+axes(panels{8}(3))
+cla reset
+hold on
+gTakeLand = reordercats(gTakeLand,["Takeoff","Mid-air","Landing"]);
+G = categories(gTakeLand);
+for ii_g = 1:length(G)
+    gcurr = G{ii_g};
+    IX = gTakeLand==gcurr;
+%     IX = IX & gForRev=="Forward";
+%     IX = IX & gForRev=="Reverse";
+    seqs_g = seqs(IX);
+    events_g = events(IX);
+    x = abs([seqs_g.middle_pos_norm] - interp1([1 2],[0 1],[events_g.rest_ball_num]));
+    histogram(x,'BinWidth',0.05,'BinLimits',[0 1],'DisplayStyle','stairs','DisplayName',gcurr,'Normalization','probability');
+end
+xlim([0 1])
+xticks([0 1])
+legend('Box','off')
+xlabel({'Distance of replay';'from current position (norm.)'},'units','normalized','position',[0.5 -.05])
+ylabel('Prob.')
 
 %% add panel letters
 font_size = 11;

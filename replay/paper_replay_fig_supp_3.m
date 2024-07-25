@@ -57,16 +57,30 @@ set(groot,  'defaultAxesTickDirMode', 'manual');
 annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 
 % create panels
-panels{1}(1) = axes('position', [3 15 5 4]);
-panels{1}(2) = axes('position', [5.3 17.8 0.5 0.5]);
+panels{1}(1) = axes('position', [2 20 5 4]);
+panels{1}(2) = axes('position', [4.3 22.8 0.5 0.5]);
 
-panels{2}(1) = axes('position', [10 15 5 4]);
-panels{2}(2) = axes('position', [15.7 18 0.5 0.5]);
+panels{2}(1) = axes('position', [9 20 5 4]);
+panels{2}(2) = axes('position', [10. 25 0.5 0.4]);
 
-panels{3}(1) = axes('position', [10   9 5 4]);
-panels{3}(2) = axes('position', [10.8 11.8 0.5 0.5]);
+panels{3}(1) = axes('position', [16   20 4.5 4]);
+panels{3}(2) = axes('position', [16.3 22.8 0.5 0.5]);
 
+panels{4}(1) = axes('position', [16   14 4.5 4]);
 
+x = linspace(2,18,5);
+y = [10 6]-1;
+for ii = 1:length(y)
+    for jj = 1:length(x)
+        panels{5}(ii,jj) = axes('position', [x(jj) y(ii) 3 3]);
+    end
+end
+% panels{5}(1,1) = axes('position', [3 10 3 3]);
+% panels{5}(1,2) = axes('position', [8 10 3 3]);
+% panels{5}(1,3) = axes('position', [13 10 3 3]);
+% panels{5}(2,1) = axes('position', [3 6 3 3]);
+% panels{5}(2,2) = axes('position', [8 6 3 3]);
+% panels{5}(2,3) = axes('position', [13 6 3 3]);
 
 %% load data
 if ~exist('events_all','var')
@@ -74,6 +88,8 @@ if ~exist('events_all','var')
 epoch_types = {'sleep','rest'};
 [exp_list,T] = decoding_get_inclusion_list();
 T = T(exp_list,:);
+bats = unique(T.bat_num);
+bats_clr_map = containers.Map(num2cell(bats),{'r','g','b','k','m','c',[0.8 0.8 0]});
 events_all_per_session = {};
 speed_mean_per_session = nan(length(epoch_types),height(T));
 speed_median_per_session = nan(length(epoch_types),height(T));
@@ -186,6 +202,48 @@ xlim([0 1])
 ylim([0 1])
 axis off
 
+%% panel B - speed correlations (replay vs flight)
+axes(panels{2}(1))
+cla
+hold on
+r=[];
+p=[];
+for ii_epoch_type = 1:length(epoch_types)
+    X = flight_speed_all;
+    Y = speed_median_per_session(ii_epoch_type,:)';
+    lm = fitlm(X,Y)
+    h=plot(lm);
+    h(1).Marker = 'o';
+    h(1).MarkerSize = 5;
+    h(1).Color = clrs{ii_epoch_type};
+    h(2).Color = clrs{ii_epoch_type};
+    h(3).Color = clrs{ii_epoch_type};
+    h(4).Color = clrs{ii_epoch_type};
+    legend off
+%     plot(X,Y,'o','Color',clrs{ii_epoch_type},'MarkerSize',5);
+    [r(ii_epoch_type) p(ii_epoch_type)] = corr(X, Y,'rows','pairwise','tail','right','type','Pearson');
+%     text(0.1,0.9, "{\itr} = "+ sprintf('%.2f',r), 'Units','normalized','FontSize',7);
+%     text(0.1,0.8, "{\itP} = "+ sprintf('%.3f',p), 'Units','normalized','FontSize',7,'FontWeight','normal');
+end
+title("")
+xlabel('Flight speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
+ylabel('Replay speed (m/s)', 'Units','normalized', 'Position',[-0.15 .5]);
+hax=gca;
+hax.TickLength(1) = [0.016];
+hax.XRuler.TickLabelGapOffset = -1;
+
+%% legend (speed correlations)
+axes(panels{2}(2))
+cla
+hold on
+plot(0,1,'o', 'color', clrs{1}, 'MarkerSize',4,'Clipping','off');
+plot(0,0,'o', 'color', clrs{2}, 'MarkerSize',4,'Clipping','off');
+text(0.4, 1, 'Sleep'+":  {\itr} = " + sprintf('%.2f',r(1)) + ",  {\itP} = "+ sprintf('%.1g',p(1)),'FontSize',7,'HorizontalAlignment','left');
+text(0.4, 0, 'Awake'+":   {\itr} = " + sprintf('%.2f',r(2)) + ",  {\itP} = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left');
+xlim([0 1])
+ylim([0 1])
+axis off
+
 
 %% panel C - Flight speed
 axes(panels{3}(1))
@@ -222,47 +280,65 @@ xlim([0 1])
 ylim([0 1])
 axis off
 
-%% panel B - speed correlations (replay vs flight)
-axes(panels{2}(1))
-cla
-hold on
-r=[];
-p=[];
-for ii_epoch_type = 1:length(epoch_types)
-    X = flight_speed_all;
-    Y = speed_mean_per_session(ii_epoch_type,:)';
-    lm = fitlm(X,Y)
-    h=plot(lm);
-    h(1).Marker = 'o';
-    h(1).MarkerSize = 5;
-    h(1).Color = clrs{ii_epoch_type};
-    h(2).Color = clrs{ii_epoch_type};
-    h(3).Color = clrs{ii_epoch_type};
-    h(4).Color = clrs{ii_epoch_type};
-    legend off
-%     plot(X,Y,'o','Color',clrs{ii_epoch_type},'MarkerSize',5);
-    [r(ii_epoch_type) p(ii_epoch_type)] = corr(X, Y,'rows','pairwise','tail','right','type','Pearson');
-%     text(0.1,0.9, "{\itr} = "+ sprintf('%.2f',r), 'Units','normalized','FontSize',7);
-%     text(0.1,0.8, "{\itP} = "+ sprintf('%.3f',p), 'Units','normalized','FontSize',7,'FontWeight','normal');
-end
-title("")
-xlabel('Flight speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
-ylabel('Replay speed (m/s)', 'Units','normalized', 'Position',[-0.15 .5]);
-hax=gca;
-hax.TickLength(1) = [0.016];
-hax.XRuler.TickLabelGapOffset = -1;
 
-%% legend (speed correlations)
-axes(panels{2}(2))
-cla
+%% plot flight speed per bat
+axes(panels{4})
+cla reset
 hold on
-plot(0,1,'o', 'color', clrs{1}, 'MarkerSize',4,'Clipping','off');
-plot(0,0,'o', 'color', clrs{2}, 'MarkerSize',4,'Clipping','off');
-text(0.4, 1, 'Sleep'+":  {\itr} = " + sprintf('%.2f',r(1)) + ",  {\itP} = "+ sprintf('%.1g',p(1)),'FontSize',7,'HorizontalAlignment','left');
-text(0.4, 0, 'Awake'+":   {\itr} = " + sprintf('%.2f',r(2)) + ",  {\itP} = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left');
-xlim([0 1])
-ylim([0 1])
-axis off
+for ii_bat = 1:length(bats)
+    bat_num = bats(ii_bat);
+    bat_session_IX = find(T.bat_num==bat_num);
+    x = flight_speed_all(bat_session_IX);
+    xi = linspace(5.5,8.5,100);
+    c = bats_clr_map(bat_num);
+    f = ksdensity(x,xi,"Bandwidth",0.05);
+    plot(xi,f,'DisplayName',"bat"+bat_num,'Color',c,'LineWidth',1.6);
+%     plot(xi,f,'DisplayName',sprintf('bat%d(%s)',bat_num,exp.details.recordingArena),'Color',c,'LineWidth',2);
+end
+xlim([5.5 8.5])
+ylim([0 8])
+xlabel('Flight speed (m/s)','Units','normalized','Position',[0.5 -0.12])
+ylabel('Probability density','Units','normalized','Position',[-0.12 0.5])
+hax=gca;
+hax.XRuler.TickLength(1) = 0.035;
+hax.YRuler.TickLength(1) = 0.035;
+hax.XRuler.TickLabelGapOffset = -2;
+hax.YRuler.TickLabelGapOffset = 0;
+hl=legend("bat "+bats,'Location','northwest','Box','off')
+hl.Position([1 2]) = hl.Position([1 2]) + [-0.07 0.25].*hl.Position([3 4]);
+
+%% panel e - scatters of compression/duration/distance/speed
+scatters_features = {
+    'compression','duration';
+    'speed','duration';
+    'compression','distance';
+    'speed','distance';
+    'distance','duration';
+    };
+fn_map = containers.Map();
+fn_map('compression') = 'Compression ratio';
+fn_map('duration') = 'Replay duration (s)';
+fn_map('distance') = 'Replay distance (m)';
+fn_map('speed') = 'Replay speed (m/s)';
+for ii_epoch_type = 1:length(epoch_types)
+    for ii_scatter = 1:size(scatters_features,1)
+        axes(panels{5}(ii_epoch_type,ii_scatter))
+        cla reset
+        hold on
+        events = [events_all_per_session{ii_epoch_type}{:}];
+        seqs = [events.seq_model];
+        fn_x = scatters_features{ii_scatter,2};
+        fn_y = scatters_features{ii_scatter,1};
+        x = [seqs.(fn_x)];
+        y = [seqs.(fn_y)];
+        plot(x,y,'.','Color',clrs{ii_epoch_type})
+        xlabel(fn_map(fn_x))
+        ylabel(fn_map(fn_y))
+        hax=gca;
+        hax.XRuler.TickLabelGapOffset = -1;
+        hax.YRuler.TickLabelGapOffset = 1;
+    end
+end
 
 %% add panel letters
 font_size = 11;
@@ -272,6 +348,8 @@ axes(panels{2}(1))
 text(-0.25,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
 text(-0.25,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels{4}(1,1))
+text(-0.33,1.2, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);

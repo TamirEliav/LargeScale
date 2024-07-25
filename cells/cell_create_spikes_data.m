@@ -14,7 +14,7 @@ exp=exp_load_data(cell.details.exp_ID, 'path');
 %     ['spikes_' cell.details.TT_ID '.NTT']);
 
 NTT_file = fullfile(exp.path.spikes_sorting,...
-                    ['spikes_' cell.details.TT_ID '.NTT']);
+                    ['spikes_' cell.details.TT_day_ID '.NTT']);
 if isempty(cell.details.stable_ts)
     [Timestamps, CellNumbers, Samples, Header] = ...
          Nlx2MatSpike(NTT_file, [1 0 1 0 1], 1, 1, [] );

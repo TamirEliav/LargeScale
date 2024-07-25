@@ -20,6 +20,8 @@ epoch_types = {'sleep','rest'};
 exp_types = {'1 bat','2 bats'};
 panels_xlim = [-0.0950    1.9950; -1.9500   40.9500; -0.4500   56.5500; -0.0210    0.4410];
 panels_xticks = {[0 0.5 1 1.5],[0 20 40],[0:10:50],[0 0.2 0.4]};
+smooth_method = 'movmean';
+smooth_n_points = 19;
 
 %% define output files
 res_dir =  'L:\paper_replay\figures';
@@ -69,12 +71,20 @@ panels{3}(1) = axes('position', [14.8 20 3 3]);
 panels{3}(2) = axes('position', [14.8 23 3 .5]);
 x = linspace(3,10,4);
 x = x+[0 0.15 -0.1 0.1];
-panels{4}(1) = axes('position', [x(1) 15 1 3]);
-panels{4}(2) = axes('position', [x(2) 15 1 3]);
-panels{4}(3) = axes('position', [x(3) 15 1 3]);
-panels{4}(4) = axes('position', [x(4) 15 1 3]);
-panels{5}(1) = axes('position', [12.5 15 3 3]);
-panels{6}(1) = axes('position', [17 15 3 3]);
+% panels{4}(1) = axes('position', [x(1) 15 1 3]);
+% panels{4}(2) = axes('position', [x(2) 15 1 3]);
+% panels{4}(3) = axes('position', [x(3) 15 1 3]);
+% panels{4}(4) = axes('position', [x(4) 15 1 3]);
+panels{5}(1,1) = axes('position', [3 15 3 3]);
+panels{5}(1,2) = axes('position', [3 12 3 1.5]);
+panels{5}(1,3) = axes('position', [3  7 3 3]);
+panels{5}(1,4) = axes('position', [3  3 3 3]);
+panels{5}(2,1) = axes('position', [7.5 15 3 3]);
+panels{5}(2,2) = axes('position', [7.5 12 3 1.5]);
+panels{5}(2,3) = axes('position', [7.5  7 3 3]);
+panels{5}(2,4) = axes('position', [7.5  3 3 3]);
+panels{6}(1) = axes('position', [16 6 3 2]);
+panels{6}(2) = axes('position', [16 3 3 2]);
 
 %% panels A - experimental setup
 axes(panels{1}(1))
@@ -263,9 +273,13 @@ text(cb_offset_middle,0,'0','Units','normalized','FontSize',7,'HorizontalAlignme
 % text(cb_offset_middle,0,clim_prctiles(1)+"%",'Units','normalized','FontSize',7,'HorizontalAlignment','center');
 end
 
-%% panels C - main scatter plot
-axes(panels{5}(1))
-hold on
+
+
+
+
+
+
+%% panels C+D - scatters (load data)
 % data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay position between 25-115.mat';
 % data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay position between 25-115 & same map.mat';
 % data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay position between 25-115 & same map & forward.mat';
@@ -279,8 +293,14 @@ data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_op
 % data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay pos between 25-115 & same map, dec acc_gt_65%.mat';
 % data_filename = 'F:\sequences\figures\replay_vs_crossover\replay_vs_crossover_opt_11_replay pos between 25-115 & same map, dec acc_gt_70%.mat';
 
+%% panels C - main scatter plot
+axes(panels{5}(1,1))
+cla reset
+hold on
 data = load(data_filename);
-scatter(data.x(data.TF),data.y(data.TF),5,'k','filled');
+X = data.x(data.TF);
+Y = data.y(data.TF);
+scatter(X,Y,5,'k','filled');
 axis equal
 xlim([0 135])
 ylim([0 135])
@@ -303,9 +323,53 @@ hax.YRuler.TickLength(1) = 0.024;
 hax.XRuler.TickLabelGapOffset = -.5;
 hax.YRuler.TickLabelGapOffset = 1;
 
-%% panels D - scatter plot (control - next crossover)
-axes(panels{6}(1))
+axes(panels{5}(1,3))
+cla reset
+hold on
+[~,IX_sorted] = sort(X,'ascend');
+X2 = smoothdata(X(IX_sorted),smooth_method,smooth_n_points);
+Y2 = smoothdata(Y(IX_sorted),smooth_method,smooth_n_points);
+scatter(X,Y,5,'k','filled');
+plot(X2,Y2,'-m')
+axis equal
+xlim([0 135])
+ylim([0 135])
+xticks(linspace(0,135,4))
+yticks(linspace(0,135,4))
+
+axes(panels{5}(1,2))
 cla
+hold on
+diff_data_prev = abs(X-Y);
+nShuffles = 10000;
+diff_shuffles_prev = zeros(1,nShuffles);
+rng(0);
+for ii_shuffle = 1:nShuffles
+    IX =randperm(length(X));    
+    diff_shuffles_prev(ii_shuffle) = mean(abs(X(IX)-Y));
+end
+diff_data_z = (mean(diff_data_prev)-mean(diff_shuffles_prev))/std(diff_shuffles_prev);
+pval = normcdf(diff_data_z,0,1);
+hh=histogram(diff_shuffles_prev);
+hh.FaceColor = .5*[1 1 1];
+xline(mean(diff_data_prev),'r');
+text(0.7,0.85,"{\itP} = "+sprintf('%.2f',pval),'units','normalized','FontSize',7);
+xlabel({'|\Deltaposition| (m)';'Replay vs. previous cross-over'});
+ylabel('Counts');
+
+axes(panels{5}(1,4))
+cla reset
+hold on
+g = nan(size(X));
+g(X<45) = 1;
+g(X>=45 & X<=90) = 2;
+g(X>90) = 3;
+boxplot(Y,g)
+xticklabels({'<45','>45 & < 90','>90'})
+
+%% panels D - scatter plot (control - next crossover)
+axes(panels{5}(2,1))
+cla reset
 hold on
 X = [data.seqs_all.next_co_pos];
 Y = data.y;
@@ -333,6 +397,77 @@ hax.XRuler.TickLength(1) = 0.035;
 hax.YRuler.TickLength(1) = 0.024;
 hax.XRuler.TickLabelGapOffset = -.5;
 hax.YRuler.TickLabelGapOffset = 1;
+
+axes(panels{5}(2,3))
+cla reset
+hold on
+[~,IX_sorted] = sort(X,'ascend');
+X2 = smoothdata(X(IX_sorted),smooth_method,smooth_n_points);
+Y2 = smoothdata(Y(IX_sorted),smooth_method,smooth_n_points);
+scatter(X,Y,5,'k','filled');
+plot(X2,Y2,'-m')
+axis equal
+xlim([0 135])
+ylim([0 135])
+xticks(linspace(0,135,4))
+yticks(linspace(0,135,4))
+
+axes(panels{5}(2,2))
+cla
+hold on
+diff_data_next = abs(X-Y);
+nShuffles = 10000;
+diff_shuffles_next = zeros(1,nShuffles);
+rng(0);
+for ii_shuffle = 1:nShuffles
+    IX =randperm(length(X));    
+    diff_shuffles_next(ii_shuffle) = mean(abs(X(IX)-Y));
+end
+diff_data_z = (mean(diff_data_next)-mean(diff_shuffles_next))/std(diff_shuffles_next);
+pval = normcdf(diff_data_z,0,1);
+hh=histogram(diff_shuffles_next);
+hh.FaceColor = .5*[1 1 1];
+xline(mean(diff_data_next),'r');
+text(0.7,0.85,"{\itP} = "+sprintf('%.2f',pval),'units','normalized','FontSize',7);
+xlabel({'|\Deltaposition| (m)';'Replay vs. next cross-over'});
+ylabel('Counts');
+
+axes(panels{5}(2,4))
+cla reset
+hold on
+g = nan(size(X));
+g(X<45) = 1;
+g(X>=45 & X<=90) = 2;
+g(X>90) = 3;
+boxplot(Y,g)
+xticklabels({'<45','>45 & < 90','>90'})
+
+%%
+axes(panels{6}(1))
+cla reset
+hold on
+hax=gca
+ecdf(diff_data_prev)
+ecdf(diff_data_next)
+hl=legend({'Next';'Previous'},'Location','none');
+hl.Units = 'centimeters';
+hl.Position = [hax.Position([1 2]) + [2 0.3] .1 .1];
+hl.Box = 'off';
+xlabel('\DeltaPosition')
+ylabel('CDF')
+%%
+axes(panels{6}(2))
+cla reset
+hold on
+hax=gca;
+hh = histogram(diff_data_prev,'DisplayStyle','stairs','DisplayName','Previous cross-over','EdgeColor','r','BinWidth',10);
+hh = histogram(diff_data_next,'DisplayStyle','stairs','DisplayName','Next cross-over','EdgeColor','b','BinWidth',10);
+hl=legend({'Next';'Previous'},'Location','none');
+hl.Units = 'centimeters';
+hl.Position = [hax.Position([1 2]) + [2.4 1.6] .1 .1];
+hl.Box = 'off';
+xlabel('\DeltaPosition')
+ylabel('Counts')
 
 %% panels E - time diff vs pos diff (recency effect)
 % axes(panels{6}(1))
@@ -515,11 +650,11 @@ axes(panels{2}(1))
 text(-0.2,1.3, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
 text(-0.38,1.3, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-axes(panels{4}(1))
-text(-1.1,1.15, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-axes(panels{5}(1))
+% axes(panels{4}(1))
+% text(-1.1,1.15, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels{5}(1,1))
 text(-0.35,1.15, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-axes(panels{6}(1))
+axes(panels{5}(2,1))
 text(-0.35,1.15, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
@@ -533,10 +668,6 @@ print(gcf, file_out, '-dpdf', '-cmyk', '-painters');
 disp('figure saved!')
 
 %%
-
-
-
-
 
 %%
 function str = genSignifStrAstricks(pval)

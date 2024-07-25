@@ -31,6 +31,26 @@ for ii_replay = 1:length(replays)
     close all
 end
 
+%% check for Saikat ripple rate
+[exp_list,T] = decoding_get_inclusion_list();
+T = T(exp_list,:);
+sleep1_ripple_rate = zeros(1,length(exp_list));
+sleep2_ripple_rate = zeros(1,length(exp_list));
+rest_ripple_rate = zeros(1,length(exp_list));
+parfor ii_exp = 1:length(exp_list)
+    %%
+    ii_exp
+    exp_ID = exp_list{ii_exp};
+    exp = exp_load_data(exp_ID,'ripples','rest');
+    sleep1_ti = exp_get_sessions_ti(exp_ID, 'Sleep1');
+    sleep2_ti = exp_get_sessions_ti(exp_ID, 'Sleep2');
+    rest_ti = exp.rest.ti;
+    events = exp.ripples.events;
+    sleep1_ripple_rate(ii_exp) = length(get_data_in_ti([events.peak_ts],sleep1_ti)) / sum(diff(sleep1_ti,1,2)*1e-6);
+    sleep2_ripple_rate(ii_exp) = length(get_data_in_ti([events.peak_ts],sleep2_ti)) / sum(diff(sleep2_ti,1,2)*1e-6);
+    rest_ripple_rate(ii_exp) = length(get_data_in_ti([events.peak_ts],rest_ti)) / sum(diff(rest_ti,1,2)*1e-6);
+end
+save("L:\DATA_for_people\Saikat\ripples_rate","sleep1_ripple_rate","sleep2_ripple_rate","rest_ripple_rate","exp_list")
 
 %%
 
