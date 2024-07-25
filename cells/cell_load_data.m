@@ -17,6 +17,7 @@ field_options = {
     'inclusion',
     'cluster_control',
     'cluster_quality',
+    'replay_FR_map',
     };
 
 %% parse input

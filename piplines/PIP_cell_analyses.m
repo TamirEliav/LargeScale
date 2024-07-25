@@ -24,14 +24,69 @@ cell_list = {
 prm=PARAMS_GetAll();
 cells_t = DS_get_cells_summary();
 % cells_t(~strcmp(cells_t.brain_area, 'CA1'),:)=[];
-cells_t(~ismember(cells_t.bat, [79,148,34,9861,2289] ),:) = [];
+% cells_t(~ismember(cells_t.bat, [79,148,34,9861,2289] ),:) = [];
 % cells_t(~ismember(cells_t.bat, [34] ),:) = [];
+% cells_t(~ismember(cells_t.bat, [9861] ),:) = [];
 % cells_t(~ismember(cells_t.bat, [148] ),:) = [];
 % cells_t(cells_t.date~='10/03/2018', :)=[];
 % cells_t(~contains(cells_t.cell_ID, cell_list),:) = [];
 
-%% filter cells - brain region / sorting quality
+%% prepare data from bat 9861 for shir (14/03/2024)
+cells_t = DS_get_cells_summary();
+cells_t(~ismember(cells_t.bat, [9861] ),:) = [];
+cells = cellfun(@(c)(cell_load_data(c,'details')), cells_t.cell_ID, 'UniformOutput',1);
+details = [cells.details];
+details(~contains({details.brain_area}, {'CA1'})) = [];
+details(~ismember([details.ClusterQuality], [2])) = [];
+cells_t = cells_t({details.cell_ID},:);
+fns = {
+    'details',
+    'spikes',
+    'RecStability',
+    'FE',
+    'FR_map',
+    'fields',
+    'signif',
+    'meanFR',
+    'stats',
+    'inclusion'
+};
+cells = cellfun(@(c)(cell_load_data(c,fns{:})), cells_t.cell_ID, 'UniformOutput',1);
+
+%% cells included in replay analysis
 if 1
+cells_t(~ismember(cells_t.bat, [184,194,2382,148,34,9861,2289] ),:) = [];
+% cells_t(~ismember(cells_t.bat, [148,34,9861,2289] ),:) = [];
+% cells_t(~ismember(cells_t.bat, [184,194,2382] ),:) = [];
+[exp_list,T] = decoding_get_inclusion_list();
+cells_exp_ID = cellfun(@(c)DS_get_exp_ID_from_cell_ID(c),cells_t.cell_ID,'UniformOutput',false);
+TF = ismember(cells_exp_ID,exp_list);
+cells_t(~TF,:)=[];
+cells = cellfun(@(c)(cell_load_data(c,'details')), cells_t.cell_ID, 'UniformOutput',1);
+details = [cells.details];
+details(~contains({details.brain_area}, {'CA1','CA3'})) = [];
+details(~ismember([details.ClusterQuality], [2])) = [];
+cells_t = cells_t({details.cell_ID},:);
+cells_t('b2382_d190623_TT13_SS01',:) = []; % not stable - remove this cell
+end
+
+%% analyze shir's data (replay analysis)
+if 0
+cells_t(~ismember(cells_t.bat, [184,194,2382] ),:) = [];
+[exp_list,T] = decoding_get_inclusion_list();
+cells_exp_ID = cellfun(@(c)DS_get_exp_ID_from_cell_ID(c),cells_t.cell_ID,'UniformOutput',false);
+TF = ismember(cells_exp_ID,exp_list);
+cells_t(~TF,:)=[];
+cells = cellfun(@(c)(cell_load_data(c,'details')), cells_t.cell_ID, 'UniformOutput',1);
+details = [cells.details];
+details(~contains({details.brain_area}, {'CA1','CA3'})) = [];
+details(~ismember([details.ClusterQuality], [2])) = [];
+cells_t = cells_t({details.cell_ID},:);
+cells_t('b2382_d190623_TT13_SS01',:) = []; % not stable - remove this cell
+end
+
+%% filter cells - brain region / sorting quality
+if 0
 cells = cellfun(@(c)(cell_load_data(c,'details')), cells_t.cell_ID, 'UniformOutput',0);
 cells = [cells{:}];
 cells = [cells.details];
@@ -51,7 +106,7 @@ cells_t([meanFR.all]>prm.inclusion.interneuron_FR_thr,:) = []; % take pyramidal
 end
 
 %% only signif place cells
-if 0
+if 1
 cells = cellfun(@(c)(cell_load_data(c,'signif')), cells_t.cell_ID, 'UniformOutput',0);
 cells = [cells{:}];
 signif = cat(1,cells.signif);
@@ -79,14 +134,14 @@ try
 %     cell_create_details(cell_ID);
 %     cell_create_spikes_data(cell_ID);
 %     
-%     cell_calc_mean_FR(cell_ID);
 %     cell_calc_time_stability(cell_ID);
 %     cell_create_flight_data(cell_ID);
+%     cell_calc_mean_FR(cell_ID);
 %     cell_calc_FR_map(cell_ID);
 %     cell_calc_FR_map_shuffles(cell_ID);
 %     cell_calc_Ipos(cell_ID);
 %     cell_calc_fields(cell_ID);
-% %     cell_calc_fields_properties(cell_ID);
+%     cell_calc_fields_properties(cell_ID);
 %     cell_calc_significant(cell_ID);
 %     cell_calc_stats(cell_ID);
 %     cell_calc_inclusion(cell_ID);
@@ -95,10 +150,13 @@ try
 %     cell_calc_cluster_control(cell_ID);
 %     cell_calc_cluster_quality2(cell_ID);
 
-    cell_plot_map_fields(cell_ID);
+%     cell_plot_map_fields(cell_ID);
 %     cell_plot_time_AC(cell_ID);
 
 %     cell_plot_figure_choose_examples(cell_ID)
+
+    cell_calc_replay_FR_map(cell_ID, plot_figs=false);
+
     toc
     
 catch err

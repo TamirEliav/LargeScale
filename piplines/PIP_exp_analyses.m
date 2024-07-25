@@ -172,6 +172,7 @@ try
         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type); 
         decoding_plot_PE_posterior(decode, event_type);
         decoding_plot_session_seqs(exp_ID, epoch_type, params_opt, event_type);
+        decoding_calc_session_seqs_spikes_corr(exp_ID, epoch_type, params_opt, event_type);
 %         decoding_xcorr_ripples_MUA_PE_vs_posterior_events(decode);
         close all
     end
