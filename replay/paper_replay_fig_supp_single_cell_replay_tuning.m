@@ -117,6 +117,11 @@ for ii_dir = 1:2
     ccc_shuffle{ii_dir} = ccc(mask_shuffle);
 end
 
+%% save correlations results to mat file
+filename = 'single_unit_replay_tuning_corr';
+file_out = fullfile(res_dir,filename);
+save(file_out,'ccc_data','ccc_shuffle');
+
 %% plot
 axes(panels{1}(1));
 cla reset

@@ -89,7 +89,8 @@ xoffset = 2;
 panels_hist_size = [2 1.5];
 panles_hist_pos_x = linspace(1.3, 9.8, nFeatures)+xoffset;
 panles_hist_pos_y = linspace(24.5, 12, nBats);
-panles_hist_pos_y(end+1) = 8;
+panles_hist_pos_y(end+1) = panles_hist_pos_y(end)-4;
+panles_hist_pos_y = panles_hist_pos_y - 4;
 for ii_bat=1:length(panles_hist_pos_y)
     panel_pos(2) = panles_hist_pos_y(ii_bat);
     for ii_feature=1:nFeatures
@@ -98,7 +99,6 @@ for ii_bat=1:length(panles_hist_pos_y)
     end
     panels{2}(ii_bat) = axes('position', [12.4+xoffset panel_pos(2) 7 1.5]);
 end
-delete(panels{2}(end))
 
 %%
 % panels{1}(1) = axes('position', [3 23 3 3]);
@@ -195,7 +195,7 @@ end
 if exist('panels_hist_legend','var')
     delete(panels_hist_legend);
 end
-panels_hist_legend = axes('position', [xoffset+2.2 25.5 0.2 0.3]);
+panels_hist_legend = axes('position', [xoffset+2.2 21.5 0.2 0.3]);
 cla
 hold on
 plot([0 1], [1 1], 'color', clrs{1}, 'LineWidth',lw,'Clipping','off');
@@ -240,7 +240,7 @@ for ii_bat = 1:nBats
 %         hl.Position([3 4]) = [0.1 0.025];
 %         hl.Box = 'off';
 %     end
-    if ii_bat == length(panels{2})
+    if ii_bat == nBats
         xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.11]);
 %         ylabel({'Replay coverage';'(prob.)'}, 'Units','normalized', 'Position',[-0.1 0.5]);
     end
@@ -276,6 +276,12 @@ for ii_dir = 1:2
     ylim([0 1])
     axis off
 end
+
+
+
+
+%% ========================================================================
+% 2 bats
 
 %% 2 bats data - load data
 exp_list_2bats = {
@@ -338,6 +344,30 @@ text(-1.1, .5, { ...
     "{\itn}_{events} = " + length(bat_seqs); ...
     },'FontSize',7,'HorizontalAlignment','center','Units','normalized','FontWeight','bold');
 
+
+%% panel J - coverage per session 2 bats)
+T_2bats = table();
+T_2bats.exp_ID = exp_list_2bats;
+coverage = decoding_calc_coverage_over_exp_table(T,params_opt,nbins);
+axes(panels{2}(end))
+cla
+hold on
+c = coverage.coverage_all;
+c = normalize(c,4,'norm',1);
+nBins = size(c,4);
+x = linspace(0,1,nBins);
+lw = .2;
+plot(x, squeeze(c(:,1,1,:)),'-','LineWidth',lw,'Color',directions_clrs{1});
+plot(x, squeeze(c(:,2,1,:)),'--','LineWidth',lw,'Color',directions_clrs{1});
+plot(x, squeeze(c(:,1,2,:)),'-','LineWidth',lw,'Color',directions_clrs{2});
+plot(x, squeeze(c(:,2,2,:)),'--','LineWidth',lw,'Color',directions_clrs{2});
+hax=gca;
+hax.XTick = [0 1];
+hax.XLim = [0 1];
+hax.XRuler.TickLabelGapOffset = -1.5;
+hax.YRuler.TickLabelGapOffset = 1;
+xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.11]);
+
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1,1))
@@ -361,6 +391,8 @@ text(-0.3,1.3, 'h', 'Units','normalized','FontWeight','bold','FontSize',font_siz
 axes(panels{1}(end,4))
 text(-0.3,1.3, 'i', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
+axes(panels{2}(end))
+text(-0.1,1.3, 'j', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);

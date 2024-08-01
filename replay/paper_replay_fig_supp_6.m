@@ -22,6 +22,16 @@ PastFutureCategoriesOrder = {
     'Past'
     'Future'};
 
+hist_style = 'stairs';
+% hist_style = 'bar';
+switch hist_style 
+    case 'stairs'
+        hist_color_prop = 'EdgeColor';
+    case 'bar'
+        hist_color_prop = 'FaceColor';
+end
+
+
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
@@ -66,18 +76,27 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 
 % create panels
 clear panels
-panels{1}(1) = axes('position', [3  19 4 4]);
-panels{2}(1) = axes('position', [9  19 3 4]);
-panels{3}(1) = axes('position', [14 19 3 4]);
-% panels{4}(1) = axes('position', [3  13 4 4]);
-% panels{5}(1) = axes('position', [9  13 3 4]);
-% panels{6}(1) = axes('position', [14 13 3 4]);
-% panels{4}(2) = axes('position', [3   7 4 4]);
-% panels{5}(2) = axes('position', [9   7 3 4]);
-% panels{6}(2) = axes('position', [14  7 3 4]);
-sdf=[panels{:}]
+panels{1}(1) = axes('position', [2  19 4 3]);
+panels{2}(1) = axes('position', [8  19 3 3]);
+panels{3}(1) = axes('position', [13 19 3 3]);
+panels{4}(1) = axes('position', [2 14.5 4 3]);
+panels{4}(2) = axes('position', [2 14.5 .5 2]+[.3 1.4 0 0]);
+panels{5}(1) = axes('position', [8 14.5 4 3]);
+
+w = 8.5;
+h = 3.5;
+x = [2 12];
+y = [8 2.2];
+panels{6}(1,1) = axes('position', [x(1) y(1) w h]);
+panels{6}(1,2) = axes('position', [x(2) y(1) w h]);
+panels{6}(2,1) = axes('position', [x(1) y(2) w h]);
+panels{6}(2,2) = axes('position', [x(2) y(2) w h]);
+
+sdf = cellfun(@(x)x(:)', panels, 'UniformOutput', false);
+sdf = [sdf{:}];
+total_offset = [0 2.5];
 for ii = 1:length(sdf)
-    sdf(ii).Position(1) = sdf(ii).Position(1) + 2;
+    sdf(ii).Position([1 2]) = sdf(ii).Position([1 2]) + total_offset;
 end
 
 %% load data
@@ -431,6 +450,364 @@ hax.YLim = [0 0.7];
 % 
 % end
 
+
+
+
+
+
+
+
+
+%% Takeoff/Landing X Past/Future X Forward/Reverse
+axes(panels{4}(1))
+cla reset
+hold on
+
+% from fig 2  (start) ---------------
+TakeLand_thr = 0.05;
+g = gTakeLand .* gPastFuture;
+[N,G] = histcounts(g);
+N = reshape(N,2,3)';
+G = reshape(G,2,3)';
+takeoff_IX = find(all(contains(G,'Takeoff'),2));
+midair_IX = find(all(contains(G,'Mid-air'),2));
+landing_IX = find(all(contains(G,'Landing'),2));
+new_order = [takeoff_IX midair_IX landing_IX];
+N = N(new_order,:);
+G = G(new_order,:);
+N([1 3],:) = N([1 3],:)./TakeLand_thr;
+N([2],:) = N([2],:)./(1-2*TakeLand_thr);
+N = N ./ sum(N,"all");
+% from fig 2  (end) ---------------
+
+g = gTakeLand .* gPastFuture .*gForRev;
+[N,G] = histcounts(g);
+N = reshape(N,2,2,3);
+G = reshape(G,2,2,3);
+N = permute(N,[3 2 1]);
+G = permute(G,[3 2 1]);
+new_order = [takeoff_IX midair_IX landing_IX];  
+N = N(new_order,:,:);
+G = G(new_order,:,:);
+
+N([1 3],:,:) = N([1 3],:,:)./TakeLand_thr;
+N([2],  :,:) = N([2],  :,:)./(1-2*TakeLand_thr);
+N = N ./ sum(N,"all");
+
+w = 0.28;
+x = linspace(0,1,3);
+hs = (x(2)-x(1))*0.35;
+clear hb1 hb2
+hb1 = bar(x-hs/2,   squeeze(N(:,1,:)), w, 'stacked');
+hb2 = bar(x+hs/2,   squeeze(N(:,2,:)), w, 'stacked');
+hb1(1).FaceColor = 'flat';
+hb1(2).FaceColor = 'flat';
+hb2(1).FaceColor = 'flat';
+hb2(2).FaceColor = 'flat';
+hb1(1).CData = 0.00*[1 1 1];
+hb1(2).CData = 0.35*[1 1 1];
+hb2(1).CData = 0.85*[1 1 1];
+hb2(2).CData = 1.00*[1 1 1];
+% hb1(1).FaceColor = 0.0*[1 1 1];
+% hb1(2).FaceColor = 0.0*[1 1 1];
+% hb2(1).FaceColor = 1.0*[1 1 1];
+% hb2(2).FaceColor = 1.0*[1 1 1];
+% plot(hb1(1).XData+w/4.*[-1 1]',hb1(1).YData([1 1;2 2;3 3]'),'w','LineWidth',1.1);
+% plot(hb2(1).XData+w/4.*[-1 1]',hb2(1).YData([1 1;2 2;3 3]'),'k','LineWidth',1.1);
+% hb1(1).EdgeColor = 'w';
+% hb1(2).EdgeColor = 'w';
+% hb2(1).EdgeColor = 'k';
+% hb2(2).EdgeColor = 'k';
+xlim([0 1]+w.*[-1 1])
+xticklabels(TakeLandCategoriesOrder)
+ylabel('Fraction')
+
+%% add legend 
+clc
+axes(panels{4}(2))
+cla reset
+hold on
+axis off
+axis ij
+
+V = [.2 0; .2 .7; .8 .7; .8 0];
+F = [1 2 3 4 1];
+h=patch('Faces',F,'Vertices',V+[0 1]*1); h.FaceColor=[1 1 1]*.1;
+h=patch('Faces',F,'Vertices',V+[0 1]*2); h.FaceColor=[1 1 1]*.3;
+h=patch('Faces',F,'Vertices',V+[0 1]*3); h.FaceColor=[1 1 1]*.7;
+h=patch('Faces',F,'Vertices',V+[0 1]*4); h.FaceColor=[1 1 1]*.9;
+
+% x = [0.2 0.2 .8 .8];
+% y = [0 .7 .7 0];
+% h=patch('XData',x, 'YData', y+1, 'FaceColor','Flat')
+% patch(x,y+1, 'r', 'FaceColor','Flat', 'CData',0.35*[1 1 1])
+% patch(x,y+2, 'r', 'FaceColor','Flat', 'CData',0.35*[1 1 1])
+% patch(x,y+3, 'r', 'FaceColor','Flat', 'CData',0.35*[1 1 1])
+% patch(x,y+4, 'r', 'FaceColor','Flat', 'CData',0.35*[1 1 1])
+% patch(x,y+2, 0.*[1 1 1])
+% patch(x,y+3, 0.85*[1 1 1])
+% patch(x,y+4, 1.0*[1 1 1])
+x = 1.1;
+y = [1:4]+0.35;
+font_size = 7;
+text(x,y(1),'Past forward','FontSize',font_size,'HorizontalAlignment','left','VerticalAlignment','middle')
+text(x,y(2),'Past reverse','FontSize',font_size,'HorizontalAlignment','left','VerticalAlignment','middle')
+text(x,y(3),'Future forward','FontSize',font_size,'HorizontalAlignment','left','VerticalAlignment','middle')
+text(x,y(4),'Future reverse','FontSize',font_size,'HorizontalAlignment','left','VerticalAlignment','middle')
+xlim([0 1])
+ylim([0 5])
+
+%% replay distance from current location
+axes(panels{5}(1))
+cla reset
+hold on
+gTakeLand = reordercats(gTakeLand,["Takeoff","Mid-air","Landing"]);
+G = categories(gTakeLand);
+for ii_g = 1:length(G)
+    gcurr = G{ii_g};
+    IX = gTakeLand==gcurr;
+%     IX = IX & gForRev=="Forward";
+%     IX = IX & gForRev=="Reverse";
+    seqs_g = seqs(IX);
+    events_g = events(IX);
+    x = abs([seqs_g.middle_pos_norm] - interp1([1 2],[0 1],[events_g.rest_ball_num]));
+    histogram(x,'BinWidth',0.05,'BinLimits',[0 1],'DisplayStyle','stairs','DisplayName',gcurr,'Normalization','probability');
+end
+xlim([0 1])
+xticks([0 1])
+legend('Box','off')
+xlabel({'Distance of replay';'from current position (norm.)'},'units','normalized','position',[0.5 -.05])
+ylabel('Prob.')
+
+
+
+
+
+
+
+
+%% ========================================================================
+
+%% plot replay start/end position histograms (per forward/reverse replays)
+nbins = 100;
+cmap = brewermap(100,'RdBu');
+clrs = cmap([0.9 0.1].*size(cmap,1),:);
+directions = [1 -1];
+g = gForRev';
+for ii_dir = 1:length(directions)
+    seqs_dir_TF = [seqs.state_direction]==directions(ii_dir);
+
+    axes(panels{6}(1,ii_dir))
+    cla reset
+    hold on
+    x = [seqs.start_pos_norm];
+    histogram(x(g=='Forward' & seqs_dir_TF),linspace(0,1,nbins+1),'Normalization','count',hist_color_prop,clrs(1,:),'DisplayStyle',hist_style);
+    histogram(x(g=='Reverse' & seqs_dir_TF),linspace(0,1,nbins+1),'Normalization','count',hist_color_prop,clrs(2,:),'DisplayStyle',hist_style);
+%     h=legend('Forward','Reverse');
+%     h.Box='off';
+    xlabel('Start position of replay (norm.)')
+    ylabel('Counts')
+    hax=gca;
+    hax.XRuler.TickLabelGapOffset = -1;
+
+    axes(panels{6}(2,ii_dir))
+    cla
+    hold on
+    x = [seqs.end_pos_norm];
+    histogram(x(g=='Forward' & seqs_dir_TF),linspace(0,1,nbins+1),'Normalization','count',hist_color_prop,clrs(1,:),'DisplayStyle',hist_style);
+    histogram(x(g=='Reverse' & seqs_dir_TF),linspace(0,1,nbins+1),'Normalization','count',hist_color_prop,clrs(2,:),'DisplayStyle',hist_style);
+    xlabel('End position of replay (norm.)')
+    ylabel('Counts')
+    hax=gca;
+    hax.XRuler.TickLabelGapOffset = -1;
+end
+
+% set ylimits
+panels{6}(1,1).YLim = [0 80];
+panels{6}(2,1).YLim = [0 180];
+panels{6}(1,2).YLim = [0 120];
+panels{6}(2,2).YLim = [0 150];
+
+for ii=1:numel(panels{6})
+    pnl = panels{6}(ii); axes(pnl);
+    text(0,-0.27*range(pnl.YLim),{'Resting';'ball 1'},'HorizontalAlignment','center','FontSize',8);
+    text(1,-0.27*range(pnl.YLim),{'Resting';'ball 2'},'HorizontalAlignment','center','FontSize',8);
+end
+
+% pointers to takeoff/landing in the histogram (dir 1)
+TL_fnt_sz = 7;
+h=annotation('textarrow');
+h.Parent=panels{6}(1,1);
+h.X = 0.011*[1 1];
+h.Y = 45+[0 -7];
+h.String = '    Takeoffs';
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(1,1);
+h.X = 0.052*[1 1];
+h.Y = 22+[0 -7];
+h.String = {'           Reverse','           takeoffs'};
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(1,1);
+h.X = 0.92.*[1 1];
+h.Y = 75+[0 -7];
+h.String = {'Landings          '};
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(1,1);
+h.X = 0.985*[1 1];
+h.Y = 70+[0 -7];
+h.String = {'            Reverse';'            landings'};
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(2,1);
+h.X = 0.005*[1 1];
+h.Y = 55+[0 -24];
+h.String = {'     Reverse','     takeoffs'};
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(2,1);
+h.X = 0.05*[1 1];
+h.Y = 35+[0 -15];
+h.String = {'        Takeoffs'};
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(2,1);
+h.X = 0.985*[1 1];
+h.Y = 180+[0 -12];
+h.String = 'Landings';
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(2,1);
+h.X = 0.93*[1 1];
+h.Y = 60+[0 -12];
+h.String = {'Reverse          ','landings          '};
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+% pointers to takeoff/landing in the histogram (dir 2)
+h=annotation('textarrow');
+h.Parent=panels{6}(1,2);
+h.X = 0.015*[1 1];
+h.Y = 110+[0 -12];
+h.String = {'     Reverse','     landings'};
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(1,2);
+h.X = 0.06*[1 1];
+h.Y = 65+[0 -12];
+h.String = '          Landings';
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(1,2);
+h.X = 0.99*[1 1];
+h.Y = 70+[0 -20];
+h.String = '       Takeoffs';
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(1,2);
+h.Units='normalized';
+h.X = 0.95+[0 0];
+h.Y = 47+[0 -15];
+h.String = {'Reverse          ','takeoffs          '};
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(2,2);
+h.X = 0.015*[1 1];
+h.Y = 140+[0 -15];
+h.String = '    Landings';
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(2,2);
+h.X = 0.07*[1 1];
+h.Y = 65+[0 -15];
+h.String = {'       Reverse','       landings'};
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(2,2);
+h.X = 0.99*[1 1];
+h.Y = 60+[0 -20];
+h.String = {'       Reverse','       takeoffs'};
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+h=annotation('textarrow');
+h.Parent=panels{6}(2,2);
+h.Units='normalized';
+h.X = 0.93+[0 0];
+h.Y = 50+[0 -15];
+h.String = {'Takeoffs         '};
+h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
+
+%% legend (dir 1)
+pnl = panels{6}(1,1);
+axes(pnl);
+h=annotation('textarrow');
+h.Units='centimeters';
+h.X = pnl.Position(1) + pnl.Position(3).*[0.6 0.8];
+h.Y = pnl.Position(2) + pnl.Position(4).*[1.1 1.1];
+h.Text.HorizontalAlignment = 'right';
+h.String = 'For map of direction  '; h.FontSize = 9;
+
+h=annotation('textarrow');
+h.Units='centimeters';
+h.X = pnl.Position(1) + pnl.Position(3).*[0.6 0.7];
+h.Y = pnl.Position(2) + pnl.Position(4).*[0.9 0.9];
+h.Color = clrs(1,:); h.String = 'Forward  '; h.FontSize = 9;
+h.HeadLength = 5; h.HeadWidth = 8;
+
+h=annotation('textarrow');
+h.Units='centimeters';
+h.X = pnl.Position(1) + pnl.Position(3).*[0.7 0.6];
+h.Y = pnl.Position(2) + pnl.Position(4).*[0.73 0.73];
+h.Color = clrs(2,:);
+h.Text.HorizontalAlignment = 'right';
+h.String = 'Reverse           '; h.FontSize = 9;
+h.HeadLength = 5; h.HeadWidth = 8;
+
+%% legend (dir 2)
+pnl = panels{6}(1,2);
+axes(pnl);
+h=annotation('textarrow');
+h.Units='centimeters';
+h.X = pnl.Position(1) + pnl.Position(3).*[0.8 0.6];
+h.Y = pnl.Position(2) + pnl.Position(4).*[1.1 1.1];
+h.Text.HorizontalAlignment = 'right';
+h.String = 'For map of direction                    '; h.FontSize = 9;
+
+h=annotation('textarrow');
+h.Units='centimeters';
+h.X = pnl.Position(1) + pnl.Position(3).*[0.7 0.6];
+h.Y = pnl.Position(2) + pnl.Position(4).*[0.9 0.9];
+h.Text.HorizontalAlignment = 'right';
+h.Color = clrs(1,:); h.String = 'Forward           '; h.FontSize = 9;
+h.HeadLength = 5; h.HeadWidth = 8;
+
+h=annotation('textarrow');
+h.Units='centimeters';
+h.X = pnl.Position(1) + pnl.Position(3).*[0.6 0.7];
+h.Y = pnl.Position(2) + pnl.Position(4).*[0.73 0.73];
+h.Color = clrs(2,:);
+h.String = 'Reverse  '; h.FontSize = 9;
+h.HeadLength = 5; h.HeadWidth = 8;
+
+
+%% ========================================================================
+
+
+
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1))
@@ -439,6 +816,14 @@ axes(panels{2}(1))
 text(-0.3,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
 text(-0.3,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels{4}(1))
+text(-0.3,1.1, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels{5}(1))
+text(-0.3,1.1, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels{6}(1,1))
+text(-0.1,1.1, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels{6}(2,1))
+text(-0.1,1.1, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %% add line titles
 % axes(panels{1}(1))

@@ -72,9 +72,10 @@ clear panels
 nrow = 6;
 ncol = 6;
 offsets_x = linspace(0,15,ncol)+2;
-offsets_y = linspace(2.5,22,nrow);
+offsets_y = linspace(3,22,nrow);
 offsets_y(nrow/2+1:end) = offsets_y(nrow/2+1:end)+1;
 offsets_y = flip(offsets_y);
+offsets_y = offsets_y - 0.5;
 nrow = length(offsets_y);
 ncol = length(offsets_x);
 for ii=1:nrow
@@ -88,7 +89,7 @@ for ii=1:nrow
     end
 end
 
-total_offset = [.5 0];
+total_offset = [.5 -0.8];
 for ii = 1:length(panels)
     subpanels = panels{ii};
     subpanels = subpanels(:);

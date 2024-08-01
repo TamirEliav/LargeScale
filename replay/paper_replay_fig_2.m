@@ -94,10 +94,10 @@ panels{6}(1) = axes('position', [7.3   7.5 2 2]);
 panels{7}(1,1) = axes('position', [10.9 7.5 2 2]);
 panels{7}(2,1) = axes('position', [13.5 7.5 2 2]);
 panels{8}(1) = axes('position', [17.5  7.5 2 2]);
-panels{8}(2) = axes('position', [17.5  4 2 2]);
-panels{8}(3) = axes('position', [17.5  1.5 3 2]);
+% panels{8}(2) = axes('position', [17.5  4 2 2]);
+% panels{8}(3) = axes('position', [17.5  1.5 3 2]);
 
-total_offset = [0 -0.5]+[0 1];
+total_offset = [0 0.5]+[0 -3];
 for ii = 1:length(panels)
     subpanels = panels{ii};
     subpanels = subpanels(:);
@@ -195,7 +195,7 @@ end
 if exist('panels_hist_legend','var')
     delete(panels_hist_legend);
 end
-panels_hist_legend = axes('position', [4 25 0.5 0.5]);
+panels_hist_legend = axes('position', [4 22 0.5 0.5]);
 cla
 hold on
 t = linspace(0,1,100);
@@ -603,7 +603,7 @@ end
 axes(panels{8}(1))
 cla reset
 hold on
-% take only rest 
+% take only rest (awake)
 seqs = seqs_all{2};
 events = events_all{2};
 TakeLand_thr = 0.05;
@@ -656,68 +656,6 @@ text(x+1.3*w,y2+h/2,'Future','HorizontalAlignment','left','VerticalAlignment','m
 % hl.Position = [hax.Position([1 2])+[0.5 0.75].*hax.Position([3 4]) .5 .5];
 % hl
 
-%% Takeoff/Landing X Past/Future X Forward/Reverse
-axes(panels{8}(2))
-cla reset
-hold on
-
-g = gTakeLand .* gPastFuture .*gForRev;
-[N,G] = histcounts(g);
-N = reshape(N,2,2,3);
-G = reshape(G,2,2,3);
-N = permute(N,[3 2 1]);
-G = permute(G,[3 2 1]);
-new_order = [takeoff_IX midair_IX landing_IX];  
-N = N(new_order,:,:);
-G = G(new_order,:,:);
-
-N([1 3],:,:) = N([1 3],:,:)./TakeLand_thr;
-N([2],  :,:) = N([2],  :,:)./(1-2*TakeLand_thr);
-N = N ./ sum(N,"all");
-
-w = 0.28;
-x = linspace(0,1,3);
-hs = (x(2)-x(1))*0.35;
-clear hb1 hb2
-hb1 = bar(x-hs/2,   squeeze(N(:,1,:)), w, 'stacked');
-hb2 = bar(x+hs/2,   squeeze(N(:,2,:)), w, 'stacked');
-hb1(1).FaceColor = .9*[1 1 1];
-hb1(2).FaceColor = 0*[1 1 1];
-hb2(1).FaceColor = 0.9*[0 1 0];
-hb2(2).FaceColor = 0.6*[0 1 0];
-% hb1(1).FaceColor = 0.0*[1 1 1];
-% hb1(2).FaceColor = 0.0*[1 1 1];
-% hb2(1).FaceColor = 1.0*[1 1 1];
-% hb2(2).FaceColor = 1.0*[1 1 1];
-% plot(hb1(1).XData+w/4.*[-1 1]',hb1(1).YData([1 1;2 2;3 3]'),'w','LineWidth',1.1);
-% plot(hb2(1).XData+w/4.*[-1 1]',hb2(1).YData([1 1;2 2;3 3]'),'k','LineWidth',1.1);
-% hb1(1).EdgeColor = 'w';
-% hb1(2).EdgeColor = 'w';
-% hb2(1).EdgeColor = 'k';
-% hb2(2).EdgeColor = 'k';
-xlim([0 1]+w.*[-1 1])
-
-%%
-axes(panels{8}(3))
-cla reset
-hold on
-gTakeLand = reordercats(gTakeLand,["Takeoff","Mid-air","Landing"]);
-G = categories(gTakeLand);
-for ii_g = 1:length(G)
-    gcurr = G{ii_g};
-    IX = gTakeLand==gcurr;
-%     IX = IX & gForRev=="Forward";
-%     IX = IX & gForRev=="Reverse";
-    seqs_g = seqs(IX);
-    events_g = events(IX);
-    x = abs([seqs_g.middle_pos_norm] - interp1([1 2],[0 1],[events_g.rest_ball_num]));
-    histogram(x,'BinWidth',0.05,'BinLimits',[0 1],'DisplayStyle','stairs','DisplayName',gcurr,'Normalization','probability');
-end
-xlim([0 1])
-xticks([0 1])
-legend('Box','off')
-xlabel({'Distance of replay';'from current position (norm.)'},'units','normalized','position',[0.5 -.05])
-ylabel('Prob.')
 
 %% add panel letters
 font_size = 11;

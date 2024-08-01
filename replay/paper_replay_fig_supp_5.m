@@ -78,45 +78,28 @@ panels{1}(2,2) = axes('position', [x(2) y w h]);
 panels{1}(2,3) = axes('position', [x(3) y w h]);
 panels{1}(2,4) = axes('position', [x(4) y w h]);
 
-w = 3;
-h = 2.5;
-y = 14;
-panels{2}(1) = axes('position', [x(1) y w h]);
-panels{2}(2) = axes('position', [x(2) y w h]);
-panels{2}(3) = axes('position', [x(3) y w h]);
-panels{2}(4) = axes('position', [x(4) y w h]);
+% w = 3;
+% h = 2.5;
+% y = 14;
+% panels{2}(1) = axes('position', [x(1) y w h]);
+% panels{2}(2) = axes('position', [x(2) y w h]);
+% panels{2}(3) = axes('position', [x(3) y w h]);
+% panels{2}(4) = axes('position', [x(4) y w h]);
 
 h = 2.5;
-w = 3;
-y = 10;
+w = 2.9;
+y = 13.7;
 panels{3}(1,1) = axes('position', [x(1) y w h]);
 panels{3}(1,2) = axes('position', [x(2) y w h]);
 panels{3}(1,3) = axes('position', [x(3) y w h]);
 panels{3}(1,4) = axes('position', [x(4) y w h]);
-y = 7;
+y = 10;
 panels{3}(2,1) = axes('position', [x(1) y w h]);
 panels{3}(2,2) = axes('position', [x(2) y w h]);
 panels{3}(2,3) = axes('position', [x(3) y w h]);
 panels{3}(2,4) = axes('position', [x(4) y w h]);
 
-w = 3;
-w2 = 2;
-h = 2.5;
-y = 3.5;
-panels{4}(1) = axes('position', [x(1) y w h]);
-panels{4}(2) = axes('position', [x(1)+w+0.5 y w2 h]);
-% panels{4}(1) = axes('position', [x(1) y w h]);
-% panels{4}(2) = axes('position', [x(2) y w h]);
-% panels{4}(3) = axes('position', [x(3) y w h]);
-% panels{4}(4) = axes('position', [x(4) y w h]);
-
-w = 8;
-h = 3
-y = -1;
-panels{5}(1) = axes('position', [x(1) y w h]);
-panels{5}(2) = axes('position', [x(3) y w h]);
-
-total_offset = [0 3];
+total_offset = [0 0];
 for ii = 1:length(panels)
     subpanels = panels{ii};
     subpanels = subpanels(:);
@@ -229,62 +212,11 @@ for ii_EL = 1:length(early_late_IX)
     end
 end
 
-%% plot boxplots
-boxplot_panels_ylimits = [0 0.8; 0 25; 3 23; .02 .18];
-pvals = [];
-for ii_fn = 1:length(features_names)
-    axes(panels{2}(ii_fn));
-    cla
-    hold on
-    fn = features_names{ii_fn};
-    X={};
-    G={};
-    for ii_epoch_type = 1:length(epoch_types)
-        for ii_EL = 1:length(early_late_IX)
-            IX = early_late_IX{ii_EL};
-            events = [events_all_per_session{ii_epoch_type,IX}];
-            seqs = [events.seq_model];
-            x = [seqs.(fn)];
-            g = (ii_EL+2*(ii_epoch_type-1));
-            X{ii_epoch_type,ii_EL} = x;
-            G{ii_epoch_type,ii_EL} = ones(size(seqs)).*g;
-            m1 = prctile(x,50);
-            m2 = prctile(x,[25 75]);
-            m3 = prctile(x,[5 95]);
-            w = 0.2;
-            lw = 1.3;
-            plot([g-w g+w],[m1 m1],'Color',epoch_type_clrs{ii_epoch_type},'LineWidth',lw);
-            plot([g g],m3,'Color',epoch_type_clrs{ii_epoch_type},'LineWidth',lw);
-            rectangle('Position',[g-w m2(1) 2*w diff(m2)],'EdgeColor',epoch_type_clrs{ii_epoch_type},'FaceColor','none','LineWidth',lw);
-        end
-        pval = ranksum(X{ii_epoch_type,1},X{ii_epoch_type,2});
-        str = genSignifStrAstricks(pval);
-        xx = [g g-1];
-        yy = boxplot_panels_ylimits(ii_fn,[2 2]);
-        plot(xx,yy,'k-');
-        font_size = 10;
-        if strcmp(str,'n.s.')
-            font_size = 8;
-            yy = yy.*1.02;
-        end
-        text(mean(xx),mean(yy),str,'HorizontalAlignment','center','VerticalAlignment','bottom','FontSize',font_size);
-        pvals(ii_fn,ii_epoch_type) = pval;
-    end
-    xlim([0.2 4.8])
-    ylim(boxplot_panels_ylimits(ii_fn,:))
-    xlabel('');
-    ylabel_pos_x = [-.23 -.21 -.21 -.25];
-    ylabel(fn_label_strs{ii_fn},'units','normalized','position',[ylabel_pos_x(ii_fn) 0.5]);
-    xticks(1:4);
-    xticklabels(["Sleep, days 1-5", "Sleep, days 6+","Awake, days 1-5", "Awake, days 6+"]);
-    xtickangle(50);    
-end
-
 %% add sleep/awake legend
 if exist('panels_hist_legend','var')
     delete(panels_hist_legend);
 end
-panels_hist_legend = axes('position', [3.8 26.5 0.3 0.25]);
+panels_hist_legend = axes('position', [3.8 23.5 0.3 0.25]);
 cla
 hold on
 plot([0 1], [1 1], 'color', epoch_type_clrs{1}, 'LineWidth',lw,'Clipping','off');
@@ -294,6 +226,58 @@ text(1.3, 0, 'Awake','FontSize',7,'HorizontalAlignment','left');
 xlim([0 1])
 ylim([0 1])
 axis off
+
+%% plot boxplots
+boxplot_panels_ylimits = [0 0.8; 0 25; 3 23; .02 .18];
+% pvals = [];
+% for ii_fn = 1:length(features_names)
+%     axes(panels{2}(ii_fn));
+%     cla
+%     hold on
+%     fn = features_names{ii_fn};
+%     X={};
+%     G={};
+%     for ii_epoch_type = 1:length(epoch_types)
+%         for ii_EL = 1:length(early_late_IX)
+%             IX = early_late_IX{ii_EL};
+%             events = [events_all_per_session{ii_epoch_type,IX}];
+%             seqs = [events.seq_model];
+%             x = [seqs.(fn)];
+%             g = (ii_EL+2*(ii_epoch_type-1));
+%             X{ii_epoch_type,ii_EL} = x;
+%             G{ii_epoch_type,ii_EL} = ones(size(seqs)).*g;
+%             m1 = prctile(x,50);
+%             m2 = prctile(x,[25 75]);
+%             m3 = prctile(x,[5 95]);
+%             w = 0.2;
+%             lw = 1.3;
+%             plot([g-w g+w],[m1 m1],'Color',epoch_type_clrs{ii_epoch_type},'LineWidth',lw);
+%             plot([g g],m3,'Color',epoch_type_clrs{ii_epoch_type},'LineWidth',lw);
+%             rectangle('Position',[g-w m2(1) 2*w diff(m2)],'EdgeColor',epoch_type_clrs{ii_epoch_type},'FaceColor','none','LineWidth',lw);
+%         end
+%         pval = ranksum(X{ii_epoch_type,1},X{ii_epoch_type,2});
+%         str = genSignifStrAstricks(pval);
+%         xx = [g g-1];
+%         yy = boxplot_panels_ylimits(ii_fn,[2 2]);
+%         plot(xx,yy,'k-');
+%         font_size = 10;
+%         if strcmp(str,'n.s.')
+%             font_size = 8;
+%             yy = yy.*1.02;
+%         end
+%         text(mean(xx),mean(yy),str,'HorizontalAlignment','center','VerticalAlignment','bottom','FontSize',font_size);
+%         pvals(ii_fn,ii_epoch_type) = pval;
+%     end
+%     xlim([0.2 4.8])
+%     ylim(boxplot_panels_ylimits(ii_fn,:))
+%     xlabel('');
+%     ylabel_pos_x = [-.23 -.21 -.21 -.25];
+%     ylabel(fn_label_strs{ii_fn},'units','normalized','position',[ylabel_pos_x(ii_fn) 0.5]);
+%     xticks(1:4);
+%     xticklabels(["Sleep, days 1-5", "Sleep, days 6+","Awake, days 1-5", "Awake, days 6+"]);
+%     xtickangle(50);    
+% end
+
 
 %% boxplots per day
 maxDays2plot = 10;
@@ -314,127 +298,23 @@ for ii_fn = 1:length(features_names)
         ylim(boxplot_panels_ylimits(ii_fn,:))
         hax=gca;
         hax.XTickLabelRotation = 0;
-        hax.XTickLabel{end} = [char(8805) num2str(maxDays2plot)];
-        ylabel(fn_label_strs{ii_fn})
-    end
-end
-
-%% replay directionality bias - calc
-directionality_contrast_index = [];
-directionality_fraction = [];
-directionality_binom_pval = [];
-nSeqs = [];
-for ii_epoch_type = 1:length(epoch_types)+1
-    for ii_exp = 1:length(exp_list)
-        switch ii_epoch_type
-            case {1,2}
-                events = events_all_per_session{ii_epoch_type,ii_exp};
-            case 3
-                events = [events_all_per_session{:,ii_exp}];
+        hax.XTickLabel{end} = ['   ' char(8805) num2str(maxDays2plot)];
+%         hax.XTickLabel{end} = [num2str(maxDays2plot) '+'];
+        hax.XRuler.FontSize = 7;
+        hax.XRuler.TickLength(1) = 0.03;
+        if ii_epoch_type == 1
+            ylabel(fn_label_strs{ii_fn},'units','normalized','position',[-0.21 -0.3])
         end
-        if isempty(events)
-            continue;
-        end
-        seqs = [events.seq_model];
-        n1 = sum([seqs.direction]==1);
-        n2 = sum([seqs.direction]==-1);
-        directionality_contrast_index(ii_epoch_type,ii_exp) = (n1-n2)/(n1+n2);
-        directionality_fraction(ii_epoch_type,ii_exp) = (n1)/(n1+n2);
-        binom_pval = myBinomTest(n1,n1+n2,0.5);
-        directionality_binom_pval(ii_epoch_type,ii_exp) = binom_pval;
-        directionality_binom_surprise(ii_epoch_type,ii_exp) = -log10(binom_pval);
-        nSeqs(ii_epoch_type,ii_exp) = length(seqs);
     end
 end
-directionality_vals = cat(3,directionality_contrast_index,directionality_fraction,directionality_binom_pval,directionality_binom_surprise);
-directionality_labels = {'contrast index','fraction','binom pval','binom surprise'};
-% bat_sym_map = containers.Map(num2cell([184;2382]),{'+','x'});
 
-%% replay directionality bias - plot trend over exposure to enviroenment
-clrs = [epoch_type_clrs,'k'];
-axes(panels{4}(1));
-cla reset
-hold on
-for ii_epoch_type = 1:length(epoch_types)+1
-    c = clrs{ii_epoch_type};
-%         sym = arrayfun(@(bat_num)bat_sym_map(bat_num),T.bat_num,'UniformOutput',false);
-    x = T.session_num_from_exposure;
-    y = directionality_contrast_index(ii_epoch_type,:);
-    y(nSeqs(ii_epoch_type,:)<minSeqsThr) = nan;
-    g = findgroups(T.bat_num);
-    hs = gscatter(x,y,g,c,'ox',4,false);
-    nPointsSmooth = 3;
-    k = (nPointsSmooth-1)/2;
-    xi = [-1 1].*k + [(1-k):(max(x)+k)]';
-    xx=[];
-    yy=[];
-    for ii_xi = 1:size(xi,1)
-        TF = x>=xi(ii_xi,1) & x<=xi(ii_xi,2);
-        xx(ii_xi) = nanmedian(x(TF));
-        yy(ii_xi) = nanmedian(y(TF));
-    end
-    plot(xx,yy,'-','Color',c);
-end
-xlabel('Session no.');
-ylabel('Replay directionality')
-ylim([-1 1])
 
-%% replay directionality bias - plot non-novelty hist
-axes(panels{4}(2));
-cla reset
-hold on
-for ii_epoch_type = 1:length(epoch_types)+1
-    c = clrs{ii_epoch_type};
-    y = directionality_contrast_index(ii_epoch_type,:);
-    TF = true(size(y));
-    TF = TF & ~(T.session_num_from_exposure <= novelty_session_num_thr)';
-%     TF = TF & ~ismember(T.bat_num,novelty_exposure_bats)';
-    TF = TF & nSeqs(ii_epoch_type,:)>=minSeqsThr;
-    y = y(TF);
-    histogram(y,'Normalization','count','DisplayStyle','stairs','EdgeColor',c,'BinWidth',0.1);
-end
-xlim([-1 1])
-view(90,-90)
-
-%% replay directionality bias - example session
-replay_directionality_bias_ex_exp_ID = 'b0184_d191130';
-ii_exp = find(strcmp(T.exp_ID,replay_directionality_bias_ex_exp_ID))
-for ii_epoch_type = 1:length(epoch_types)
-    axes(panels{5}(ii_epoch_type))
-    cla reset
-    hold on
-    events = events_all_per_session{ii_epoch_type,ii_exp};
-    seqs = [events.seq_model];
-    epoch_sep = find(diff([events.epoch_num])~=0)+0.5;
-    seqs_edges = [seqs.start_pos_norm; seqs.end_pos_norm];
-    seqs_IX = 1:length(seqs);
-    if strcmp(epoch_types(ii_epoch_type),'sleep')
-        plot(repmat(epoch_sep,2,1),[0 1],':','LineWidth',1.5,'Color',0.5*[1 1 1]);
-    end
-    h=plot([seqs_IX;seqs_IX],seqs_edges,'-','LineWidth',.55);
-    dir_1_IX = [seqs.state_direction]==1;
-    dir_2_IX = [seqs.state_direction]==-1;
-    [h(dir_1_IX).Color] = disperse(repelem(directions_clrs(1),length(dir_1_IX)));
-    [h(dir_2_IX).Color] = disperse(repelem(directions_clrs(2),length(dir_2_IX)));
-    scatter(seqs_IX,seqs_edges(1,:), 3, [seqs.state_direction]==-1, "filled");
-    hax=gca;
-    hax.Colormap = cell2mat(directions_clrs);
-    hax.YTick = [0 1];
-    hax.XTick = [1 10*ceil(length(seqs)/10)];
-    hax.YLim = [0 1];
-    hax.XRuler.TickLabelGapOffset = -1;
-    hax.YRuler.TickLabelGapOffset = 1;
-    ylabel('Position (norm.)', 'Units','normalized', 'Position',[-0.017 0.5]);
-    xlabel('Replay event no.', 'Units','normalized', 'Position',[0.5 -0.06]);
-%     title('Sleep replays', 'Units','normalized', 'Position',[0.47 0.99],'FontWeight','normal');
-%     text(1.1, 1.05, 'Example session: all individual replays','FontSize',9,'HorizontalAlignment','center','Units','normalized')
-end
 
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1,1))
 text(-0.3,1.1, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-axes(panels{2}(1))
+axes(panels{3}(1))
 text(-0.4,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%

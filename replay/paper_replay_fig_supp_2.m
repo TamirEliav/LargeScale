@@ -132,7 +132,6 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 offsets_x = linspace(2,17,4);
 offsets_y = linspace(5,14,2)+0.2;
 offsets_y = flip(offsets_y);
-offsets_y = offsets_y-2;
 clear panels_ex panels
 for ii=1:2
     for jj=1:4
@@ -153,8 +152,8 @@ for ii=1:2
     end
 end
 panels_ex = {panels_ex{:}}';
-offset_y = 22;
-panels{1}(1) = axes('position', [2 offset_y 3 3]);
+% offset_y = 22;
+% panels{1}(1) = axes('position', [2 offset_y 3 3]);
 % panels{1}(2) = axes('position', [6 offset_y 3 3]);
 % panels{1}(3) = axes('position', [10 offset_y 3 3]);
 % panels{1}(4) = axes('position', [14 offset_y 3 3]);

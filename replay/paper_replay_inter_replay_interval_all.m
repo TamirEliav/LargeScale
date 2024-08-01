@@ -60,6 +60,11 @@ for ii_exp = 1:nExp
     end
 end
 
+%% save results to a mat file
+filename = 'inter_replay_interval_all';
+file_OUT = fullfile(dir_out,filename);
+save(file_OUT,'T','exp_list','epoch_types','IRI_all');
+
 %% plot ISI hist per session/bat/grand avg
 close all
 fig=figure
