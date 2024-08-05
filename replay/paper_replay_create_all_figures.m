@@ -1,0 +1,25 @@
+%%
+clear
+clc
+
+%% create all figures!
+% main
+paper_replay_fig_1          % fig 1 - replay examples
+paper_replay_fig_2_new      % fig 2 - single units activity in replay
+paper_replay_fig_2          % fig 3 - population
+                            % fig 4 - shir (short tunnel)
+paper_replay_fig_3          % fig 5 - 2 bats (behavioral relevance)
+
+% supp
+paper_replay_fig_supp_1     % EDF1 - many examples
+paper_replay_fig_supp_2     % EDF2 - replay decoding deconstructed          - fix panel letter and positions
+paper_replay_fig_supp_3     % EDF3 - replay vs flight speed + stats
+paper_replay_fig_supp_4     % EDF4 - per bat results
+                            % EDF5 - shir long replays
+paper_replay_fig_supp_5     % EDF6 - novelty from day 1
+paper_replay_fig_supp_6     % EDF7 - reverse/forward + future+past + takeoff/landing/midair + ball1/ball2
+
+
+paper_replay_fig_supp_MUA_FR_maps
+paper_replay_fig_supp_replay_directionality
+paper_replay_fig_supp_7     % EDF10 - 2bats

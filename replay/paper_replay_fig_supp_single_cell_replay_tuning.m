@@ -97,6 +97,7 @@ for ii_cell = 1:length(cells)
 end
 ccc_shuffle = {};
 ccc_data = {};
+cells_inc_TF_per_dir = {};
 for ii_dir = 1:2
     cells_inc_TF = true(size(cells))';
     cells_inc_TF = cells_inc_TF & [replay_FR_maps(cat_IX,ii_dir,:).valid_fields_coverage_prc]>0.5;
@@ -105,7 +106,8 @@ for ii_dir = 1:2
     cells_inc_TF = cells_inc_TF & [cells_signif(:,ii_dir).SI_thr_shuffle];
     cells_inc_TF = cells_inc_TF & [cells_signif(:,ii_dir).SI_thr_signif];
 %     cells_inc_TF = cells_inc_TF & [cells_signif(:,ii_dir).TF]; % this excludes maps without signif fields
-    
+    cells_inc_TF_per_dir{ii_dir} = cells_inc_TF;
+
     X = squeeze(PSTH_flight(cells_inc_TF,ii_dir,:))';
     Y = squeeze(PSTH_replay(cells_inc_TF,ii_dir,:))';
     ccc = corr(X,Y,'rows','pairwise','type',corr_type);
@@ -120,7 +122,7 @@ end
 %% save correlations results to mat file
 filename = 'single_unit_replay_tuning_corr';
 file_out = fullfile(res_dir,filename);
-save(file_out,'ccc_data','ccc_shuffle');
+save(file_out,'ccc_data','ccc_shuffle','PSTH_flight','PSTH_replay','cells_inc_TF_per_dir','details');
 
 %% plot
 axes(panels{1}(1));

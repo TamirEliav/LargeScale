@@ -1,4 +1,4 @@
-%% Replay - Fig 2 - replay population 
+%% Replay - Fig 3 - replay population 
 %%
 clear 
 clc
@@ -34,7 +34,7 @@ panel_H_bin_size = panel_H_bin_size_options(panel_H_bin_size_opt)
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_2';
+fig_name_str = 'Fig_3';
 fig_caption_str = ' ';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');

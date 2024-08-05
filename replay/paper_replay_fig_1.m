@@ -88,6 +88,7 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 % create panels
 clear panels
 panels{1}(1) = axes('position', [2 23.3 13 2]);
+panels{1}(2) = axes('position', [2.5 25.7 .3 .3]);
 panels{2}(1) = axes('position', [16.5 23.3 2.2 2]);
 panels{3}(1) = axes('position', [2 19.3 2.2 2.5]);
 panels{3}(2) = axes('position', [4.8 19.3 2.2 2.5]);
@@ -114,8 +115,9 @@ panels{7}(1,2) = axes('position', [4.7 5 1.5 1.5]);
 panels{7}(2,2) = axes('position', [10.7 5 1.5 1.5]);
 panels{7}(1,3) = axes('position', [2.35 5.8 .36 .4]);
 panels{7}(2,3) = axes('position', [8.35 5.8 .36 .4]);
+panels{8}(1) = axes('position', [14 3.5 3 3]);
 
-total_offset = [.5 1];
+total_offset = [.5 -0.1];
 for ii = 1:length(panels)
     subpanels = panels{ii};
     subpanels = subpanels(:);
@@ -235,8 +237,6 @@ ah.Position = [xlimits(1) ylimits(1) 0 0.4*range(ylimits)];
 text(xlimits(1)+0.00*range(xlimits), ylimits(1)-0.15*range(ylimits),'Time in session','FontSize',8,'Rotation',0,'HorizontalAlignment','left','VerticalAlignment','middle');
 text(xlimits(1)-0.02*range(xlimits), ylimits(1)+0.*range(ylimits),'Position','FontSize',8,'Rotation',90,'HorizontalAlignment','left','VerticalAlignment','middle');
 %% add legend
-% delete(panels{1}(2))
-panels{1}(2) = axes('position', [2.5 26.5 .3 .3]);
 axes(panels{1}(2))
 cla reset
 hold on
@@ -488,7 +488,7 @@ for ii_ex = 1:size(panels_ex,1)
     end
     prob_state = squeeze(decode.posterior_state(event.state_num,IX));
     prob_state_other_map = squeeze(decode.posterior_state(other_map_state_num,IX));
-    plot(prob_t, prob_state_other_map, 'Color',0.5*[1 1 1], 'LineWidth',1);
+%     plot(prob_t, prob_state_other_map, 'Color',0.5*[1 1 1], 'LineWidth',1);
     plot(prob_t, prob_state, 'k','LineWidth',2);
     hax = gca;
     hax.XLim = prob_t([1 end]);
@@ -616,7 +616,45 @@ for ii = 1:2
     
 end
 
+%% scatters: number of ripples vs replay duration
+load("L:\processed_data_structs\replay_events.mat");
+events = [events_all_per_session{:}];
+seqs = [events.seq_model];
 
+% features_fn = {'duration','compression','distance','distance_norm'};
+features_fn = {'duration'};
+fn_map = containers.Map();
+fn_map('duration') = 'Replay duration (s)';
+fn_map('compression') = 'Compression ratio';
+fn_map('distance') = 'Replay distance (m)';
+fn_map('distance_norm') = 'Replay distance (norm)';
+nFeatures = length(features_fn);
+for ii_fn = 1:nFeatures
+    axes(panels{8}(ii_fn));
+    cla reset
+    hold on
+    fn = features_fn{ii_fn};
+    fn_label = fn_map(fn);
+    X = [seqs.(fn)];
+    Y = [events.num_ripples];
+    Y(Y==0)=nan;
+    jitter_sd = .1;
+    rng(0);
+    Y_jitter = randn(size(Y)).*jitter_sd;
+    plot(X,Y+Y_jitter,'.k')
+%     swarmchart(Y,X,'.k','XJitter','density','XJitterWidth',.5);
+    [r,pval] = corr(X',Y','type','Spearman','rows','pairwise');
+    fprintf('%s: r=%.2g pval=%.2g\n',fn,r,pval);
+%     view([90 -90])
+%     yticks(1:6)
+    xlabel(fn_label)
+    ylabel('No. ripples')
+    hax=gca;
+    hax.XRuler.TickLength(1) = 0.03;
+    hax.YRuler.TickLength(1) = 0.02;
+    hax.XRuler.TickLabelGapOffset = -2;
+    hax.YRuler.TickLabelGapOffset = 0;
+end
 
 %% add panel letters
 font_size = 11;
@@ -642,7 +680,8 @@ axes(panels{7}(1,1))
 text(-0.28,1.05, 'h', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{7}(2,1))
 text(-0.28,1.05, 'i', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-
+axes(panels{8}(1))
+text(-0.3,1.1, 'j', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, sprintf('%s_%s',fig_name_str,err_dist_normalization));

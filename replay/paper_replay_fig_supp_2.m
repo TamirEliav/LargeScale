@@ -130,7 +130,7 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 
 % create panels
 offsets_x = linspace(2,17,4);
-offsets_y = linspace(5,14,2)+0.2;
+offsets_y = linspace(3,14,2)+0.2;
 offsets_y = flip(offsets_y);
 clear panels_ex panels
 for ii=1:2
@@ -364,53 +364,24 @@ for ii_ex = 1:length(replay_examples)
 
 end
 
-%% scatters: number of ripples vs replay duration/distance
-load("L:\processed_data_structs\replay_events.mat");
-events = [events_all_per_session{:}];
-seqs = [events.seq_model];
-
-% features_fn = {'duration','compression','distance','distance_norm'};
-features_fn = {'duration'};
-fn_map = containers.Map();
-fn_map('duration') = 'Replay duration (s)';
-fn_map('compression') = 'Compression ratio';
-fn_map('distance') = 'Replay distance (m)';
-fn_map('distance_norm') = 'Replay distance (norm)';
-nFeatures = length(features_fn);
-for ii_fn = 1:nFeatures
-    axes(panels{1}(ii_fn));
-    cla reset
-    hold on
-    fn = features_fn{ii_fn};
-    fn_label = fn_map(fn);
-    X = [seqs.(fn)];
-    Y = [events.num_ripples];
-    Y(Y==0)=nan;
-    jitter_sd = .1;
-    rng(0);
-    Y_jitter = randn(size(Y)).*jitter_sd;
-    plot(X,Y+Y_jitter,'.k')
-%     swarmchart(Y,X,'.k','XJitter','density','XJitterWidth',.5);
-    [r,pval] = corr(X',Y','type','Spearman','rows','pairwise');
-    fprintf('%s: r=%.2g pval=%.2g\n',fn,r,pval);
-%     view([90 -90])
-%     yticks(1:6)
-    ylabel(fn_label)
-    ylabel('No. ripples')
-end
-
 %% add panel letters
-% font_size = 11;
-% axes(panels{1}(1))
-% text(-0.13,1.25, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-% axes(panels{1}(2))
-% text(-0.13,0.9, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-% axes(panels{1}(3))
-% text(-0.13,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-% axes(panels{1}(4))
-% text(-0.13,1.0, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-% axes(panels{1}(5))
-% text(-0.13,1.0, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+font_size = 11;
+axes(panels_ex{1}(end))
+text(-0.13,1.6, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels_ex{2}(end))
+text(-0.13,1.6, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels_ex{3}(end))
+text(-0.13,1.6, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels_ex{4}(end))
+text(-0.13,1.6, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels_ex{5}(end))
+text(-0.13,1.6, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels_ex{6}(end))
+text(-0.13,1.6, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels_ex{7}(end))
+text(-0.13,1.6, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels_ex{8}(end))
+text(-0.13,1.6, 'h', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = fig_name_str;

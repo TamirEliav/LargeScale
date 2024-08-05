@@ -1,4 +1,4 @@
-%% Replay - Fig 3 - 2 bats crossovers
+%% Replay - Fig 5 - 2 bats crossovers
 %%
 clear 
 clc
@@ -26,7 +26,7 @@ smooth_n_points = 19;
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_3';
+fig_name_str = 'Fig_5';
 fig_caption_str = ' ';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');

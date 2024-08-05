@@ -1,4 +1,4 @@
-%% Replay - Fig supp 7 - two bats same map criteria
+%% Replay - Fig supp 10 - two bats same map criteria
 clear 
 clc
 close all
@@ -13,7 +13,7 @@ params_opt = 11; % decoding opt
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Extended_Data_Fig_7';
+fig_name_str = 'Extended_Data_Fig_10';
 fig_caption_str = 'Novelty effects';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');

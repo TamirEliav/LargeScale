@@ -1,4 +1,4 @@
-%% Replay - Fig supp 5 - Novelty (days 1-5 vs 6+)
+%% Replay - Fig supp 6 - Novelty (days 1-5 vs 6+)
 clear 
 clc
 close all
@@ -25,7 +25,7 @@ epoch_types_str = {'Sleep','Awake'};
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Extended_Data_Fig_5';
+fig_name_str = 'Extended_Data_Fig_6';
 fig_caption_str = 'Novelty effects';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');

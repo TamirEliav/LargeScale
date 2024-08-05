@@ -1,4 +1,4 @@
-%% Replay - Fig supp XXX - Firing rate maps
+%% Replay - Fig supp 8 - Firing rate maps
 clear 
 clc
 close all
@@ -12,7 +12,7 @@ close all
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Extended_Data_Fig_XXX_MUA_FR_maps';
+fig_name_str = 'Extended_Data_Fig_8';
 fig_caption_str = 'MUA_FR_maps';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
