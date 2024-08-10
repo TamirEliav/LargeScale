@@ -23,7 +23,39 @@ tuning_corr_cell_examples_list = [...
     struct('cell_num', 796, 'ii_dir', 1),... %  211
     struct('cell_num',2044, 'ii_dir', 1),... % 1490
     struct('cell_num',2055, 'ii_dir', 1),... % 1020
+struct('cell_num', 999, 'ii_dir', 2),... %  1309
+struct('cell_num',2181, 'ii_dir', 2),... %  1560
+struct('cell_num',1387, 'ii_dir', 2),... %  1379
+struct('cell_num',2044, 'ii_dir', 1),... %  1016
+struct('cell_num', 525, 'ii_dir', 1),... %    72
+struct('cell_num',1607, 'ii_dir', 1),... %   746
+    struct('cell_num',2070, 'ii_dir', 1),... %  1022
+    struct('cell_num', 752, 'ii_dir', 1),... %   178
+    struct('cell_num',1450, 'ii_dir', 2),... %  1395
+    struct('cell_num',1406, 'ii_dir', 2),... %  1383
+    struct('cell_num',1984, 'ii_dir', 1),... %   853
+    struct('cell_num',2055, 'ii_dir', 1),... %  1020
+struct('cell_num',1066, 'ii_dir', 2),... %  1329
+struct('cell_num',2107, 'ii_dir', 1),... %  1059
+struct('cell_num',2046, 'ii_dir', 1),... %  1017
+struct('cell_num',1832, 'ii_dir', 1),... %   830
+struct('cell_num',2104, 'ii_dir', 2),... %  1552
+struct('cell_num',1922, 'ii_dir', 2),... %  1490
+    struct('cell_num',1074, 'ii_dir', 2),... %  1331
+    struct('cell_num',2148, 'ii_dir', 1),... %  1064
+    struct('cell_num',2070, 'ii_dir', 2),... %  1540
+    struct('cell_num', 796, 'ii_dir', 1),... %   211
+    struct('cell_num', 830, 'ii_dir', 1),... %   216
+    struct('cell_num',1680, 'ii_dir', 1),... %   766
+struct('cell_num',1738, 'ii_dir', 2),... %  1444
+struct('cell_num',2117, 'ii_dir', 2),... %  1554
+struct('cell_num',1297, 'ii_dir', 1),... %   499
+struct('cell_num',1738, 'ii_dir', 2),... %  1444
+struct('cell_num',2117, 'ii_dir', 2),... %  1554
+struct('cell_num',1297, 'ii_dir', 1),... %   499
 ];
+panel_d_opt = 6;
+tuning_corr_cell_examples_list = tuning_corr_cell_examples_list([1:6]+(panel_d_opt-1)*6);
 
 %% graphics params
 spikes_tick_height = 10;
@@ -559,6 +591,7 @@ for ii_cell = 1:length(tuning_corr_cell_examples_list)
     ylim([0 1])
     xticks(0:50:200)
     yticks([0 1])
+    text(0.01,1.2,sprintf("cell %d dir %d",cell_num,ii_dir),'units','normalized','FontSize',6.5);
     if ii_cell==5 || ii_cell==6
         xlabel('Position (m)','Units','normalized','position',[0.5 -0.43])
     end
@@ -624,6 +657,7 @@ fig_name = sprintf('%s_ex_1_FE_%d_ex_2_FE_%d', ...
     fig_name_str, ...
     seq_examples_list(1).ii_FE,...
     seq_examples_list(2).ii_FE)
+fig_name = sprintf('%s_panel_d_opt_%d',fig_name,panel_d_opt)
 file_out = fullfile(res_dir, fig_name);
 print(gcf, file_out, '-dpdf', '-cmyk', '-painters');
 disp('figure saved!')
