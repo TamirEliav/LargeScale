@@ -15,6 +15,7 @@ field_options = {
     'PE',           1
     'rest',         1
     'MUA_FR_map',   1
+    'uturns',       1
     };
 
 %% parse input

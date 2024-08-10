@@ -63,7 +63,7 @@ disp('-------------------------------------------------------------------')
 %% replay - 82 days inclusion list
 [exp_list,exp_t] = decoding_get_inclusion_list();
 exp_t = exp_t(exp_list,:);
-exp_t(ismember(exp_t.bat_num, [2382] ),:) = [];
+% exp_t(ismember(exp_t.bat_num, [2382] ),:) = [];
 
 %%
 exp_t 
@@ -127,6 +127,8 @@ try
 %     wingbeat_plot_map(exp_ID)
 
 %     exp_detect_rest(exp_ID);
+    exp_detect_uturns(exp_ID);
+
 
 %     decoding_detect_spikes(exp_ID,forcecalc);
 %     decoding_prepare_exp_data(exp_ID);
@@ -151,32 +153,32 @@ try
 %     end
     
 
-%     epoch_type = 'sleep';
-    epoch_type = 'rest';
-%     params_opts = [8:14];
-    params_opts = [11];
-%     params_opts = [16 17]; % longer state time decay
-%     params_opts = [18 19 20]; % best bin sizes for 6m
-%     params_opts = [21]; % random_walk (instead of empirical_speed), all other params as in opt 11
-%     event_type = 'PE';
-    event_type = 'posterior';
-    flight_decoding_param_opt = 4; % best for 200/120m
-%     flight_decoding_param_opt = 18; % best for 6m
-    for params_opt = params_opts
-        fprintf('params_opt: %d\n', params_opt);
-        decode = decoding_load_data(exp_ID, epoch_type, params_opt);
-        decoding_plot_MAP(decode,flight_decoding_param_opt);
-        decoding_detect_posterior_events(decode);
-        decoding_seq_quantify(decode, event_type);
-        decoding_seq_quantify_add_info(exp_ID, epoch_type, params_opt , event_type);
-        decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type); 
-        decoding_plot_PE_posterior(decode, event_type);
-        decoding_plot_session_seqs(exp_ID, epoch_type, params_opt, event_type);
-        decoding_calc_session_seqs_spikes_corr(exp_ID, epoch_type, params_opt, event_type);
-%         decoding_xcorr_ripples_MUA_PE_vs_posterior_events(decode);
-        close all
-    end
-%     decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
+% %     epoch_type = 'sleep';
+%     epoch_type = 'rest';
+% %     params_opts = [8:14];
+%     params_opts = [11];
+% %     params_opts = [16 17]; % longer state time decay
+% %     params_opts = [18 19 20]; % best bin sizes for 6m
+% %     params_opts = [21]; % random_walk (instead of empirical_speed), all other params as in opt 11
+% %     event_type = 'PE';
+%     event_type = 'posterior';
+%     flight_decoding_param_opt = 4; % best for 200/120m
+% %     flight_decoding_param_opt = 18; % best for 6m
+%     for params_opt = params_opts
+%         fprintf('params_opt: %d\n', params_opt);
+%         decode = decoding_load_data(exp_ID, epoch_type, params_opt);
+%         decoding_plot_MAP(decode,flight_decoding_param_opt);
+%         decoding_detect_posterior_events(decode);
+%         decoding_seq_quantify(decode, event_type);
+%         decoding_seq_quantify_add_info(exp_ID, epoch_type, params_opt , event_type);
+%         decoding_seq_quantify_plot(exp_ID, epoch_type, params_opt, event_type); 
+%         decoding_plot_PE_posterior(decode, event_type);
+%         decoding_plot_session_seqs(exp_ID, epoch_type, params_opt, event_type);
+%         decoding_calc_session_seqs_spikes_corr(exp_ID, epoch_type, params_opt, event_type);
+% %         decoding_xcorr_ripples_MUA_PE_vs_posterior_events(decode);
+%         close all
+%     end
+% %     decoding_compare_replay_speeds(exp_ID, epoch_type, params_opts, event_type);
 
 catch err
     getReport(err)
