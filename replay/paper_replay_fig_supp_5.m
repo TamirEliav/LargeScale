@@ -12,6 +12,7 @@ minSeqsThr = 30;
 panels_xlim = [-0.0950    1.9950; -1.9500   40.9500; -0.4500   56.5500; -0.0210    0.4410];
 panels_xticks = {[0 0.5 1 1.5],[0 20 40],[0:10:50],[0 0.2 0.4]};
 panels_bin_size = [0.05 1 1 0.01];
+boxplot_prctiles = [10 25 50 75 90];
 
 %% graphics params
 epoch_types = {'sleep','rest'};
@@ -98,6 +99,11 @@ panels{3}(2,1) = axes('position', [x(1) y w h]);
 panels{3}(2,2) = axes('position', [x(2) y w h]);
 panels{3}(2,3) = axes('position', [x(3) y w h]);
 panels{3}(2,4) = axes('position', [x(4) y w h]);
+
+panels{3}(1,2).Position(1) = panels{3}(1,2).Position(1)+0.2;
+panels{3}(2,2).Position(1) = panels{3}(2,2).Position(1)+0.2;
+panels{3}(1,4).Position(1) = panels{3}(1,4).Position(1)+0.2;
+panels{3}(2,4).Position(1) = panels{3}(2,4).Position(1)+0.2;
 
 total_offset = [0 0];
 for ii = 1:length(panels)
@@ -191,7 +197,7 @@ for ii_EL = 1:length(early_late_IX)
             seqs = [events.seq_model];
             X = [seqs.(fn)];
             hh(ii_epoch_type) = histogram(X,'DisplayStyle','stairs','Normalization','pdf','EdgeColor',epoch_type_clrs{ii_epoch_type},'LineWidth',lw,'BinWidth',panels_bin_size(ii_fn));
-            text(0.5,0.9-ii_epoch_type*0.1, "{\itn}_{" + epoch_types_str{ii_epoch_type} + "} = "+length(X),'units','normalized','FontSize',7)
+            text(0.5,0.9-ii_epoch_type*0.14, "{\itn}_{" + epoch_types_str{ii_epoch_type} + "} = "+length(X),'units','normalized','FontSize',7)
         end
         linkprop(hh,'BinEdges');
         xlim(panels_xlim(ii_fn,:))
@@ -200,7 +206,7 @@ for ii_EL = 1:length(early_late_IX)
             xlabel(fn_label_strs{ii_fn});
         end
         if ii_fn == 1
-            text(-0.5,0.5,days_types{ii_EL},'Units','normalized','HorizontalAlignment','center');
+            text(-0.5,0.5,days_types{ii_EL},'Units','normalized','HorizontalAlignment','center','FontSize',8);
             ylabel('Probability density','Units','normalized','Position',[-0.13 0.5]);
         end
         hax=gca;
@@ -291,19 +297,42 @@ for ii_fn = 1:length(features_names)
         session_num = [events.session_num_from_exposure];
         g = session_num;
         g(g>maxDays2plot) = maxDays2plot;
+        [G,ID] = findgroups(g);
         seqs = [events.seq_model];
         x = [seqs.(fn)];
-        boxplot(x,g,'PlotStyle','traditional','BoxStyle','outline','Colors',epoch_type_clrs{ii_epoch_type},'Symbol','','Notch','off');
+        for ii = 1:length(ID)
+            id = ID(ii);
+            IX = G==id;
+            xg = x(IX);
+            xg_prctl = prctile(xg,boxplot_prctiles);
+            c = epoch_type_clrs{ii_epoch_type};
+            w = 0.2;
+            xx = ii+w*[-1 1];
+            plot(xx, xg_prctl([3 3]),'Color',c);
+            plot(xx, xg_prctl([2 2]),'Color',c);
+            plot(xx, xg_prctl([4 4]),'Color',c);
+            plot(xx([1 1]), xg_prctl([2 4]),'Color',c);
+            plot(xx([2 2]), xg_prctl([2 4]),'Color',c);
+            plot([ii ii], xg_prctl([1 5]),'Color',c);
+        end
+%         boxplot(x,g,'PlotStyle','traditional','BoxStyle','outline','Colors',epoch_type_clrs{ii_epoch_type},'Symbol','','Notch','off');
         box off
-        ylim(boxplot_panels_ylimits(ii_fn,:))
+%         ylim(boxplot_panels_ylimits(ii_fn,:))
         hax=gca;
         hax.XTickLabelRotation = 0;
+        hax.XTick = 1:length(ID);
         hax.XTickLabel{end} = ['   ' char(8805) num2str(maxDays2plot)];
 %         hax.XTickLabel{end} = [num2str(maxDays2plot) '+'];
         hax.XRuler.FontSize = 7;
         hax.XRuler.TickLength(1) = 0.03;
+        hax.XRuler.TickLabelGapOffset = -1.;
+%         hax.YRuler.TickLabelGapOffset = 1;
         if ii_epoch_type == 1
-            ylabel(fn_label_strs{ii_fn},'units','normalized','position',[-0.21 -0.3])
+            ylabel_xpos = [-0.21 -0.21 -0.21 -0.25];
+            ylabel(fn_label_strs{ii_fn},'units','normalized','position',[ylabel_xpos(ii_fn) -0.3])
+        end
+        if ii_epoch_type == 2
+            xlabel('Session no.','units','normalized','position',[0.5 -0.2])
         end
     end
 end
@@ -313,12 +342,14 @@ end
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1,1))
-text(-0.3,1.1, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.2, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
 text(-0.4,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
-fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);
+% fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);
+fig_name = sprintf('%s_boxplot_prctiles_%d_%d_%d_%d_%d',fig_name_str, boxplot_prctiles);
+
 file_out = fullfile(res_dir, fig_name);
 print(gcf, file_out, '-dpdf', '-cmyk', '-painters');
 disp('figure saved!')

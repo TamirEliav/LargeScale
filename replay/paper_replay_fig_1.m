@@ -93,7 +93,7 @@ panels{2}(1) = axes('position', [16.5 23.3 2.2 2]);
 panels{3}(1) = axes('position', [2 19.3 2.2 2.5]);
 panels{3}(2) = axes('position', [4.8 19.3 2.2 2.5]);
 panels{4}(1) = axes('position', [8.2 19.3 2.5 2.5]);
-panels{5}(1) = axes('position', [12.7 19.3 3.3 2.5]);
+panels{5}(1) = axes('position', [12.9 19.3 3.3 2.5]);
 panels{5}(2) = axes('position', [17.5 19.3 2 2.5]);
 offsets_x = linspace(0,15,6)+2;
 offsets_y = linspace(0,6,2)+7;
@@ -111,8 +111,8 @@ for ii=1:2
 end
 panels{7}(1,1) = axes('position', [2 2.5 4 4]);
 panels{7}(2,1) = axes('position', [8 2.5 4 4]);
-panels{7}(1,2) = axes('position', [4.7 5 1.5 1.5]);
-panels{7}(2,2) = axes('position', [10.7 5 1.5 1.5]);
+panels{7}(1,2) = axes('position', [4.7 5 1.8 1.5]);
+panels{7}(2,2) = axes('position', [10.7 5 1.8 1.5]);
 panels{7}(1,3) = axes('position', [2.35 5.8 .36 .4]);
 panels{7}(2,3) = axes('position', [8.35 5.8 .36 .4]);
 panels{8}(1) = axes('position', [14 3.5 3 3]);
@@ -501,7 +501,7 @@ for ii_ex = 1:size(panels_ex,1)
     hax.TickLength = [0.02 0.02];
     hax.XRuler.TickLabelGapOffset = -4;
     rescale_plot_data('x',[1e-6 seq_ti(1)]);
-    text(0.5,1.01,sprintf('%d_%s_%s_%d',ex_num,epoch_type,exp_ID,event_num),'units','normalized','Interpreter','none','FontWeight','normal','FontSize',5,'HorizontalAlignment','center','VerticalAlignment','bottom');
+%     text(0.5,1.01,sprintf('%d_%s_%s_%d',ex_num,epoch_type,exp_ID,event_num),'units','normalized','Interpreter','none','FontWeight','normal','FontSize',5,'HorizontalAlignment','center','VerticalAlignment','bottom');
     
     %% plot posterior (position)
     axes(panels_ex(ii_ex,1));
@@ -511,6 +511,7 @@ for ii_ex = 1:size(panels_ex,1)
     prob_t = decode.time(IX);
     prob_pos = squeeze(decode.posterior(:,event.state_num,IX));
     imagesc(prob_t, decode.pos, prob_pos);
+    box on
     plot([seq.start_ts seq.end_ts],[seq.start_pos seq.end_pos],'-r','LineWidth',0.8);
     hax = gca;
     clim_prctiles = [1 99];
@@ -528,8 +529,26 @@ for ii_ex = 1:size(panels_ex,1)
     xlabel('Time (s)','Units','normalized','Position',[0.5 -0.105]);
     rescale_plot_data('x',[1e-6 seq_ti(1)]);
     
+    %% set manual adjustments to xlimits
+    switch ex_num
+        case 536
+            hax.XLim(2) = 0.29;
+        case 552
+            hax.XLim(1) = hax.XLim(1)-0.01;
+        case 197
+            hax.XLim = hax.XLim + 0.02*[-1 1];
+        case 29
+            hax.XLim(2) = 0.42;
+    end
+    xlimits = hax.XLim;
+
+    %% workaround to fix the image occluding the axes
+    plot(hax.XLim([1 1]),hax.YLim,'k-')
+    plot(hax.XLim([2 2]),hax.YLim,'k-')
+
     %% link x axes
     linkaxes(panels_ex(ii_ex,:),'x');
+    xlim(xlimits); % make sure to set the xlim after manual changes
 
     %% add colorbar
     if ii_ex==size(panels{6},1)
@@ -552,9 +571,9 @@ for ii_ex = 1:size(panels_ex,1)
 end
 %%
 axes(panels{6}(1,1,1))
-ylabel('Position (m)','Units','normalized','Position',[-0.3 0.6]);
+ylabel('Position (m)','Units','normalized','Position',[-0.3 0.5]);
 axes(panels{6}(1,2,1))
-ylabel('Position (m)','Units','normalized','Position',[-0.3 0.6]);
+ylabel('Position (m)','Units','normalized','Position',[-0.3 0.5]);
 axes(panels{6}(1,1,2))
 ylabel('Prob.','Units','normalized','Position',[-0.3 0.5]);
 axes(panels{6}(1,2,2))
@@ -646,9 +665,9 @@ for ii_fn = 1:nFeatures
     [r,pval] = corr(X',Y','type','Spearman','rows','pairwise');
     fprintf('%s: r=%.2g pval=%.2g\n',fn,r,pval);
 %     view([90 -90])
-%     yticks(1:6)
-    xlabel(fn_label)
-    ylabel('No. ripples')
+    yticks(0:6)
+    xlabel(fn_label,'Units','normalized','Position',[0.5 -0.15])
+    ylabel('No. of ripples')
     hax=gca;
     hax.XRuler.TickLength(1) = 0.03;
     hax.YRuler.TickLength(1) = 0.02;
@@ -681,7 +700,7 @@ text(-0.28,1.05, 'h', 'Units','normalized','FontWeight','bold','FontSize',font_s
 axes(panels{7}(2,1))
 text(-0.28,1.05, 'i', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{8}(1))
-text(-0.3,1.1, 'j', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.07, 'j', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, sprintf('%s_%s',fig_name_str,err_dist_normalization));

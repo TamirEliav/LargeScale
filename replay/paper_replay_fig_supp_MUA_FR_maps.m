@@ -1,4 +1,4 @@
-%% Replay - Fig supp 8 - Firing rate maps
+%% Replay - Fig supp 7 - Firing rate maps
 clear 
 clc
 close all
@@ -12,7 +12,7 @@ close all
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Extended_Data_Fig_8';
+fig_name_str = 'Extended_Data_Fig_7';
 fig_caption_str = 'MUA_FR_maps';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -51,10 +51,10 @@ set(groot,  'defaultAxesTickDirMode', 'manual');
 annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 
 % create panels
-panels{1}(1,1) = axes('position', [2.5 20 17 4]);
-panels{1}(1,2) = axes('position', [2.5 15 17 4]);
-panels{1}(2,1) = axes('position', [2.5 9 17 4]);
-panels{1}(2,2) = axes('position', [2.5 4 17 4]);
+panels{1}(1,1) = axes('position', [4 20 15 4]);
+panels{1}(1,2) = axes('position', [4 15 15 4]);
+panels{1}(2,1) = axes('position', [4 9 15 4]);
+panels{1}(2,2) = axes('position', [4 4 15 4]);
 
 %% load data
 [exp_list,T] = decoding_get_inclusion_list();
@@ -81,8 +81,8 @@ for ii_dir = 1:2
     plot(x,y);
     plot(x,mean(y,2),'-k','LineWidth',2)
     xlabel('Position (norm.)')
-    ylabel('MUA firing rate (Hz)')
-    text(0.1,0.8,map_dir_str,'units','normalized');
+    ylabel('Multiunit firing rate (Hz)')
+    text(0.1,0.95,map_dir_str,'units','normalized','FontSize',8);
 
     axes(panels{1}(2,ii_dir));
     cla reset
@@ -93,8 +93,8 @@ for ii_dir = 1:2
     plot(x,y)
     plot(x,mean(y,2),'-k','LineWidth',2)
     xlabel('Position (norm.)')
-    ylabel('MUA firing rate (z)')
-    text(0.1,0.95,map_dir_str,'units','normalized');
+    ylabel('Multiunit firing rate (z)')
+    text(0.1,0.95,map_dir_str,'units','normalized','FontSize',8);
 end
 
 %% add panel letters

@@ -9,53 +9,61 @@ ii_cat = 3; % pooled
 params_opt = 11;
 seq_examples_list = [ ...FR_peaks_loc
     struct('exp_ID','b0184_d191205', 'ii_dir',1, 'ii_seq', 18, 'ii_FE', 9);...%  FE=2/5/9/18/26/27/31,  best=9
-    struct('exp_ID','b0184_d191205', 'ii_dir',1, 'ii_seq', 28, 'ii_FE', 30);...% FE=20/30/31,           best=30
+    struct('exp_ID','b0184_d191205', 'ii_dir',1, 'ii_seq', 28, 'ii_FE', 31);...% FE=20/30/31,           best=30, nachums choice 31
     ];
 norm_FR_matrix_per_cell = 1;
 undetected_field_cell_ID = 'b0184_d191205_TT12_SS02';
 undetected_field_map_ii_dir = 1;
 undetected_field_loc = 36.2;
 
+% tuning_corr_cell_examples_list = [...
+%     struct('cell_num',2070, 'ii_dir', 2),... % 1540
+%     struct('cell_num',2046, 'ii_dir', 1),... % 1017
+%     struct('cell_num',1297, 'ii_dir', 1),... %  499
+%     struct('cell_num', 796, 'ii_dir', 1),... %  211
+%     struct('cell_num',2044, 'ii_dir', 1),... % 1490
+%     struct('cell_num',2055, 'ii_dir', 1),... % 1020
+% struct('cell_num', 999, 'ii_dir', 2),... %  1309
+% struct('cell_num',2181, 'ii_dir', 2),... %  1560
+% struct('cell_num',1387, 'ii_dir', 2),... %  1379
+% struct('cell_num',2044, 'ii_dir', 1),... %  1016
+% struct('cell_num', 525, 'ii_dir', 1),... %    72
+% struct('cell_num',1607, 'ii_dir', 1),... %   746
+%     struct('cell_num',2070, 'ii_dir', 1),... %  1022
+%     struct('cell_num', 752, 'ii_dir', 1),... %   178
+%     struct('cell_num',1450, 'ii_dir', 2),... %  1395
+%     struct('cell_num',1406, 'ii_dir', 2),... %  1383
+%     struct('cell_num',1984, 'ii_dir', 1),... %   853
+%     struct('cell_num',2055, 'ii_dir', 1),... %  1020
+% struct('cell_num',1066, 'ii_dir', 2),... %  1329
+% struct('cell_num',2107, 'ii_dir', 1),... %  1059
+% struct('cell_num',2046, 'ii_dir', 1),... %  1017
+% struct('cell_num',1832, 'ii_dir', 1),... %   830
+% struct('cell_num',2104, 'ii_dir', 2),... %  1552
+% struct('cell_num',1922, 'ii_dir', 2),... %  1490
+%     struct('cell_num',1074, 'ii_dir', 2),... %  1331
+%     struct('cell_num',2148, 'ii_dir', 1),... %  1064
+%     struct('cell_num',2070, 'ii_dir', 2),... %  1540
+%     struct('cell_num', 796, 'ii_dir', 1),... %   211
+%     struct('cell_num', 830, 'ii_dir', 1),... %   216
+%     struct('cell_num',1680, 'ii_dir', 1),... %   766
+% struct('cell_num',1738, 'ii_dir', 2),... %  1444
+% struct('cell_num',2117, 'ii_dir', 2),... %  1554
+% struct('cell_num',1297, 'ii_dir', 1),... %   499
+% struct('cell_num',1738, 'ii_dir', 2),... %  1444
+% struct('cell_num',2117, 'ii_dir', 2),... %  1554
+% struct('cell_num',1297, 'ii_dir', 1),... %   499
+% ];
+% panel_d_opt = 6;
+% tuning_corr_cell_examples_list = tuning_corr_cell_examples_list([1:6]+(panel_d_opt-1)*6);
 tuning_corr_cell_examples_list = [...
-    struct('cell_num',2070, 'ii_dir', 2),... % 1540
-    struct('cell_num',2046, 'ii_dir', 1),... % 1017
-    struct('cell_num',1297, 'ii_dir', 1),... %  499
-    struct('cell_num', 796, 'ii_dir', 1),... %  211
-    struct('cell_num',2044, 'ii_dir', 1),... % 1490
-    struct('cell_num',2055, 'ii_dir', 1),... % 1020
-struct('cell_num', 999, 'ii_dir', 2),... %  1309
-struct('cell_num',2181, 'ii_dir', 2),... %  1560
-struct('cell_num',1387, 'ii_dir', 2),... %  1379
-struct('cell_num',2044, 'ii_dir', 1),... %  1016
-struct('cell_num', 525, 'ii_dir', 1),... %    72
-struct('cell_num',1607, 'ii_dir', 1),... %   746
-    struct('cell_num',2070, 'ii_dir', 1),... %  1022
-    struct('cell_num', 752, 'ii_dir', 1),... %   178
-    struct('cell_num',1450, 'ii_dir', 2),... %  1395
-    struct('cell_num',1406, 'ii_dir', 2),... %  1383
-    struct('cell_num',1984, 'ii_dir', 1),... %   853
-    struct('cell_num',2055, 'ii_dir', 1),... %  1020
-struct('cell_num',1066, 'ii_dir', 2),... %  1329
-struct('cell_num',2107, 'ii_dir', 1),... %  1059
-struct('cell_num',2046, 'ii_dir', 1),... %  1017
-struct('cell_num',1832, 'ii_dir', 1),... %   830
-struct('cell_num',2104, 'ii_dir', 2),... %  1552
-struct('cell_num',1922, 'ii_dir', 2),... %  1490
-    struct('cell_num',1074, 'ii_dir', 2),... %  1331
-    struct('cell_num',2148, 'ii_dir', 1),... %  1064
-    struct('cell_num',2070, 'ii_dir', 2),... %  1540
-    struct('cell_num', 796, 'ii_dir', 1),... %   211
-    struct('cell_num', 830, 'ii_dir', 1),... %   216
-    struct('cell_num',1680, 'ii_dir', 1),... %   766
-struct('cell_num',1738, 'ii_dir', 2),... %  1444
-struct('cell_num',2117, 'ii_dir', 2),... %  1554
-struct('cell_num',1297, 'ii_dir', 1),... %   499
-struct('cell_num',1738, 'ii_dir', 2),... %  1444
-struct('cell_num',2117, 'ii_dir', 2),... %  1554
-struct('cell_num',1297, 'ii_dir', 1),... %   499
-];
-panel_d_opt = 6;
-tuning_corr_cell_examples_list = tuning_corr_cell_examples_list([1:6]+(panel_d_opt-1)*6);
+    struct('cell_num',2046, 'ii_dir', 1),...
+    struct('cell_num',2044, 'ii_dir', 1),...
+    struct('cell_num',1984, 'ii_dir', 1),...
+    struct('cell_num', 796, 'ii_dir', 1),...
+    struct('cell_num',2070, 'ii_dir', 2),...
+    struct('cell_num',1738, 'ii_dir', 2),...
+    ];
 
 %% graphics params
 spikes_tick_height = 10;
@@ -128,7 +136,7 @@ panels{3} = panels{3}(:);
 x = 2;
 y = 3;
 panels{4}(1) = axes('position', [x y 5 3]);
-panels{4}(2) = axes('position', [x+0.2 y+2 .5 .5]);
+panels{4}(2) = axes('position', [x+0.3 y+2.2 .5 .5]);
 
 % w = 5;
 % h = 3;
@@ -225,14 +233,6 @@ for ii_ex = 1:length(seq_examples_list)
     [~, sort_cells_IX] = sort(first_field_locs_all_cells,'ascend');
     cells_dir = cells_dir(sort_cells_IX);
 
-    %% choose colors for cells
-    clrs = distinguishable_colors(nCellsDir);
-%     rng(1);
-%     clrs_order = randperm(nCellsDir);
-    clrs_order = [1 3 2 4 5];
-%     clrs_order = 1:5;
-    clrs = clrs(clrs_order,:);
-
     %% get the relevant seq
     seq = seqs(ii_seq);
     event = events(ii_seq);
@@ -240,6 +240,14 @@ for ii_ex = 1:length(seq_examples_list)
     seq_pos = [seq.start_pos seq.end_pos];
     seq_pos_limits = sort(seq_pos,'ascend');
 
+    %% choose colors for cells
+    clrs = distinguishable_colors(nCellsDir);
+%     rng(1);
+%     clrs_order = randperm(nCellsDir);
+    clrs_order = [1 3 2 4 5];
+%     clrs_order = 1:5;
+    clrs = clrs(clrs_order,:);
+    clrs(3,:) = [1 0.5 0];
 
     %% plot cells FR map
     xlimits = [7 75];
@@ -256,10 +264,10 @@ for ii_ex = 1:length(seq_examples_list)
             y = y./max(y(IX))*1.2;
             y = y + ii_cell*0.2;
             plot(x,y, 'Color', clrs(ii_cell,:),'LineWidth',2);
-            text(xlimits(1)-2, ii_cell*0.2, "Cell "+ii_cell, 'FontSize',6, 'HorizontalAlignment','right','Units','data','Color',clrs(ii_cell,:),'FontWeight','bold')
+            text(xlimits(1)-2, ii_cell*0.2+0.06, "Cell "+ii_cell, 'FontSize',6, 'HorizontalAlignment','right','Units','data','Color',clrs(ii_cell,:),'FontWeight','bold')
         end
         xlim(xlimits)
-        xlabel('Position (m)')
+        xlabel('Position (m)','Units','normalized','Position',[0.5 -0.17])
         ylabel('firing rate (norm.)')
         hax=gca;
         hax.XRuler.TickLength(1) = 0.009;
@@ -281,7 +289,7 @@ for ii_ex = 1:length(seq_examples_list)
         IX = x>seq_pos(1) & x<seq_pos(2);
         y = y./max(y(IX))*1;
         y = y + ii_cell*0.2;
-        plot(y,x, 'Color', clrs(ii_cell,:),'LineWidth',.5);
+        plot(y,x, 'Color', clrs(ii_cell,:),'LineWidth',.65);
     end
     ylim(seq_pos)
     xlabel('firing rate (norm.)')
@@ -363,12 +371,12 @@ for ii_ex = 1:length(seq_examples_list)
         epoch_type = 'rest';
     end
     fprintf('epoch type = %s (#%d)\n',epoch_type,event.epoch_num)
-    decode = decoding_load_data(exp_ID, epoch_type, params_opt);
-    seq_ts_with_margin = seq_ts + [-1 1].*1e6*0.1;
-    decode_IX = find(decode.time > seq_ts_with_margin(1) & decode.time < seq_ts_with_margin(2));
-    decode_posterior = squeeze(decode.posterior(:,event.state_num,decode_IX));
-    decode_time = decode.time(decode_IX);
-    decode_pos = decode.pos;
+%     decode = decoding_load_data(exp_ID, epoch_type, params_opt);
+%     seq_ts_with_margin = seq_ts + [-1 1].*1e6*0.1;
+%     decode_IX = find(decode.time > seq_ts_with_margin(1) & decode.time < seq_ts_with_margin(2));
+%     decode_posterior = squeeze(decode.posterior(:,event.state_num,decode_IX));
+%     decode_time = decode.time(decode_IX);
+%     decode_pos = decode.pos;
 
     %% plot seq spikes
 %     % this panel is made of two panels: 1) posterior imagesc and 2) spikes
@@ -434,6 +442,7 @@ for ii_ex = 1:length(seq_examples_list)
     x_all = [];
     y_all = [];
     c_all = [];
+    g_all = [];
     for ii_cell = 1:nCellsDir
         cell = cells_dir(ii_cell);
         FE = cell.FE{ii_dir}(ii_FE);
@@ -456,20 +465,32 @@ for ii_ex = 1:length(seq_examples_list)
         y = [FE.spikes_pos]';
         c = clrs(ii_cell,:);
         c = repmat(c,length(x),1);
+        g = ii_cell.*ones(size(x));
         x_all = [x_all; x];
         y_all = [y_all; y];
         c_all = [c_all; c];
+        g_all = [g_all; g];
     end
     rng(4);
     rand_order_IX = randperm(length(x_all));
     x_all = x_all(rand_order_IX);
     y_all = y_all(rand_order_IX);
     c_all = c_all(rand_order_IX,:);
-    scatter(x_all,y_all,[], c_all, '|', 'LineWidth',.1, 'SizeData',spikes_tick_height);
+    g_all = g_all(rand_order_IX,:);
+    yoffset = zeros(size(g_all));
+    yoffset(g_all==5) = +2;
+    yoffset(g_all==4) = +1;
+    yoffset(g_all==3) = 0;
+    yoffset(g_all==2) = -1;
+    yoffset(g_all==1) = -2;
+    yoffset_gain = 0.01.*range(ylimits);
+    yoffset_gain = yoffset_gain*2; % opt 2
+    yoffset = yoffset.*yoffset_gain;
+    scatter(x_all,y_all+yoffset,[], c_all, '|', 'LineWidth',.1, 'SizeData',spikes_tick_height);
     xlim(xlimits)
     ylim(ylimits)
     rescale_plot_data('x',[1e-6 xlimits(1)])
-    text(0.05,0.85,"flight #"+ii_FE,'HorizontalAlignment','Left','units','normalized');
+    text(0.05,0.85,"Flight #"+ii_FE,'HorizontalAlignment','Left','units','normalized','FontSize',7);
     xlabel('Time (s)','units','normalized','position',[0.5 -0.09]);
     ylabel('Position (m)')
     if ii_ex == 1
@@ -571,7 +592,7 @@ for ii_cell = 1:length(tuning_corr_cell_examples_list)
     x = cell.FR_map(ii_dir).all.bin_centers;
     y = cell.FR_map(ii_dir).all.PSTH;
     y = y./max(y);
-    plot(x,y,'k-','LineWidth',3);
+    plot(x,y,'k-','LineWidth',2.4);
     x = cell.replay_FR_map.replay_PSTH_all(ii_cat,ii_dir).bin_centers;
     y = cell.replay_FR_map.replay_PSTH_all(ii_cat,ii_dir).PSTH;
     y = y./max(y);
@@ -591,14 +612,14 @@ for ii_cell = 1:length(tuning_corr_cell_examples_list)
     ylim([0 1])
     xticks(0:50:200)
     yticks([0 1])
-    text(0.01,1.2,sprintf("cell %d dir %d",cell_num,ii_dir),'units','normalized','FontSize',6.5);
+%     text(0.01,1.2,sprintf("cell %d dir %d",cell_num,ii_dir),'units','normalized','FontSize',6.5);
     if ii_cell==5 || ii_cell==6
         xlabel('Position (m)','Units','normalized','position',[0.5 -0.43])
     end
     if ii_cell == 5
         ylabel('Firing rate (norm.)','Units','normalized','position',[-0.1 2])
     end
-    if ii_cell == 1
+    if ii_cell == 4
         x = 100+[0 6];
         y = [0.8 1.05];
         plot(x,y([2 2]), 'k-','LineWidth', 3,'Clipping','Off');
@@ -613,10 +634,18 @@ axes(panels{4}(1))
 cla reset
 hold on
 FR_corr = load("E:\Tamir\work\PROJECTS\LargeScale\paper_replay\figures\single_unit_replay_tuning_corr.mat");
-histogram(cat(1,FR_corr.ccc_data{:}),'FaceColor',0.35*[1 1 1],'normalization','pdf','NumBins',21,'EdgeColor','k','LineWidth',1);
-histogram(cat(1,FR_corr.ccc_shuffle{:}),'EdgeColor','k','DisplayStyle','Stairs','normalization','pdf','LineWidth',1.5);
+x = cat(1,FR_corr.ccc_data{:});
+x_shuffle = cat(1,FR_corr.ccc_shuffle{:});
+histogram(x,'FaceColor',0.15*[1 1 1],'normalization','pdf','NumBins',21,'EdgeColor','k','LineWidth',1);
+histogram(x_shuffle,'EdgeColor','k','DisplayStyle','Stairs','normalization','pdf','LineWidth',1.5);
+[~,P_KS, KS_stats] = kstest2(x, x_shuffle);
+[~,P_ttest, ~, ttest_stats] = ttest2(x, x_shuffle);
+fprintf('FR corr distribution, data vs shuffle, ks-test: p=%g\n',P_KS);
+fprintf('FR corr distribution, data vs shuffle, t-test: p=%g\n',P_ttest);
+text(0.53,0.88,['{\itP}_{KS} = ' sprintf('%.2g',P_KS)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
+text(0.53,0.95,['{\itP}_{t} = ' sprintf('%.2g',P_ttest)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
 xlim([-1 1])
-xlabel({'Correlation of firing rate maps';'during flight vs. during replay'})
+xlabel({'Correlation of firing rate maps (r)';'during flight vs. during replay'})
 ylabel('Probability density')
 hax=gca;
 hax.XRuler.TickLength(1) = 0.02;
@@ -630,7 +659,7 @@ cla reset
 hold on
 axis off
 axis equal
-patch([0 0 1 1],[0 1 1 0], 0.35*[1 1 1],'EdgeColor','k');
+patch([0 0 1 1],[0 1 1 0], 0.15*[1 1 1],'EdgeColor','k');
 plot([0 1],[1 1].*2, 'k-','LineWidth',1.5)
 text(1.5,0.5, 'Data','FontSize',7)
 text(1.5,2, 'Shuffle','FontSize',7)
@@ -639,15 +668,15 @@ axis ij
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1))
-text(-0.07,1.0, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.08,1.0, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{2}(1,1))
-text(-0.2,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.26,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{2}(2,1))
-text(-0.2,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.26,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{3}(1,1))
-text(-0.15,1.12, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.17,1.12, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{4}(1))
 text(-0.2,1.1, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
@@ -657,7 +686,7 @@ fig_name = sprintf('%s_ex_1_FE_%d_ex_2_FE_%d', ...
     fig_name_str, ...
     seq_examples_list(1).ii_FE,...
     seq_examples_list(2).ii_FE)
-fig_name = sprintf('%s_panel_d_opt_%d',fig_name,panel_d_opt)
+% fig_name = sprintf('%s_panel_d_opt_%d',fig_name,panel_d_opt)
 file_out = fullfile(res_dir, fig_name);
 print(gcf, file_out, '-dpdf', '-cmyk', '-painters');
 disp('figure saved!')

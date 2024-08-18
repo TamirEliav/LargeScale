@@ -51,8 +51,9 @@ replay_examples_list = table2struct(readtable(replay_examples_list_filename));
 replay_examples_options = [
 536 552 493 450 41 76 253 1000;
 450 493 552 536 41 76 253 1000;
+493 450 552 536 41 76 253 1000;
 ];
-replay_ex_opt = 2; 
+replay_ex_opt = 3; 
 [~,IX] = ismember(replay_examples_options(replay_ex_opt,:),[replay_examples_list.ex_num]);
 replay_examples = replay_examples_list(IX);
 disp('chosen examples:')
@@ -79,12 +80,12 @@ cmap = flipud(cmap);
 xlimits = [-1 1]*.3;
 xtick = [-0.3:0.1:0.3];
 states_clrs = [
-0 98 190
-230 136 180
-0 251 246
 133  63 0
 160 225 157
 235 223 99
+0 98 190
+230 136 180
+0 251 246
 ]./255;
 
 %% define output files
@@ -241,6 +242,7 @@ for ii_ex = 1:length(replay_examples)
         hcb.Label.Rotation = 0;
 %         hcb.Label.Position(1) = 1.5;
         hcb.Label.String = 'Probability';
+        hcb.Label.Position(2) = -0.2;
         hcb.Ticks = [];
         text(0.85, y, '0','FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
         text(1.07, y, 'Max','FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
@@ -269,8 +271,8 @@ for ii_ex = 1:length(replay_examples)
     end
     text(0.5, 1.15, titles_str{ii_ex}, ...
         'Units','normalized','FontWeight','normal','FontSize',8,'HorizontalAlignment','center');
-    text(0.5, 1.45, sprintf('%d_%s_%s_%d',ex_num,epoch_type,exp_ID,event_num),'Interpreter','none', ...
-        'Units','normalized','FontWeight','normal','FontSize',6,'HorizontalAlignment','center');
+%     text(0.5, 1.45, sprintf('%d_%s_%s_%d',ex_num,epoch_type,exp_ID,event_num),'Interpreter','none', ...
+%         'Units','normalized','FontWeight','normal','FontSize',6,'HorizontalAlignment','center');
     
     %% plot LFP (ripple-band)
     axes(panels_ex{ii_ex}(4));
@@ -283,7 +285,7 @@ for ii_ex = 1:length(replay_examples)
     rescale_plot_data('x',[1e-6 t0]);
     axis off
     if ismember(ii_ex,[1 5])
-        text(-0.06, .5, 'Ripple', 'Units','normalized','FontSize',8.25,'Rotation',90,'HorizontalAlignment','center','VerticalAlignment','middle');
+        text(-0.06, .5, 'Ripple', 'Units','normalized','FontSize',7,'Rotation',90,'HorizontalAlignment','center','VerticalAlignment','middle');
     end
     
     %% plot LFP (raw)
@@ -297,7 +299,7 @@ for ii_ex = 1:length(replay_examples)
     rescale_plot_data('x',[1e-6 t0]);
     axis off
     if ismember(ii_ex,[1 5])
-        text(-0.06, .5, 'SWR', 'Units','normalized','FontSize',8.25,'Rotation',90,'HorizontalAlignment','center','VerticalAlignment','middle');
+        text(-0.06, .5, 'SWR', 'Units','normalized','FontSize',7,'Rotation',90,'HorizontalAlignment','center','VerticalAlignment','middle');
     end
 
     %% plot posterior (state)
@@ -358,6 +360,10 @@ for ii_ex = 1:length(replay_examples)
         ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.23 .5]);
     end
     
+    %% workaround to fix the image occluding the axes
+    plot(hax.XLim([1 1]),hax.YLim,'k-')
+    plot(hax.XLim([2 2]),hax.YLim,'k-')
+
     %% link x axes
     linkaxes(panels_ex{ii_ex}(:),'x');
     xlim(xlimits)

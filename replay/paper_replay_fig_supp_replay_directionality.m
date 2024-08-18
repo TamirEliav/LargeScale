@@ -57,8 +57,10 @@ set(groot,  'defaultAxesTickDirMode', 'manual');
 annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 
 % create panels
-panels{1}(1) = axes('position', [2 15 3.5 8]);
-panels{1}(2) = axes('position', [6.5 15 3.5 8]);
+panels{1}(1,1) = axes('position', [2 15 3.5 8]);
+panels{1}(1,2) = axes('position', [6.5 15 3.5 8]);
+% panels{1}(2,1) = axes('position', [2 4 3.5 8]);
+% panels{1}(2,2) = axes('position', [6.5 4 3.5 8]);
 panels{2}(1) = axes('position', [12 19.4 4 3.5]);
 
 %% ========================================================================
@@ -138,8 +140,8 @@ for ii_epoch_type = 1:length(epoch_types)+1
             continue;
         end
         seqs = [events.seq_model];
-        n1 = sum([seqs.direction]==1);
-        n2 = sum([seqs.direction]==-1);
+        n1 = sum([seqs.direction]==-1);
+        n2 = sum([seqs.direction]==1);
         directionality_contrast_index(ii_epoch_type,ii_exp) = (n1-n2)/(n1+n2);
         directionality_fraction(ii_epoch_type,ii_exp) = (n1)/(n1+n2);
         binom_pval = myBinomTest(n1,n1+n2,0.5);
@@ -154,49 +156,53 @@ directionality_labels = {'contrast index','fraction','binom pval','binom surpris
 
 
 %% replay directionality bias - example session
-replay_directionality_bias_ex_exp_ID = 'b0184_d191130'
-ii_exp = find(strcmp(T.exp_ID,replay_directionality_bias_ex_exp_ID));
-example_session_num_form_exposure = T.session_num_from_exposure(replay_directionality_bias_ex_exp_ID);
-for ii_epoch_type = 1:length(epoch_types)
-    axes(panels{1}(ii_epoch_type))
-    cla reset
-    hold on
-    events = events_all_per_session{ii_epoch_type,ii_exp};
-    seqs = [events.seq_model];
-    epoch_sep = find(diff([events.epoch_num])~=0)+0.5;
-    seqs_edges = [seqs.start_pos_norm; seqs.end_pos_norm];
-    seqs_IX = 1:length(seqs);
-    if strcmp(epoch_types(ii_epoch_type),'sleep')
-        plot([0 1],repmat(epoch_sep,2,1),':','LineWidth',1.5,'Color',0.5*[1 1 1]);
+% replay_directionality_bias_ex_exp_ID_list = {'b0184_d191129','b0184_d191130'};
+replay_directionality_bias_ex_exp_ID_list = {'b0184_d191130'};
+for ii_ex = 1:length(replay_directionality_bias_ex_exp_ID_list)
+    replay_directionality_bias_ex_exp_ID = replay_directionality_bias_ex_exp_ID_list{ii_ex};
+    ii_exp = find(strcmp(T.exp_ID,replay_directionality_bias_ex_exp_ID));
+    example_session_num_form_exposure = T.session_num_from_exposure(replay_directionality_bias_ex_exp_ID);
+    for ii_epoch_type = 1:length(epoch_types)
+        axes(panels{1}(ii_ex,ii_epoch_type))
+        cla reset
+        hold on
+        events = events_all_per_session{ii_epoch_type,ii_exp};
+        seqs = [events.seq_model];
+        epoch_sep = find(diff([events.epoch_num])~=0)+0.5;
+        seqs_edges = [seqs.start_pos_norm; seqs.end_pos_norm];
+        seqs_IX = 1:length(seqs);
+        if strcmp(epoch_types(ii_epoch_type),'sleep')
+            plot([0 1],repmat(epoch_sep,2,1),':','LineWidth',1.5,'Color',0.5*[1 1 1]);
+        end
+        h=plot(seqs_edges,[seqs_IX;seqs_IX],'-','LineWidth',.55);
+        dir_1_IX = [seqs.state_direction]==1;
+        dir_2_IX = [seqs.state_direction]==-1;
+        [h(dir_1_IX).Color] = disperse(repelem(directions_clrs(1),length(dir_1_IX)));
+        [h(dir_2_IX).Color] = disperse(repelem(directions_clrs(2),length(dir_2_IX)));
+        scatter(seqs_edges(1,:),seqs_IX, 3, [seqs.state_direction]==-1, "filled");
+        hax=gca;
+        hax.Colormap = cell2mat(directions_clrs);
+        hax.XTick = [0 1];
+        hax.YTick = [1 10*ceil(length(seqs)/10)];
+        hax.XLim = [0 1];
+        hax.YRuler.TickLabelGapOffset = -1;
+        hax.XRuler.TickLabelGapOffset = 1;
+        xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.02]);
+        ylabel('Replay event no.', 'Units','normalized', 'Position',[-0.1 0.5]);
+        text(0,-0.09,'Door','Units','normalized','FontSize',7,'HorizontalAlignment','center')
+        switch epoch_types{ii_epoch_type}
+            case 'sleep'
+                title_str = 'Sleep replays';
+            case 'rest'
+                title_str = 'Awake replays';
+        end
+        title(title_str, 'Units','normalized', 'Position',[0.5 0.99],'FontWeight','normal');
     end
-    h=plot(seqs_edges,[seqs_IX;seqs_IX],'-','LineWidth',.55);
-    dir_1_IX = [seqs.state_direction]==1;
-    dir_2_IX = [seqs.state_direction]==-1;
-    [h(dir_1_IX).Color] = disperse(repelem(directions_clrs(1),length(dir_1_IX)));
-    [h(dir_2_IX).Color] = disperse(repelem(directions_clrs(2),length(dir_2_IX)));
-    scatter(seqs_edges(1,:),seqs_IX, 3, [seqs.state_direction]==-1, "filled");
-    hax=gca;
-    hax.Colormap = cell2mat(directions_clrs);
-    hax.XTick = [0 1];
-    hax.YTick = [1 10*ceil(length(seqs)/10)];
-    hax.XLim = [0 1];
-    hax.YRuler.TickLabelGapOffset = -1;
-    hax.XRuler.TickLabelGapOffset = 1;
-    xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.02]);
-    ylabel('Replay event no.', 'Units','normalized', 'Position',[-0.1 0.5]);
-    switch epoch_types{ii_epoch_type}
-        case 'sleep'
-            title_str = 'Sleep replays';
-        case 'rest'
-            title_str = 'Awake replays';
-    end
-    title(title_str, 'Units','normalized', 'Position',[0.5 0.99],'FontWeight','normal');
+    title_str = {
+        sprintf('Example session #%d:', example_session_num_form_exposure); ...
+        'Over-representation of replay directionality'};
+    text(-.2, 1.12, title_str,'FontSize',9,'HorizontalAlignment','center','Units','normalized')
 end
-title_str = {
-    sprintf('Example session #%d:', example_session_num_form_exposure); ...
-    'Over representation of replay directionality'};
-text(-.2, 1.12, title_str,'FontSize',9,'HorizontalAlignment','center','Units','normalized')
-
 
 %% replay directionality bias - plot trend over exposure to enviroenment
 axes(panels{2}(1));
@@ -224,12 +230,12 @@ for ii_epoch_type = 1:length(epoch_types)+1
     plot(xx,yy,'-','Color',c);
 end
 % legend
-x = [1 2];
+x = [0.3 2]+32;
 y = linspace(0.35,0,3)+0.6;
 plot(x,y(1)*[1 1],'Color',clrs{1},'LineWidth',1.5,'Clipping','off')
 plot(x,y(2)*[1 1],'Color',clrs{2},'LineWidth',1.5,'Clipping','off')
 plot(x,y(3)*[1 1],'Color',clrs{3},'LineWidth',1.5,'Clipping','off')
-x = x(end)+range(x);
+x = x(end)+1;
 text(x,y(1), "Sleep", 'FontSize',7)
 text(x,y(2), "Awake", 'FontSize',7)
 text(x,y(3), "Pooled", 'FontSize',7)
@@ -242,12 +248,13 @@ hax.XRuler.TickLength(1) = 0.02;
 hax.YRuler.TickLength(1) = 0.035;
 hax.XRuler.TickLabelGapOffset = -1;
 hax.YRuler.TickLabelGapOffset = 0;
-text(5.5,-0.75,"\leftarrow"+"session #"+example_session_num_form_exposure)
-% h = annotation('arrow');
-% h.Parent = gca;
-% h.Units = 'normalized';
-% h.X = [.8 .5];
-% h.Y = [1 1].*0.3;
+% text(5.5,-0.75,"\leftarrow"+"session #"+example_session_num_form_exposure,'FontSize',8)
+h=annotation('textarrow');
+h.Parent=hax;
+h.X = 3.5*[1 1];
+h.Y = [1 0.85];
+h.String = {'                  Sessions #3 and #4'};
+h.FontSize = 7; h.HeadLength = 4; h.HeadWidth = 4;
 
 %% add panel letters
 font_size = 11;

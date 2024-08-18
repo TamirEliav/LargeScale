@@ -1,4 +1,4 @@
-%% Replay - Fig supp 7 - reverse/forward + future+past + takeoff/landing/midair + ball1/ball2
+%% Replay - Fig supp 8 - reverse/forward + future+past + takeoff/landing/midair + ball1/ball2
 %%
 clear 
 clc
@@ -35,7 +35,7 @@ end
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Extended_Data_Fig_7';
+fig_name_str = 'Extended_Data_Fig_8';
 fig_caption_str = ' ';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -193,8 +193,7 @@ h=bar(xG,Y);
 h.BarWidth = 0.75;
 h.FaceColor = 0.5*[1 1 1];
 hax=gca;
-hax.XTick = xG;
-hax.XTickLabel = TakeLandCategoriesOrder;
+% hax.XTickLabel = TakeLandCategoriesOrder;
 for ii = 1:length(G)
     x = ii+[-1 1].*h.BarWidth/2;
     y = expectedProportion(ii).*sum(Y);
@@ -213,7 +212,11 @@ hax.TickLength(1) = [0.025];
 hax.XRuler.TickLabelGapOffset = -1;
 hax.YRuler.TickLabelGapOffset = 0;
 hax.XLim = [min(xG) max(xG)] + [-1 1].*0.5;
-
+hax.XTick = xG;
+hax.XTickLabel = [];
+for ii=1:length(TakeLandCategoriesOrder)
+    text(ii, hax.YLim(1)-0.15*range(hax.YLim), {TakeLandCategoriesOrder{ii},'zone'},'HorizontalAlignment','center','FontSize',7)
+end
 
 %% takeoff vs landing - separated by balls
 % for ii_ball = 1:2
@@ -519,7 +522,13 @@ hb2(2).CData = 1.00*[1 1 1];
 % hb2(1).EdgeColor = 'k';
 % hb2(2).EdgeColor = 'k';
 xlim([0 1]+w.*[-1 1])
-xticklabels(TakeLandCategoriesOrder)
+xticklabels()
+hax=gca;
+hax.XTickLabel = [];
+for ii=1:length(TakeLandCategoriesOrder)
+    text(x(ii), hax.YLim(1)-0.15*range(hax.YLim), {TakeLandCategoriesOrder{ii},'zone'},'HorizontalAlignment','center','FontSize',7)
+end
+
 ylabel('Fraction')
 
 %% add legend 
@@ -561,23 +570,25 @@ ylim([0 5])
 axes(panels{5}(1))
 cla reset
 hold on
-gTakeLand = reordercats(gTakeLand,["Takeoff","Mid-air","Landing"]);
-G = categories(gTakeLand);
-for ii_g = 1:length(G)
-    gcurr = G{ii_g};
-    IX = gTakeLand==gcurr;
-%     IX = IX & gForRev=="Forward";
-%     IX = IX & gForRev=="Reverse";
-    seqs_g = seqs(IX);
-    events_g = events(IX);
-    x = abs([seqs_g.middle_pos_norm] - interp1([1 2],[0 1],[events_g.rest_ball_num]));
-    histogram(x,'BinWidth',0.05,'BinLimits',[0 1],'DisplayStyle','stairs','DisplayName',gcurr,'Normalization','probability');
-end
+x = abs([seqs.middle_pos_norm] - interp1([1 2],[0 1],[events.rest_ball_num]));
+histogram(x,'BinWidth',0.05,'BinLimits',[0 1],'DisplayStyle','stairs','Normalization','probability','EdgeColor','k');
+% gTakeLand = reordercats(gTakeLand,["Takeoff","Mid-air","Landing"]);
+% G = categories(gTakeLand);
+% for ii_g = 1:length(G)
+%     gcurr = G{ii_g};
+%     IX = gTakeLand==gcurr;
+% %     IX = IX & gForRev=="Forward";
+% %     IX = IX & gForRev=="Reverse";
+%     seqs_g = seqs(IX);
+%     events_g = events(IX);
+%     x = abs([seqs_g.middle_pos_norm] - interp1([1 2],[0 1],[events_g.rest_ball_num]));
+%     histogram(x,'BinWidth',0.05,'BinLimits',[0 1],'DisplayStyle','stairs','DisplayName',gcurr,'Normalization','probability');
+% end
 xlim([0 1])
 xticks([0 1])
-legend('Box','off')
-xlabel({'Distance of replay';'from current position (norm.)'},'units','normalized','position',[0.5 -.05])
-ylabel('Prob.')
+% legend('Box','off')
+xlabel({'Distance of awake replay';'from current position (norm.)'},'units','normalized','position',[0.5 -.05])
+ylabel('Probability')
 
 
 
@@ -630,8 +641,8 @@ panels{6}(2,2).YLim = [0 150];
 
 for ii=1:numel(panels{6})
     pnl = panels{6}(ii); axes(pnl);
-    text(0,-0.27*range(pnl.YLim),{'Resting';'ball 1'},'HorizontalAlignment','center','FontSize',8);
-    text(1,-0.27*range(pnl.YLim),{'Resting';'ball 2'},'HorizontalAlignment','center','FontSize',8);
+    text(0,-0.24*range(pnl.YLim),{'Resting';'platform 1'},'HorizontalAlignment','center','FontSize',8);
+    text(1,-0.24*range(pnl.YLim),{'Resting';'platform 2'},'HorizontalAlignment','center','FontSize',8);
 end
 
 % pointers to takeoff/landing in the histogram (dir 1)
@@ -667,7 +678,7 @@ h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
 h=annotation('textarrow');
 h.Parent=panels{6}(2,1);
 h.X = 0.005*[1 1];
-h.Y = 55+[0 -24];
+h.Y = 61+[0 -30];
 h.String = {'     Reverse','     takeoffs'};
 h.FontSize = TL_fnt_sz; h.HeadLength = 4; h.HeadWidth = 4;
 
@@ -811,19 +822,19 @@ h.HeadLength = 5; h.HeadWidth = 8;
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1))
-text(-0.3,1.1, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.25,1.1, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{2}(1))
-text(-0.3,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.4,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
 text(-0.3,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{4}(1))
-text(-0.3,1.1, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.25,1.1, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{5}(1))
-text(-0.3,1.1, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.28,1.1, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{6}(1,1))
-text(-0.1,1.1, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.115,1.1, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{6}(2,1))
-text(-0.1,1.1, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.115,1.1, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %% add line titles
 % axes(panels{1}(1))

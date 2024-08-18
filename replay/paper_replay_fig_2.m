@@ -79,21 +79,22 @@ panels{1}(2) = axes('position', [7 23.3 3 2.5]);
 panels{1}(3) = axes('position', [11 23.3 3 2.5]);
 panels{1}(4) = axes('position', [15 23.3 3 2.5]);
 
-panels{2}(1) = axes('position', [12 19.5 7 1.5]);
-panels{2}(2) = axes('position', [12 17.5 7 1.5]);
-panels{2}(3) = axes('position', [12 15.5 7 1.5]);
-panels{2}(4) = axes('position', [12 13.5 7 1.5]);
+panels{2}(1) = axes('position', [3 11 3.5 10]);
+panels{2}(2) = axes('position', [7 11 3.5 10]);
 
-panels{3}(1) = axes('position', [12 11 7 1.5]);
+x = 12.3;
+panels{3}(1) = axes('position', [x 19.5 7 1.5]);
+panels{3}(2) = axes('position', [x 17.5 7 1.5]);
+panels{3}(3) = axes('position', [x 15.5 7 1.5]);
+panels{3}(4) = axes('position', [x 13.5 7 1.5]);
+panels{4}(1) = axes('position', [x 11 7 1.5]);
 
-panels{4}(1) = axes('position', [3 11 3.5 10]);
-panels{4}(2) = axes('position', [7 11 3.5 10]);
-
-panels{5}(1) = axes('position', [3   7.5 2 2]);
-panels{6}(1) = axes('position', [7.3   7.5 2 2]);
+panels{5}(1) = axes('position', [3     7.5 2 2]);
+panels{5}(2) = axes('position', [4.1     9 .35 .35]);
+panels{6}(1) = axes('position', [7.3    7.5 2 2]);
 panels{7}(1,1) = axes('position', [10.9 7.5 2 2]);
 panels{7}(2,1) = axes('position', [13.5 7.5 2 2]);
-panels{8}(1) = axes('position', [17.5  7.5 2 2]);
+panels{8}(1) = axes('position', [17.5   7.5 2 2]);
 % panels{8}(2) = axes('position', [17.5  4 2 2]);
 % panels{8}(3) = axes('position', [17.5  1.5 3 2]);
 
@@ -217,10 +218,10 @@ ylim([0 1])
 axis off
 
 
-%% panel E - coverage per session
+%% panel F - coverage per session
 load('E:\Tamir\work\PROJECTS\LargeScale\paper_replay\data_prepared_for_figures\replay_coverage.mat');
-for ii_ex = 1:length(panels{2})
-    axes(panels{2}(ii_ex))
+for ii_ex = 1:length(panels{3})
+    axes(panels{3}(ii_ex))
     cla
     hold on
     ii_exp = replay_coverage_examples_IX(ii_ex);
@@ -244,18 +245,18 @@ for ii_ex = 1:length(panels{2})
 %         hl.Position([3 4]) = [0.1 0.025];
 %         hl.Box = 'off';
     end
-    if ii_ex == length(panels{2})
-        xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.07]);
+    if ii_ex == length(panels{3})
+        xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.06]);
         ylabel({'Replay coverage';'(counts)'}, 'Units','normalized', 'Position',[-0.1 2.4]);
     end
 end
 
-%% panel E legend
+%% panel F legend
 if exist('panels_coverage_legend','var')
     delete(panels_coverage_legend);
 end
-panels_coverage_legend(1) = axes('position', [panels{2}(1).Position([1 2])+[.5 1.25] 0.5 0.5]);
-panels_coverage_legend(2) = axes('position', [panels{2}(1).Position([1 2])+[2.5 1.25] 0.5 0.5]);
+panels_coverage_legend(1) = axes('position', [panels{3}(1).Position([1 2])+[.5 1.25] 0.5 0.5]);
+panels_coverage_legend(2) = axes('position', [panels{3}(1).Position([1 2])+[2.6 1.25] 0.5 0.5]);
 arrow_str = {'\rightarrow','\leftarrow'};
 for ii_dir = 1:2
     axes(panels_coverage_legend(ii_dir))
@@ -275,8 +276,8 @@ for ii_dir = 1:2
     axis off
 end
 
-%% panel F - coverage total
-axes(panels{3}(1))
+%% panel G - coverage total
+axes(panels{4}(1))
 cla
 hold on
 c = squeeze(sum(coverage_all,1));
@@ -291,12 +292,12 @@ hax.XTick = [0 1];
 hax.XLim = [0 1];
 hax.XRuler.TickLabelGapOffset = -1.5;
 hax.YRuler.TickLabelGapOffset = 1;
-xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.11]);
+xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.06]);
 ylabel({'Replay coverage';'(counts)'}, 'Units','normalized', 'Position',[-0.1 .5]);
-title("Population: {\itn} = "+size(coverage_all,1)+" sessions",'Units','normalized','Position',[0.27 1.05],'FontWeight','normal');
+title("Population: {\itn} = "+size(coverage_all,1)+" sessions",'Units','normalized','Position',[0.5 0.9],'FontWeight','normal');
 
-%% panel G  - all seqs in a session (sleep)
-axes(panels{4}(1))
+%% panel E  - all seqs in a session (sleep)
+axes(panels{2}(1))
 hax=gca;
 cla
 hold on
@@ -326,10 +327,10 @@ hax.YRuler.TickLabelGapOffset = 1;
 xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.017]);
 ylabel('Replay event no.', 'Units','normalized', 'Position',[-0.06 .5]);
 title('Sleep replays', 'Units','normalized', 'Position',[0.47 0.99],'FontWeight','normal');
-text(1.1, 1.05, 'Example session: all individual replays','FontSize',9,'HorizontalAlignment','center','Units','normalized')
+text(1.043, 1.05, 'Example session: all individual replays','FontSize',7,'HorizontalAlignment','center','Units','normalized')
 
-%% Panel G - all seqs in a session (rest)
-axes(panels{4}(2))
+%% Panel E - all seqs in a session (rest)
+axes(panels{2}(2))
 hax=gca;
 cla
 hold on
@@ -365,7 +366,7 @@ cla reset
 hold on
 sleep_vs_rest_coverage_corr = ccc_all(:,:,1,2);
 sleep_vs_rest_coverage_corr = sleep_vs_rest_coverage_corr(:);
-h=histogram(sleep_vs_rest_coverage_corr,'FaceColor','k','Normalization','pdf');
+h=histogram(sleep_vs_rest_coverage_corr,'FaceColor',0.15*[1 1 1],'Normalization','pdf');
 h.BinWidth = panel_H_bin_size;
 h.BinLimits = [-1 1];
 nbins = 50;
@@ -377,7 +378,7 @@ nbins = 50;
 % h.NumBins = nbins;
 xi = linspace(-1,1,nbins);
 f = ksdensity(cat(1,ccc_shuffled{:}),xi,'Function','pdf');
-plot(xi,f,'k','LineWidth',1.5)
+plot(xi,f,'k','LineWidth',1)
 [~,P_KS, KS_stats] = kstest2(sleep_vs_rest_coverage_corr, cat(1,ccc_shuffled{:}));
 text(0.5,1.15,['{\itP}_{KS} = ' sprintf('%.2g',P_KS)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
 hax=gca;
@@ -392,6 +393,19 @@ hax.YRuler.TickLabelGapOffset = 1;
 hax.XTickLabelRotation = 0;
 xlabel({'Corr. of replay positions (r)';'sleep vs. awake'}, 'Units','normalized', 'Position',[0.5 -0.25]);
 ylabel({'Probability','density'}, 'Units','normalized', 'Position',[-0.08 .5]);
+
+%% add legend
+axes(panels{5}(2))
+cla reset
+hold on
+axis off
+axis equal
+patch([0 0 1 1],[0 1 1 0], 0.15*[1 1 1],'EdgeColor','k');
+plot([0 1],[1 1].*2, 'k-','LineWidth',1.5)
+text(1.5,0.5, 'Data','FontSize',7)
+text(1.5,2, 'Shuffle','FontSize',7)
+axis ij
+
 
 %% replay rate - PRE vs POST sleep
 axes(panels{6}(1))
@@ -576,8 +590,8 @@ for ii_epoch_type = 1:nEpochTypes
         hcb.Label.Rotation = -90;
         hcb.Label.Units = 'normalized';
         hcb.Label.Position = [1.3 0.5];
-        text(1.14,1,'Max','Units','normalized','FontSize',7,'HorizontalAlignment','center');
-        text(1.14,0,'0','Units','normalized','FontSize',7,'HorizontalAlignment','center');
+        text(1.14,1+0.03,'Max','Units','normalized','FontSize',7,'HorizontalAlignment','center');
+        text(1.14,0-0.03,'0','Units','normalized','FontSize',7,'HorizontalAlignment','center');
     end
 
 %     axes(panels{6}(ii_epoch_type,2))
@@ -643,7 +657,7 @@ ylabel('Fraction')
 % create legend
 w = 0.08*range(hax.XLim);
 h = 0.10*range(hax.YLim);
-x = hax.XLim(1)+0.15*range(hax.XLim);
+x = hax.XLim(1)+0.1*range(hax.XLim);
 y1 = hax.YLim(1)+0.9*range(hax.YLim);
 y2 = hax.YLim(1)+0.75*range(hax.YLim);
 rectangle(Position=[x y1 w h],FaceColor=hb(1).FaceColor);
@@ -669,20 +683,20 @@ axes(panels{1}(4))
 text(-0.2,1.12, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{2}(1))
-text(-0.1,1.3, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-axes(panels{3}(1))
-text(-0.1,1.18, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-axes(panels{4}(1))
 text(-0.25,1.035, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels{3}(1))
+text(-0.1,1.3, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels{4}(1))
+text(-0.1,1.18, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{5}(1))
 text(-0.3,1.2, 'h', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{6}(1))
-text(-0.35,1.2, 'i', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.85,1.2, 'i', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{7}(1))
 text(-0.6,1.2, 'j', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{8}(1))
-text(-0.4,1.2, 'k', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.45,1.2, 'k', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 
 

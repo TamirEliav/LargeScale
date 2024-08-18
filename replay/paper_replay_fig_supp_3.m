@@ -67,7 +67,7 @@ panels{1}(1) = axes('position', [2 y w h]);
 panels{1}(2) = axes('position', [3.1 y+2.2 0.5 0.5]);
 
 panels{2}(1) = axes('position', [7 y w h]);
-panels{2}(2) = axes('position', [7.3 y+3.2 0.5 0.4]);
+panels{2}(2) = axes('position', [7.3 y+3.4 0.5 0.4]);
 
 panels{3}(1) = axes('position', [12   y w h]);
 panels{3}(2) = axes('position', [12.3 y+2.8 0.5 0.5]);
@@ -236,6 +236,7 @@ ylabel('Replay speed (m/s)', 'Units','normalized', 'Position',[-0.17 .5]);
 hax=gca;
 hax.TickLength(1) = [0.016];
 hax.XRuler.TickLabelGapOffset = -1;
+hax.YLim(1) = 10;
 
 %% legend (speed correlations)
 axes(panels{2}(2))
@@ -244,7 +245,7 @@ hold on
 plot(0,1,'o', 'color', clrs{1}, 'MarkerSize',4,'Clipping','off');
 plot(0,0,'o', 'color', clrs{2}, 'MarkerSize',4,'Clipping','off');
 text(0.4, 1, 'Sleep'+":  {\itr} = " + sprintf('%.2f',r(1)) + ",  {\itP} = "+ sprintf('%.1g',p(1)),'FontSize',7,'HorizontalAlignment','left');
-text(0.4, 0, 'Awake'+":   {\itr} = " + sprintf('%.2f',r(2)) + ",  {\itP} = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left');
+text(0.4, 0.3, 'Awake'+":   {\itr} = " + sprintf('%.2f',r(2)) + ",  {\itP} = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left');
 xlim([0 1])
 ylim([0 1])
 axis off
@@ -317,9 +318,9 @@ hax.YRuler.TickLabelGapOffset = 0;
 scatters_features = {
     'compression','duration';
     'speed','duration';
+    'distance','duration';
     'compression','distance';
     'speed','distance';
-    'distance','duration';
     };
 fn_map = containers.Map();
 fn_map('compression') = 'Compression ratio';
@@ -364,7 +365,7 @@ end
 % hh=histogram(x,'Normalization','pdf','DisplayStyle','Stairs','BinWidth',IRI_bin_size,'EdgeColor','k');
 % hh.LineWidth = 2;
 xlim(IRI_bin_limits)
-xlabel('Inter-replay-interval (s)')
+xlabel('Inter-replay interval (s)')
 ylabel('Probability density')
 
 %% add legend
@@ -374,14 +375,15 @@ hold on
 axis off
 x = [0 1];
 y = [0 0];
-plot(x,y+1,'Color',epoch_type_clrs{1})
-plot(x,y+2,'Color',epoch_type_clrs{2})
+plot(x,y+1,'Color',epoch_type_clrs{1},'LineWidth',1.5)
+plot(x,y+2,'Color',epoch_type_clrs{2},'LineWidth',1.5)
 % plot(x,y+3,'Color','k')
 x = 1.2;
-text(x,1,'Sleep')
-text(x,2,'Awake')
+text(x,1,'Sleep','FontSize',7)
+text(x,2,'Awake','FontSize',7)
 % text(x,3,'Pooled')
 axis ij
+ylim([0.8 2.2])
 
 %% add panel letters
 font_size = 11;
@@ -390,13 +392,13 @@ text(-0.3,1.1, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_siz
 axes(panels{2}(1))
 text(-0.3,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
-text(-0.3,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.25,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{4}(1))
-text(-0.3,1.1, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.25,1.1, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{5}(1,1))
 text(-0.4,1.2, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{6}(1))
-text(-0.3,1.1, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.28,1.1, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);

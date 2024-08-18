@@ -21,8 +21,15 @@ replay_examples_options = [
 168  58  76  15  39 112 ... 
 177 109 113  62  51  41 ...
 193 228 131 257 253  83 ...
+;
+500 328 348 378 359 555 ...
+516 394 543 450 557 460 ...
+561 339 463 288 493 364 ...
+168  58  76 112  39  15 ... 
+177 109 113  41  51  62 ...
+193 228 131  83 253 257 ...
 ];
-replay_ex_opt = 2; 
+replay_ex_opt = 3; 
 replay_examples = replay_examples_list(replay_examples_options(replay_ex_opt,:))
 
 %% define output files
@@ -174,7 +181,7 @@ for ii_ex = 1:size(panels_ex,1)
     hax.TickLength = [0.02 0.02];
     hax.XRuler.TickLabelGapOffset = -4;
     rescale_plot_data('x',[1e-6 seq_ti(1)]);
-    text(0.5,1.01,sprintf('%d_%s_%s_%d',ex_num,epoch_type,exp_ID,event_num),'units','normalized','Interpreter','none','FontWeight','normal','FontSize',5,'HorizontalAlignment','center','VerticalAlignment','bottom');
+%     text(0.5,1.01,sprintf('%d_%s_%s_%d',ex_num,epoch_type,exp_ID,event_num),'units','normalized','Interpreter','none','FontWeight','normal','FontSize',5,'HorizontalAlignment','center','VerticalAlignment','bottom');
     
     %% plot posterior (position)
     axes(panels_ex(ii_ex,1));
@@ -203,8 +210,33 @@ for ii_ex = 1:size(panels_ex,1)
     end
     rescale_plot_data('x',[1e-6 seq_ti(1)]);
     
+    %% set manual adjustments to xlimits
+    switch ex_num
+        case 500
+            hax.XLim(1) = hax.XLim(1) - 0.010;
+        case 555
+            hax.XLim(1) = hax.XLim(1) - 0.010;
+        case 460
+            hax.XLim(1) = hax.XLim(1) - 0.010;
+        case 493
+            hax.XLim(1) = hax.XLim(1) - 0.010;
+        case 228
+            hax.XLim(2) = hax.XLim(2) + 0.010;
+        case 193
+            hax.XLim(1) = hax.XLim(1) - 0.020;
+            hax.XLim(2) = hax.XLim(2) + 0.020;
+        case 83
+            hax.XLim(2) = 0.3;
+    end
+    xlimits = hax.XLim;
+
+    %% workaround to fix the image occluding the axes
+    plot(hax.XLim([1 1]),hax.YLim,'k-')
+    plot(hax.XLim([2 2]),hax.YLim,'k-')
+
     %% link x axes
     linkaxes(panels_ex(ii_ex,:),'x');
+    xlim(xlimits); % make sure to set the xlim after manual changes
 
     %% add colorbar
     if ii_ex==size(panels{1},1)
@@ -238,10 +270,10 @@ end
 font_size = 11;
 axes(panels{1}(1,1,end));
 text(-0.5,3, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-text(-0.05,3, 'Sleep', 'Units','normalized','FontWeight','normal','FontSize',9);
+text(-0.05,3, 'Sleep replays', 'Units','normalized','FontWeight','normal','FontSize',9);
 axes(panels{1}(1,4,end));
 text(-0.5,3, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-text(-0.05,3, 'Awake', 'Units','normalized','FontWeight','normal','FontSize',9);
+text(-0.05,3, 'Awake replays', 'Units','normalized','FontWeight','normal','FontSize',9);
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, sprintf('%s',fig_name_str));

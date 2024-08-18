@@ -65,7 +65,7 @@ set(groot,  'defaultAxesTickDirMode', 'manual');
 annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 
 % create panels
-panels{1}(1) = axes('position', [2.7 20.3 4 3]);
+panels{1}(1) = axes('position', [2.9 20.3 4 3]);
 panels{2}(1) = axes('position', [8 20 5 3]);
 panels{3}(1) = axes('position', [14.8 20 3 3]);
 panels{3}(2) = axes('position', [14.8 23 3 .5]);
@@ -115,7 +115,7 @@ switch behavior_ex_opt
         ti_seconds_in_session = [5200 5600];
     case 2
         exp_ID = 'b2299_d191213';
-        ti_seconds_in_session = 5850 +[0 4*60]+[0.4 -0.1]; %[5850 6200];
+        ti_seconds_in_session = 5850 +[0 4*60]+[0.4 -0.1]+[0.35 -0.13].*60; %[5850 6200];
     case 3
         exp_ID = 'b2299_d191213';
         ti_seconds_in_session = [2900 3600];
@@ -166,8 +166,8 @@ hold on
 plot([0 0.1],[0.8 0.8],'-','LineWidth',lw);
 plot([0 0.1],[0.0 0.0],'-','LineWidth',1);
 plot(0.6,0.8,'xk','MarkerSize',8);
-plot([0.5 0.6]+0.05,[0 0],'-m','LineWidth',1.3);
-plot(0.65,0,'>m','MarkerSize',2,'MarkerFaceColor','m');
+plot([0.57 0.63],[0 0],'-k','LineWidth',1.);
+plot(0.57,0,'.k','MarkerSize',7);
 text(.15, .8, 'Recorded bat','FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
 text(.15, .0, 'Other bat','FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
 text(.7, .8, 'Cross-overs','FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
@@ -220,6 +220,7 @@ plot(prob_t, prob_state, 'k','LineWidth',2);
 hax = gca;
 hax.XLim = prob_t([1 end]);
 hax.YLim = [0 1];
+hax.XTickLabel = [];
 box on
 colormap(cmap);
 hax.XLim = seq_ti+[-1 1].*0.2*range(seq_ti);
@@ -253,6 +254,8 @@ hax.XRuler.TickLabelGapOffset = -2;
 xlabel('Time (s)','Units','normalized','Position',[0.5 -0.105]);
 ylabel('Position (m)','Units','normalized','Position',[-0.22 0.5]);
 rescale_plot_data('x',[1e-6 seq_ti(1)]);
+plot(hax.XLim([1 1]),hax.YLim,'k-')
+plot(hax.XLim([2 2]),hax.YLim,'k-')
 
 %% link x axes
 linkaxes(panels{3},'x');
@@ -644,18 +647,16 @@ hax.YRuler.TickLabelGapOffset = 1;
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1))
-text(-0.3,1.2, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.35,1.2, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{1}(2))
 axes(panels{2}(1))
 text(-0.2,1.3, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
 text(-0.38,1.3, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-% axes(panels{4}(1))
-% text(-1.1,1.15, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{5}(1,1))
-text(-0.35,1.15, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.35,1.15, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{5}(2,1))
-text(-0.35,1.15, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.35,1.15, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = sprintf('%s',fig_name_str);
