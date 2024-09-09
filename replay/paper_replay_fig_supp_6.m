@@ -215,7 +215,9 @@ hax.XLim = [min(xG) max(xG)] + [-1 1].*0.5;
 hax.XTick = xG;
 hax.XTickLabel = [];
 for ii=1:length(TakeLandCategoriesOrder)
-    text(ii, hax.YLim(1)-0.15*range(hax.YLim), {TakeLandCategoriesOrder{ii},'zone'},'HorizontalAlignment','center','FontSize',7)
+%     text(ii, hax.YLim(1)-0.15*range(hax.YLim), {TakeLandCategoriesOrder{ii},'zone'},'HorizontalAlignment','center','FontSize',7)
+    text(ii, hax.YLim(1)-0.085*range(hax.YLim), TakeLandCategoriesOrder{ii},'HorizontalAlignment','center','FontSize',7)
+    text(ii, hax.YLim(1)-0.18*range(hax.YLim), 'zone','HorizontalAlignment','center','FontSize',7)
 end
 
 %% takeoff vs landing - separated by balls
@@ -526,7 +528,9 @@ xticklabels()
 hax=gca;
 hax.XTickLabel = [];
 for ii=1:length(TakeLandCategoriesOrder)
-    text(x(ii), hax.YLim(1)-0.15*range(hax.YLim), {TakeLandCategoriesOrder{ii},'zone'},'HorizontalAlignment','center','FontSize',7)
+%     text(x(ii), hax.YLim(1)-0.15*range(hax.YLim), {TakeLandCategoriesOrder{ii},'zone'},'HorizontalAlignment','center','FontSize',7)
+    text(x(ii), hax.YLim(1)-0.085*range(hax.YLim), TakeLandCategoriesOrder{ii},'HorizontalAlignment','center','FontSize',7)
+    text(x(ii), hax.YLim(1)-0.18*range(hax.YLim), 'zone','HorizontalAlignment','center','FontSize',7)
 end
 
 ylabel('Fraction')

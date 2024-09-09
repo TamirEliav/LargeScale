@@ -486,7 +486,7 @@ for ii_ex = 1:length(seq_examples_list)
     yoffset_gain = 0.01.*range(ylimits);
     yoffset_gain = yoffset_gain*2; % opt 2
     yoffset = yoffset.*yoffset_gain;
-    scatter(x_all,y_all+yoffset,[], c_all, '|', 'LineWidth',.1, 'SizeData',spikes_tick_height);
+    scatter(x_all,y_all+yoffset,[], c_all, '|', 'LineWidth',.35, 'SizeData',spikes_tick_height);
     xlim(xlimits)
     ylim(ylimits)
     rescale_plot_data('x',[1e-6 xlimits(1)])
@@ -592,7 +592,7 @@ for ii_cell = 1:length(tuning_corr_cell_examples_list)
     x = cell.FR_map(ii_dir).all.bin_centers;
     y = cell.FR_map(ii_dir).all.PSTH;
     y = y./max(y);
-    plot(x,y,'k-','LineWidth',2.4);
+    plot(x,y,'k-','LineWidth',2);
     x = cell.replay_FR_map.replay_PSTH_all(ii_cat,ii_dir).bin_centers;
     y = cell.replay_FR_map.replay_PSTH_all(ii_cat,ii_dir).PSTH;
     y = y./max(y);
@@ -619,7 +619,7 @@ for ii_cell = 1:length(tuning_corr_cell_examples_list)
     if ii_cell == 5
         ylabel('Firing rate (norm.)','Units','normalized','position',[-0.1 2])
     end
-    if ii_cell == 4
+    if ii_cell == 2
         x = 100+[0 6];
         y = [0.8 1.05];
         plot(x,y([2 2]), 'k-','LineWidth', 3,'Clipping','Off');
@@ -643,9 +643,9 @@ histogram(x_shuffle,'EdgeColor','k','DisplayStyle','Stairs','normalization','pdf
 fprintf('FR corr distribution, data vs shuffle, ks-test: p=%g\n',P_KS);
 fprintf('FR corr distribution, data vs shuffle, t-test: p=%g\n',P_ttest);
 text(0.53,0.88,['{\itP}_{KS} = ' sprintf('%.2g',P_KS)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
-text(0.53,0.95,['{\itP}_{t} = ' sprintf('%.2g',P_ttest)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
+% text(0.53,0.95,['{\itP}_{t} = ' sprintf('%.2g',P_ttest)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
 xlim([-1 1])
-xlabel({'Correlation of firing rate maps (r)';'during flight vs. during replay'})
+xlabel({'Correlation of firing rate maps';'during flight vs. during replay'})
 ylabel('Probability density')
 hax=gca;
 hax.XRuler.TickLength(1) = 0.02;

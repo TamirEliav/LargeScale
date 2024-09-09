@@ -200,7 +200,7 @@ for ii_ex = 1:length(replay_directionality_bias_ex_exp_ID_list)
     end
     title_str = {
         sprintf('Example session #%d:', example_session_num_form_exposure); ...
-        'Over-representation of replay directionality'};
+        'over-representation of replay directionality'};
     text(-.2, 1.12, title_str,'FontSize',9,'HorizontalAlignment','center','Units','normalized')
 end
 
@@ -229,6 +229,8 @@ for ii_epoch_type = 1:length(epoch_types)+1
     end
     plot(xx,yy,'-','Color',c);
 end
+hax=gca;
+text(.5, 1.29, {'Replay directionality';'all sessions'},'FontSize',9,'HorizontalAlignment','center','Units','normalized')
 % legend
 x = [0.3 2]+32;
 y = linspace(0.35,0,3)+0.6;
@@ -238,7 +240,7 @@ plot(x,y(3)*[1 1],'Color',clrs{3},'LineWidth',1.5,'Clipping','off')
 x = x(end)+1;
 text(x,y(1), "Sleep", 'FontSize',7)
 text(x,y(2), "Awake", 'FontSize',7)
-text(x,y(3), "Pooled", 'FontSize',7)
+text(x,y(3), "Combined", 'FontSize',7)
 xlabel('Session no.','Units','normalized','Position',[0.5 -0.05]);
 ylabel('Replay directionality index')
 ylim([-1 1])
@@ -261,7 +263,7 @@ font_size = 11;
 axes(panels{1}(1))
 text(-0.3,1.1, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{2}(1))
-text(-0.3,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.25, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);

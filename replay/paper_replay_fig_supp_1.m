@@ -214,10 +214,10 @@ for ii_ex = 1:size(panels_ex,1)
     switch ex_num
         case 500
             hax.XLim(1) = hax.XLim(1) - 0.010;
-        case 555
-            hax.XLim(1) = hax.XLim(1) - 0.010;
-        case 460
-            hax.XLim(1) = hax.XLim(1) - 0.010;
+%         case 555
+%             hax.XLim(1) = hax.XLim(1) - 0.010;
+%         case 460
+%             hax.XLim(1) = hax.XLim(1) - 0.010;
         case 493
             hax.XLim(1) = hax.XLim(1) - 0.010;
         case 228

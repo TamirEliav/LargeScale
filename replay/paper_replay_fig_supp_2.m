@@ -267,9 +267,10 @@ for ii_ex = 1:length(replay_examples)
     rescale_plot_data('x',[1e-6 t0]);
     % axis off
     if ismember(ii_ex,[1 5])
-        ylabel({'Multiunit';'firing-rate';'(Hz)'}, 'Units','normalized', 'Position',[-0.12 .42]);
+        ylabel({'Multiunit';'firing-rate (Hz)'}, 'Units','normalized', 'Position',[-0.2 .42]);
     end
-    text(0.5, 1.15, titles_str{ii_ex}, ...
+    title_ypos = [1.15 1.15 1.15 1.15 1.3 1.3 1.3 1.35];
+    text(0.5, title_ypos(ii_ex), titles_str{ii_ex}, ...
         'Units','normalized','FontWeight','normal','FontSize',8,'HorizontalAlignment','center');
 %     text(0.5, 1.45, sprintf('%d_%s_%s_%d',ex_num,epoch_type,exp_ID,event_num),'Interpreter','none', ...
 %         'Units','normalized','FontWeight','normal','FontSize',6,'HorizontalAlignment','center');
@@ -285,7 +286,7 @@ for ii_ex = 1:length(replay_examples)
     rescale_plot_data('x',[1e-6 t0]);
     axis off
     if ismember(ii_ex,[1 5])
-        text(-0.06, .5, 'Ripple', 'Units','normalized','FontSize',7,'Rotation',90,'HorizontalAlignment','center','VerticalAlignment','middle');
+        text(-0.06, .5, 'Ripple', 'Units','normalized','FontSize',8.25,'Rotation',90,'HorizontalAlignment','center','VerticalAlignment','middle');
     end
     
     %% plot LFP (raw)
@@ -299,7 +300,7 @@ for ii_ex = 1:length(replay_examples)
     rescale_plot_data('x',[1e-6 t0]);
     axis off
     if ismember(ii_ex,[1 5])
-        text(-0.06, .5, 'SWR', 'Units','normalized','FontSize',7,'Rotation',90,'HorizontalAlignment','center','VerticalAlignment','middle');
+        text(-0.06, .5, 'SWR', 'Units','normalized','FontSize',8.25,'Rotation',90,'HorizontalAlignment','center','VerticalAlignment','middle');
     end
 
     %% plot posterior (state)
@@ -361,6 +362,7 @@ for ii_ex = 1:length(replay_examples)
     end
     
     %% workaround to fix the image occluding the axes
+    xlim(xlimits)
     plot(hax.XLim([1 1]),hax.YLim,'k-')
     plot(hax.XLim([2 2]),hax.YLim,'k-')
 

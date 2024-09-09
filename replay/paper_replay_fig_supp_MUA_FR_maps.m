@@ -82,7 +82,7 @@ for ii_dir = 1:2
     plot(x,mean(y,2),'-k','LineWidth',2)
     xlabel('Position (norm.)')
     ylabel('Multiunit firing rate (Hz)')
-    text(0.1,0.95,map_dir_str,'units','normalized','FontSize',8);
+    text(0.1,0.9,map_dir_str,'units','normalized','FontSize',8);
 
     axes(panels{1}(2,ii_dir));
     cla reset
@@ -94,7 +94,7 @@ for ii_dir = 1:2
     plot(x,mean(y,2),'-k','LineWidth',2)
     xlabel('Position (norm.)')
     ylabel('Multiunit firing rate (z)')
-    text(0.1,0.95,map_dir_str,'units','normalized','FontSize',8);
+    text(0.1,0.9,map_dir_str,'units','normalized','FontSize',8);
 end
 
 %% add panel letters

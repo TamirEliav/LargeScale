@@ -242,10 +242,10 @@ hax.YLim(1) = 10;
 axes(panels{2}(2))
 cla
 hold on
-plot(0,1,'o', 'color', clrs{1}, 'MarkerSize',4,'Clipping','off');
-plot(0,0,'o', 'color', clrs{2}, 'MarkerSize',4,'Clipping','off');
-text(0.4, 1, 'Sleep'+":  {\itr} = " + sprintf('%.2f',r(1)) + ",  {\itP} = "+ sprintf('%.1g',p(1)),'FontSize',7,'HorizontalAlignment','left');
-text(0.4, 0.3, 'Awake'+":   {\itr} = " + sprintf('%.2f',r(2)) + ",  {\itP} = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left');
+plot(0,1-0.05,'o', 'color', clrs{1}, 'MarkerSize',4,'Clipping','off');
+plot(0,0.3-0.05,'o', 'color', clrs{2}, 'MarkerSize',4,'Clipping','off');
+text(0.4, 1,   'Sleep'+":  {\itr} = " + sprintf('%.2f',r(1)) + ",  {\itP} = "+ sprintf('%.1g',p(1)),'FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
+text(0.4, 0.3, 'Awake'+": {\itr} = " + sprintf('%.2f',r(2)) + ",  {\itP} = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
 xlim([0 1])
 ylim([0 1])
 axis off
@@ -344,6 +344,15 @@ for ii_epoch_type = 1:length(epoch_types)
         hax=gca;
         hax.XRuler.TickLabelGapOffset = -1;
         hax.YRuler.TickLabelGapOffset = 1;
+        if ii_scatter==1
+            legend_strs = {'Sleep';'Awake'};
+            str = legend_strs{ii_epoch_type};
+            x = hax.XLim(1)+[0.5 0.65].*range(hax.XLim);
+            y = hax.YLim(1)+[0.8 0.8].*range(hax.YLim);
+            plot(x,y,'Color',epoch_type_clrs{ii_epoch_type},'LineWidth',1.5)
+%             plot(x(2),y(2),'.','Color',epoch_type_clrs{ii_epoch_type},'LineWidth',1.5)
+            text(x(2)+0.2*diff(x),y(1),str,'FontSize',7)
+        end
     end
 end
 

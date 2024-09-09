@@ -20,5 +20,5 @@ paper_replay_fig_supp_5     % EDF6 - novelty from day 1
 paper_replay_fig_supp_MUA_FR_maps % EDF7
 paper_replay_fig_supp_6     % EDF8 - reverse/forward + future+past + takeoff/landing/midair + ball1/ball2
 
-paper_replay_fig_supp_replay_directionality % EDF9
-paper_replay_fig_supp_7     % EDF10 - 2bats
+% paper_replay_fig_supp_replay_directionality % EDF9 --> move to main fig 5
+paper_replay_fig_supp_7     % EDF9 - 2bats

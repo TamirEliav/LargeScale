@@ -300,6 +300,7 @@ for ii_fn = 1:length(features_names)
         [G,ID] = findgroups(g);
         seqs = [events.seq_model];
         x = [seqs.(fn)];
+        m = 0;
         for ii = 1:length(ID)
             id = ID(ii);
             IX = G==id;
@@ -314,7 +315,10 @@ for ii_fn = 1:length(features_names)
             plot(xx([1 1]), xg_prctl([2 4]),'Color',c);
             plot(xx([2 2]), xg_prctl([2 4]),'Color',c);
             plot([ii ii], xg_prctl([1 5]),'Color',c);
+            m = max(m,xg_prctl(5));
         end
+        ylimits = [0 m*1.05];
+        ylim(ylimits)
 %         boxplot(x,g,'PlotStyle','traditional','BoxStyle','outline','Colors',epoch_type_clrs{ii_epoch_type},'Symbol','','Notch','off');
         box off
 %         ylim(boxplot_panels_ylimits(ii_fn,:))
@@ -333,6 +337,18 @@ for ii_fn = 1:length(features_names)
         end
         if ii_epoch_type == 2
             xlabel('Session no.','units','normalized','position',[0.5 -0.2])
+            if ii_fn==1
+                text(.5,-0.4,'(Day no.)','Units','normalized','FontSize',7.7,'HorizontalAlignment','center');
+            end
+        end
+        if ii_fn==1
+            legend_strs = {'Sleep';'Awake'};
+            str = legend_strs{ii_epoch_type};
+            x = hax.XLim(1)+[0.6 0.75].*range(hax.XLim);
+            y = hax.YLim(1)+[1.05 1.05].*range(hax.YLim);
+            plot(x,y,'Color',epoch_type_clrs{ii_epoch_type},'LineWidth',1.5,'Clipping','off');
+%             plot(x(2),y(2),'.','Color',epoch_type_clrs{ii_epoch_type},'LineWidth',1.5)
+            text(x(2)+0.2*diff(x),y(1),str,'FontSize',7)
         end
     end
 end

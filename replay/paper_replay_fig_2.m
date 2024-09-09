@@ -294,7 +294,7 @@ hax.XRuler.TickLabelGapOffset = -1.5;
 hax.YRuler.TickLabelGapOffset = 1;
 xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.06]);
 ylabel({'Replay coverage';'(counts)'}, 'Units','normalized', 'Position',[-0.1 .5]);
-title("Population: {\itn} = "+size(coverage_all,1)+" sessions",'Units','normalized','Position',[0.5 0.9],'FontWeight','normal');
+title("Population: {\itn} = "+size(coverage_all,1)+" sessions",'Units','normalized','Position',[0.5 0.85],'FontWeight','normal');
 
 %% panel E  - all seqs in a session (sleep)
 axes(panels{2}(1))
@@ -327,7 +327,7 @@ hax.YRuler.TickLabelGapOffset = 1;
 xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.017]);
 ylabel('Replay event no.', 'Units','normalized', 'Position',[-0.06 .5]);
 title('Sleep replays', 'Units','normalized', 'Position',[0.47 0.99],'FontWeight','normal');
-text(1.043, 1.05, 'Example session: all individual replays','FontSize',7,'HorizontalAlignment','center','Units','normalized')
+text(1.043, 1.05, 'Example session: all individual replays','FontSize',8.25,'HorizontalAlignment','center','Units','normalized')
 
 %% Panel E - all seqs in a session (rest)
 axes(panels{2}(2))
@@ -662,8 +662,8 @@ y1 = hax.YLim(1)+0.9*range(hax.YLim);
 y2 = hax.YLim(1)+0.75*range(hax.YLim);
 rectangle(Position=[x y1 w h],FaceColor=hb(1).FaceColor);
 rectangle(Position=[x y2 w h],FaceColor=hb(2).FaceColor);
-text(x+1.3*w,y1+h/2,'Past','HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
-text(x+1.3*w,y2+h/2,'Future','HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
+text(x+1.5*w,y1+h/2,'Past','HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
+text(x+1.5*w,y2+h/2,'Future','HorizontalAlignment','left','VerticalAlignment','middle','FontSize',7);
 
 % hl=legend(["past","Future"],'box','off','location','none')
 % hl.Units = hax.Units;
@@ -692,7 +692,7 @@ text(-0.1,1.18, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_si
 axes(panels{5}(1))
 text(-0.3,1.2, 'h', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{6}(1))
-text(-0.85,1.2, 'i', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.88,1.205, 'i', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{7}(1))
 text(-0.6,1.2, 'j', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{8}(1))
