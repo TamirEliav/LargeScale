@@ -65,6 +65,7 @@ uturn_directions(~TF) = [];
 uturns = struct();
 uturns.ts = pos.ts(U_turn_IX);
 uturns.pos = pos.pos(U_turn_IX);
+uturns.pos_norm = interp1(exp.rest.balls_loc, [0 1], uturns.pos, "linear");
 uturns.dir = uturn_directions;
 
 %% plot 
