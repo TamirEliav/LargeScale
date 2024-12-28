@@ -34,7 +34,7 @@ panel_H_bin_size = panel_H_bin_size_options(panel_H_bin_size_opt)
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_3';
+fig_name_str = 'Figure 3';
 fig_caption_str = ' ';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -294,7 +294,7 @@ hax.XRuler.TickLabelGapOffset = -1.5;
 hax.YRuler.TickLabelGapOffset = 1;
 xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.06]);
 ylabel({'Replay coverage';'(counts)'}, 'Units','normalized', 'Position',[-0.1 .5]);
-title("Population: {\itn} = "+size(coverage_all,1)+" sessions",'Units','normalized','Position',[0.5 0.85],'FontWeight','normal');
+title("Population: n = "+size(coverage_all,1)+" sessions",'Units','normalized','Position',[0.5 0.85],'FontWeight','normal');
 
 %% panel E  - all seqs in a session (sleep)
 axes(panels{2}(1))
@@ -380,7 +380,7 @@ xi = linspace(-1,1,nbins);
 f = ksdensity(cat(1,ccc_shuffled{:}),xi,'Function','pdf');
 plot(xi,f,'k','LineWidth',1)
 [~,P_KS, KS_stats] = kstest2(sleep_vs_rest_coverage_corr, cat(1,ccc_shuffled{:}));
-text(0.5,1.15,['{\itP}_{KS} = ' sprintf('%.2g',P_KS)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
+text(0.5,1.15,['P_{KS} = ' sprintf('%.2g',P_KS)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
 hax=gca;
 hax.XLim = [-1 1];
 hax.XTick = -1:0.5:1;
@@ -422,7 +422,7 @@ fprintf('pval (signrank test)= %.2g\n', pval );
 % replay_rate_diff_sleep = diff(replay_rate(:,[3 4]),1,2);
 % h=histogram(replay_rate_diff_sleep,'FaceColor','k','Normalization','pdf');
 % pval = signrank(replay_rate_diff_sleep);
-text(0.5,1.15,['{\itP}_{signrank} = ' sprintf('%.1g',pval)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
+text(0.5,1.15,['P_{signrank} = ' sprintf('%.1g',pval)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
 axis square
 axis equal
 hax=gca;
@@ -674,29 +674,29 @@ text(x+1.5*w,y2+h/2,'Future','HorizontalAlignment','left','VerticalAlignment','m
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1))
-text(-0.2,1.12, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.2,1.12, 'A', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{1}(2))
-text(-0.2,1.12, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.2,1.12, 'B', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{1}(3))
-text(-0.2,1.12, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.2,1.12, 'C', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{1}(4))
-text(-0.2,1.12, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.2,1.12, 'D', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{2}(1))
-text(-0.25,1.035, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.25,1.035, 'E', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
-text(-0.1,1.3, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.1,1.3, 'F', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{4}(1))
-text(-0.1,1.18, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.1,1.18, 'G', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{5}(1))
-text(-0.3,1.2, 'h', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.2, 'H', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{6}(1))
-text(-0.88,1.205, 'i', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.88,1.205, 'I', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{7}(1))
-text(-0.6,1.2, 'j', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.6,1.2, 'J', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{8}(1))
-text(-0.45,1.2, 'k', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.45,1.2, 'K', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 
 

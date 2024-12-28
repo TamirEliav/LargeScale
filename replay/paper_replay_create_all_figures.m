@@ -8,7 +8,7 @@ paper_replay_fig_1          % fig 1 - replay examples
 paper_replay_fig_2_new      % fig 2 - single units activity in replay
 paper_replay_fig_2          % fig 3 - population
                             % fig 4 - shir (short tunnel)
-paper_replay_fig_3          % fig 5 - 2 bats (behavioral relevance)
+paper_replay_fig_3          % fig 5 - directionality + 2 bats (behavioral relevance)
 
 % supp
 paper_replay_fig_supp_1     % EDF1 - many examples

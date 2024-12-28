@@ -35,7 +35,7 @@ end
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Extended_Data_Fig_8';
+fig_name_str = 'Figure S8';
 fig_caption_str = ' ';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -826,19 +826,19 @@ h.HeadLength = 5; h.HeadWidth = 8;
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1))
-text(-0.25,1.1, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.25,1.1, 'A', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{2}(1))
-text(-0.4,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.4,1.1, 'B', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
-text(-0.3,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.1, 'C', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{4}(1))
-text(-0.25,1.1, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.25,1.1, 'D', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{5}(1))
-text(-0.28,1.1, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.28,1.1, 'E', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{6}(1,1))
-text(-0.115,1.1, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.115,1.1, 'F', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{6}(2,1))
-text(-0.115,1.1, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.115,1.1, 'G', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %% add line titles
 % axes(panels{1}(1))

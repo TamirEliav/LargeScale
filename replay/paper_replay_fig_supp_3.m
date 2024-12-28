@@ -21,7 +21,7 @@ lw = 1.1;
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Extended_Data_Fig_3';
+fig_name_str = 'Figure S3';
 fig_caption_str = 'replay and flight speed histograms';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -227,8 +227,8 @@ for ii_epoch_type = 1:length(epoch_types)
     legend off
 %     plot(X,Y,'o','Color',clrs{ii_epoch_type},'MarkerSize',5);
     [r(ii_epoch_type) p(ii_epoch_type)] = corr(X, Y,'rows','pairwise','tail','right','type','Pearson');
-%     text(0.1,0.9, "{\itr} = "+ sprintf('%.2f',r), 'Units','normalized','FontSize',7);
-%     text(0.1,0.8, "{\itP} = "+ sprintf('%.3f',p), 'Units','normalized','FontSize',7,'FontWeight','normal');
+%     text(0.1,0.9, "r = "+ sprintf('%.2f',r), 'Units','normalized','FontSize',7);
+%     text(0.1,0.8, "P = "+ sprintf('%.3f',p), 'Units','normalized','FontSize',7,'FontWeight','normal');
 end
 title("")
 xlabel('Flight speed (m/s)', 'Units','normalized', 'Position',[0.5 -0.12]);
@@ -244,8 +244,8 @@ cla
 hold on
 plot(0,1-0.05,'o', 'color', clrs{1}, 'MarkerSize',4,'Clipping','off');
 plot(0,0.3-0.05,'o', 'color', clrs{2}, 'MarkerSize',4,'Clipping','off');
-text(0.4, 1,   'Sleep'+":  {\itr} = " + sprintf('%.2f',r(1)) + ",  {\itP} = "+ sprintf('%.1g',p(1)),'FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
-text(0.4, 0.3, 'Awake'+": {\itr} = " + sprintf('%.2f',r(2)) + ",  {\itP} = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
+text(0.4, 1,   'Sleep'+":  r = " + sprintf('%.2f',r(1)) + ",  P = "+ sprintf('%.1g',p(1)),'FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
+text(0.4, 0.3, 'Awake'+": r = " + sprintf('%.2f',r(2)) + ",  P = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
 xlim([0 1])
 ylim([0 1])
 axis off
@@ -267,7 +267,7 @@ hax.XTick = [0 5 10];
 hax.TickLength(1) = [0.016];
 hax.XRuler.TickLabelGapOffset = -1;
 [~,P,CI,STATS] = ttest2(X(g=='200m'), X(g=='120m'), 'Tail','both');
-text(0.6,1.1,"{\itP} = "+ sprintf('%.2g',P), 'Units','normalized','FontSize',7);
+text(0.6,1.1,"P = "+ sprintf('%.2g',P), 'Units','normalized','FontSize',7);
 
 %% legend (flight speed hists)
 axes(panels{3}(2))
@@ -397,17 +397,17 @@ ylim([0.8 2.2])
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1))
-text(-0.3,1.1, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.1, 'A', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{2}(1))
-text(-0.3,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.1, 'B', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
-text(-0.25,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.25,1.1, 'C', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{4}(1))
-text(-0.25,1.1, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.25,1.1, 'D', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{5}(1,1))
-text(-0.4,1.2, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.4,1.2, 'E', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{6}(1))
-text(-0.28,1.1, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.28,1.1, 'F', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);

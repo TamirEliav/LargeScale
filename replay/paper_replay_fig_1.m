@@ -46,7 +46,7 @@ flight_clr = 'r';
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_1';
+fig_name_str = 'Figure 1';
 fig_caption_str = ' ';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -366,7 +366,7 @@ hold on
 plot(err_CDF_edges, err_CDF,'LineWidth',0.3);
 shadedErrorBar(err_CDF_edges, err_CDF', {@mean,@nansem},'lineprops',{'k','linewidth',3});
 xlabel('Positional decoding error (m)','Units','normalized', Position=[0.5 -0.22]);
-title("{\itn} = "+size(err_CDF,2)+" sessions",'FontWeight','normal','Units','normalized','Position',[0.4 1.02]);
+title("n = "+size(err_CDF,2)+" sessions",'FontWeight','normal','Units','normalized','Position',[0.4 1.02]);
 grid on
 ylabel('Cumulative fraction','Units','normalized','Position',[-0.18 0.5]);
 hax.XScale = 'log';
@@ -678,29 +678,29 @@ end
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1));
-text(-0.08,1.12, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.08,1.12, 'A', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{2}(1));
-text(-0.55,1.12, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.55,1.12, 'B', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1));
-text(-0.5,1.17, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.5,1.17, 'C', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{4}(1))
-text(-0.42,1.17, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.42,1.17, 'D', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{5}(1))
-text(-0.35,1.17, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.35,1.17, 'E', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{6}(1,1,end));
-text(-0.5,1.9, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.5,1.9, 'F', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 text(-0.05,1.9, 'Sleep replays', 'Units','normalized','FontWeight','normal','FontSize',9);
 axes(panels{6}(1,2,end));
-text(-0.5,1.9, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.5,1.9, 'G', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 text(-0.05,1.9, 'Awake replays', 'Units','normalized','FontWeight','normal','FontSize',9);
 
 axes(panels{7}(1,1))
-text(-0.28,1.05, 'h', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.28,1.05, 'H', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{7}(2,1))
-text(-0.28,1.05, 'i', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.28,1.05, 'I', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{8}(1))
-text(-0.3,1.07, 'j', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.07, 'J', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %% print/save the figure
 fig_name_out = fullfile(res_dir, sprintf('%s_%s',fig_name_str,err_dist_normalization));

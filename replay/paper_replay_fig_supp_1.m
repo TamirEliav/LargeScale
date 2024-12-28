@@ -35,7 +35,7 @@ replay_examples = replay_examples_list(replay_examples_options(replay_ex_opt,:))
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Extended_Data_Fig_1';
+fig_name_str = 'Figure S1';
 fig_caption_str = ' ';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -269,10 +269,10 @@ end
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1,1,end));
-text(-0.5,3, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.5,3, 'A', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 text(-0.05,3, 'Sleep replays', 'Units','normalized','FontWeight','normal','FontSize',9);
 axes(panels{1}(1,4,end));
-text(-0.5,3, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.5,3, 'B', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 text(-0.05,3, 'Awake replays', 'Units','normalized','FontWeight','normal','FontSize',9);
 
 %% print/save the figure

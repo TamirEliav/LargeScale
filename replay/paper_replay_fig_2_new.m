@@ -71,7 +71,7 @@ spikes_tick_height = 10;
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_2';
+fig_name_str = 'Figure 2';
 fig_caption_str = 'single unit activity during replays';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -642,8 +642,8 @@ histogram(x_shuffle,'EdgeColor','k','DisplayStyle','Stairs','normalization','pdf
 [~,P_ttest, ~, ttest_stats] = ttest2(x, x_shuffle);
 fprintf('FR corr distribution, data vs shuffle, ks-test: p=%g\n',P_KS);
 fprintf('FR corr distribution, data vs shuffle, t-test: p=%g\n',P_ttest);
-text(0.53,0.88,['{\itP}_{KS} = ' sprintf('%.2g',P_KS)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
-% text(0.53,0.95,['{\itP}_{t} = ' sprintf('%.2g',P_ttest)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
+text(0.53,0.88,['P_{KS} = ' sprintf('%.2g',P_KS)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
+% text(0.53,0.95,['P_{t} = ' sprintf('%.2g',P_ttest)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
 xlim([-1 1])
 xlabel({'Correlation of firing rate maps';'during flight vs. during replay'})
 ylabel('Probability density')
@@ -668,18 +668,18 @@ axis ij
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1))
-text(-0.08,1.0, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.08,1.0, 'A', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{2}(1,1))
-text(-0.26,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.26,1.1, 'B', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{2}(2,1))
-text(-0.26,1.1, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.26,1.1, 'C', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{3}(1,1))
-text(-0.17,1.12, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.17,1.12, 'D', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{4}(1))
-text(-0.2,1.1, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.2,1.1, 'E', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = sprintf('%s_ex_1_FE_%d_ex_2_FE_%d', ...

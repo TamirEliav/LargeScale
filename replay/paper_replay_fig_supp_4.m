@@ -28,7 +28,7 @@ panels_xticks = {[0 0.5 1 1.5],[0 20 40],[0:25:50],[0 0.2 0.4]};
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Extended_Data_Fig_4';
+fig_name_str = 'Figure S4';
 fig_caption_str = ' per bat results';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -247,8 +247,8 @@ for ii_bat = 1:nBats
     text(-1.9, .5, { ...
         "bat "+T2.bat_num(ii_bat); ...
         T2.recordingArena{ii_bat}; ...
-        "{\itn}_{sessions} = " + T2.GroupCount(ii_bat); ...
-        "{\itn}_{events} = " + T2.nEvents(ii_bat); ...
+        "n_{sessions} = " + T2.GroupCount(ii_bat); ...
+        "n_{events} = " + T2.nEvents(ii_bat); ...
         },'FontSize',7,'HorizontalAlignment','center','Units','normalized','FontWeight','bold');
 end
 
@@ -340,8 +340,8 @@ axes(panels{1}(end,1));
 text(-1.1, .5, { ...
     "bat 2299"; ...
     "135m, 2 bats"; ...
-    "{\itn}_{sessions} = " + length(exp_list_2bats); ...
-    "{\itn}_{events} = " + length(bat_seqs); ...
+    "n_{sessions} = " + length(exp_list_2bats); ...
+    "n_{events} = " + length(bat_seqs); ...
     },'FontSize',7,'HorizontalAlignment','center','Units','normalized','FontWeight','bold');
 
 
@@ -371,28 +371,28 @@ xlabel('Position (norm.)', 'Units','normalized', 'Position',[0.5 -0.11]);
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1,1))
-text(-0.3,1.3, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.3, 'A', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{1}(1,2))
-text(-0.3,1.3, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.3, 'B', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{1}(1,3))
-text(-0.3,1.3, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.3, 'C', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{1}(1,4))
-text(-0.3,1.3, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.3, 'D', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{2}(1))
-text(-0.1,1.3, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.1,1.3, 'E', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{1}(end,1))
-text(-0.3,1.3, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.3, 'F', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{1}(end,2))
-text(-0.3,1.3, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.3, 'G', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{1}(end,3))
-text(-0.3,1.3, 'h', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.3, 'H', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{1}(end,4))
-text(-0.3,1.3, 'i', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.3, 'I', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{2}(end))
-text(-0.1,1.3, 'j', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.1,1.3, 'J', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);

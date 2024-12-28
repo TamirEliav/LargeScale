@@ -33,7 +33,7 @@ smooth_n_points = 19;
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Fig_5';
+fig_name_str = 'Figure 5';
 fig_caption_str = ' ';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -506,11 +506,11 @@ xticks(linspace(0,135,4))
 yticks(linspace(0,135,4))
 xlabel('Previous cross-over position (m)', 'Units','normalized', 'Position',[0.5 -0.16]);
 ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.2 .5]);
-% text(0.8,0.3,"{\itn} = "+ data.stats.n,'Units','normalized','FontSize',9);
-% text(0.6,0.2,"{\itr} = "+ sprintf('%.2g',data.stats.Pearson.r), 'Units','normalized','FontSize',7);
-% text(0.6,0.1,"{\itP} = "+ sprintf('%.2g',data.stats.Pearson.p), 'Units','normalized','FontSize',7);
-text(.3,1.2,"{\it\rho} = "+ sprintf('%.2f',data.stats.Spearman.r), 'Units','normalized','FontSize',7);
-text(.3,1.1,"{\itP} = "+ sprintf('%.2g',data.stats.Spearman.p), 'Units','normalized','FontSize',7);
+% text(0.8,0.3,"n = "+ data.stats.n,'Units','normalized','FontSize',9);
+% text(0.6,0.2,"r = "+ sprintf('%.2g',data.stats.Pearson.r), 'Units','normalized','FontSize',7);
+% text(0.6,0.1,"P = "+ sprintf('%.2g',data.stats.Pearson.p), 'Units','normalized','FontSize',7);
+text(.3,1.2,"{\rho} = "+ sprintf('%.2f',data.stats.Spearman.r), 'Units','normalized','FontSize',7);
+text(.3,1.1,"P = "+ sprintf('%.2g',data.stats.Spearman.p), 'Units','normalized','FontSize',7);
 % text(.3,1.3,"{\itn} = "+ sprintf('%d',sum(data.TF)), 'Units','normalized','FontSize',7);
 % text(0,-.4,data.msg_str, 'Units','normalized','FontSize',10);
 h=refline(1,0);
@@ -539,11 +539,11 @@ xticks(linspace(0,135,4))
 yticks(linspace(0,135,4))
 xlabel('Next cross-over position (m)', 'Units','normalized', 'Position',[0.5 -0.16]);
 ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.2 .5]);
-% text(0.8,0.3,"{\itn} = "+ data.stats.n,'Units','normalized','FontSize',9);
-% text(0.8,0.2,"{\itr} = "+ sprintf('%.2g',stats.Pearson.r), 'Units','normalized','FontSize',7);
-% text(0.8,0.1,"{\itP} = "+ sprintf('%.2g',stats.Pearson.p), 'Units','normalized','FontSize',7);
-text(.3,1.2,"{\it\rho} = "+ sprintf('%.2f',stats.Spearman.r), 'Units','normalized','FontSize',7);
-text(.3,1.1,"{\itP} = "+ sprintf('%.2f',stats.Spearman.p), 'Units','normalized','FontSize',7);
+% text(0.8,0.3,"n = "+ data.stats.n,'Units','normalized','FontSize',9);
+% text(0.8,0.2,"r = "+ sprintf('%.2g',stats.Pearson.r), 'Units','normalized','FontSize',7);
+% text(0.8,0.1,"P = "+ sprintf('%.2g',stats.Pearson.p), 'Units','normalized','FontSize',7);
+text(.3,1.2,"{\rho} = "+ sprintf('%.2f',stats.Spearman.r), 'Units','normalized','FontSize',7);
+text(.3,1.1,"P = "+ sprintf('%.2f',stats.Spearman.p), 'Units','normalized','FontSize',7);
 h=refline(1,0);
 h.Color = .8.*[1 1 1];
 hax=gca;
@@ -555,21 +555,21 @@ hax.YRuler.TickLabelGapOffset = 1;
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1))
-text(-0.3,1.1, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.1, 'A', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{2}(1))
-text(-0.3,1.25, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.25, 'B', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{3}(1))
-text(-0.17,1.2, 'c', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.17,1.2, 'C', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(2))
 axes(panels{4}(1))
-text(-0.2,1.3, 'd', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.2,1.3, 'D', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{5}(1))
-text(-0.38,1.3, 'e', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.38,1.3, 'E', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{6}(1,1))
-text(-0.35,1.15, 'f', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.35,1.15, 'F', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{6}(2,1))
-text(-0.35,1.15, 'g', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.35,1.15, 'G', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = sprintf('%s',fig_name_str);

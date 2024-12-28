@@ -26,7 +26,7 @@ epoch_types_str = {'Sleep','Awake'};
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Extended_Data_Fig_6';
+fig_name_str = 'Figure S6';
 fig_caption_str = 'Novelty effects';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -197,7 +197,7 @@ for ii_EL = 1:length(early_late_IX)
             seqs = [events.seq_model];
             X = [seqs.(fn)];
             hh(ii_epoch_type) = histogram(X,'DisplayStyle','stairs','Normalization','pdf','EdgeColor',epoch_type_clrs{ii_epoch_type},'LineWidth',lw,'BinWidth',panels_bin_size(ii_fn));
-            text(0.5,0.9-ii_epoch_type*0.14, "{\itn}_{" + epoch_types_str{ii_epoch_type} + "} = "+length(X),'units','normalized','FontSize',7)
+            text(0.5,0.9-ii_epoch_type*0.14, "n_{" + epoch_types_str{ii_epoch_type} + "} = "+length(X),'units','normalized','FontSize',7)
         end
         linkprop(hh,'BinEdges');
         xlim(panels_xlim(ii_fn,:))
@@ -358,9 +358,9 @@ end
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1,1))
-text(-0.3,1.2, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.3,1.2, 'A', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
-text(-0.4,1.1, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.4,1.1, 'B', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 % fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);

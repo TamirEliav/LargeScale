@@ -12,7 +12,7 @@ close all
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Extended_Data_Fig_7';
+fig_name_str = 'Figure S7';
 fig_caption_str = 'MUA_FR_maps';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -100,9 +100,9 @@ end
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1,1))
-text(-0.08,1.15, 'a', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.08,1.15, 'A', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{1}(2,1))
-text(-0.08,1.15, 'b', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.08,1.15, 'B', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = sprintf('%s',fig_name_str);
