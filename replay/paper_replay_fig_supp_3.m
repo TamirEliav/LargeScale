@@ -84,6 +84,8 @@ end
 
 panels{6}(1) = axes('position', [2 7 4 3.5]);
 panels{6}(2) = axes('position', [4 9 .5 .5]);
+panels{7}(1) = axes('position', [8 7 6 3.5]);
+panels{7}(2) = axes('position', [16 7 4 3.5]);
 
 %% load data
 if ~exist('events_all','var')
@@ -394,6 +396,73 @@ text(x,2,'Awake','FontSize',7)
 axis ij
 ylim([0.8 2.2])
 
+%% load and prepare data - full continuous flights vs short replays
+load('L:\processed_data_structs\replay_events.mat');
+FE_dist_norm_all = {};
+nUturnsPerSession = [];
+nFlightsPerSession = [];
+for ii_exp = 1:length(exp_list)
+    exp_ID = exp_list{ii_exp};
+    exp = exp_load_data(exp_ID,'flight','uturns','rest');
+    L = diff(exp.rest.balls_loc);
+    FE_dist = [exp.flight.FE.distance];
+    FE_dist_norm = FE_dist / L;
+    FE_dist_norm(FE_dist_norm>1)=1;
+    FE_dist_norm_all{ii_exp} = FE_dist_norm;
+    TF = exp.uturns.pos_norm > 0.05 & exp.uturns.pos_norm < 0.95;
+    nUturnsPerSession(ii_exp) = sum(TF);
+%     nUturnsPerSession(ii_exp) = length(exp.uturns.pos);
+    nFlightsPerSession(ii_exp) = length(FE_dist_norm);
+end
+events = [events_all_per_session{:}];
+seqs = [events.seq_model];
+
+%% plot
+axes(panels{7}(1));
+cla reset
+hold on
+hax=gca;
+hax.ColorOrder = hax.ColorOrder(1:2,:);
+bins = linspace(0,1,101);
+lw = 1.5;
+histogram([FE_dist_norm_all{:}],bins,'normalization','probability','DisplayStyle','stairs','DisplayName','flights','LineWidth',lw);
+hold on
+histogram([seqs.distance_norm],bins,'normalization','probability','DisplayStyle','stairs','DisplayName','replays','LineWidth',lw)
+% legend(Location="north")
+xlabel('Distance (norm.)')
+ylabel('probability')
+plot([0.04 0.11],[1 1]*0.65,'LineWidth',lw);
+plot([0.04 0.11],[1 1]*0.6,'LineWidth',lw);
+text(0.14, 0.65, 'Flights','FontSize',7)
+text(0.14, 0.6, 'Replays','FontSize',7)
+ylim([0 0.65]);
+ha = annotation("arrow",[0 0], [0 0]);
+ha.Parent = hax;
+m = median([FE_dist_norm_all{:}]);
+ha.X = [1 1]*m;
+ha.Y = [0 -0.04]+0.59;
+ha.HeadLength = 3;
+ha.HeadWidth = 3;
+ha.HeadStyle = 'cback2';
+text(0.97, 0.58, {'Median flight distance';sprintf(' = %.f%% of tunnel',m*100)},'FontSize',7,'HorizontalAlignment','right')
+ha = annotation("arrow",[0 0], [0 0]);
+ha.Parent = hax;
+m = median([seqs.distance_norm]);
+ha.X = [1 1]*m;
+ha.Y = [0 -0.04]+0.21;
+ha.HeadLength = 3;
+ha.HeadWidth = 3;
+ha.HeadStyle = 'cback2';
+text(0.1, 0.2, {'Median replay distance';sprintf('= %.1g%% of tunnel',m*100)},'FontSize',7,'HorizontalAlignment','left')
+
+axes(panels{7}(2));
+cla reset
+histogram(nUturnsPerSession./nFlightsPerSession,10,'Normalization','probability');
+xlim([0 1])
+xlabel('No. of u-turns per flight')
+ylabel('Fraction of sessions')
+
+
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1))
@@ -408,6 +477,10 @@ axes(panels{5}(1,1))
 text(-0.4,1.2, 'E', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{6}(1))
 text(-0.28,1.1, 'F', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels{7}(1))
+text(-0.2,1.1, 'G', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+axes(panels{7}(2))
+text(-0.28,1.1, 'H', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);
