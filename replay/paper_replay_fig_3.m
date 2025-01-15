@@ -1,4 +1,4 @@
-%% Replay - Fig 5 - 2 bats crossovers
+%% Replay - Fig 5 - 2 bats crossovers + replay directionality (behavioral relevance)
 %%
 clear 
 clc
@@ -7,7 +7,6 @@ close all
 %% plotting options
 params_opt = 11; % decoding opt 
 novelty_session_num_thr = 5;
-minSeqsThr = 30;
 
 behavior_ex_opt = 2 % number 2 was chosen
 
@@ -33,7 +32,7 @@ smooth_n_points = 19;
 %% define output files
 res_dir =  'L:\paper_replay\figures';
 mkdir(res_dir)
-fig_name_str = 'Figure 5';
+fig_name_str = 'Figure_5';
 fig_caption_str = ' ';
 log_name_str = [fig_name_str '_log_file' '.txt'];
 log_name_str = strrep(log_name_str , ':', '-');
@@ -75,6 +74,7 @@ annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment',
 panels{1}(1,1) = axes('position', [2 15 3.5 8]);
 panels{1}(1,2) = axes('position', [6.5 15 3.5 8]);
 panels{2}(1) = axes('position', [12 19.4 4 3.5]);
+% panels{2}(2) = axes('position', [12 15 4 3]);
 panels{3}(1) = axes('position', [11.5 15 4 3]);
 panels{3}(2) = axes('position', [11.5 17.6 .2 .3]);
 panels{4}(1) = axes('position', [2 9.5 5 3]);
@@ -84,40 +84,57 @@ panels{5}(2) = axes('position', [8.8 12.5 3 .5]);
 panels{6}(1,1) = axes('position', [2 4.5 3 3]);
 panels{6}(2,1) = axes('position', [6.5 4.5 3 3]);
 
-
-
 %% ========================================================================
 %% arrange sessions to load (novelty bats)
 [exp_list,T] = decoding_get_inclusion_list();
 T = T(exp_list,:);
-novelty_exposure_bats = [184 2382];
-novelty_exposure_bats_first_session = {'b0184_d191127','b2382_d190623'};
-bat_novelty_session_mapping = containers.Map(novelty_exposure_bats,novelty_exposure_bats_first_session);
-TF_novelty_bats = ismember(T.bat_num, novelty_exposure_bats);
+% novelty_exposure_bats = [184 2382];
+bats = unique(T.bat_num);
+bats_colors = [1 0 0; 0 1 0; 0 0 1; 0 0 0; 1 0 1; 0 1 1; 0.8 0.8 0];
+bats_clr_map = containers.Map(num2cell(bats),num2cell(bats_colors,2));
+% novelty_exposure_bats_first_session = {'b0184_d191127','b2382_d190623'};
+% bats_list = [34 148 194 2289 9861 184 2382];
+% num_training_sessions = [6 11 20 13 11 0 0];
+% first_rec_sessions = {'b0034_d180227', 'b0148_d170605', 'b0194_d180429', 'b2289_d180514', 'b9861_d180519', 'b0184_d191127','b2382_d190623'};
+% % bat_novelty_session_mapping = containers.Map(novelty_exposure_bats,novelty_exposure_bats_first_session);
+% bat_num_training_sessions_mapping = containers.Map(bats_list, num_training_sessions);
+% bat_first_rec_exp_ID_mapping = containers.Map(bats_list, first_rec_sessions);
+% TF_novelty_bats = ismember(T.bat_num, novelty_exposure_bats);
 
-%% get session number (from exposure)
+%% get session number (from exposure) - old
+% exp_summary_t = DS_get_exp_summary();
+% exp_summary_t(~ismember(exp_summary_t.batNum, bats_list),:)=[];
+% for ii_exp = 1:height(exp_summary_t)
+%     exp = exp_summary_t(ii_exp,:);
+%     num_training_sessions = bat_num_training_sessions_mapping(exp.batNum);
+%     first_rec_exp_ID = bat_first_rec_exp_ID_mapping(exp.batNum);
+%     first_rec_date = exp_summary_t.date(first_rec_exp_ID);
+%     TF = exp_summary_t.batNum ==exp.batNum &...
+%         exp_summary_t.date >= first_rec_date &...
+%         exp_summary_t.date <= exp.date;
+%     session_num = sum(TF) + num_training_sessions;
+%     exp_summary_t{ii_exp,'session_num_from_exposure'} = session_num;
+% end
+% T = innerjoin(T,exp_summary_t,'Keys','exp_ID');
+
+%% get session number (from exposure) - corrected
 exp_summary_t = DS_get_exp_summary();
+exp_summary_t(~ismember(exp_summary_t.batNum, bats),:)=[];
+training_filename = "L:\Analysis\Code\inclusion_lists\training_history_per_bat.xlsx";
 for ii_exp = 1:height(exp_summary_t)
     exp = exp_summary_t(ii_exp,:);
-    if any(exp.batNum == novelty_exposure_bats)
-        exposure_exp_ID = bat_novelty_session_mapping(exp.batNum);
-        exposure_date = exp_summary_t.date(exposure_exp_ID);
-        TF = exp_summary_t.batNum ==exp.batNum &...
-            exp_summary_t.date >= exposure_date &...
-            exp_summary_t.date <= exp.date;
-        session_num = sum(TF);
-    else
-        session_num = nan;
-    end
-    exp_summary_t{ii_exp,'session_num_from_exposure'} = session_num;
+    T2 = readtable(training_filename,'Sheet',num2str(exp.batNum));
+    surgery_date = T2.date(ismember(T2.comments,'surgery'));
+    exp_summary_t{ii_exp,'session_num_from_exposure'} = sum(T2.long_flight_session == 1 & T2.date <= exp.date);
+    exp_summary_t{ii_exp,'session_num_from_surgery'} = sum(T2.long_flight_session == 1 & T2.date <= exp.date & T2.date > surgery_date);
 end
 T = innerjoin(T,exp_summary_t,'Keys','exp_ID');
 
 %% arrange to early and late sessions
-early_days_IX = find(T.session_num_from_exposure <= novelty_session_num_thr);
-late_days_IX = find(T.session_num_from_exposure > novelty_session_num_thr);
-early_late_IX = {early_days_IX,late_days_IX};
-exp_list = T.exp_ID;
+% early_days_IX = find(T.session_num_from_exposure <= novelty_session_num_thr);
+% late_days_IX = find(T.session_num_from_exposure > novelty_session_num_thr);
+% early_late_IX = {early_days_IX,late_days_IX};
+% exp_list = T.exp_ID;
 
 %% load data
 events_all_per_session = {};
@@ -147,9 +164,16 @@ for ii_epoch_type = 1:length(epoch_types)
 end
 
 %% replay directionality bias - calc
+if ~exist('directionality_contrast_index','var')
+minSeqsThr = 20;
+resampling_n = 20;
+nrep = 1000;
 directionality_contrast_index = [];
 directionality_fraction = [];
 directionality_binom_pval = [];
+directionality_binom_surprise = [];
+directionality_binom_surprise2 = nan(length(epoch_types)+1, length(exp_list));
+directionality_binom_surprise2_sem = nan(length(epoch_types)+1, length(exp_list));
 nSeqs = [];
 for ii_epoch_type = 1:length(epoch_types)+1
     for ii_exp = 1:length(exp_list)
@@ -166,17 +190,41 @@ for ii_epoch_type = 1:length(epoch_types)+1
         n1 = sum([seqs.direction]==-1);
         n2 = sum([seqs.direction]==1);
         directionality_contrast_index(ii_epoch_type,ii_exp) = (n1-n2)/(n1+n2);
-        directionality_fraction(ii_epoch_type,ii_exp) = (n1)/(n1+n2);
+        directionality_fraction(ii_epoch_type,ii_exp) = (n1)/(n1+n2) .* sign(n1-n2);
         binom_pval = myBinomTest(n1,n1+n2,0.5);
+        binom_pval(binom_pval==0) = realmin;
         directionality_binom_pval(ii_epoch_type,ii_exp) = binom_pval;
-        directionality_binom_surprise(ii_epoch_type,ii_exp) = -log10(binom_pval);
+        directionality_binom_surprise(ii_epoch_type,ii_exp) = -log10(binom_pval) .* sign(n1-n2);
         nSeqs(ii_epoch_type,ii_exp) = length(seqs);
+        if length(seqs)>=resampling_n
+            sdf=zeros(1,nrep);
+            for ii=1:nrep
+                IX = randperm(length(seqs),resampling_n);
+                n1 = sum([seqs(IX).direction]==-1);
+                n2 = sum([seqs(IX).direction]==1);
+                sdf(ii) = sign(n1-n2) * -log10(myBinomTest(n1,n1+n2,0.5));
+            end
+            directionality_binom_surprise2(ii_epoch_type,ii_exp) = nanmedian(sdf);
+        end
     end
 end
 directionality_vals = cat(3,directionality_contrast_index,directionality_fraction,directionality_binom_pval,directionality_binom_surprise);
 directionality_labels = {'contrast index','fraction','binom pval','binom surprise'};
 % bat_sym_map = containers.Map(num2cell([184;2382]),{'+','x'});
+end
 
+%% save replay directionality results
+filename = fullfile(res_dir, 'replay_directionality');
+save(filename, ...
+    "directionality_contrast_index", ...
+    "directionality_fraction", ...
+    "directionality_binom_pval", ...
+    "directionality_binom_surprise", ...
+    "directionality_binom_surprise2", ...
+    "directionality_binom_surprise2_sem", ...
+    "nSeqs","epoch_types", ...
+    "minSeqsThr","resampling_n","nrep", ...
+    "bats","bats_clr_map","T");
 
 %% replay directionality bias - example session
 % replay_directionality_bias_ex_exp_ID_list = {'b0184_d191129','b0184_d191130'};
@@ -225,48 +273,72 @@ for ii_ex = 1:length(replay_directionality_bias_ex_exp_ID_list)
         sprintf('Example session #%d:', example_session_num_form_exposure); ...
         'over-representation of replay directionality'};
     text(-.2, 1.12, title_str,'FontSize',9,'HorizontalAlignment','center','Units','normalized')
+    for ii_dir = 1:2
+        arrow_str = {'\rightarrow','\leftarrow'};
+        arrow_offset_y = [0.02 0];
+        text(-0.4, 0.99+arrow_offset_y(ii_dir), arrow_str{ii_dir},'Color',directions_clrs{ii_dir},'FontWeight','bold', 'FontSize',10,'Units','normalized');
+    end
+    
 end
 
 %% replay directionality bias - plot trend over exposure to enviroenment
-axes(panels{2}(1));
-cla reset
-hold on
 clrs = [epoch_type_clrs,'k'];
-for ii_epoch_type = 1:length(epoch_types)+1
-    c = clrs{ii_epoch_type};
-%         sym = arrayfun(@(bat_num)bat_sym_map(bat_num),T.bat_num,'UniformOutput',false);
+surprise_clipping = 50;
+for ii_epoch_type = 3%1:length(epoch_types)
+    axes(panels{2}(1));
+    cla reset
+    hold on
+    yline(0,'-k');
+%     c = clrs{ii_epoch_type};
     x = T.session_num_from_exposure;
-    y = directionality_contrast_index(ii_epoch_type,:);
+    y = directionality_binom_surprise(ii_epoch_type,:);
+%     y(~ismember(T.batNum,novelty_exposure_bats)) = nan;
     y(nSeqs(ii_epoch_type,:)<minSeqsThr) = nan;
-    g = findgroups(T.bat_num);
-    hs = gscatter(x,y,g,c,'ox',4,false);
-    nPointsSmooth = 3;
-    k = (nPointsSmooth-1)/2;
-    xi = [-1 1].*k + [(1-k):(max(x)+k)]';
-    xx=[];
-    yy=[];
-    for ii_xi = 1:size(xi,1)
-        TF = x>=xi(ii_xi,1) & x<=xi(ii_xi,2);
-        xx(ii_xi) = nanmedian(x(TF));
-        yy(ii_xi) = nanmedian(y(TF));
+    y(y>surprise_clipping) = surprise_clipping;
+   y(y<-surprise_clipping) = -surprise_clipping;
+   ylimits = [-1 1]*surprise_clipping;
+    for ii_bat = 1:length(bats)
+        bat_num = bats(ii_bat);
+        c = bats_clr_map(bat_num);
+        IX = T.bat_num==bat_num;
+        xx = x(IX);
+        yy = y(IX);
+        invalid = isnan(yy);
+        xx(invalid) = [];
+        yy(invalid) = [];
+        plot(xx,yy,'o-','color',c,'DisplayName',"bat "+bat_num,'MarkerFaceColor',c,'MarkerSize',2);
     end
-    plot(xx,yy,'-','Color',c);
+
+%     nPointsSmooth = 3;
+%     k = (nPointsSmooth-1)/2;
+%     xi = [-1 1].*k + [(1-k):(max(x)+k)]';
+%     xx=[];
+%     yy=[];
+%     for ii_xi = 1:size(xi,1)
+%         TF = x>=xi(ii_xi,1) & x<=xi(ii_xi,2);
+%         xx(ii_xi) = nanmedian(x(TF));
+%         yy(ii_xi) = nanmedian(y(TF));
+%     end
+%     plot(xx,yy,'-','Color',c);
+    ylim(ylimits)
+    ylabel('Replay directionality index')
+%     text(0.5,0.8,epoch_types{ii_epoch_type},'Units','normalized')
 end
 hax=gca;
-text(.5, 1.29, {'Replay directionality';'all sessions'},'FontSize',9,'HorizontalAlignment','center','Units','normalized')
+text(.5, 2.8, {'Replay directionality';'all sessions'},'FontSize',9,'HorizontalAlignment','center','Units','normalized')
 % legend
-x = [0.3 2]+32;
-y = linspace(0.35,0,3)+0.6;
-plot(x,y(1)*[1 1],'Color',clrs{1},'LineWidth',1.5,'Clipping','off')
-plot(x,y(2)*[1 1],'Color',clrs{2},'LineWidth',1.5,'Clipping','off')
-plot(x,y(3)*[1 1],'Color',clrs{3},'LineWidth',1.5,'Clipping','off')
-x = x(end)+1;
-text(x,y(1), "Sleep", 'FontSize',7)
-text(x,y(2), "Awake", 'FontSize',7)
-text(x,y(3), "Combined", 'FontSize',7)
+% x = [0.3 2]+32;
+% y = linspace(0.35,0,3)+0.6;
+% plot(x,y(1)*[1 1],'Color',clrs{1},'LineWidth',1.5,'Clipping','off')
+% plot(x,y(2)*[1 1],'Color',clrs{2},'LineWidth',1.5,'Clipping','off')
+% plot(x,y(3)*[1 1],'Color',clrs{3},'LineWidth',1.5,'Clipping','off')
+% x = x(end)+1;
+% text(x,y(1), "Sleep", 'FontSize',7)
+% text(x,y(2), "Awake", 'FontSize',7)
+% text(x,y(3), "Combined", 'FontSize',7)
 xlabel('Session no.','Units','normalized','Position',[0.5 -0.05]);
-ylabel('Replay directionality index')
-ylim([-1 1])
+ylim([-1 1]*55)
+yticks([-50 0 50])
 xticks([1 40])
 hax=gca;
 hax.XRuler.TickLength(1) = 0.02;
@@ -276,10 +348,128 @@ hax.YRuler.TickLabelGapOffset = 0;
 % text(5.5,-0.75,"\leftarrow"+"session #"+example_session_num_form_exposure,'FontSize',8)
 h=annotation('textarrow');
 h.Parent=hax;
-h.X = 3.5*[1 1];
-h.Y = [1 0.85];
-h.String = {'                  Sessions #3 and #4'};
-h.FontSize = 7; h.HeadLength = 4; h.HeadWidth = 4;
+h.X = [6 5];
+h.Y = [50 50];
+h.String = {'  SAS=4'};
+h.FontSize = 7; h.HeadLength = 4; h.HeadWidth = 3; h.HeadStyle = 'cback2';
+h.HorizontalAlignment = 'left';
+h.VerticalAlignment = 'middle';
+h=annotation('textarrow');
+h.Parent=hax;
+h.X = 16 + [0 0.1];
+h.Y = -16 + [0 0.1];
+h.String = {'SAS=8  '};
+h.FontSize = 7; h.HeadLength = 4; h.HeadWidth = 3; h.HeadStyle = 'cback2';
+h.HorizontalAlignment = 'right';
+h.VerticalAlignment = 'top';
+h=annotation('textarrow');
+h.Parent=hax;
+h.X = 25 + [0 1];
+h.Y = -50 + [0 0];
+h.String = {'SAS=27  '};
+h.FontSize = 7; h.HeadLength = 4; h.HeadWidth = 3; h.HeadStyle = 'cback2';
+h.HorizontalAlignment = 'right';
+h.VerticalAlignment = 'middle';
+h=annotation('textarrow');
+h.Parent=hax;
+h.X = 30 + [0 -0.1];
+h.Y = -50 + [0 0];
+h.String = {'   SAS=19'};
+h.FontSize = 7; h.HeadLength = 4; h.HeadWidth = 3; h.HeadStyle = 'cback2';
+h.HorizontalAlignment = 'left';
+h.VerticalAlignment = 'middle';
+
+%% cell revision 
+bats = unique(T.bat_num);
+bats_colors = [1 0 0; 0 1 0; 0 0 1; 0 0 0; 1 0 1; 0 1 1; 0.8 0.8 0];
+bats_clr_map = containers.Map(num2cell(bats),num2cell(bats_colors,2));
+surprise_clipping = 50;
+fig2=figure(WindowState="maximized");
+tiledlayout(4,3);
+for ii=1:4
+    for ii_epoch_type = 1:length(epoch_types)+1
+        nexttile
+        hold on
+        x = T.session_num_from_exposure;
+       switch ii
+           case {1,2}
+               y = directionality_contrast_index(ii_epoch_type,:);
+               ylabel_str = {'Replay directionality';'contrast index'};
+               ylimits = [-1 1];
+           case 3
+               y = directionality_binom_surprise(ii_epoch_type,:);
+               ylabel_str = {'Replay directionality';'surprise'};
+               y(y>surprise_clipping) = surprise_clipping;
+               y(y<-surprise_clipping) = -surprise_clipping;
+               ylimits = [-1 1]*surprise_clipping;
+           case 4
+               y = directionality_binom_surprise2(ii_epoch_type,:);
+               ylabel_str = {'Replay directionality';'surprise (resampling)'};
+               ylimits = [-10 10];
+       end
+        y(nSeqs(ii_epoch_type,:)<minSeqsThr) = nan;
+        yline(0)
+        for ii_bat = 1:length(bats)
+            bat_num = bats(ii_bat);
+            c = bats_clr_map(bat_num);
+            IX = find(T.bat_num==bat_num);
+            xx = x(IX);
+            yy = y(IX);
+            invalid = isnan(yy);
+            xx(invalid) = [];
+            yy(invalid) = [];
+            IX(invalid) = [];
+            if ii==2
+                sym='.-';
+            else
+                sym='o-';
+            end
+            hp = plot(xx,yy,sym,'color',c,'DisplayName',"bat "+bat_num,'MarkerFaceColor',c);
+            if ~isempty(hp)
+                hp.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('bat num',repelem(bat_num,length(xx)));
+                hp.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('exp ID',T.exp_ID(IX));
+                hp.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('#replays',nSeqs(ii_epoch_type,IX));
+                hp.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('#fromExposure',T.session_num_from_exposure(IX));
+                hp.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('#fromSurgery',T.session_num_from_surgery(IX));
+            end
+        end
+        if ii==2
+            sz = nSeqs(ii_epoch_type,:);
+            sz(isnan(y)) = nan;
+%             sz = interp1([0 50],[0 1],sz,'linear','extrap');
+            c = arrayfun(@(bat)bats_clr_map(bat),T.bat_num,'UniformOutput',0);
+            c = cat(1,c{:});
+            hbb=bubblechart(x,y,sz,c);
+            bubblelim([min(sz) max(sz)])
+            bubblesize([3 20])
+            bubblelegend('#replays','location','southeast')
+        end
+%         legend('NumColumns',length(bats),'Location',[0.1 0.9 0.8 0.1])
+        legend('NumColumns',2)
+%         nPointsSmooth = 3;
+%         k = (nPointsSmooth-1)/2;
+%         xi = [-1 1].*k + [(1-k):(max(x)+k)]';
+%         xx=[];
+%         yy=[];
+%         for ii_xi = 1:size(xi,1)
+%             TF = x>=xi(ii_xi,1) & x<=xi(ii_xi,2);
+%             xx(ii_xi) = nanmedian(x(TF));
+%             yy(ii_xi) = nanmedian(y(TF));
+%         end
+%         plot(xx,yy,'-','Color','k','LineWidth',2);
+        titles_strs = [epoch_types, 'pooled'];
+        title(titles_strs{ii_epoch_type});
+        ylabel(ylabel_str)
+        xlabel('Session no.')
+        ylim(ylimits)
+        xlim([0 max(x)+1])
+    end
+end
+fig2_filename = 'E:\Tamir\work\PROJECTS\LargeScale\paper_replay\figures\cell_revision\replay_directionality_population_options';
+saveas(fig2,fig2_filename,'fig');
+exportgraphics(fig2,[fig2_filename '.pdf'],'BackgroundColor','white');
+% saveas(fig2,fig2_filename,'pdf');
+
 
 %% ========================================================================
 
@@ -417,7 +607,7 @@ hax.XLim = prob_t([1 end]);
 hax.YLim = [0 1];
 hax.XTickLabel = [];
 box on
-colormap(cmap);
+hax.Colormap = cmap;
 hax.XLim = seq_ti+[-1 1].*0.2*range(seq_ti);
 hax.TickDir = 'out';
 hax.TickLength = [0.02 0.02];
@@ -441,7 +631,7 @@ hax.CLim = prctile(prob_pos(:),clim_prctiles);
 hax.XLim = prob_t([1 end]);
 hax.YLim = [min(decode.pos) max(decode.pos)] + [-1 1].*median(diff(decode.pos))*1;
 box on
-colormap(cmap);
+hax.Colormap = cmap;
 hax.XLim = seq_ti+[-1 1].*0.2*range(seq_ti);
 hax.TickDir = 'out';
 hax.TickLength = [0.02 0.02];
@@ -581,7 +771,6 @@ file_out = fullfile(res_dir, fig_name);
 print(gcf, file_out, '-dpdf', '-cmyk', '-painters');
 disp('figure saved!')
 
-%%
 
 %%
 function str = genSignifStrAstricks(pval)
@@ -595,3 +784,11 @@ else
     str = 'n.s.';
 end
 end
+
+
+
+
+
+
+
+%%
