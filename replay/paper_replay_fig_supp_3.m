@@ -85,7 +85,7 @@ end
 panels{6}(1) = axes('position', [2 7 4 3.5]);
 panels{6}(2) = axes('position', [4 9 .5 .5]);
 panels{7}(1) = axes('position', [8 7 6 3.5]);
-panels{7}(2) = axes('position', [16 7 4 3.5]);
+% panels{7}(2) = axes('position', [16 7 4 3.5]);
 
 %% load data
 if ~exist('events_all','var')
@@ -430,7 +430,7 @@ hold on
 histogram([seqs.distance_norm],bins,'normalization','probability','DisplayStyle','stairs','DisplayName','replays','LineWidth',lw)
 % legend(Location="north")
 xlabel('Distance (norm.)')
-ylabel('probability')
+ylabel('Probability')
 plot([0.04 0.11],[1 1]*0.65,'LineWidth',lw);
 plot([0.04 0.11],[1 1]*0.6,'LineWidth',lw);
 text(0.14, 0.65, 'Flights','FontSize',7)
@@ -440,11 +440,11 @@ ha = annotation("arrow",[0 0], [0 0]);
 ha.Parent = hax;
 m = median([FE_dist_norm_all{:}]);
 ha.X = [1 1]*m;
-ha.Y = [0 -0.04]+0.59;
+ha.Y = [0 -0.04]+0.61;
 ha.HeadLength = 3;
 ha.HeadWidth = 3;
 ha.HeadStyle = 'cback2';
-text(0.97, 0.58, {'Median flight distance';sprintf(' = %.f%% of tunnel',m*100)},'FontSize',7,'HorizontalAlignment','right')
+text(0.97, 0.6, {'Median flight distance';sprintf(' = %.f%% of tunnel',m*100)},'FontSize',7,'HorizontalAlignment','right')
 ha = annotation("arrow",[0 0], [0 0]);
 ha.Parent = hax;
 m = median([seqs.distance_norm]);
@@ -455,13 +455,16 @@ ha.HeadWidth = 3;
 ha.HeadStyle = 'cback2';
 text(0.1, 0.2, {'Median replay distance';sprintf('= %.1g%% of tunnel',m*100)},'FontSize',7,'HorizontalAlignment','left')
 
-axes(panels{7}(2));
-cla reset
-histogram(nUturnsPerSession./nFlightsPerSession,10,'Normalization','probability');
-xlim([0 1])
-xlabel('No. of u-turns per flight')
-ylabel('Fraction of sessions')
+% axes(panels{7}(2));
+% cla reset
+% histogram(nUturnsPerSession./nFlightsPerSession,10,'Normalization','probability');
+% xlim([0 1])
+% xlabel('No. of u-turns per flight')
+% ylabel('Fraction of sessions')
 
+%% save FE_dist_norm_all to mat file
+filename = fullfile(res_dir, 'FE_dist_norm_all.mat');
+save(filename, 'FE_dist_norm_all')
 
 %% add panel letters
 font_size = 11;
@@ -479,8 +482,8 @@ axes(panels{6}(1))
 text(-0.28,1.1, 'F', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{7}(1))
 text(-0.2,1.1, 'G', 'Units','normalized','FontWeight','bold','FontSize',font_size);
-axes(panels{7}(2))
-text(-0.28,1.1, 'H', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+% axes(panels{7}(2))
+% text(-0.28,1.1, 'H', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 %%
 fig_name = sprintf('%s_decoding_opt_%d',fig_name_str, params_opt);

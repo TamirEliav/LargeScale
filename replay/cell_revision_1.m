@@ -60,9 +60,22 @@ for ii_tunnel_type = 1:2
         ylabel('Probability density function')
     end
 end
-legend(Location="northeast",Box="off")
+x = [4.2 5]-2;
+y = [1 1]*1.8;
+ystep = 0.17;
+plot(x,y-0*ystep,'-','LineWidth',2, 'Color',epoch_type_clrs{1});
+plot(x,y-1*ystep,'-','LineWidth',2, 'Color',epoch_type_clrs{2});
+plot(x,y-2*ystep,':','LineWidth',2, 'Color',epoch_type_clrs{1});
+plot(x,y-3*ystep,':','LineWidth',2, 'Color',epoch_type_clrs{2});
+x = x(2)+0.3*range(x);
+y = mean(y);
+text(x,y-0*ystep,'Sleep, long tunnel (200m or 130m)','FontSize',9,'VerticalAlignment','middle','HorizontalAlignment','left');
+text(x,y-1*ystep,'Awake, long tunnel (200m or 130m)','FontSize',9,'VerticalAlignment','middle','HorizontalAlignment','left');
+text(x,y-2*ystep,'Sleep, short tunnel (15m)','FontSize',9,'VerticalAlignment','middle','HorizontalAlignment','left');
+text(x,y-3*ystep,'Awake, short tunnel (15m)','FontSize',9,'VerticalAlignment','middle','HorizontalAlignment','left');
+% legend(Location="northeast",Box="off")
 box off
-filename = fullfile(out_dir, "replay_behavioral_duration.pdf");
+filename = fullfile(out_dir, "Fig_R2_replay_behavioral_duration.pdf");
 % exportgraphics(fig2,filename)
 saveas(fig2,filename,'pdf')
 

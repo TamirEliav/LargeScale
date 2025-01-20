@@ -53,7 +53,7 @@ for ii_epoch_type = 3%1:length(epoch_types)
     axes(panels{1}(1));
     cla reset
     hold on
-    yline(0,'-k');
+    yline(0,'-','Color',[1 1 1]*0.8,'LineWidth',0.2);
     x = T.session_num_from_exposure;
     y = directionality_contrast_index(ii_epoch_type,:);
     y(nSeqs(ii_epoch_type,:)<minSeqsThr) = nan;
@@ -99,41 +99,42 @@ xlabel('Session no.','Units','normalized','Position',[0.5 -0.05]);
 ylim([-1 1]*1.2)
 yticks([-1 0 1])
 xticks([1 40])
+xlim([0 40.5])
 hax=gca;
-hax.XRuler.TickLength(1) = 0.02;
-hax.YRuler.TickLength(1) = 0.035;
+hax.XRuler.TickLength(1) = 0.01;
+hax.YRuler.TickLength(1) = 0.01;
 hax.XRuler.TickLabelGapOffset = -1;
 hax.YRuler.TickLabelGapOffset = 0;
 % text(5.5,-0.75,"\leftarrow"+"session #"+example_session_num_form_exposure,'FontSize',8)
 h=annotation('textarrow');
 h.Parent=hax;
-h.X = 6 + [0 -1];
+h.X = 5.3 + [0 -1]*0.01;
 h.Y = [1 1]*0.75;
-h.String = {'  SAS=4'};
+% h.String = {'  SAS=4'};
 h.FontSize = 7; h.HeadLength = 4; h.HeadWidth = 3; h.HeadStyle = 'cback2';
 h.HorizontalAlignment = 'left';
 h.VerticalAlignment = 'middle';
 h=annotation('textarrow');
 h.Parent=hax;
-h.X = 15 + [0 1];
+h.X = 16.3 + [0 1]*0.01;
 h.Y = -1 + [0 0];
-h.String = {'SAS=8   '};
+% h.String = {'SAS=8   '};
 h.FontSize = 7; h.HeadLength = 4; h.HeadWidth = 3; h.HeadStyle = 'cback2';
 h.HorizontalAlignment = 'right';
 h.VerticalAlignment = 'middle';
 h=annotation('textarrow');
 h.Parent=hax;
-h.X = 25 + [0 1];
+h.X = 26.2 + [0 1]*0.01;
 h.Y = -0.92 + [0 0];
-h.String = {'SAS=27 '};
+% h.String = {'SAS=27 '};
 h.FontSize = 7; h.HeadLength = 4; h.HeadWidth = 3; h.HeadStyle = 'cback2';
 h.HorizontalAlignment = 'right';
 h.VerticalAlignment = 'middle';
 h=annotation('textarrow');
 h.Parent=hax;
-h.X = 31 + [0 -1];
+h.X = 29.9 + [0 -1]*0.01;
 h.Y = -1 + [0 0];
-h.String = {'   SAS=19'};
+% h.String = {'   SAS=19'};
 h.FontSize = 7; h.HeadLength = 4; h.HeadWidth = 3; h.HeadStyle = 'cback2';
 h.HorizontalAlignment = 'left';
 h.VerticalAlignment = 'middle';

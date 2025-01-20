@@ -66,6 +66,22 @@ for ii_exp = 1:length(exp_list)
     [events.next_co_pos] = disperse(co.pos(next_co_IX));
     [events.exp_ID] = deal(exp_ID);
     events(prev_co_invalid)=[];
+    % 2-back previous CO
+    prev_co_IX = interp1(co.ts, 1:length(co.ts), [events.peak_ts], "previous","extrap");
+    prev_2_co_IX = prev_co_IX - 1;
+    prev_2_co_IX(prev_2_co_IX<1) = nan;
+    prev_2_co_invalid = isnan(prev_2_co_IX);
+    prev_2_co_IX(prev_2_co_invalid) = 1;
+    prev_2_co_pos = co.pos(prev_2_co_IX);
+    prev_2_co_pos(prev_2_co_invalid) = nan;
+    [events.prev_2_co_pos] = disperse(prev_2_co_pos);
+    prev_3_co_IX = prev_co_IX - 2;
+    prev_3_co_IX(prev_3_co_IX<1) = nan;
+    prev_3_co_invalid = isnan(prev_3_co_IX);
+    prev_3_co_IX(prev_3_co_invalid) = 1;
+    prev_3_co_pos = co.pos(prev_3_co_IX);
+    prev_3_co_pos(prev_3_co_invalid) = nan;
+    [events.prev_3_co_pos] = disperse(prev_3_co_pos);
     events_all_sessions{ii_exp} = events;
     catch err
         fprintf('something happened (%s):',exp_ID);
@@ -80,6 +96,8 @@ seqs_all = [events_all.seq_model];
 [seqs_all.prev_co_same_map] = disperse([events_all.prev_co_same_map]);
 [seqs_all.prev_co_pos] = disperse([events_all.prev_co_pos]);
 [seqs_all.next_co_pos] = disperse([events_all.next_co_pos]);
+[seqs_all.prev_2_co_pos] = disperse([events_all.prev_2_co_pos]);
+[seqs_all.prev_3_co_pos] = disperse([events_all.prev_3_co_pos]);
 
 %% prepare data info 
 data_info = struct();
