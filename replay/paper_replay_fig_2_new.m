@@ -642,8 +642,8 @@ histogram(x_shuffle,'EdgeColor','k','DisplayStyle','Stairs','normalization','pdf
 [~,P_ttest, ~, ttest_stats] = ttest2(x, x_shuffle);
 fprintf('FR corr distribution, data vs shuffle, ks-test: p=%g\n',P_KS);
 fprintf('FR corr distribution, data vs shuffle, t-test: p=%g\n',P_ttest);
-text(0.53,0.88,['P_{KS} = ' sprintf('%.2g',P_KS)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
-% text(0.53,0.95,['P_{t} = ' sprintf('%.2g',P_ttest)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
+text(0.53,0.88,['p_{KS} = ' sprintf('%.2g',P_KS)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
+% text(0.53,0.95,['p_{t} = ' sprintf('%.2g',P_ttest)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
 xlim([-1 1])
 xlabel({'Correlation of firing rate maps';'during flight vs. during replay'})
 ylabel('Probability density')

@@ -246,8 +246,8 @@ cla
 hold on
 plot(0,1-0.05,'o', 'color', clrs{1}, 'MarkerSize',4,'Clipping','off');
 plot(0,0.3-0.05,'o', 'color', clrs{2}, 'MarkerSize',4,'Clipping','off');
-text(0.4, 1,   'Sleep'+":  r = " + sprintf('%.2f',r(1)) + ",  P = "+ sprintf('%.1g',p(1)),'FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
-text(0.4, 0.3, 'Awake'+": r = " + sprintf('%.2f',r(2)) + ",  P = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
+text(0.4, 1,   'Sleep'+":  r = " + sprintf('%.2f',r(1)) + ",  p = "+ sprintf('%.1g',p(1)),'FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
+text(0.4, 0.3, 'Awake'+": r = " + sprintf('%.2f',r(2)) + ",  p = "+ sprintf('%.2f',p(2)),'FontSize',7,'HorizontalAlignment','left','VerticalAlignment','middle');
 xlim([0 1])
 ylim([0 1])
 axis off
@@ -269,7 +269,7 @@ hax.XTick = [0 5 10];
 hax.TickLength(1) = [0.016];
 hax.XRuler.TickLabelGapOffset = -1;
 [~,P,CI,STATS] = ttest2(X(g=='200m'), X(g=='120m'), 'Tail','both');
-text(0.6,1.1,"P = "+ sprintf('%.2g',P), 'Units','normalized','FontSize',7);
+text(0.6,1.1,"p = "+ sprintf('%.2g',P), 'Units','normalized','FontSize',7);
 
 %% legend (flight speed hists)
 axes(panels{3}(2))

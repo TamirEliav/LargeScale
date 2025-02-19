@@ -545,6 +545,8 @@ for ii_ex = 1:size(panels_ex,1)
     %% workaround to fix the image occluding the axes
     plot(hax.XLim([1 1]),hax.YLim,'k-')
     plot(hax.XLim([2 2]),hax.YLim,'k-')
+    plot(hax.XLim,hax.YLim([1 1]),'k-')
+    plot(hax.XLim,hax.YLim([2 2]),'k-')
 
     %% link x axes
     linkaxes(panels_ex(ii_ex,:),'x');

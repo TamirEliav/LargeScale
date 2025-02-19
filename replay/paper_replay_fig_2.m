@@ -380,7 +380,7 @@ xi = linspace(-1,1,nbins);
 f = ksdensity(cat(1,ccc_shuffled{:}),xi,'Function','pdf');
 plot(xi,f,'k','LineWidth',1)
 [~,P_KS, KS_stats] = kstest2(sleep_vs_rest_coverage_corr, cat(1,ccc_shuffled{:}));
-text(0.5,1.15,['P_{KS} = ' sprintf('%.2g',P_KS)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
+text(0.5,1.15,['p_{KS} = ' sprintf('%.2g',P_KS)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
 hax=gca;
 hax.XLim = [-1 1];
 hax.XTick = -1:0.5:1;
@@ -422,7 +422,7 @@ fprintf('pval (signrank test)= %.2g\n', pval );
 % replay_rate_diff_sleep = diff(replay_rate(:,[3 4]),1,2);
 % h=histogram(replay_rate_diff_sleep,'FaceColor','k','Normalization','pdf');
 % pval = signrank(replay_rate_diff_sleep);
-text(0.5,1.15,['P_{signrank} = ' sprintf('%.1g',pval)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
+text(0.5,1.15,['p_{signrank} = ' sprintf('%.1g',pval)],'units','normalized','FontSize',7,'HorizontalAlignment','center');
 axis square
 axis equal
 hax=gca;
@@ -683,7 +683,7 @@ axes(panels{1}(4))
 text(-0.2,1.12, 'D', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 
 axes(panels{2}(1))
-text(-0.25,1.035, 'E', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.25,1.05, 'E', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{3}(1))
 text(-0.1,1.3, 'F', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{4}(1))

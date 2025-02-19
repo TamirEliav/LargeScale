@@ -52,15 +52,15 @@ set(groot,  'defaultAxesTickDirMode', 'manual');
 annotation('textbox', [0.5 1 0 0], 'String',fig_name_str, 'HorizontalAlignment','center','Interpreter','none', 'FitBoxToText','on');
 
 % create panels
-panels{1}(1) = axes('position', [3 20 4 3.5]);
+panels{1}(1) = axes('position', [3 20.4 4 3.5]);
 panels{2}(1,1) = axes('position', [3 15 3 3]);
-panels{2}(1,2) = axes('position', [3+2 15+3 1 0.7]);
+panels{2}(1,2) = axes('position', [3+1.9 15+3 1 0.7]);
 panels{2}(2,1) = axes('position', [8 15 3 3]);
-panels{2}(2,2) = axes('position', [8+2 15+3 1 0.7]);
+panels{2}(2,2) = axes('position', [8+1.9 15+3 1 0.7]);
 panels{2}(3,1) = axes('position', [3 9 3 3]);
-panels{2}(3,2) = axes('position', [3+2 9+3 1 0.7]);
+panels{2}(3,2) = axes('position', [3+1.9 9+3 1 0.7]);
 panels{2}(4,1) = axes('position', [8 9 3 3]);
-panels{2}(4,2) = axes('position', [8+2 9+3 1 0.7]);
+panels{2}(4,2) = axes('position', [8+1.9 9+3 1 0.7]);
 
 %% replay directionality bias - plot trend over exposure to enviroenment (resampled version)
 load('E:\Tamir\work\PROJECTS\LargeScale\paper_replay\figures\replay_directionality.mat')
@@ -104,7 +104,7 @@ for ii_epoch_type = 3%1:length(epoch_types)
 %     end
 %     plot(xx,yy,'-','Color',c);
     ylim(ylimits)
-    ylabel({'Replay directionality index';'(resampled data)'})
+    ylabel({'Replay directionality index';'(subsampled data)'})
 %     text(0.5,0.8,epoch_types{ii_epoch_type},'Units','normalized')
 end
 hax=gca;
@@ -190,11 +190,12 @@ ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.2 .5]);
 % text(0.6,0.2,"r = "+ sprintf('%.2g',data.stats.Pearson.r), 'Units','normalized','FontSize',7);
 % text(0.6,0.1,"P = "+ sprintf('%.2g',data.stats.Pearson.p), 'Units','normalized','FontSize',7);
 text(.05,1.1,"{\rho} = "+ sprintf('%.2f',data.stats.Spearman.r), 'Units','normalized','FontSize',7);
-text(.05,1.0,"P = "+ sprintf('%.2g',data.stats.Spearman.p), 'Units','normalized','FontSize',7);
+text(.05,1.0,"p = "+ sprintf('%.2g',data.stats.Spearman.p), 'Units','normalized','FontSize',7);
 % text(.3,1.3,"n = "+ sprintf('%d',sum(data.TF)), 'Units','normalized','FontSize',7);
 % text(0,-.4,data.msg_str, 'Units','normalized','FontSize',10);
 h=refline(1,0);
 h.Color = .8.*[1 1 1];
+h.LineWidth = 1.5;
 hax=gca;
 hax.XRuler.TickLength(1) = 0.035;
 hax.YRuler.TickLength(1) = 0.024;
@@ -231,7 +232,7 @@ xlabel('{\rho}','Units','normalized','Position',[0.5 .1])
 ylim([0 120])
 xticks([])
 yticks([])
-text(0.5,1.25,"P = "+ sprintf('%.2g',pval_nonparam), 'Units','normalized','FontSize',7,'HorizontalAlignment','Center');
+text(0.5,1.25,"p = "+ sprintf('%.2g',pval_nonparam), 'Units','normalized','FontSize',7,'HorizontalAlignment','Center');
 
 
 %% Scatter plot (control - next crossover)
@@ -256,9 +257,10 @@ ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.2 .5]);
 % text(0.8,0.2,"r = "+ sprintf('%.2g',stats.Pearson.r), 'Units','normalized','FontSize',7);
 % text(0.8,0.1,"P = "+ sprintf('%.2g',stats.Pearson.p), 'Units','normalized','FontSize',7);
 text(.05,1.2,"{\rho} = "+ sprintf('%.2f',stats.Spearman.r), 'Units','normalized','FontSize',7);
-text(.05,1.1,"P = "+ sprintf('%.2f',stats.Spearman.p), 'Units','normalized','FontSize',7);
+text(.05,1.1,"p = "+ sprintf('%.2f',stats.Spearman.p), 'Units','normalized','FontSize',7);
 h=refline(1,0);
 h.Color = .8.*[1 1 1];
+h.LineWidth = 1.5;
 hax=gca;
 hax.XRuler.TickLength(1) = 0.035;
 hax.YRuler.TickLength(1) = 0.024;
@@ -295,7 +297,7 @@ xlabel('{\rho}','Units','normalized','Position',[0.5 .1])
 ylim([0 120])
 xticks([])
 yticks([])
-text(0.5,1.25,"P = "+ sprintf('%.2g',pval_nonparam), 'Units','normalized','FontSize',7,'HorizontalAlignment','Center');
+text(0.5,1.25,"p = "+ sprintf('%.2g',pval_nonparam), 'Units','normalized','FontSize',7,'HorizontalAlignment','Center');
 
 %% Scatter plot (control - 2-back previous)
 axes(panels{2}(3,1))
@@ -319,9 +321,10 @@ ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.2 .5]);
 % text(0.8,0.2,"r = "+ sprintf('%.2g',stats.Pearson.r), 'Units','normalized','FontSize',7);
 % text(0.8,0.1,"P = "+ sprintf('%.2g',stats.Pearson.p), 'Units','normalized','FontSize',7);
 text(.05,1.2,"{\rho} = "+ sprintf('%.2f',stats.Spearman.r), 'Units','normalized','FontSize',7);
-text(.05,1.1,"P = "+ sprintf('%.2f',stats.Spearman.p), 'Units','normalized','FontSize',7);
+text(.05,1.1,"p = "+ sprintf('%.2f',stats.Spearman.p), 'Units','normalized','FontSize',7);
 h=refline(1,0);
 h.Color = .8.*[1 1 1];
+h.LineWidth = 1.5;
 hax=gca;
 hax.XRuler.TickLength(1) = 0.035;
 hax.YRuler.TickLength(1) = 0.024;
@@ -358,7 +361,7 @@ xlabel('{\rho}','Units','normalized','Position',[0.5 .1])
 ylim([0 120])
 xticks([])
 yticks([])
-text(0.5,1.25,"P = "+ sprintf('%.2g',pval_nonparam), 'Units','normalized','FontSize',7,'HorizontalAlignment','Center');
+text(0.5,1.25,"p = "+ sprintf('%.2g',pval_nonparam), 'Units','normalized','FontSize',7,'HorizontalAlignment','Center');
 
 
 %% Scatter plot (control - 3-back previous)
@@ -383,9 +386,10 @@ ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.2 .5]);
 % text(0.8,0.2,"r = "+ sprintf('%.2g',stats.Pearson.r), 'Units','normalized','FontSize',7);
 % text(0.8,0.1,"P = "+ sprintf('%.2g',stats.Pearson.p), 'Units','normalized','FontSize',7);
 text(.05,1.2,"{\rho} = "+ sprintf('%.2f',stats.Spearman.r), 'Units','normalized','FontSize',7);
-text(.05,1.1,"P = "+ sprintf('%.2f',stats.Spearman.p), 'Units','normalized','FontSize',7);
+text(.05,1.1,"p = "+ sprintf('%.2f',stats.Spearman.p), 'Units','normalized','FontSize',7);
 h=refline(1,0);
 h.Color = .8.*[1 1 1];
+h.LineWidth = 1.5;
 hax=gca;
 hax.XRuler.TickLength(1) = 0.035;
 hax.YRuler.TickLength(1) = 0.024;
@@ -422,13 +426,13 @@ xlabel('{\rho}','Units','normalized','Position',[0.5 .1])
 ylim([0 120])
 xticks([])
 yticks([])
-text(0.5,1.25,"P = "+ sprintf('%.2g',pval_nonparam), 'Units','normalized','FontSize',7,'HorizontalAlignment','Center');
+text(0.5,1.25,"p = "+ sprintf('%.2g',pval_nonparam), 'Units','normalized','FontSize',7,'HorizontalAlignment','Center');
 
 
 %% add panel letters
 font_size = 11;
 axes(panels{1}(1))
-text(-0.35,1.12, 'A', 'Units','normalized','FontWeight','bold','FontSize',font_size);
+text(-0.26,1.1, 'A', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{2}(1,1))
 text(-0.35,1.12, 'B', 'Units','normalized','FontWeight','bold','FontSize',font_size);
 axes(panels{2}(2,1))

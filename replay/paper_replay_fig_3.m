@@ -75,16 +75,16 @@ panels{1}(1,1) = axes('position', [2 15 3.5 8]);
 panels{1}(1,2) = axes('position', [6.5 15 3.5 8]);
 panels{2}(1) = axes('position', [12 19.4 4 3.5]);
 % panels{2}(2) = axes('position', [12 15 4 3]);
-panels{3}(1) = axes('position', [11.5 15 4 3]);
-panels{3}(2) = axes('position', [11.5 17.6 .2 .3]);
+panels{3}(1) = axes('position', [11.5 14.6 4 3]);
+panels{3}(2) = axes('position', [11.5 17.2 .2 .3]);
 panels{4}(1) = axes('position', [2 9.5 5 3]);
 panels{4}(2) = axes('position', [2 12.85 5 0.4]);
 panels{5}(1) = axes('position', [8.8 9.5 3 3]);
 panels{5}(2) = axes('position', [8.8 12.5 3 .5]);
 panels{6}(1,1) = axes('position', [2 4.5 3 3]);
-panels{6}(1,2) = axes('position', [2+2 4.5+3 1 0.7]);
-panels{6}(2,1) = axes('position', [6.5 4.5 3 3]);
-panels{6}(2,2) = axes('position', [6.5+2 4.5+3 1 0.7]);
+panels{6}(1,2) = axes('position', [2+1.9 4.5+3 1 0.7]);
+panels{6}(2,1) = axes('position', [6.7 4.5 3 3]);
+panels{6}(2,2) = axes('position', [6.7+1.9 4.5+3 1 0.7]);
 
 %% ========================================================================
 %% arrange sessions to load (novelty bats)
@@ -644,6 +644,12 @@ rescale_plot_data('x',[1e-6 seq_ti(1)]);
 plot(hax.XLim([1 1]),hax.YLim,'k-')
 plot(hax.XLim([2 2]),hax.YLim,'k-')
 
+%% workaround to fix the image occluding the axes
+plot(hax.XLim([1 1]),hax.YLim,'k-')
+plot(hax.XLim([2 2]),hax.YLim,'k-')
+plot(hax.XLim,hax.YLim([1 1]),'k-')
+plot(hax.XLim,hax.YLim([2 2]),'k-')
+
 %% link x axes
 linkaxes(panels{5},'x');
 
@@ -702,11 +708,12 @@ ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.2 .5]);
 % text(0.6,0.2,"r = "+ sprintf('%.2g',data.stats.Pearson.r), 'Units','normalized','FontSize',7);
 % text(0.6,0.1,"P = "+ sprintf('%.2g',data.stats.Pearson.p), 'Units','normalized','FontSize',7);
 text(.05,1.1,"{\rho} = "+ sprintf('%.2f',data.stats.Spearman.r), 'Units','normalized','FontSize',7);
-text(.05,1.0,"P = "+ sprintf('%.2g',data.stats.Spearman.p), 'Units','normalized','FontSize',7);
+text(.05,1.0,"p = "+ sprintf('%.2g',data.stats.Spearman.p), 'Units','normalized','FontSize',7);
 % text(.3,1.3,"{\itn} = "+ sprintf('%d',sum(data.TF)), 'Units','normalized','FontSize',7);
 % text(0,-.4,data.msg_str, 'Units','normalized','FontSize',10);
 h=refline(1,0);
 h.Color = .8.*[1 1 1];
+h.LineWidth = 1.5;
 hax=gca;
 hax.XRuler.TickLength(1) = 0.035;
 hax.YRuler.TickLength(1) = 0.024;
@@ -743,7 +750,7 @@ xlabel('{\rho}','Units','normalized','Position',[0.5 .1])
 ylim([0 120])
 xticks([])
 yticks([])
-text(0.5,1.25,"P = "+ sprintf('%.2g',pval_nonparam), 'Units','normalized','FontSize',7,'HorizontalAlignment','Center');
+text(0.5,1.25,"p = "+ sprintf('%.2g',pval_nonparam), 'Units','normalized','FontSize',7,'HorizontalAlignment','Center');
 
 %% 2-back previous CO (revision)
 % fig4 = figure(Units="centimeters",Position=[5 5 6 6]);
@@ -760,6 +767,7 @@ text(0.5,1.25,"P = "+ sprintf('%.2g',pval_nonparam), 'Units','normalized','FontS
 % text(.3,0.95,"P = "+ sprintf('%.2g',pval), 'Units','normalized','FontSize',7);
 % h=refline(1,0);
 % h.Color = .8.*[1 1 1];
+% h.LineWidth = 1.5;
 % axis equal
 % xlim([0 135])
 % ylim([0 135])
@@ -792,9 +800,10 @@ ylabel('Replay position (m)', 'Units','normalized', 'Position',[-0.2 .5]);
 % text(0.8,0.2,"r = "+ sprintf('%.2g',stats.Pearson.r), 'Units','normalized','FontSize',7);
 % text(0.8,0.1,"P = "+ sprintf('%.2g',stats.Pearson.p), 'Units','normalized','FontSize',7);
 text(0.05,1.1,"{\rho} = "+ sprintf('%.2f',stats.Spearman.r), 'Units','normalized','FontSize',7);
-text(0.05,1.0,"P = "+ sprintf('%.2f',stats.Spearman.p), 'Units','normalized','FontSize',7);
+text(0.05,1.0,"p = "+ sprintf('%.2f',stats.Spearman.p), 'Units','normalized','FontSize',7);
 h=refline(1,0);
 h.Color = .8.*[1 1 1];
+h.LineWidth = 1.5;
 hax=gca;
 hax.XRuler.TickLength(1) = 0.035;
 hax.YRuler.TickLength(1) = 0.024;
@@ -831,7 +840,7 @@ xlabel('{\rho}','Units','normalized','Position',[0.5 .1])
 ylim([0 120])
 xticks([])
 yticks([])
-text(0.5,1.25,"P = "+ sprintf('%.2g',pval_nonparam), 'Units','normalized','FontSize',7,'HorizontalAlignment','Center');
+text(0.5,1.25,"p = "+ sprintf('%.2g',pval_nonparam), 'Units','normalized','FontSize',7,'HorizontalAlignment','Center');
 
 %% add panel letters
 font_size = 11;
